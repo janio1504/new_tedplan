@@ -120,7 +120,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
           placeholder='Titulo da Norma' 
           name='titulo'          
           />
-          {errors.titulo && errors.titulo.type === "required" && <span>O campo Titulo é obrigatório!</span>}
+          {errors.titulo && errors.titulo.type && <span>O campo Titulo é obrigatório!</span>}
          
         
           <select {...register('id_tipo_norma',  {required: true})}>
@@ -131,7 +131,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
            ))}     
            
          </select>
-         {errors.id_tipo_norma && errors.id_tipo_norma.type === "required" && <span>Selecionar um Tipo de Norma é obrigatório!</span>}
+         {errors.id_tipo_norma && errors.id_tipo_norma.type && <span>Selecionar um Tipo de Norma é obrigatório!</span>}
 
           <select {...register('id_escala',  {required: true})}>
          aria-invalid={errors.value ? "true" : "false"}
@@ -141,7 +141,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
            ))}     
            
          </select>
-         {errors.id_escala && errors.id_escala.type === "required" && <span>Selecionar uma escala é obrigatório!</span>}
+         {errors.id_escala && errors.id_escala.type && <span>Selecionar uma escala é obrigatório!</span>}
                      
 
          <select {...register('id_eixo',  {required: true})}>
@@ -152,7 +152,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
            ))}     
            
          </select>
-         {errors.id_eixo && errors.id_eixo.type === "required" && <span>Selecionar um Eixo é obrigatório!</span>}
+         {errors.id_eixo && errors.id_eixo.type && <span>Selecionar um Eixo é obrigatório!</span>}
          
          
          <label>Imagem</label>
@@ -163,7 +163,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
          name='imagem'
          accept='image/*'
           />
-          {errors.arquivo && errors.arquivo.type === "required" && <span>Selecionar uma imagem é obrigatório!</span>}
+          {errors.arquivo && errors.arquivo.type && <span>Selecionar uma imagem é obrigatório!</span>}
        
         <label>Arquivo</label>
          <input
@@ -173,7 +173,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
          type='file'  
          name='arquivo'
           />
-          {errors.arquivo && errors.arquivo.type === "required" && <span>Selecionar um Arquivo é obrigatório!</span>}
+          {errors.arquivo && errors.arquivo.type && <span>Selecionar um Arquivo é obrigatório!</span>}
          <SubmitButton type="submit">
                 Gravar
               </SubmitButton>

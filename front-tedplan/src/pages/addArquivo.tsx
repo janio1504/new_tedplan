@@ -129,7 +129,7 @@ export default function AddNorma({
             placeholder="Titulo do arquivo"
             name="titulo"
           />
-          {errors.titulo && errors.titulo.type === "required" && (
+          {errors.titulo && errors.titulo.type && (
             <span>O campo Titulo é obrigatório!</span>
           )}
 
@@ -140,7 +140,7 @@ export default function AddNorma({
             type="text"
             placeholder="Link do arquivo no ondrive"
           />
-          {errors.link && errors.link.type === "required" && (
+          {errors.link && errors.link.type && (
             <span>O Link do arquivo no ondrive é obrigatório!</span>
           )}
 
@@ -156,7 +156,7 @@ export default function AddNorma({
               </option>
             ))}
           </select>
-          {errors.id_tipo && errors.id_tipo.type === "required" && (
+          {errors.id_tipo && errors.id_tipo.type && (
             <span>Selecionar um Tipo é obrigatório!</span>
           )}
 
@@ -169,7 +169,7 @@ export default function AddNorma({
               </option>
             ))}
           </select>
-          {errors.id_status && errors.id_status.type === "required" && (
+          {errors.id_status && errors.id_status.type && (
             <span>Selecionar um status é obrigatório!</span>
           )}
 
@@ -182,7 +182,7 @@ export default function AddNorma({
               </option>
             ))}
           </select>
-          {errors.id_eixo && errors.id_eixo.type === "required" && (
+          {errors.id_eixo && errors.id_eixo.type && (
             <span>Selecionar um Eixo é obrigatório!</span>
           )}
 
@@ -190,7 +190,7 @@ export default function AddNorma({
           <InputData>
             <InputMask {...register("data_entrega")} mask="99/99/9999" />
           </InputData>
-          {errors.arquivo && errors.arquivo.type === "required" && (
+          {errors.arquivo && errors.arquivo.type && (
             <span>Selecionar uma imagem é obrigatório!</span>
           )}
 

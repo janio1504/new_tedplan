@@ -127,7 +127,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
           placeholder='Titulo da Publicacao' 
           name='titulo'          
           />
-          {errors.titulo && errors.titulo.type === "required" && <span>O campo Titulo é obrigatório!</span>}
+          {errors.titulo && errors.titulo.type && <span>O campo Titulo é obrigatório!</span>}
 
           <input
             {...register("id_categoria")}
@@ -143,7 +143,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
                 <option key={tipo.id_tipo_publicacao} value={tipo.id_tipo_publicacao} >{tipo.nome}</option>
               ))}             
          </select>
-         {errors.id_tipo_publicacao && errors.id_tipo_publicacao.type === "required" && <span>Selecionar um Tipo de Publicação é obrigatório!</span>}
+         {errors.id_tipo_publicacao && errors.id_tipo_publicacao.type && <span>Selecionar um Tipo de Publicação é obrigatório!</span>}
         
          <select
          aria-invalid={errors.value ? "true" : "false"}
@@ -153,7 +153,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
                 <option key={municipio.id_municipio} value={municipio.id_municipio} >{municipio.nome}</option>
               ))}        
          </select>
-         {errors.id_municipio && errors.id_municipio.type === "required" && <span>Selecionar um Municipio é obrigatório!</span>}
+         {errors.id_municipio && errors.id_municipio.type && <span>Selecionar um Municipio é obrigatório!</span>}
   
          <select
          aria-invalid={errors.value ? "true" : "false"}
@@ -163,7 +163,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
                 <option key={key} value={eixo.id_eixo} >{eixo.nome}</option>
               ))}
          </select>
-         {errors.id_eixo && errors.id_eixo.type === "required" && <span>Selecionar um Eixo é obrigatório!</span>}
+         {errors.id_eixo && errors.id_eixo.type && <span>Selecionar um Eixo é obrigatório!</span>}
 
          <label>Arquivo da Publicação</label>
          <input
@@ -173,7 +173,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
          type='file'  
          name='arquivo'
           />
-          {errors.arquivo && errors.arquivo.type === "required" && <span>Selecionar um Arquivo é obrigatório!</span>}
+          {errors.arquivo && errors.arquivo.type && <span>Selecionar um Arquivo é obrigatório!</span>}
 
          <label>Imagem de Rótulo Publicação</label>
          <input 
@@ -183,7 +183,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
          name='imagem'
          accept='image/*'
           />
-          {errors.imagem && errors.imagem.type === "required" && <span>Selecionar uma imagem é obrigatório!</span>}
+          {errors.imagem && errors.imagem.type && <span>Selecionar uma imagem é obrigatório!</span>}
 
          <SubmitButton type="submit">
                 Gravar

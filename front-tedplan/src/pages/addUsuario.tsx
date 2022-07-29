@@ -118,7 +118,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             placeholder="Nome completo"
             name="nome"
           />
-          {errors.nome && errors.nome.type === "required" && (
+          {errors.nome && errors.nome.type && (
             <span>O campo Nome é obrigatório!</span>
           )}
 
@@ -130,7 +130,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             placeholder="Login"
             name="login"
           />
-          {errors.login && errors.login.type === "required" && (
+          {errors.login && errors.login.type && (
             <span>O campo Login é obrigatório!</span>
           )}
 
@@ -142,7 +142,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             placeholder="Senha"
             name="senha"
           />
-          {errors.senha && errors.senha.type === "required" && (
+          {errors.senha && errors.senha.type && (
             <span>O campo Senha é obrigatório!</span>
           )}
 
@@ -154,7 +154,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             placeholder="Email"
             name="email"
           />
-          {errors.email && errors.email.type === "required" && (
+          {errors.email && errors.email.type && (
             <span>O campo Email é obrigatório!</span>
           )}
 
@@ -174,7 +174,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             <option value="1">Simisab</option>
             <option value="2">Indicadores</option>
           </select>
-          {errors.id_sistema && errors.id_sistema.type === "required" && (
+          {errors.id_sistema && errors.id_sistema.type && (
             <span>Selecionar um Sistema é obrigatório!</span>
           )}
 
@@ -189,7 +189,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             ))}
             
           </select>
-          {errors.id_sistema && errors.id_sistema.type === "required" && (
+          {errors.id_sistema && errors.id_sistema.type && (
             <span>Selecionar um Sistema é obrigatório!</span>
           )}
 

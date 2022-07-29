@@ -177,7 +177,7 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
               </option>
             ))}
           </select>
-          {errors.id_municipio && errors.id_municipio.type === "required" && (
+          {errors.id_municipio && errors.id_municipio.type && (
             <span>Selecionar um Municipio é obrigatório!</span>
           )}
 
@@ -188,7 +188,7 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
             name="id_categoria"
             value="1"
           />
-          {errors.id_categoria && errors.id_categoria.type === "required" && (
+          {errors.id_categoria && errors.id_categoria.type && (
             <span>Selecionar uma categoria é obrigatória!</span>
           )}
           <label>Imagem</label>
@@ -199,7 +199,7 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
             name="arquivo"
             accept="image/*"
           />
-          {errors.arquivo && errors.arquivo.type === "required" && (
+          {errors.arquivo && errors.arquivo.type && (
             <span>Selecionar uma imagem é obrigatório!</span>
           )}
           <label>Texto</label>

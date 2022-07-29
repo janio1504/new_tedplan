@@ -230,7 +230,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
             placeholder="Titulo da Galeria"
             name="titulo"
           />
-          {errors.titulo && errors.titulo.type === "required" && (
+          {errors.titulo && errors.titulo.type && (
             <span>O campo Titulo é obrigatório!</span>
           )}
           <select
@@ -245,7 +245,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
               </option>
             ))}
           </select>
-          {errors.mes && errors.mes.type === "required" && (
+          {errors.mes && errors.mes.type && (
             <span>Selecionar um mês é obrigatório!</span>
           )}
 
@@ -261,7 +261,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
               </option>
             ))}
           </select>
-          {errors.ano && errors.ano.type === "required" && (
+          {errors.ano && errors.ano.type && (
             <span>Selecionar um ano é obrigatório!</span>
           )}
 
@@ -280,7 +280,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
               </option>
             ))}
           </select>
-          {errors.id_municipio && errors.id_municipio.type === "required" && (
+          {errors.id_municipio && errors.id_municipio.type && (
             <span>Selecionar um Municipio é obrigatório!</span>
           )}
 
@@ -296,7 +296,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
               </option>
             ))}
           </select>
-          {errors.id_eixo && errors.id_eixo.type === "required" && (
+          {errors.id_eixo && errors.id_eixo.type && (
             <span>Selecionar um Eixo é obrigatório!</span>
           )}
 
@@ -307,7 +307,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
             type="file"
             name="imagem"
           />
-          {errors.imagem && errors.imagem.type === "required" && (
+          {errors.imagem && errors.imagem.type && (
             <span>Selecionar uma imagem é obrigatório!</span>
           )}
           <label>Descricão</label>
