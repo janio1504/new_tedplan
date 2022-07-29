@@ -1,4 +1,4 @@
-
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -20,7 +20,6 @@ import {
   InputGG,
   InputSNIS,
 } from "../../styles/financeiro";
-
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -55,12 +54,11 @@ export default function Agua({ municipio }: MunicipioProps) {
 
   useEffect(() => {
     getDadosAgua()
-  }, [municipio]);
+  }, []);
 
   function handleOnChange(content) {
     setContent(content);
-  }
-  
+  }  
 
   async function handleCadastro(data) {  
     data.id_agua = dadosAgua?.id_agua
