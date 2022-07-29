@@ -159,7 +159,7 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
             placeholder="Titulo do post"
             name="titulo"
           />
-          {errors.titulo && errors.titulo.type === "required" && (
+          {errors.titulo && errors.titulo.type && (
             <span>O campo Titulo é obrigatório!</span>
           )}
           <select
