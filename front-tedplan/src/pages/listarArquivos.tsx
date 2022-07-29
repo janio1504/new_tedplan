@@ -269,7 +269,7 @@ export default function ArquivosOndrive({
                               </option>
                             ))}
                           </select>
-                          {errors.id_status && errors.id_status.type === "required" && <span>Selecionar um status é obrigatório!</span>}
+                          {errors.id_status && errors.id_status.type && <span>Selecionar um status é obrigatório!</span>}
                         </ConteudoModal>
                         <SubmitButton type="submit">Gravar</SubmitButton>
                       </FormModal>
