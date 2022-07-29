@@ -203,11 +203,9 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
             <span>Selecionar uma imagem é obrigatório!</span>
           )}
           <label>Texto</label>
-          <SunEditor
+          <textarea
           onChange={handleOnChange}          
-          />
-          
-          
+          />          
           
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>

@@ -1,37 +1,27 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
 import {
   Container,
   DivCenter,
   DivForm,
-  DivTituloForm,
-  DivInput,
+  DivTituloForm,  
   Form,
   InputP,
   InputM,
   InputG,
-  SubmitButton,
-  DivEixo,
-  TextArea,
-  DivTextArea,
+  SubmitButton,  
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
   DivTitulo,
-  DivFormEixo,
-  DivTituloEixo,
   DivFormConteudo,
   DivTituloConteudo,
   InputGG,
-  DivSeparadora,
   InputSNIS,
-  InputXL,
 } from "../../styles/financeiro";
+
 import HeadIndicadores from "../../components/headIndicadores";
-import dynamic from "next/dynamic";
-import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
 import { parseCookies } from "nookies";
