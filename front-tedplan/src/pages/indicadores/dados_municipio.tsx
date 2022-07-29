@@ -679,7 +679,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_nome_prefeitura && errors.municipio_nome_prefeitura.type === "required" && (
+              {errors.municipio_nome_prefeitura && errors.municipio_nome_prefeitura.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputG>
@@ -694,7 +694,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_cep && errors.municipio_cep.type === "required" && (
+              {errors.municipio_cep && errors.municipio_cep.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputP>
@@ -709,7 +709,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_endereco && errors.municipio_endereco.type === "required" && (
+              {errors.municipio_endereco && errors.municipio_endereco.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputG>
@@ -724,7 +724,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_numero && errors.municipio_numero.type === "required" && (
+              {errors.municipio_numero && errors.municipio_numero.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputP>
@@ -739,7 +739,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_bairro && errors.municipio_bairro.type === "required" && (
+              {errors.municipio_bairro && errors.municipio_bairro.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputM>
@@ -754,7 +754,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_telefone && errors.municipio_telefone.type === "required" && (
+              {errors.municipio_telefone && errors.municipio_telefone.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputP>
@@ -769,7 +769,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-              {errors.municipio_email && errors.municipio_email.type === "required" && (
+              {errors.municipio_email && errors.municipio_email.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputM>
@@ -784,7 +784,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"
               />
-               {errors.municipio_prefeito && errors.municipio_prefeito.type === "required" && (
+               {errors.municipio_prefeito && errors.municipio_prefeito.type && (
                 <span>O campo é obrigatório!</span>
               )}
             </InputG>
