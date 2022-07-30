@@ -17,7 +17,7 @@ import {
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
-import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from 'react-nextjs-toast'
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
 

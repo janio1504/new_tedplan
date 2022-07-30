@@ -10,7 +10,7 @@ import { getAPIClient } from '../services/axios';
 import { useForm } from 'react-hook-form';
 import HeadPublico from '../components/headPublico';
 import MenuPublicoLateral from '../components/MenuPublicoLateral';
-import { useToasts } from 'react-toast-notifications'
+import { toast, ToastContainer } from 'react-nextjs-toast'
 
 type INorma = {
   id_norma: string;
@@ -50,8 +50,7 @@ interface NormasProps {
 
 export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps ){
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
-  const [ normasList, setNormasList ] = useState<INorma[] | any>(normas)
-  const { addToast } = useToasts()
+  const [ normasList, setNormasList ] = useState<INorma[] | any>(normas)  
 
   useEffect(() =>{
     if(normas){      
@@ -72,10 +71,11 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
       id_tipo_publicacao: '',
       id_eixo: ''
     }), 
-    addToast('Nenhum resultado foi encontrado para busca!', {        
-      appearance: 'warning',
-      autoDismiss: true,
-    })   
+    toast.notify('Dados gravados com sucesso!',{
+      title: "Sucesso!",
+      duration: 7,
+      type: "success",
+    })
     )
 
     getNormas(normas)
@@ -135,7 +135,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
      return (
       
      <Container>     
-       
+       <ToastContainer></ToastContainer>
        <HeadPublico></HeadPublico>       
        <DivCenter>
          <MenuLateral>

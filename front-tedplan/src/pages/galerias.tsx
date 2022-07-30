@@ -25,7 +25,7 @@ import {
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
-import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from 'react-nextjs-toast'
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
 
@@ -72,7 +72,7 @@ export default function Galerias({
   const [isGaleria, setGaleria] = useState<IGaleria | any>(galerias);
   const [imagensGaleria, setImagensGaleria] = useState(null);
   const [isModalGaleria, setModalGaleria] = useState(false);
-  const { addToast } = useToasts();
+  
 
   useEffect(() => {
     if (galerias) {
@@ -98,9 +98,10 @@ export default function Galerias({
           id_municipio: "",
           id_eixo: "",
         }),
-        addToast("Nenhum resultado foi encontrado para busca!", {
-          appearance: "warning",
-          autoDismiss: true,
+        toast.notify('Nenhum resutado foi encontrado!',{
+          title: "Atenção!",
+          duration: 7,
+          type: "warning",
         })
       );
 
