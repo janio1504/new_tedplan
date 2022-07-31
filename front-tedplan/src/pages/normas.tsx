@@ -152,7 +152,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
              {...register('id_escala')}
              >
                <option value=''>Todos</option>
-               {escala.map((escala, key) => (
+               {escala?.map((escala, key) => (
                  <option key={key} value={escala.id_escala}>{escala.nome}</option>
                ))}
              </select>
@@ -164,7 +164,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
              {...register('id_eixo')}
              >
                <option value=''>Todos</option>
-               {eixos.map((eixo, key) => (
+               {eixos?.map((eixo, key) => (
                  <option key={key} value={eixo.id_eixo}>{eixo.nome}</option>
                ))}
              </select>
@@ -176,7 +176,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
              {...register('id_tipo_norma')}
              >
                <option value=''>Todos</option>
-               {tipoNorma.map((tipo, key) =>(
+               {tipoNorma?.map((tipo, key) =>(
                  <option key={key} value={tipo.id_tipo_norma}>{tipo.nome}</option>
                ))}
              </select>
@@ -196,7 +196,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
              </DivInput>
            </Form>
            
-           {normasList.map(norma => (
+           {normasList?.map(norma => (
             <Lista key={norma.id_norma}>
               <ImagemLista >                                    
                 <img src={norma.imagem} alt="TedPlan" />

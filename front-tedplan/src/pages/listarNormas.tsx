@@ -14,8 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { useToasts } from "react-toast-notifications";
-import dynamic from "next/dynamic";
+import { toast, ToastContainer } from 'react-nextjs-toast'
 import "suneditor/dist/css/suneditor.min.css";
 import { getData } from "./api/post";
 
@@ -91,7 +90,7 @@ export default function Postagens({ normas }: NormasProps) {
   const [idNorma, setIdNorma] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
-  const { addToast } = useToasts();
+  
 
   useEffect(() => {});
 
@@ -172,10 +171,11 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        addToast("Norma alterada com sucesso!", {
-          appearance: "success",
-          autoDismiss: true,
-        });
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })
       })
       .catch((error) => {
         console.log(error);
@@ -193,18 +193,20 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        addToast("Norma removida com sucesso!", {
-          appearance: "success",
-          autoDismiss: true,
-        });
+        toast.notify('Norma removida com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })
         setModalConfirm(false);
         Router.push("/listarNormas");
       })
       .catch((error) => {
-        addToast(error + "!", {
-          appearance: "error",
-          autoDismiss: true,
-        });
+        toast.notify('Aconteceu um erro!',{
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        })
         setModalConfirm(false);
         Router.push("/listarNormas");
       });
@@ -230,10 +232,11 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        addToast("Imagem atualizada com sucesso!", {
-          appearance: "success",
-          autoDismiss: true,
-        });
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })
         return response;
       })
       .catch((error) => {
@@ -256,7 +259,7 @@ export default function Postagens({ normas }: NormasProps) {
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>
-
+      <ToastContainer></ToastContainer>
       <DivCenter>
         <NewButton onClick={handleAddNorma}>Adicionar Norma</NewButton>
         <ListPost>
