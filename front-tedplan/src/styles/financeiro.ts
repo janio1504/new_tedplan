@@ -138,6 +138,7 @@ export const DivCenter = styled.div`
   background: #fff;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
   text-align: left;
   justify-content: left;
   align-items: left;
@@ -224,13 +225,13 @@ export const DivConteudo = styled.div`
   flex-direction: row;
 `;
 
+
 export const DivColRelatorios = styled.div`
   float: left;
   width: 30%;
   height: 100%;
   color: #666;
   padding: 20px;
-
   li {
     color: blue;
     cursor: pointer;

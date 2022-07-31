@@ -26,7 +26,7 @@ import {
   Tabela,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
-import dynamic from "next/dynamic";
+import Image from "next/image";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -36,7 +36,7 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import RepresentanteGestaoAssociada from "../../components/RepresentanteGestaoAssociada";
 import { FormModal } from "../../styles/dashboard";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Excluir from "../../img/excluir.png";
 import {
   faPlus,
   faCoffee,
@@ -445,7 +445,7 @@ export default function GestaoIndicadores({
                         <td>{representante.id_representante_servicos_ga}</td>
                         <td >{representante.nome}</td>
                         <td>
-                          <span>Remover</span>
+                          <Image src={Excluir} alt="Excluir" width={20} height={20}/>
                         </td>
                       </tr>
                     </>
@@ -499,16 +499,15 @@ export default function GestaoIndicadores({
                         <td >{politica.titulo}</td>
                         <td>{politica.ano}</td>
                         <td>
-                          <span
-                            onClick={() => {
-                              handleRemoverPolitica({
-                                id: politica.id_politica_municipal,
-                                id_arquivo: politica.id_arquivo,
-                              });
-                            }}
-                          >
-                            Remover
-                          </span>
+                        <Image src={Excluir} alt="Excluir" width={20} height={20}
+                          onClick={() => {
+                            handleRemoverPolitica({
+                              id: politica.id_politica_municipal,
+                              id_arquivo: politica.id_arquivo,
+                            });
+                        }}
+                        />
+                        
                         </td>
                       </tr>
                     </>
@@ -550,16 +549,15 @@ export default function GestaoIndicadores({
                         <td >{plano.titulo}</td>
                         <td>{plano.ano}</td>
                         <td>
-                          <span
-                            onClick={() => {
-                              handleRemoverPlano({
-                                id: plano.id_plano_municipal,
-                                id_arquivo: plano.id_arquivo,
-                              });
-                            }}
-                          >
-                            Remover
-                          </span>
+                        <Image src={Excluir} alt="Excluir" width={20} height={20}
+                          onClick={() => {
+                            handleRemoverPlano({
+                              id: plano.id_plano_municipal,
+                              id_arquivo: plano.id_arquivo,
+                            });
+                          }}
+                        />
+                         
                         </td>
                       </tr>
                     </>
@@ -602,16 +600,15 @@ export default function GestaoIndicadores({
                         <td >{participacao.titulo}</td>
                         <td>{participacao.ano}</td>
                         <td>
-                          <span
-                            onClick={() =>
-                              handleRemoverParticipacao({
-                                id: participacao.id_participacao_controle_social,
-                                id_arquivo: participacao.id_arquivo,
-                              })
-                            }
-                          >
-                            Remover
-                          </span>
+                        <Image src={Excluir} alt="Excluir" width={20} height={20}
+                         onClick={() =>
+                          handleRemoverParticipacao({
+                            id: participacao.id_participacao_controle_social,
+                            id_arquivo: participacao.id_arquivo,
+                          })
+                        }
+                        />
+                         
                         </td>
                       </tr>
                     </>

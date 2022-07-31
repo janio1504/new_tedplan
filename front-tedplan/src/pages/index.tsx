@@ -1,8 +1,8 @@
 import Router from "next/router";
 import { destroyCookie } from "nookies";
 import logo from "../img/logo_tedplan_login.png";
-import sou_minicipio from "../img/sou_municipio.png";
-import sou_tedplan from "../img/sou_tedplan.png";
+import sou_minicipio from "../img/user_mun.png";
+import sou_tedplan from "../img/icone_logon.png";
 import Image from "next/image";
 import {
   Container,

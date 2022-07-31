@@ -347,19 +347,47 @@ export const DivConteudo = styled.div`
   flex-direction: row;
 `;
 
+export const DivRelatorios = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+`;
+
 export const DivColRelatorios = styled.div`
-  float: left;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 30%;
   height: 100%;
   color: #666;
   padding: 20px;
-
   li {
     color: blue;
     cursor: pointer;
     font-size: 16px;
     padding: 5px;
   }
+`;
+
+export const TituloRelatorios = styled.div`
+  font-size: 24px;
+  font-weight: bolder;
+  color: #70B8C2;
+  text-align: center;
+  p{
+    font-size: 18px;
+  }
+`;
+export const BaixarRelatorio = styled.div`
+width: 200px;
+text-align: center;
+margin-top: 10px;
+background-color: #3D6CA6;
+font-size: 22px;
+color: #fff;
+border-radius: 5px;
+padding: 5px 20px;
+cursor: pointer;
 `;
 
 export const DivForm = styled.div`

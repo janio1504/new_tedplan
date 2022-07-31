@@ -1,18 +1,17 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Container,
-  DivMenu,
-  DivBotao,
-  BotaoMenu,
-  DivCenter,
   DivConteudo,
   DivColRelatorios,
   MenuMunicipio,
-  MunicipioDireita,
   Municipio,
-  StatusMunicipio,
   MenuMunicipioItem,
+  DivRelatorios,
+  DivBotaoMenu,
+  BaixarRelatorio,
+  TituloRelatorios,
 } from "../../styles/indicadores";
+import Image from "next/image";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadores";
 import Router from "next/router";
@@ -22,6 +21,10 @@ import api from "../../services/api";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
 import { cadastroPDF } from "../../reports/Cadastro/cadastro"
+import { DivCenter, DivForm, DivTituloForm } from "../../styles/financeiro";
+import PrestacaoServicos from "../../img/icone_servicos.png"
+import Gestao from "../../img/icone_gestao.png"
+import Cadastro from "../../img/icone_cadastro.png"
 
 interface IMunicipio {
   id_municipio: string;
@@ -182,14 +185,41 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       </MenuMunicipio>
 
       <MenuIndicadores></MenuIndicadores>
-      <DivConteudo>
+      <DivCenter>
+        <DivForm>
+          <DivTituloForm>Relatórios Atuais</DivTituloForm>
+            
+        <DivRelatorios> 
+      
         <DivColRelatorios>
-          <ul>
-            <li onClick={()=>cadastroPDF(dadosMunicipio)}>Relatório de cadastro!</li>           
-          </ul>
+          <TituloRelatorios>
+            <p>Módulo de</p>
+              CADASTRO
+          </TituloRelatorios>
+        <Image src={Cadastro} alt='Cadastro' />
+        <BaixarRelatorio onClick={()=>cadastroPDF(dadosMunicipio)}>Baixar</BaixarRelatorio>
+        </DivColRelatorios>
+        <DivColRelatorios>
+          <TituloRelatorios>
+            <p>Módulo de</p>
+              GESTÃO
+          </TituloRelatorios> 
+            <Image src={Gestao} alt='Gestão' />
+            <BaixarRelatorio onClick={()=>cadastroPDF(dadosMunicipio)}>Baixar</BaixarRelatorio>
+        </DivColRelatorios>
+        <DivColRelatorios>
+          <TituloRelatorios>
+            <p>Módulo de</p>
+              PRESTAÇÃO DE SERVIÇOS
+          </TituloRelatorios>
+          <Image src={PrestacaoServicos} alt='Prestação de Serviços' />
+          <BaixarRelatorio onClick={()=>cadastroPDF(dadosMunicipio)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         
-      </DivConteudo>
+        </DivRelatorios>
+      
+        </DivForm>
+      </DivCenter>
     </Container>
   );
 }
