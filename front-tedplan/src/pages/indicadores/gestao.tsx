@@ -439,7 +439,7 @@ export default function GestaoIndicadores({
                   </tr>
                 </thead>
                 <tbody>
-                  {representantes.map((representante, index) => (
+                  {representantes?.map((representante, index) => (
                     <>
                       <tr role="row" key={index}>
                         <td>{representante.id_representante_servicos_ga}</td>
@@ -492,7 +492,7 @@ export default function GestaoIndicadores({
                   </tr>
                 </thead>
                 <tbody>
-                  {politicas.map((politica, index) => (
+                  {politicas?.map((politica, index) => (
                     <>
                       <tr key={index}>
                         <td>{politica.id_politica_municipal}</td>
@@ -542,7 +542,7 @@ export default function GestaoIndicadores({
                   </tr>
                 </thead>
                 <tbody>
-                  {planos.map((plano, index) => (
+                  {planos?.map((plano, index) => (
                     <>
                       <tr key={index}>
                         <td>{plano.id_plano_municipal}</td>
