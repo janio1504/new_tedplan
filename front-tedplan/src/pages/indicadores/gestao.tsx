@@ -381,7 +381,7 @@ export default function GestaoIndicadores({
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuMunicipio>
-        <Municipio>Municipio: {isMunicipio.municipio_nome}</Municipio>
+        <Municipio>Municipio: {isMunicipio?.municipio_nome}</Municipio>
         <MenuMunicipioItem>
           <ul>
             <li onClick={handleHome}>Home</li>
@@ -402,7 +402,7 @@ export default function GestaoIndicadores({
               <label>Nome da associação</label>
               <input
                 {...register("nome_associacao")}
-                defaultValue={isGestao.ga_nome}
+                defaultValue={isGestao?.ga_nome}
                 onChange={handleOnChange}
                 type="text"
               ></input>
@@ -413,7 +413,7 @@ export default function GestaoIndicadores({
               </label>
               <input
                 {...register("norma_associacao")}
-                defaultValue={isGestao.ga_norma}
+                defaultValue={isGestao?.ga_norma}
                 onChange={handleOnChange}
                 type="text"
               ></input>
@@ -462,7 +462,7 @@ export default function GestaoIndicadores({
               <label>Titulo</label>
               <input
                 {...register("politica_titulo")}
-                defaultValue={isGestao.politica_titulo}
+                defaultValue={isGestao?.politica_titulo}
                 onChange={handleOnChange}
                 type="text"
               ></input>
@@ -471,7 +471,7 @@ export default function GestaoIndicadores({
               <label>Ano</label>
               <input
                 {...register("politica_ano")}
-                defaultValue={isGestao.politica_ano}
+                defaultValue={isGestao?.politica_ano}
                 onChange={handleOnChange}
                 type="text"
               ></input>
@@ -625,7 +625,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("sr_descricao")}
-                  defaultValue={isGestao.sr_descricao}
+                  defaultValue={isGestao?.sr_descricao}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -640,7 +640,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_nomes_comunidades")}
-                  defaultValue={isGestao.nomes_comunidades_beneficiadas}
+                  defaultValue={isGestao?.nomes_comunidades_beneficiadas}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -650,7 +650,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_descricao")}
-                  defaultValue={isGestao.ct_descricao}
+                  defaultValue={isGestao?.ct_descricao}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -679,7 +679,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_nome_representante")}
-                      defaultValue={isGestao.ga_nome_representante}
+                      defaultValue={isGestao?.ga_nome_representante}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -690,7 +690,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_cargo")}
-                      defaultValue={isGestao.ga_cargo}
+                      defaultValue={isGestao?.ga_cargo}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -701,7 +701,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_telefone")}
-                      defaultValue={isGestao.ga_telefone}
+                      defaultValue={isGestao?.ga_telefone}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -712,7 +712,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_email")}
-                      defaultValue={isGestao.ga_email}
+                      defaultValue={isGestao?.ga_email}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
