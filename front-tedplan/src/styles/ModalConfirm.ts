@@ -16,7 +16,6 @@ export const ContainerModal = styled.div`
 
 export const Modal = styled.div`
     width: 600px;
-    height: ;
     background-color: #ffffff;
     border: 1px solid #bebebe;
     border-radius: 2px;

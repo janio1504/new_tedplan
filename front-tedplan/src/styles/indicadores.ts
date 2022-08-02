@@ -39,8 +39,9 @@ export const DivLogout = styled.aside`
 `;
 
 export const IconeColeta = styled.div`
-  width: 150px;
+  width: 180px;
   margin: 20px;
+  cursor: pointer;
   float: left;
     img {
       width: 100px;     
@@ -388,6 +389,18 @@ color: #fff;
 border-radius: 5px;
 padding: 5px 20px;
 cursor: pointer;
+`;
+export const BotaoResiduos = styled.div`
+width: 150px;
+text-align: center;
+margin-top: 10px;
+background-color: #42895B;
+font-size: 18px;
+color: #fff;
+border-radius: 5px;
+padding: 5px 20px;
+cursor: pointer;
+font-weight: bolder;
 `;
 
 export const DivForm = styled.div`

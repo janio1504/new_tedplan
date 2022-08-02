@@ -171,7 +171,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivFormResiduo>
-            <DivTituloFormResiduo>Qualidade</DivTituloFormResiduo>    
+            <DivTituloFormResiduo>Tarifa Social</DivTituloFormResiduo>    
             <DivFormEixo>
               <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
             

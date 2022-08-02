@@ -22,7 +22,7 @@ export default function LoginIndicadores() {
   useEffect(() => {
     destroyCookie(undefined, "tedplan.token", {});
     destroyCookie(undefined, "tedplan.id_usuario", {}); 
-    reset()
+    
   }, []);
 
   async function handleSignInIndicadores(data) {

@@ -241,14 +241,14 @@ export default function HomeIndicadores({ municipio }: MunicipioProps) {
             <Image src={Agua} onClick={handleAgua} alt="Agua" />
           </PsImageEsquerda>
           <PsImageDireita>
-            <Image src={Esgoto} onClick={handleEsgoto} alt="Esgoto" />
+          <Image src={Residuos} onClick={handleResiduosColeta} alt="Residuos" />            
           </PsImageDireita>
           <Ps3>  
             <Ps3ImageEsquerda>
-              <Image src={Drenagem} onClick={handleDrenagem} alt="Drenagem" />
+            <Image src={Esgoto} onClick={handleEsgoto} alt="Esgoto" />              
             </Ps3ImageEsquerda>
             <Ps3ImageDireita>
-              <Image src={Residuos} onClick={handleResiduosColeta} alt="Residuos" />
+            <Image src={Drenagem} onClick={handleDrenagem} alt="Drenagem" />
             </Ps3ImageDireita>    
           </Ps3>          
         </Ps2>

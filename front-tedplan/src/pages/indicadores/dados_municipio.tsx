@@ -1014,7 +1014,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               ></input>
             </InputG>
 
-            <DivEixo>Esgotamento Sanitario</DivEixo>
+            <DivEixo>Esgotamento Sanitário</DivEixo>
             <input
               {...register("id_ps_esgotamento_sanitario")}
               defaultValue={dadosMunicipio.id_ps_esgotamento_sanitario}
@@ -1518,7 +1518,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               ></input>
             </InputG>
             <DivTextArea>
-              <label>Breve descrição</label>
+              <label>Descrição detalhada das funções e responsabilidades<span> *</span></label>
               <TextArea>
                 <textarea
                   {...register("rf_descricao")}

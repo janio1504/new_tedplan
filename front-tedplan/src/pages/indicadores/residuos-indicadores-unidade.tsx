@@ -43,6 +43,9 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
+import unidade_escuro from "../../img/Icono-unidadeDeProcessamento.png"
+import coleta_claro from "../../img/Icono-coleta-claro.png"
+import Image from "next/image";
 import {
   Tabela,
   ContainerModal,
@@ -55,6 +58,9 @@ import {
   TabelaModal,
   ModalForm,
   ModalFormUnidade,
+  DivBotao,
+  IconeColeta,
+  BotaoResiduos,
 } from "../../styles/indicadores";
 import api from "../../services/api";
 import { BotaoEditar } from "../../styles/dashboard";
@@ -257,6 +263,10 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     Router.push("/indicadores/gestao");
   }
 
+  function unidadeColeta() {
+    Router.push("/indicadores/residuos-indicadores-coleta");
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -278,8 +288,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         
           <DivFormResiduo>
             <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo> 
-
-           
+            <DivCenter>
+            <DivBotao>
+                <IconeColeta> <Image onClick={()=>unidadeColeta()} src={coleta_claro} alt="Simisab" />
+                <BotaoResiduos onClick={()=>unidadeColeta()}>Coleta</BotaoResiduos>
+                </IconeColeta>      
+                <IconeColeta> <Image  src={unidade_escuro} alt="Simisab" />
+                <BotaoResiduos>Processamento</BotaoResiduos>
+                </IconeColeta>
+            </DivBotao>
+            </DivCenter>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>

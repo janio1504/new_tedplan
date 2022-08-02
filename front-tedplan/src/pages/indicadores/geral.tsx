@@ -35,6 +35,7 @@ import {
   LabelCenter,
   DivChekbox,
   CheckBox,
+  DivTituloEixoDrenagem,
 } from "../../styles/financeiro";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
@@ -234,7 +235,7 @@ export default function Geral({ municipio }: MunicipioProps) {
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivFormResiduo>
-            <DivTituloFormResiduo>Geral</DivTituloFormResiduo>    
+            <DivTituloForm>Geral</DivTituloForm>    
             <DivFormEixo>
               <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
             
@@ -509,7 +510,7 @@ export default function Geral({ municipio }: MunicipioProps) {
        
           <DivFormEixo>
            
-            <DivTituloEixo>Drenagem e Águas Pluviais</DivTituloEixo>
+            <DivTituloEixoDrenagem>Drenagem de Águas Pluviais</DivTituloEixoDrenagem>
             
             <DivFormConteudo>
               <DivTitulo>
@@ -570,7 +571,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                                 </select></InputP></td>
-                    <td>Domicílios</td>
+                    <td></td>
                   </tr>         
                 </tbody>                
               </table>            

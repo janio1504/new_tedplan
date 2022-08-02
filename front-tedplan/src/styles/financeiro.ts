@@ -329,7 +329,7 @@ export const DivFormResiduo = styled.div`
   border: solid #1bb6d3 2px;
   border-radius: 5px;
   margin-top: 20px;
-  margin-bottom: 30px;
+  margin-bottom: 0px;
   color: #667778;
 `;
 
@@ -352,7 +352,7 @@ export const DivTituloForm = styled.div`
   width: auto;
   padding: 10px;
   margin: -11px -13px 0 -11px;
-  background-color: #1BB6D3;
+  background-color: #008080;
   border-radius: 2px;
   font-weight: bolder;
   color: #fff;
@@ -374,6 +374,18 @@ export const DivTituloEixo = styled.div`
   padding: 10px 40px;
   margin: -30px 10px 0 -11px;
   background-color: #3A8191;
+  border-radius: 25px;
+  font-weight: bolder;
+  text-align: center;
+  color: #fff;
+`;
+
+export const DivTituloEixoDrenagem = styled.div`
+  //width: 300px;
+  float: right;
+  padding: 10px 40px;
+  margin: -30px 10px 0 -11px;
+  background-color: #0F4C81;
   border-radius: 25px;
   font-weight: bolder;
   text-align: center;

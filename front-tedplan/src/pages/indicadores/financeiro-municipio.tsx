@@ -279,30 +279,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
             <DivFormEixo>
               <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
              
-              <DivFormConteudo>
-              <DivTitulo>
-                  <DivTituloConteudo>Ano </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                  <tr>
-                    <td>
-                      <InputAno >Selecione o ano para cadastro ou edição </InputAno>
-                    </td>
-                    <td>
-                      <select {...register('ano')} onChange={(e)=>handleSelect(e.target.value)}>
-                        <option value="">Selecionar</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                        <option value="2020">2020</option>
-                        <option value="2019">2019</option>
-                        <option value="2018">2018</option>
-                      </select>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>              
-                </DivFormConteudo>
+              
               <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Receitas</DivTituloConteudo>

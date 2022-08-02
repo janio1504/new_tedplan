@@ -49,6 +49,7 @@ import {
   DivBotao,
   IconeColeta,
   TabelaModal,
+  BotaoResiduos,
 } from "../../styles/indicadores";
 import Image from "next/image";
 import api from "../../services/api";
@@ -335,6 +336,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     Router.push("/indicadores/gestao");
   }
 
+  
+
+  function unidadeProcessamento() {
+    Router.push("/indicadores/residuos-indicadores-unidade");
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -363,8 +370,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
             <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo>
             <DivCenter>
         <DivBotao>
-            <IconeColeta> <Image src={coleta_escuro} alt="Simisab" /></IconeColeta>      
-            <IconeColeta> <Image src={unidade_claro} alt="Simisab" /></IconeColeta>
+            <IconeColeta> <Image src={coleta_escuro} alt="Simisab" />
+            <BotaoResiduos>Coleta</BotaoResiduos>
+            </IconeColeta>      
+            <IconeColeta> <Image onClick={()=>unidadeProcessamento()} src={unidade_claro} alt="Simisab" />
+            <BotaoResiduos onClick={()=>unidadeProcessamento()}>Processamento</BotaoResiduos>
+            </IconeColeta>
         </DivBotao>
         </DivCenter>
 
@@ -1218,7 +1229,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td>CO019</td>
-                    <td>É utilizada balança para pesagem rotineira</td>
+                    <td>Os resíduos sólidos DOMICILIARES coletados são enviados para outro município?</td>
                     <td>
                       <InputP>
                         <select {...register("CO019")}
@@ -1234,7 +1245,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td>CO020</td>
-                    <td>É utilizada balança para pesagem rotineira</td>
+                    <td>Município(s) de destino de RDO e RPU exportado</td>
                     <th>
                       <p
                         onClick={() => {
@@ -1278,7 +1289,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
-                  Serviços de coleta noturna e conteinerizada
+                  Serviços de coleta noturna com uso de container
                 </DivTituloConteudo>
               </DivTitulo>
               <table>
@@ -3811,20 +3822,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </table>
              
             
-              <DivSeparadora></DivSeparadora>
-              <InputSNIS>
-                <p>CA009</p>
-              </InputSNIS>
-              <InputM>
-                <p>Descrição sucinta dos trabalhos(por exemplo: bolsa-escola para filhos, programa de alfabetização, etc...)</p>
-              </InputM>
-
-              <InputGG>
-                <textarea {...register("CA009")}
-                defaultValue={dadosResiduos?.ca009}
-                onChange={handleOnChange}
-                />
-              </InputGG>
               <table>
                    <tbody>
                         <tr>
