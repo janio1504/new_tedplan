@@ -3,7 +3,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any){
     pdfMake.vfs = pdfFonts.pdfMake.vfs 
-    
+
     const reportTitle: any = [
         {
             text: 'Prestação de Serviços',
@@ -388,32 +388,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['FN201', 'A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?', financeiro.fn201],
                 ['FN202', 'Principal forma adotada', financeiro.fn202],
                 ['FN203', 'Descrição da outra forma adotada', financeiro.fn203],
-                ['FN204', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-                ['', '', financeiro.fn201],
-              
+                
            
             ]
         },
