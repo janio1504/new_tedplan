@@ -251,16 +251,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
-                <tbody>                 
-                  <tr>
-                    <td><InputSNIS>GE005</InputSNIS></td>
-                    <td>Quantidade de Municípios atendidos </td>
-                    <td><InputP><input {...register('GE005')}
-                      defaultValue={dadosGeral?.ge005}
-                      onChange={handleOnChange}
-                    type="text"></input></InputP></td>
-                    <td>Municipios</td>
-                  </tr>
+                <tbody>
                   <tr>
                     <td><InputSNIS>GE05A</InputSNIS></td>
                     <td>Quantidade de Municípios atendidos com abastecimento de água </td>
@@ -527,7 +518,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <tbody>                 
                   <tr>
                     <td><InputSNIS>GE001</InputSNIS></td>
-                    <td>Área territorial total do município(Fonte IBGE) </td>
+                    <td>Área territorial total do município (Fonte IBGE) </td>
                     <td><InputP><input {...register('GE001')}
                     defaultValue={dadosGeral?.ge001}
                     onChange={handleOnChange}
@@ -541,7 +532,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.ge002}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Municipios</td>
+                    <td>km²</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>GE007</InputSNIS></td>
@@ -563,7 +554,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tr>    
                   <tr>
                     <td><InputSNIS>GE016</InputSNIS></td>
-                    <td>Município Crítico(Fonte: CPRM) </td>
+                    <td>Município Crítico (Fonte: CPRM) </td>
                     <td><InputP><select {...register('GE016')}
                     defaultValue={dadosGeral?.ge016}
                     onChange={handleOnChange} >
@@ -593,30 +584,20 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <tbody>                 
                   <tr>
                     <td><InputSNIS>GE010</InputSNIS></td>
-                    <td>Região Hidrográfica em que se encontra o município(Fonte:ANA)</td>
-                    <td><InputP><select {...register('GE010')}
+                    <td>Região Hidrográfica em que se encontra o município (Fonte:ANA)</td>
+                    <td><InputP><input {...register('GE010')}
                     defaultValue={dadosGeral?.ge016}
-                    onChange={handleOnChange}>
-                        <option value=""></option>
-                      </select></InputP></td>
+                    onChange={handleOnChange}></input></InputP></td>
                     <td>Sede</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>GE011</InputSNIS></td>
-                    <td>Nome da(s) bacia(s) hidrografica(s) a que pertence o município(Fonte: ANA) </td>
+                    <td>Nome da(s) bacia(s) hidrografica(s) a que pertence o município (Fonte: ANA) </td>
                     <td>
-                      <DivChekbox>
-                        <CheckBox><input {...register('GE011_1')}
+                    <input {...register('GE011_1')} type="text"
                         defaultValue={dadosGeral?.ge011_1}
-                        onChange={handleOnChange}
-                        type="checkbox"/><span>Bacia 1</span></CheckBox>
-                        <CheckBox><input {...register('GE011_2')}
-                        defaultValue={dadosGeral?.ge011_2}
-                        onChange={handleOnChange}
-                        type="checkbox"/><span>Bacia 2</span></CheckBox>
-                    </DivChekbox>
-                    </td>
-                    
+                        onChange={handleOnChange} />
+                    </td>                    
                   </tr>
                   <tr>
                     <td><InputSNIS>GE012</InputSNIS></td>
@@ -720,7 +701,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tr>   
                   <tr>
                     <td><InputSNIS>IE013</InputSNIS></td>
-                    <td>Existe projeto básico, executivo pu "as built" de unidades operacionais? </td>
+                    <td>Existe projeto básico, executivo ou "as built" de unidades operacionais? </td>
                     <td><InputP><select {...register('IE013')}
                     defaultValue={dadosGeral?.ie013}
                     onChange={handleOnChange}
@@ -745,7 +726,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tr>   
                   <tr>
                     <td><InputSNIS>IE016</InputSNIS></td>
-                    <td>Qual o tipo de istema de Drenagem Urbana? </td>
+                    <td>Qual o tipo de sistema de Drenagem Urbana? </td>
                     <td><InputP><select {...register('IE016')}
                     defaultValue={dadosGeral?.ie016}
                     onChange={handleOnChange}
@@ -761,7 +742,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputSNIS>IE016A</InputSNIS></td>
                     <td>Especifique qual é o outro tipo de sistema de drenagem Urbana</td>
                     <td colSpan={4}><input {...register('IE016A')}
-                    defaultValue={dadosGeral?.ie016}
+                    defaultValue={dadosGeral?.ie016a}
                     onChange={handleOnChange}
                     type="text"></input></td>                    
                   </tr>                     
@@ -839,15 +820,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                         <CheckBox><input {...register('RI001_1')}
                          defaultChecked={dadosGeral?.ri001_1 == "false" || false ? false : true}
                         type="checkbox"/>
-                          <span>Não houve intervenção ou manutenção</span></CheckBox>
+                          <span>Não há instituições relacionadas com à gestão de riscos ou respostas a desastres</span></CheckBox>
                         <CheckBox><input {...register('RI001_2')}
                           defaultChecked={dadosGeral?.ri001_2 == "false" || false ? false : true}
                         type="checkbox"/>
-                        <span>Manutenção ou recuperação de sarjetas</span></CheckBox>
+                        <span>Unidades de corpos de bombeiros</span></CheckBox>
                         <CheckBox><input {...register('RI001_3')}
                           defaultChecked={dadosGeral?.ri001_2 == "false" || false ? false : true}
                         type="checkbox"/>
-                        <span>Manutenção ou recuperação estrutural</span></CheckBox>
+                        <span>Coordenação Municipal de Defesa Civil (COMDEC)</span></CheckBox>
                     </DivChekbox>
                     </td>
                     
@@ -999,7 +980,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tr> 
                   <tr>
                     <td><InputSNIS>RI010</InputSNIS></td>
-                    <td>o mapeamento é parcial ou integral?</td>
+                    <td>O mapeamento é parcial ou integral?</td>
                     <td><InputP><select {...register('RI010')}
                     defaultValue={dadosGeral?.ri010}
                     onChange={handleOnChange}
@@ -1016,13 +997,19 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.ri011}
                     onChange={handleOnChange} >
                                   <option value=""></option>
-                                  <option value="De 1% a 25%">Sim</option>
-                                  <option value="De 26% a 50%">Não</option>
-                                  <option value="De 51% a 75%">Sim</option>
-                                  <option value="De 76% a 100%">Não</option>
+                                  <option value="De 1% a 25%">De 1% a 25%</option>
+                                  <option value="De 26% a 50%">De 26% a 50%</option>
+                                  <option value="De 51% a 75%">De 51% a 75%</option>
+                                  <option value="De 76% a 100%">De 76% a 100%</option>
                                 </select></InputP></td>
                     
-                  </tr>     
+                  </tr>  
+                  </tbody>                
+              </table> 
+
+              <table>   
+              <tbody>                
+                   
                   <tr>
                     <td><InputSNIS>RI012</InputSNIS></td>
                     <td>Tempo de recorrência(ou periodo de retorno) adotado para o mapeamento</td>

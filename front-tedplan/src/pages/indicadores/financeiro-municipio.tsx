@@ -300,7 +300,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>Receita operacional direta de Água</p>
                   <p>Receita operacional direta de Esgoto</p>
                   <p>
-                    Receita operacional direta de Água exportada(Bruta ou
+                    Receita operacional direta de Água exportada (Bruta ou
                     Tratada)
                   </p>
                   <p>Receita operacional direta - Esgoto bruto importado</p>
@@ -426,7 +426,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>Despesa com água importada (Bruta ou tratada)</p>
                   <p>Despesa com esgoto exportado</p>
                   <p>Despesas fiscais ou tributarias computadas na dex</p>
-                  <p>Outras despesas de exportacões</p>
+                  <p>Outras despesas de exploração</p>
                   <p>Despesas de exploração (DEX)</p>
                   <p>Despesas com juros e encargos do serviço da divida</p>
                   <p>
@@ -570,7 +570,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     Investimentos realizados em abastecimento de água pelo
                     prestador de serviços
                   </p>
-                  <p>Despesa com água importada(Bruta ou Tratada)</p>
+                  <p>Despesa com água importada (Bruta ou Tratada)</p>
                   <p>
                     Outros investimentos realizados pelo prestador de serviços
                   </p>
@@ -909,6 +909,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     <option>
                       Selecione
                     </option>
+                    <option value="Cobrança de taxa específica">Cobrança de taxa específica</option>
+                    <option value="Cobrança de tarifa">Cobrança de tarifa</option>
+                    <option value="Outra">Outra</option>
                   </select>
                   <input {...register("CB002A")} type="text"
                   defaultValue={dadosFinanceiros?.cb002a}
@@ -983,6 +986,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     <option>
                       Selecione
                     </option>
+                    <option value="Não existe forma de custeio">Não existe forma de custeio</option>
+                    <option value="Receitas de taxas">Receitas de taxas</option>
+                    <option value="Receitas de contribuição de melhoria">Receitas de contribuição de melhoria</option>
+                    <option value="Recursos do orçamento geral do município">Recursos do orçamento geral do município</option>
+                    <option value="Outra">Outra</option>
                   </select>
                   <input {...register("FN004A")} type="text"
                   defaultValue={dadosFinanceiros?.fn004a}
@@ -1029,7 +1037,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
                 <InputGG>
                   <label>Descrição</label>
-                  <p>Despesa total do município(Saúde, Educação, pagamento de pessoal, etc...)</p>
+                  <p>Despesa total do município (Saúde, Educação, pagamento de pessoal, etc...)</p>
                   <p>Despesas de Exploração(DEX) diretas ou de custeio total dos serviços de Drenagem e Manejo de APU</p>
                   <p>Despesa total com serviço da dívida para os serviços de drenagem e Manejo de APU</p>
                   <p>Despesa total com serviços de Drenagem e Manejo de APU</p>
@@ -1059,8 +1067,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 <InputP>
                   <label>.</label>
                   <p>R$/ano</p>
-                  <p>.</p>
-                  <p>.</p>
+                  <p>R$/ano</p>
+                  <p>R$/ano</p>
                   <p>R$/ano</p>
              
                 </InputP>
@@ -1208,11 +1216,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
                 <InputGG>
                   <label>Descrição</label>
-                  <p>A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU</p>
+                  <p>A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?</p>
                   <p>Principal forma adotada</p>
-                  <p>Derscrição da outra forma adotada</p>
-                  <p>Unidade adotada para a cobrança(No caso de tarifa)</p>
-                  <p>A prefeitura cobra pela prestação serviços especiais ou eventuais de manejo de RSU?</p>
+                  <p>Descrição da outra forma adotada</p>
+                  <p>Unidade adotada para a cobrança (No caso de tarifa)</p>
+                  <p>A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?</p>
                 </InputGG>
             
                 <InputP>
@@ -1220,6 +1228,10 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 
                   <select
                     {...register("FN201")}>
+                      <option 
+                       defaultValue={dadosFinanceiros?.fn201}
+                       onChange={handleOnChange}
+                      ></option>
                     <option>
                       Sim
                     </option>
@@ -1227,18 +1239,28 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       Não
                     </option>
                   </select>
-                  <input {...register("FN202")} type="text"
-                  defaultValue={dadosFinanceiros?.fn202}
-                  onChange={handleOnChange}
-                  ></input>
+                  <select {...register("FN202")}>
+                    <option 
+                    defaultValue={dadosFinanceiros?.fn202}
+                    onChange={handleOnChange}
+                    ></option>
+                    <option value="Taxa específica no boleto do IPTU">Taxa específica no boleto do IPTU</option>
+                    <option value="Taxa em boleto exclusivo">Taxa em boleto exclusivo</option>
+                    <option value="Tarifa">Tarifa</option>
+                    <option value="Taxa específica no boleto de água">Taxa específica no boleto de água</option>
+                    <option value="outra forma.">outra forma.</option>
+                  </select>
                   <input {...register("FN203")} type="text"
                   defaultValue={dadosFinanceiros?.fn203}
                   onChange={handleOnChange}
                   ></input>
-                  <input {...register("FN204")} type="text"
-                  defaultValue={dadosFinanceiros?.fn204}
-                  onChange={handleOnChange}
-                  ></input>
+                  <select {...register("FN204")}>
+                    <option  
+                    defaultValue={dadosFinanceiros?.fn204}
+                    onChange={handleOnChange}></option>
+                    <option value="Peso">Peso</option>
+                    <option value="Volume">Volume</option>
+                  </select>
                   <select
                     {...register("FN205")}
                     defaultValue={dadosFinanceiros?.fn205}
@@ -1297,11 +1319,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>Despesa dos agentes públicos com o serviço de varrição</p>
                   <p>Despesa com empresas contratadas para o serviço de varrição</p>
                   <p>Despesa total com serviço de varrição</p>
-                  <p>Despesas com agentes públicos executores dos demais serviços quando não especificadosem campo próprio</p>
+                  <p>Despesas com agentes públicos executores dos demais serviços quando não especificado sem campo próprio</p>
                   <p>
-                  Despesas com agentes privados executores dos demais serviços quando não especificadosem campo próprio
+                  Despesas com agentes privados executores dos demais serviços quando não especificado sem campo próprio
                   </p>
-                  <p>Despesas total com todos os agentes executores dos demais serviços quando não especificadosem campo próprio</p>
+                  <p>Despesas total com todos os agentes executores dos demais serviços quando não especificado sem campo próprio</p>
                   <p>Despesa dos agentes públicos executores de serviços de manejo de RSU</p>
                   <p>Despesa dos agentes privados executores de serviços de manejo de RSU</p>                  
                   <p>Despesa  total com os serviços de manejo de RSU</p>
@@ -1470,15 +1492,19 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       defaultValue={dadosFinanceiros?.fn225}
                       onChange={handleOnChange}
                       ></input></InputP></td>
-                      <td></td>
+                      <td>R$</td>
                     </tr>
                     <tr>
                       <td>FN226</td>
                       <td>Tipo de recurso</td>
-                      <td><InputP><input {...register("FN226")} type="text"
-                      defaultValue={dadosFinanceiros?.fn226}
-                      onChange={handleOnChange}
-                      ></input></InputP></td>
+                      <td><InputP><select {...register("FN226")}>
+                        <option
+                        defaultValue={dadosFinanceiros?.fn226}
+                        onChange={handleOnChange}
+                        ></option>
+                        <option value="Oneroso">Oneroso</option>
+                        <option value="Não oneroso">Não oneroso</option>
+                        </select></InputP></td>
                     </tr>
                     <tr>
                       <td>FN227</td>

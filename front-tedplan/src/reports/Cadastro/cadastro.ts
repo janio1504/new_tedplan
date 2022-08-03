@@ -2,9 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 export function cadastroPDF(dadosMunicipio: any){
-    pdfMake.vfs = pdfFonts.pdfMake.vfs
-   
-    console.log(dadosMunicipio);
+    pdfMake.vfs = pdfFonts.pdfMake.vfs   
     
     const reportTitle: any = [
         {

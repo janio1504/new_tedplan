@@ -163,11 +163,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   const editor = useRef();
   const firstRender = useRef(true);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
- 
+  const [nomeMunicipio, setMunicipio] = useState("");
+
 
   useEffect(() => {    
     setDadosMunicipio(municipio[0]);
     setContentForEditor(municipio[0].rf_descricao);
+    setMunicipio(municipio[0].municipio_nome)
   }, [municipio]);
 
   async function handleGetMunicipio(id_municipio) {
@@ -584,7 +586,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         : (data.dd_total_moradias = dadosMunicipio.dd_total_moradias);
     }
     
-
     const res = await api
       .post("addMunicipio", data)
       .then((response) => {
@@ -620,174 +621,227 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuMunicipio>
-        <Municipio>Municipio: {dadosMunicipio.municipio_nome}</Municipio>
+        <Municipio>Bem vindos Municipio de {nomeMunicipio}</Municipio>
         <MenuMunicipioItem>
-             <ul>  
-             <li onClick={handleHome}>Home</li>            
-               <li onClick={handleGestao}>Gestão</li>
-               <li onClick={handleIndicadores}>Indicadores</li>
-               <li onClick={handleReporte}>Reporte</li>
-               <li onClick={handleSignOut}>Sair</li>
-             </ul>
-           </MenuMunicipioItem>
+          <ul>
+            <li onClick={handleGestao}>Gestão</li>
+            <li onClick={handleIndicadores}>Indicadores</li>
+            <li onClick={handleSignOut}>Manuais</li>
+            <li onClick={handleReporte}>Relatorios</li>
+            <li onClick={handleSignOut}>Sair</li>
+          </ul>
+        </MenuMunicipioItem>
       </MenuMunicipio>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)} autoComplete="off">
           <DivForm>
-            <DivTituloForm>Dados do Municipio</DivTituloForm>
+            <DivTituloForm>Dados do Município</DivTituloForm>
             <input
               {...register("id_municipio")}
               defaultValue={usuario?.id_municipio}
               onChange={handleOnChange}
               type="hidden"
             ></input>
-            <InputP>
-              <label>Código do IBGE</label>
-              <input
-                {...register("municipio_codigo_ibge")}
-                defaultValue={dadosMunicipio.municipio_codigo_ibge}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputM>
-              <label>Municipio</label>
-              <input
-                {...register("municipio_nome")}
-                defaultValue={dadosMunicipio.municipio_nome}
-                onChange={handleOnChange}
-              ></input>
-            </InputM>
-            <InputM>
-              <label>CNPJ</label>
-              <input
-                {...register("municipio_cnpj")}
-                defaultValue={dadosMunicipio.municipio_cnpj}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputG>
-              <label>
-                Nome da Prefeitura<span> *</span>
-              </label>
-              <input
-                aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_nome_prefeitura", { required: false })}
-                defaultValue={dadosMunicipio.municipio_nome_prefeitura}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_nome_prefeitura && errors.municipio_nome_prefeitura.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputG>
-            <InputP>
-              <label>
-                CEP<span> *</span>
-              </label>
-              <input
-               aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_cep", { required: false })}
-                defaultValue={dadosMunicipio.municipio_cep}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_cep && errors.municipio_cep.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputP>
-            <InputG>
-              <label>
-                Endereço<span> *</span>
-              </label>
-              <input
-              aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_endereco", { required: false })}
-                defaultValue={dadosMunicipio.municipio_endereco}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_endereco && errors.municipio_endereco.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputG>
-            <InputP>
-              <label>
-                Numero<span> *</span>
-              </label>
-              <input
-              aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_numero", { required: false })}
-                defaultValue={dadosMunicipio.municipio_numero}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_numero && errors.municipio_numero.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputP>
-            <InputM>
-              <label>
-                Bairro<span> *</span>
-              </label>
-              <input
-              aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_bairro", { required: false })}
-                defaultValue={dadosMunicipio.municipio_bairro}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_bairro && errors.municipio_bairro.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-              aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_telefone", { required: false })}
-                defaultValue={dadosMunicipio.municipio_telefone}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_telefone && errors.municipio_telefone.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputP>
-            <InputM>
-              <label>
-                E-mail<span> *</span>
-              </label>
-              <input
-                aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_email", { required: false })}
-                defaultValue={dadosMunicipio.municipio_email}
-                onChange={handleOnChange}
-                type="text"
-              />
-              {errors.municipio_email && errors.municipio_email.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputM>
-            <InputG>
-              <label>
-                Nome do Prefeito<span> *</span>
-              </label>
-              <input
-              aria-invalid={errors.value ? "true" : "false"}
-                {...register("municipio_prefeito", { required: false })}
-                defaultValue={dadosMunicipio.municipio_prefeito}
-                onChange={handleOnChange}
-                type="text"
-              />
-               {errors.municipio_prefeito && errors.municipio_prefeito.type && (
-                <span>O campo é obrigatório!</span>
-              )}
-            </InputG>
+            <table>
+              <thead></thead>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputP>
+                    <label>Código do IBGE</label>
+                    <input
+                      {...register("municipio_codigo_ibge")}
+                      defaultValue={dadosMunicipio.municipio_codigo_ibge}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                    <label>Municipio</label>
+                    <input
+                      {...register("municipio_nome")}
+                      defaultValue={dadosMunicipio.municipio_nome}
+                      onChange={handleOnChange}
+                    ></input>
+                  </InputM>
+                  </td>
+                  <td>
+                  <InputM>
+                    <label>CNPJ</label>
+                    <input
+                      {...register("municipio_cnpj")}
+                      defaultValue={dadosMunicipio.municipio_cnpj}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputM>
+                  </td>
+                </tr>
+                </tbody>
+              </table> 
+              <table>
+                <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Nome da Prefeitura<span> *</span>
+                    </label>
+                    <input
+                      aria-invalid={errors.value ? "true" : "false"}
+                      {...register("municipio_nome_prefeitura", { required: false })}
+                      defaultValue={dadosMunicipio.municipio_nome_prefeitura}
+                      onChange={handleOnChange}
+                      type="text"
+                    />
+                    {errors.municipio_nome_prefeitura && errors.municipio_nome_prefeitura.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        CEP<span> *</span>
+                      </label>
+                      <input
+                      aria-invalid={errors.value ? "true" : "false"}
+                        {...register("municipio_cep", { required: false })}
+                        defaultValue={dadosMunicipio.municipio_cep}
+                        onChange={handleOnChange}
+                        type="text"
+                      />
+                      {errors.municipio_cep && errors.municipio_cep.type && (
+                        <span>O campo é obrigatório!</span>
+                      )}
+                    </InputP>
+                  </td>
+                </tr>
+                </tbody>
+              </table> 
+              <table>
+                <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Endereço<span> *</span>
+                    </label>
+                    <input
+                    aria-invalid={errors.value ? "true" : "false"}
+                      {...register("municipio_endereco", { required: false })}
+                      defaultValue={dadosMunicipio.municipio_endereco}
+                      onChange={handleOnChange}
+                      type="text"
+                    />
+                    {errors.municipio_endereco && errors.municipio_endereco.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                    <label>
+                      Numero<span> *</span>
+                    </label>
+                    <input
+                    aria-invalid={errors.value ? "true" : "false"}
+                      {...register("municipio_numero", { required: false })}
+                      defaultValue={dadosMunicipio.municipio_numero}
+                      onChange={handleOnChange}
+                      type="text"
+                    />
+                    {errors.municipio_numero && errors.municipio_numero.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                  </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                    <label>
+                      Bairro<span> *</span>
+                    </label>
+                    <input
+                    aria-invalid={errors.value ? "true" : "false"}
+                      {...register("municipio_bairro", { required: false })}
+                      defaultValue={dadosMunicipio.municipio_bairro}
+                      onChange={handleOnChange}
+                      type="text"
+                    />
+                    {errors.municipio_bairro && errors.municipio_bairro.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                  </InputM>
+                  </td>
+                </tr>
+                </tbody>
+              </table> 
+              <table>
+                <tbody>
+                <tr>
+                  <td>
+                  <InputP>
+                    <label>
+                      Telefone<span> *</span>
+                    </label>
+                    <input
+                    aria-invalid={errors.value ? "true" : "false"}
+                      {...register("municipio_telefone", { required: false })}
+                      defaultValue={dadosMunicipio.municipio_telefone}
+                      onChange={handleOnChange}
+                      type="text"
+                    />
+                    {errors.municipio_telefone && errors.municipio_telefone.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                  </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        E-mail<span> *</span>
+                      </label>
+                      <input
+                        aria-invalid={errors.value ? "true" : "false"}
+                        {...register("municipio_email", { required: false })}
+                        defaultValue={dadosMunicipio.municipio_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      />
+                      {errors.municipio_email && errors.municipio_email.type && (
+                        <span>O campo é obrigatório!</span>
+                      )}
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputG>
+                    <label>
+                      Nome do Prefeito<span> *</span>
+                    </label>
+                    <input
+                    aria-invalid={errors.value ? "true" : "false"}
+                      {...register("municipio_prefeito", { required: false })}
+                      defaultValue={dadosMunicipio.municipio_prefeito}
+                      onChange={handleOnChange}
+                      type="text"
+                    />
+                    {errors.municipio_prefeito && errors.municipio_prefeito.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                  </InputG>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+       
+            
+          
+           
+           
           </DivForm>
 
           <DivForm>
@@ -800,72 +854,107 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               onChange={handleOnChange}
               type="hidden"
             />
-            <InputG>
-              <label>
-                Setor Responsável<span> *</span>
-              </label>
-              <input
-                {...register("ts_setor_responsavel")}
-                defaultValue={dadosMunicipio.ts_setor_reponsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Telefone Comercial<span> *</span>
-              </label>
-              <input
-                {...register("ts_telefone_comercial")}
-                defaultValue={dadosMunicipio.ts_telefone_comercial}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Nome Responsável<span> *</span>
-              </label>
-              <input
-                {...register("ts_responsavel")}
-                defaultValue={dadosMunicipio.ts_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputM>
-              <label>
-                Cargo<span> *</span>
-              </label>
-              <input
-                {...register("ts_cargo")}
-                defaultValue={dadosMunicipio.ts_cargo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-                {...register("ts_telefone")}
-                defaultValue={dadosMunicipio.ts_telefone}
-                onChange={handleOnChange}
-                type="text"
-              />
-            </InputP>
-            <InputG>
-              <label>
-                Email<span> *</span>
-              </label>
-              <input
-                {...register("ts_email")}
-                defaultValue={dadosMunicipio.ts_email}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
+             <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("ts_setor_responsavel")}
+                      defaultValue={dadosMunicipio.ts_setor_reponsavel}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                    <label>
+                      Telefone Comercial<span> *</span>
+                    </label>
+                    <input
+                      {...register("ts_telefone_comercial")}
+                      defaultValue={dadosMunicipio.ts_telefone_comercial}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+         
+            
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Nome Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("ts_responsavel")}
+                      defaultValue={dadosMunicipio.ts_responsavel}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("ts_cargo")}
+                        defaultValue={dadosMunicipio.ts_cargo}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <input
+                        {...register("ts_telefone")}
+                        defaultValue={dadosMunicipio.ts_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      />
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table> 
+        
+           
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Email<span> *</span>
+                    </label>
+                    <input
+                      {...register("ts_email")}
+                      defaultValue={dadosMunicipio.ts_email}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+         
           </DivForm>
 
           <DivForm>
@@ -879,140 +968,197 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               onChange={handleOnChange}
               type="hidden"
             />
-            <InputG>
-              <label>
-                Secretaria ou Setor Responsável<span> *</span>
-              </label>
-              <input
-                {...register("aa_secretaria_setor_responsavel")}
-                defaultValue={dadosMunicipio.aa_secretaria_setor_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Abrangência<span> *</span>
-              </label>
-              <input
-                {...register("aa_abrangencia")}
-                defaultValue={dadosMunicipio.aa_abrangencia}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Natureza jurídica<span> *</span>
-              </label>
-              <select {...register("aa_natureza_juridica")}>
-                <option value={dadosMunicipio.aa_natureza_juridica}>
-                  {dadosMunicipio.aa_natureza_juridica}
-                </option>
-                <option value="PESSOA FISICA">PESSOA FISICA</option>
-                <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
-              </select>
-            </InputG>
-            <InputM>
-              <label>
-                CNPJ<span> *</span>
-              </label>
-              <input
-                {...register("aa_cnpj")}
-                defaultValue={dadosMunicipio.aa_cnpj}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-                {...register("aa_telefone")}
-                defaultValue={dadosMunicipio.aa_telefone}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputP>
-              <label>
-                CEP<span> *</span>
-              </label>
-              <input
-                {...register("aa_cep")}
-                defaultValue={dadosMunicipio.aa_cep}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputM>
-              <label>
-                Endereço<span> *</span>
-              </label>
-              <input
-                {...register("aa_endereco")}
-                defaultValue={dadosMunicipio.aa_endereco}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Numero<span> *</span>
-              </label>
-              <input
-                {...register("aa_numero")}
-                defaultValue={dadosMunicipio.aa_numero}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Bairro<span> *</span>
-              </label>
-              <input
-                {...register("aa_bairro")}
-                defaultValue={dadosMunicipio.aa_bairro}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-
-            <InputG>
-              <label>
-                Nome do Responsável<span> *</span>
-              </label>
-              <input
-                {...register("aa_responsavel")}
-                defaultValue={dadosMunicipio.aa_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Cargo<span> *</span>
-              </label>
-              <input
-                {...register("aa_cargo")}
-                defaultValue={dadosMunicipio.aa_cargo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Email<span> *</span>
-              </label>
-              <input
-                {...register("aa_email")}
-                defaultValue={dadosMunicipio.aa_email}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Secretaria ou Setor Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_secretaria_setor_responsavel")}
+                        defaultValue={dadosMunicipio.aa_secretaria_setor_responsavel}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                    <label>
+                      Abrangência<span> *</span>
+                    </label>
+                    <input
+                      {...register("aa_abrangencia")}
+                      defaultValue={dadosMunicipio.aa_abrangencia}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+          
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Natureza jurídica<span> *</span>
+                    </label>
+                    <select {...register("aa_natureza_juridica")}>
+                      <option value={dadosMunicipio.aa_natureza_juridica}>
+                        {dadosMunicipio.aa_natureza_juridica}
+                      </option>
+                      <option value="Administração Pública Direta">Administração Pública Direta</option>
+                      <option value="Autarquia">Autarquia</option>
+                      <option value="Empresa pública">Empresa pública</option>
+                      <option value="Sociedade de economia mista com administração privada">Sociedade de economia mista com administração privada</option>
+                      <option value="Sociedade de economia mista com administração pública">Sociedade de economia mista com administração pública</option>
+                    </select>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        CNPJ<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_cnpj")}
+                        defaultValue={dadosMunicipio.aa_cnpj}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_telefone")}
+                        defaultValue={dadosMunicipio.aa_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          
+          
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputP>
+                      <label>
+                        CEP<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_cep")}
+                        defaultValue={dadosMunicipio.aa_cep}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Endereço<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_endereco")}
+                        defaultValue={dadosMunicipio.aa_endereco}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Numero<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_numero")}
+                        defaultValue={dadosMunicipio.aa_numero}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Bairro<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_bairro")}
+                        defaultValue={dadosMunicipio.aa_bairro}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </tbody>
+            </table>   
+            
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Nome do Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("aa_responsavel")}
+                      defaultValue={dadosMunicipio.aa_responsavel}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_cargo")}
+                        defaultValue={dadosMunicipio.aa_cargo}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("aa_email")}
+                        defaultValue={dadosMunicipio.aa_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+        
+           
 
             <DivEixo>Esgotamento Sanitário</DivEixo>
             <input
@@ -1021,140 +1167,200 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               onChange={handleOnChange}
               type="hidden"
             />
-            <InputG>
-              <label>
-                Secretaria ou Setor Responsável<span> *</span>
-              </label>
-              <input
-                {...register("es_secretaria_setor_responsavel")}
-                defaultValue={dadosMunicipio.es_secretaria_setor_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Abrangência<span> *</span>
-              </label>
-              <input
-                {...register("es_abrangencia")}
-                defaultValue={dadosMunicipio.es_abrangencia}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Natureza jurídica<span> *</span>
-              </label>
-              <select {...register("es_natureza_juridica")}>
-                <option value={dadosMunicipio.es_natureza_juridica}>
-                  {dadosMunicipio.es_natureza_juridica}
-                </option>
-                <option value="PESSOA FISICA">PESSOA FISICA</option>
-                <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
-              </select>
-            </InputG>
-            <InputM>
-              <label>
-                CNPJ<span> *</span>
-              </label>
-              <input
-                {...register("es_cnpj")}
-                defaultValue={dadosMunicipio.es_cnpj}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-                {...register("es_telefone")}
-                defaultValue={dadosMunicipio.es_telefone}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputP>
-              <label>
-                CEP<span> *</span>
-              </label>
-              <input
-                {...register("es_cep")}
-                defaultValue={dadosMunicipio.es_cep}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputM>
-              <label>
-                Endereço<span> *</span>
-              </label>
-              <input
-                {...register("es_endereco")}
-                defaultValue={dadosMunicipio.es_endereco}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Numero<span> *</span>
-              </label>
-              <input
-                {...register("es_numero")}
-                defaultValue={dadosMunicipio.es_numero}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Bairro<span> *</span>
-              </label>
-              <input
-                {...register("es_bairro")}
-                defaultValue={dadosMunicipio.es_bairro}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-
-            <InputG>
-              <label>
-                Nome do Responsável<span> *</span>
-              </label>
-              <input
-                {...register("es_responsavel")}
-                defaultValue={dadosMunicipio.es_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Cargo<span> *</span>
-              </label>
-              <input
-                {...register("es_cargo")}
-                defaultValue={dadosMunicipio.es_cargo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Email<span> *</span>
-              </label>
-              <input
-                {...register("es_email")}
-                defaultValue={dadosMunicipio.es_email}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Secretaria ou Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("es_secretaria_setor_responsavel")}
+                      defaultValue={dadosMunicipio.es_secretaria_setor_responsavel}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Abrangência<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_abrangencia")}
+                        defaultValue={dadosMunicipio.es_abrangencia}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          
+          
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Natureza jurídica<span> *</span>
+                      </label>
+                      <select {...register("es_natureza_juridica")}>
+                        <option value={dadosMunicipio.es_natureza_juridica}>
+                          {dadosMunicipio.es_natureza_juridica}
+                        </option>
+                              <option value="Administração Pública Direta">Administração Pública Direta</option>
+                              <option value="Autarquia">Autarquia</option>
+                              <option value="Empresa pública">Empresa pública</option>
+                              <option value="Sociedade de economia mista com administração privada">Sociedade de economia mista com administração privada</option>
+                              <option value="Sociedade de economia mista com administração pública">Sociedade de economia mista com administração pública</option>
+                      </select>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        CNPJ<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_cnpj")}
+                        defaultValue={dadosMunicipio.es_cnpj}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_telefone")}
+                        defaultValue={dadosMunicipio.es_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>  
+         
+           
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                     <InputP>
+                      <label>
+                        CEP<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_cep")}
+                        defaultValue={dadosMunicipio.es_cep}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                      <InputM>
+                        <label>
+                          Endereço<span> *</span>
+                        </label>
+                        <input
+                          {...register("es_endereco")}
+                          defaultValue={dadosMunicipio.es_endereco}
+                          onChange={handleOnChange}
+                          type="text"
+                        ></input>
+                      </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Numero<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_numero")}
+                        defaultValue={dadosMunicipio.es_numero}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Bairro<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_bairro")}
+                        defaultValue={dadosMunicipio.es_bairro}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+        
+         
+        
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Nome do Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_responsavel")}
+                        defaultValue={dadosMunicipio.es_responsavel}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_cargo")}
+                        defaultValue={dadosMunicipio.es_cargo}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("es_email")}
+                        defaultValue={dadosMunicipio.es_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      
+        
+          
 
             <DivEixo>Drenagem e Àguas pluviais</DivEixo>
             <input
@@ -1163,140 +1369,198 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               onChange={handleOnChange}
               type="hidden"
             />
-            <InputG>
-              <label>
-                Secretaria ou Setor Responsável<span> *</span>
-              </label>
-              <input
-                {...register("da_secretaria_setor_responsavel")}
-                defaultValue={dadosMunicipio.da_secretaria_setor_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Abrangência<span> *</span>
-              </label>
-              <input
-                {...register("da_abrangencia")}
-                defaultValue={dadosMunicipio.da_abrangencia}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Natureza jurídica<span> *</span>
-              </label>
-              <select {...register("da_natureza_juridica")}>
-                <option value={dadosMunicipio.da_natureza_juridica}>
-                  {dadosMunicipio.da_natureza_juridica}
-                </option>
-                <option value="PESSOA FISICA">PESSOA FISICA</option>
-                <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
-              </select>
-            </InputG>
-            <InputM>
-              <label>
-                CNPJ<span> *</span>
-              </label>
-              <input
-                {...register("da_cnpj")}
-                defaultValue={dadosMunicipio.da_cnpj}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-                {...register("da_telefone")}
-                defaultValue={dadosMunicipio.da_telefone}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputP>
-              <label>
-                CEP<span> *</span>
-              </label>
-              <input
-                {...register("da_cep")}
-                defaultValue={dadosMunicipio.da_cep}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputM>
-              <label>
-                Endereço<span> *</span>
-              </label>
-              <input
-                {...register("da_endereco")}
-                defaultValue={dadosMunicipio.da_endereco}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Numero<span> *</span>
-              </label>
-              <input
-                {...register("da_numero")}
-                defaultValue={dadosMunicipio.da_numero}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Bairro<span> *</span>
-              </label>
-              <input
-                {...register("da_bairro")}
-                defaultValue={dadosMunicipio.da_bairro}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-
-            <InputG>
-              <label>
-                Nome do Responsável<span> *</span>
-              </label>
-              <input
-                {...register("da_responsavel")}
-                defaultValue={dadosMunicipio.da_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Cargo<span> *</span>
-              </label>
-              <input
-                {...register("da_cargo")}
-                defaultValue={dadosMunicipio.da_cargo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Email<span> *</span>
-              </label>
-              <input
-                {...register("da_email")}
-                defaultValue={dadosMunicipio.da_email}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Secretaria ou Setor Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_secretaria_setor_responsavel")}
+                        defaultValue={dadosMunicipio.da_secretaria_setor_responsavel}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Abrangência<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_abrangencia")}
+                        defaultValue={dadosMunicipio.da_abrangencia}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          
+         
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Natureza jurídica<span> *</span>
+                      </label>
+                      <select {...register("da_natureza_juridica")}>
+                        <option value={dadosMunicipio.da_natureza_juridica}>
+                          {dadosMunicipio.da_natureza_juridica}
+                        </option>
+                        <option value="PESSOA FISICA">PESSOA FISICA</option>
+                        <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
+                      </select>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        CNPJ<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_cnpj")}
+                        defaultValue={dadosMunicipio.da_cnpj}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_telefone")}
+                        defaultValue={dadosMunicipio.da_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          
+           
+          
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputP>
+                      <label>
+                        CEP<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_cep")}
+                        defaultValue={dadosMunicipio.da_cep}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Endereço<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_endereco")}
+                        defaultValue={dadosMunicipio.da_endereco}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Numero<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_numero")}
+                        defaultValue={dadosMunicipio.da_numero}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Bairro<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_bairro")}
+                        defaultValue={dadosMunicipio.da_bairro}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </tbody>
+            </table>        
+         
+        
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Nome do Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_responsavel")}
+                        defaultValue={dadosMunicipio.da_responsavel}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_cargo")}
+                        defaultValue={dadosMunicipio.da_cargo}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("da_email")}
+                        defaultValue={dadosMunicipio.da_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+       
+         
+        
 
             <DivEixo>Resíduos Sólidos</DivEixo>
             <input

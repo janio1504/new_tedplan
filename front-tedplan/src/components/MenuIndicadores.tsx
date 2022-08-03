@@ -41,7 +41,7 @@ export default function HeadPublico() {
       <DivBotaoMenu>
         <NumeroMenu>01</NumeroMenu>
         { rota == "/indicadores/dados_municipio" ? 
-        <BotaoMenuActive onClick={handleDadosMunicipio}>Gestão</BotaoMenuActive>:
+        <BotaoMenuActive onClick={handleDadosMunicipio}>Cadastro</BotaoMenuActive>:
         <BotaoMenu onClick={handleDadosMunicipio}>Cadastro</BotaoMenu>}
       </DivBotaoMenu>
       <DivBotaoMenu>

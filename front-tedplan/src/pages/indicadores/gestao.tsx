@@ -143,6 +143,7 @@ export default function GestaoIndicadores({
   let txtArea = useRef();
   const firstRender = useRef(true);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
+  const [nomeMunicipio, setNomeMunicipio] = useState("");
 
   const getSunEditorInstance = (sunEditor) => {
     editor.current = sunEditor;
@@ -151,6 +152,7 @@ export default function GestaoIndicadores({
   useEffect(() => {
     municipio.map((value) => {
       setMunicipio(value);
+      setNomeMunicipio(value.municipio_nome)
     });
     setListParticipacoes(participacoes)
     setGestao(gestao[0]);
@@ -381,13 +383,13 @@ export default function GestaoIndicadores({
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuMunicipio>
-        <Municipio>Municipio: {isMunicipio?.municipio_nome}</Municipio>
+        <Municipio>Bem vindos Municipio de {nomeMunicipio}</Municipio>
         <MenuMunicipioItem>
           <ul>
-            <li onClick={handleHome}>Home</li>
             <li onClick={handleGestao}>Gestão</li>
             <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleReporte}>Reporte</li>
+            <li onClick={handleSignOut}>Manuais</li>
+            <li onClick={handleReporte}>Relatorios</li>
             <li onClick={handleSignOut}>Sair</li>
           </ul>
         </MenuMunicipioItem>
