@@ -3,7 +3,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any){
     pdfMake.vfs = pdfFonts.pdfMake.vfs 
-    alert(financeiro.fn037)
+    
     const reportTitle: any = [
         {
             text: 'Prestação de Serviços',
@@ -372,6 +372,48 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['FN021', 'Desembolsos de investimentos com recursos não onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro.fn021],
                 ['FN023', 'Desembolsos total de investimentos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro.fn023],
                 ['FN999', 'Observações, esclarecimentos ou sugestões', financeiro.fn999],
+           
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+
+
+       {text: 'Resíduos Sólidos', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados.ano}],
+                ['FN201', 'A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?', financeiro.fn201],
+                ['FN202', 'Principal forma adotada', financeiro.fn202],
+                ['FN203', 'Descrição da outra forma adotada', financeiro.fn203],
+                ['FN204', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+                ['', '', financeiro.fn201],
+              
            
             ]
         },
