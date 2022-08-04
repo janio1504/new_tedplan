@@ -1,9 +1,10 @@
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
-export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any){
+export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any,
+    dadosAgua: any){
     pdfMake.vfs = pdfFonts.pdfMake.vfs 
-
+    
     const reportTitle: any = [
         {
             text: 'Prestação de Serviços',
@@ -371,7 +372,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['FN019', 'Desembolsos de investimentos com recursos onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro.fn019],
                 ['FN021', 'Desembolsos de investimentos com recursos não onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro.fn021],
                 ['FN023', 'Desembolsos total de investimentos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro.fn023],
-                ['FN999', 'Observações, esclarecimentos ou sugestões', financeiro.fn999],
+                ['FN999', 'Observações, esclarecimentos ou sugestões', financeiro.drenagem_fn999],
            
             ]
         },
@@ -388,12 +389,75 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['FN201', 'A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?', financeiro.fn201],
                 ['FN202', 'Principal forma adotada', financeiro.fn202],
                 ['FN203', 'Descrição da outra forma adotada', financeiro.fn203],
-                
+                ['FN204', 'Unidade adotada para a cobrança (No caso de tarifa)', financeiro.fn204],
+                ['FN205', 'A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?', financeiro.fn205],
+                ['FN206', 'Despesa dos agentes públicos com o serviço de coleta de RDO e RPU', financeiro.fn201],
+                ['FN207', 'Despesa com agentes privados para execução do serviço de coleta de RDO e RPU', financeiro.fn207],
+                ['FN208', 'Despesa com o serviço de coleta de RDO e RPU', financeiro.fn208],
+                ['FN209', 'Despesa com agentes públicos com a coleta RSS', financeiro.fn209],
+                ['FN210', 'Despesa com empresas contratadas para coleta RSS', financeiro.fn210],
+                ['FN211', 'Despesa total com a coleta RSS', financeiro.fn211],
+                ['FN212', 'Despesa dos agentes públicos com o serviço de varrição', financeiro.fn212],
+                ['FN213', 'Despesa com empresas contratadas para o serviço de varrição', financeiro.fn213],
+                ['FN214', 'Despesa total com serviço de varrição', financeiro.fn214],
+                ['FN215', 'Despesas com agentes públicos executores dos demais serviços quando não especificado sem campo próprio', financeiro.fn215],
+                ['FN216', 'Despesas com agentes privados executores dos demais serviços quando não especificado sem campo próprio', financeiro.fn216],
+                ['FN217', 'Despesas total com todos os agentes executores dos demais serviços quando não especificado sem campo próprio', financeiro.fn217],
+                ['FN218', 'Despesa dos agentes públicos executores de serviços de manejo de RSU', financeiro.fn218],
+                ['FN219', 'Despesa dos agentes privados executores de serviços de manejo de RSU', financeiro.fn219],
+                ['FN220', 'Despesa total com os serviços de manejo de RSU', financeiro.fn220],
+                ['FN223', 'Despesa corrente da prefeitura durante o ano com todos os serviços do município (Saúde, educação, pagamento de pessoal, etc...)', financeiro.fn223],
+                ['FN221', 'Receita orçada com a cobrança de taxas e tarifas referentes á getão e manejo de RSU', financeiro.fn221],
+                ['FN222', 'Receita arrecadada com taxas e tarifas referentes á gestão e manejo de RSU', financeiro.fn222],
+                ['FN224', 'A prefeitura recebeu algum recurso federal para aplicação no setor de manejo de RSU?', financeiro.fn224],
+                ['FN225', 'Valor repassado', financeiro.fn225],
+                ['FN226', 'Tipo de recurso', financeiro.fn226],
+                ['FN227', 'Em que foi aplicado o recurso?', financeiro.fn227],
+                ['FN999', 'Observações, esclarecimentos ou sugestões	', financeiro.residuos_fn999],
+              
            
             ]
         },
         layout: 'headerLineOnly'
        },
+
+       {text: 'Água', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados.ano}],
+                // ['AG021', 'Quantidade de ligações totais de água', dadosAgua.ag021],
+                // ['AG002','Quantidade de ligações ativas de água',dadosAgua.ag002],
+                // ['AG004','Quantidade de ligações ativas de água micromedidas',dadosAgua.ag004],
+                // ['AG003','Quantidade de economias ativas de água',dadosAgua.ag003],
+                // ['AG014','Quantidade de economias ativas de água micromedidas',dadosAgua.ag014],
+                // ['AG013','Quantidade de economias residenciais ativas de água',dadosAgua.ag013],
+                // ['AG022','Quantidade de economias residenciais ativas de água micromedidas',dadosAgua.ag022],
+                // ['AG006','Volume de água produzido',dadosAgua.ag006],
+                // ['AG024','Volume de água de serviço',dadosAgua.ag024],
+                // ['AG016','Volume de água bruta importado',dadosAgua.ag016],
+                // ['AG018','Volume de água tratada importado',dadosAgua.ag018],
+                // ['AG017','Volume de água bruta exportado',dadosAgua.ag017],
+                // ['AG019','Volume de água tratada exportado',dadosAgua.ag019],
+                // ['AG007','Volume de água tratada em ETA(s)',dadosAgua.ag007],
+                // ['AG015','Volume de água de água tratada por simples desinfecção',dadosAgua.ag015],
+                // ['AG027','Volume de água fluoretada',dadosAgua.ag027],
+                // ['AG012','Volume de água macromedida',dadosAgua.ag012],
+                // ['AG008','Volume de água micromedida',dadosAgua.ag008],
+                // ['AG010','Volume de água consumido',dadosAgua.ag010],
+                // ['AG011','Volume de água faturado',dadosAgua.ag011],
+                // ['AG020','Volume micromedido nas economias residenciais de água',dadosAgua.ag020],
+                // ['AG005','Extenção da rede de água',dadosAgua.ag005],
+                // ['AG028','Consumo total de energia elétrica nos sistemas de água',dadosAgua.ag028],
+                // ['AG098','Campo de justificativa',dadosAgua.ag098],
+                // ['AG099','Observações',dadosAgua.ag099],
+                
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+
        
     ]
    

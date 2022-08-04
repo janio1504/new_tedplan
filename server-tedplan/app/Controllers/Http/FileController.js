@@ -9,7 +9,6 @@ class FileController {
   async showFile({ request, response }) {
     try {
       const { id } = request.all();
-      console.log(id);
       if (id) {
         const file = await File.findOrFail(id);
 

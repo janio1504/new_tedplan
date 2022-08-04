@@ -1563,146 +1563,197 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         
 
             <DivEixo>Resíduos Sólidos</DivEixo>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Secretaria ou Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("rs_secretaria_setor_responsavel")}
+                      defaultValue={dadosMunicipio.rs_secretaria_setor_responsavel}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                    <label>
+                      Abrangência<span> *</span>
+                    </label>
+                    <input
+                      {...register("rs_abrangencia")}
+                      defaultValue={dadosMunicipio.rs_abrangencia}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
             <input
               {...register("id_ps_residuo_solido")}
               defaultValue={dadosMunicipio.id_ps_residuo_solido}
               onChange={handleOnChange}
               type="hidden"
             />
-            <InputG>
-              <label>
-                Secretaria ou Setor Responsável<span> *</span>
-              </label>
-              <input
-                {...register("rs_secretaria_setor_responsavel")}
-                defaultValue={dadosMunicipio.rs_secretaria_setor_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Abrangência<span> *</span>
-              </label>
-              <input
-                {...register("rs_abrangencia")}
-                defaultValue={dadosMunicipio.rs_abrangencia}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Natureza jurídica<span> *</span>
-              </label>
-              <select {...register("rs_natureza_juridica")}>
-                <option value={dadosMunicipio.rs_natureza_juridica}>
-                  {dadosMunicipio.rs_natureza_juridica}
-                </option>
-                <option value="PESSOA FISICA">PESSOA FISICA</option>
-                <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
-              </select>
-            </InputG>
-            <InputM>
-              <label>
-                CNPJ<span> *</span>
-              </label>
-              <input
-                {...register("rs_cnpj")}
-                defaultValue={dadosMunicipio.rs_cnpj}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-                {...register("rs_telefone")}
-                defaultValue={dadosMunicipio.rs_telefone}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputP>
-              <label>
-                CEP<span> *</span>
-              </label>
-              <input
-                {...register("rs_cep")}
-                defaultValue={dadosMunicipio.rs_cep}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputM>
-              <label>
-                Endereço<span> *</span>
-              </label>
-              <input
-                {...register("rs_endereco")}
-                defaultValue={dadosMunicipio.rs_endereco}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Numero<span> *</span>
-              </label>
-              <input
-                {...register("rs_numero")}
-                defaultValue={dadosMunicipio.rs_numero}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Bairro<span> *</span>
-              </label>
-              <input
-                {...register("rs_bairro")}
-                defaultValue={dadosMunicipio.rs_bairro}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-
-            <InputG>
-              <label>
-                Nome do Responsável<span> *</span>
-              </label>
-              <input
-                {...register("rs_responsavel")}
-                defaultValue={dadosMunicipio.rs_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Cargo<span> *</span>
-              </label>
-              <input
-                {...register("rs_cargo")}
-                defaultValue={dadosMunicipio.rs_cargo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Email<span> *</span>
-              </label>
-              <input
-                {...register("rs_email")}
-                defaultValue={dadosMunicipio.rs_email}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
+        
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Natureza jurídica<span> *</span>
+                      </label>
+                      <select {...register("rs_natureza_juridica")}>
+                        <option value={dadosMunicipio.rs_natureza_juridica}>
+                          {dadosMunicipio.rs_natureza_juridica}
+                        </option>
+                        <option value="PESSOA FISICA">PESSOA FISICA</option>
+                        <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
+                      </select>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        CNPJ<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_cnpj")}
+                        defaultValue={dadosMunicipio.rs_cnpj}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_telefone")}
+                        defaultValue={dadosMunicipio.rs_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputP>
+                      <label>
+                        CEP<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_cep")}
+                        defaultValue={dadosMunicipio.rs_cep}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputM>
+                      <label>
+                        Endereço<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_endereco")}
+                        defaultValue={dadosMunicipio.rs_endereco}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Numero<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_numero")}
+                        defaultValue={dadosMunicipio.rs_numero}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputG>
+                      <label>
+                        Bairro<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_bairro")}
+                        defaultValue={dadosMunicipio.rs_bairro}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                      <label>
+                        Nome do Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_responsavel")}
+                        defaultValue={dadosMunicipio.rs_responsavel}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_cargo")}
+                        defaultValue={dadosMunicipio.rs_cargo}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                  <InputG>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("rs_email")}
+                        defaultValue={dadosMunicipio.rs_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          
+            
+         
           </DivForm>
 
           <DivForm>

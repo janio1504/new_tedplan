@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { parseCookies } from 'nookies';
 import { AuthContext } from '../contexts/AuthContext';
-import { useToasts } from 'react-toast-notifications';
+import { toast, ToastContainer } from 'react-nextjs-toast';
 import {
   Container,
      Form, SubmitButton,
@@ -50,11 +50,8 @@ interface NormaProps {
 
 export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProps ){
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
-  
-  const { addToast } = useToasts()
 
-  
-
+   
   async function handleAddNorma(data: INorma){
     
     const formData = new FormData();
@@ -71,19 +68,18 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
           "Content-Type": `multipart/form-data=${formData}`,
           }
       }).then((response) =>{
-        addToast('Publicação Adicionada com sucesso!', {        
-          appearance: 'success',
-          autoDismiss: true,
-        })  
-
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })   
       }).catch((error) => {
         if(error){
-          console.log(error);
-          
-          addToast('Todos os campos são obrigatórios!', {        
-            appearance: 'error',
-            autoDismiss: true,
-          })
+          toast.notify('Erro ao gravar dados!',{
+            title: "Erro!",
+            duration: 7,
+            type: "error",
+          })   
           return error
         }        
          
@@ -179,12 +175,10 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
               </SubmitButton>
        </Form>
       </DivCenter>
-       
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
      </Container>
       )
 }
-
-
 
 
 export const getServerSideProps: GetServerSideProps<NormaProps> = async (ctx) => {

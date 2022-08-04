@@ -214,3 +214,75 @@ export const BotaoMenuTexto = styled.button`
   }
 `;
 
+export const DivEixosEstatisticas= styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const DivColEstatisticas = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 10%;
+  height: 100%;
+  color: #666;
+  padding: 20px;
+  li {
+    color: blue;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+  }
+`;
+
+export const BotaoResiduosClaro = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #42895B;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoAguaEscuro = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #667778;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoDrenagemEscuro = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #667778;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoResiduos = styled.div`
+width: 150px;
+text-align: center;
+margin-top: 10px;
+background-color: #42895B;
+font-size: 18px;
+color: #fff;
+border-radius: 5px;
+padding: 5px 20px;
+cursor: pointer;
+font-weight: bolder;
+`;
+

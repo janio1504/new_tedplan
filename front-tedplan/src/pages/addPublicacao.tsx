@@ -2,7 +2,7 @@ import { GetServerSideProps } from 'next';
 import React, { useContext, useState } from 'react';
 import { parseCookies } from 'nookies';
 import { AuthContext } from '../contexts/AuthContext';
-import { useToasts } from 'react-toast-notifications'
+import { toast, ToastContainer } from 'react-nextjs-toast';
 
 import {
   Container,
@@ -53,7 +53,7 @@ interface MunicipiosProps {
 
 export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categorias }: MunicipiosProps ){
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
-  const { addToast } = useToasts()
+  
 
   const [ disabledTipoPublicacao, setdisabledTipoPublicacao ] = useState(false)
   const [ disabledMunicipio, setdisabledMunicipio ] = useState(false)
@@ -76,9 +76,10 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
           }
       }).catch((error) => {
         if(error){
-          addToast('Todos os campos são obrigatórios!', {        
-            appearance: 'error',
-            autoDismiss: true,
+          toast.notify('Erro ao gravar!',{
+            title: "Erro!",
+            duration: 7,
+            type: "error",
           })
           return error
         }        
@@ -94,10 +95,11 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
           id_municipio: '',        
         })
         
-        addToast('Publicação Adicionada com sucesso!', {        
-          appearance: 'success',
-          autoDismiss: true,
-        })          
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })         
 
   }
 
@@ -190,7 +192,7 @@ export default function AddPublicacao({ municipios, tipoPublicacao, eixos, categ
               </SubmitButton>
        </Form>
       </DivCenter>
-       <Footer>&copy; Todos os direitos reservados</Footer>
+       <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
      </Container>
       )
 }

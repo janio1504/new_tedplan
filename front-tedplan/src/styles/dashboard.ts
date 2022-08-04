@@ -409,9 +409,10 @@ export const ModalGaleria = styled.div`
 
 export const ConteudoModal = styled.div`
   width: 100%;
-  float: left;
-  text-align: left;
+  
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
   input {
     border: 2px solid #2dd9d0;
     border-radius: 5px;
@@ -455,6 +456,15 @@ export const ConteudoModal = styled.div`
   }
 `;
 
+export const ContainerImagems = styled.div`
+  width: 100%;
+  
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  
+`;
+
 export const ImagemModal = styled.div`
   flex-direction: column;
   display: flex;
@@ -485,20 +495,21 @@ export const ImagemGaleria = styled.div`
 `;
 
 export const ImagensGaleria = styled.div`
-  float: left;
-  text-align: left;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   min-width: 120px;
   min-height: 180px;
   margin: 10px;
   border-radius: 5px;
   border: solid 1px #2dd9d0;
-  align-items: center;
-  text-align: center;
+ 
   img {
     text-align: center;
-    float: left;
+    display: flex;
+    align-items: center;
     width: 100px;
-    margin: 10px 10px 10px -10px;
+    margin: 10px 10px 10px 10px;
   }
   button {
     border: none;

@@ -56,6 +56,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [dadosGeral, setDadosGeral] = useState(null);
   const [concessionarias, setConcessionarias] = useState(null);
   const [financeiro, setFinanceiro] = useState(null);
+  const [dadosAgua, setDadosAgua] = useState(null);
   useEffect(() => {
     setDadosMunicipio(municipio[0]);
     
@@ -65,6 +66,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     getDadosGerais()
     getConcessionarias()
     getDadosFinanceiros()
+    getDadosAgua()
   }, [municipio]);
 
   async function getDadosGerais(){
@@ -78,6 +80,21 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       .catch((error) => {      
         console.log(error);
       });
+  }
+
+  async function getDadosAgua() {  
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()  
+    const res = await api
+      .post("get-agua", {id_municipio: id_municipio, ano: ano})
+      .then((response) => {        
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      setDadosAgua(res[0])
   }
   async function getConcessionarias(){
     const id_municipio = municipio[0].id_municipio
@@ -165,7 +182,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
               PRESTAÇÃO DE SERVIÇOS
           </TituloRelatorios>
           <Image src={PrestacaoServicos} alt='Prestação de Serviços' />
-          <BaixarRelatorio onClick={()=>prestacaoServicos(dadosGeral, concessionarias, financeiro)}>Baixar</BaixarRelatorio>
+          <BaixarRelatorio onClick={()=>prestacaoServicos(dadosGeral,
+             concessionarias, financeiro, dadosAgua)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         
         </DivRelatorios>

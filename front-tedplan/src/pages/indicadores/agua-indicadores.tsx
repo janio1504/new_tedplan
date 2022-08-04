@@ -53,6 +53,9 @@ export default function Agua({ municipio }: MunicipioProps) {
   const [content, setContent] = useState(null);
 
   useEffect(() => {
+    municipio.map((value) => {
+       setDadosMunicipio(value);
+    });
     getDadosAgua()
   }, []);
 
@@ -110,13 +113,13 @@ export default function Agua({ municipio }: MunicipioProps) {
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuMunicipio>
-        <Municipio>Municipio: {}</Municipio>
+        <Municipio>Bem vindos Município de {dadosMunicipio.municipio_nome}</Municipio>
         <MenuMunicipioItem>
           <ul>
-            <li onClick={handleHome}>Home</li>
             <li onClick={handleGestao}>Gestão</li>
             <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleReporte}>Reporte</li>
+            <li onClick={handleSignOut}>Manuais</li>
+            <li onClick={handleReporte}>Relatorios</li>
             <li onClick={handleSignOut}>Sair</li>
           </ul>
         </MenuMunicipioItem>

@@ -71,13 +71,13 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
       id_tipo_publicacao: '',
       id_eixo: ''
     }), 
-    toast.notify('Dados gravados com sucesso!',{
-      title: "Sucesso!",
+    toast.notify('Nenhum resultado encontrado para a busca!',{
+      title: "Atenção!",
       duration: 7,
-      type: "success",
+      type: "error",
     })
     )
-
+   
     getNormas(normas)
     reset({
       titulo: '',
@@ -88,11 +88,11 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
   } 
 
   async function getNormas(normas?: any) {
-
+    
     const apiClient = getAPIClient()
-    if(normas){
+    if(normas){           
     const norma = await Promise.all(
-      normas.map( async (p) =>{
+      normas?.map( async (p) =>{
         const imagem = await apiClient({
           method: 'GET',
           url: 'getImagem',
@@ -135,7 +135,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
      return (
       
      <Container>     
-       <ToastContainer></ToastContainer>
+      
        <HeadPublico></HeadPublico>       
        <DivCenter>
          <MenuLateral>

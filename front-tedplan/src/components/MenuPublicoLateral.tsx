@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Router, { useRouter } from "next/router";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FaAngleRight } from "react-icons/fa";
 
 
 export default function MenuPublicoLateral() {
@@ -24,19 +24,19 @@ export default function MenuPublicoLateral() {
     <>
       <ul>
         <li>
-          <FontAwesomeIcon icon='angle-right' /> Mapas
+          <FaAngleRight /> Mapas
         </li>
         <li onClick={handleNormas}>
-          <FontAwesomeIcon icon='angle-right' /> Normas
+          <FaAngleRight /> Normas
         </li>
         <li onClick={handlePublicacoes}>
-          <FontAwesomeIcon icon='angle-right' /> Publicações
+          <FaAngleRight /> Publicações
         </li>
         <li onClick={handleGalerias}>
-          <FontAwesomeIcon icon='angle-right' /> Galerias de fotos
+          <FaAngleRight /> Galerias de fotos
         </li>
         <li onClick={handleEstatisticas}>
-          <FontAwesomeIcon icon='angle-right' /> Estatísticas
+          <FaAngleRight /> Estatísticas
         </li>
       </ul>
     </>

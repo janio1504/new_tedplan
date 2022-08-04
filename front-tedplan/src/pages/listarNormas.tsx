@@ -122,6 +122,7 @@ export default function Postagens({ normas }: NormasProps) {
         params: { id: id_arquivo },
         responseType: "blob",
       }).then((response) => {
+        
         return URL.createObjectURL(response.data);
       });
       setArquivo(arquivo);

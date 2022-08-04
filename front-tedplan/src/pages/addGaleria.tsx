@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
-import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from 'react-nextjs-toast';
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 //import suneditor from "suneditor";
@@ -11,6 +11,7 @@ import {
   SubmitButton,
   DivCenter,
   DivInstrucoes,
+  Footer,
 } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
@@ -64,7 +65,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
     reset,
     formState: { errors },
   } = useForm();
-  const { addToast } = useToasts();
+
 
   const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
@@ -72,11 +73,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
   let txtArea = useRef();
   const firstRender = useRef(true);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
-
-  const getSunEditorInstance = (sunEditor) => {
-    editor.current = sunEditor;
-  };
-
+  
   async function handleAddGaleria({
     titulo,
     mes,
@@ -103,10 +100,11 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
         },
       })
       .then((response) => {
-        addToast("Publicação Adicionada com sucesso!", {
-          appearance: "success",
-          autoDismiss: true,
-        });
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })   
         reset({
           imagem: "",
           titulo: "",
@@ -119,10 +117,11 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
       })
       .catch((error) => {
         if (error) {
-          addToast("Todos os campos são obrigatórios!" + error, {
-            appearance: "error",
-            autoDismiss: true,
-          });
+          toast.notify('Erro ao gravar dados!',{
+            title: "Erro!",
+            duration: 7,
+            type: "error",
+          })   
           return error;
         }
       });
@@ -219,7 +218,11 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
 
       <DivCenter>
         <DivInstrucoes>
-          <b>Cadastro de galeria:</b>
+          <b>Cadastro de galeria: </b>
+          <p>Adicione uma galeria com os dados solicitados abaixo, escolha uma imagem de capa 
+          que será mostrada no portal galerias, e se desejar, escreva uma descrição.</p>
+          <p>Após gravar a galeria clique no menu galerias e na lista clique no botão Adicionar imagens!</p>
+          
         </DivInstrucoes>
         <Form onSubmit={handleSubmit(handleAddGaleria)}>
           <label>Titulo</label>
@@ -316,6 +319,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
     </Container>
   );
 }

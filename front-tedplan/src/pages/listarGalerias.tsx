@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from 'react-nextjs-toast';
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
@@ -42,9 +42,11 @@ import {
   ModalGaleria,
   ImagemGaleria,
   ImagensGaleria,
+  ContainerImagems,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 import image from "next/image";
+import { Form } from "../styles/indicadores";
 
 interface IGaleria {
   id_galeria: string;
@@ -75,7 +77,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
   const [idImagem, setIdImagen] = useState(null);
   const [imagem, setImagem] = useState(null);
   const [imagensGaleria, setImagensGaleria] = useState(null);
-  const { addToast } = useToasts();
+ 
 
   const fileInputRef = useRef<HTMLInputElement>();
 
@@ -113,8 +115,10 @@ export default function Postagens({ galerias }: GaleriaProps) {
           url: "getImagem",
           params: { id: imagem.id },
           responseType: "blob",
-        }).then((response) => {
+        }).then((response) => {          
           return { imagen: URL.createObjectURL(response.data), id: imagem.id };
+        }).catch((error)=>{          
+          console.log(error);          
         });
         return img;
       })
@@ -132,42 +136,44 @@ export default function Postagens({ galerias }: GaleriaProps) {
     const resDelete = await api.delete("deleteGaleria", {
       params: { id_galeria: idGaleria, id_imagem: idImagem },
     });
-    addToast("Galeria removida com sucesso!", {
-      appearance: "warning",
-      autoDismiss: true,
-    });
+    toast.notify('Os dados foram removidos!',{
+      title: "Atenção!",
+      duration: 7,
+      type: "error",
+    })  
     setModalConfirm(false);
     Router.push("/listarGalerias");
   }
 
   async function handleAddImagens(data) {
     const formData = new FormData();
-
+    
     for (let img of data.imagem) {
-      console.log(img);
-
+      
       formData.append("imagem", img);
       formData.append("id_galeria", data.id_galeria);
       const res = await api
         .post("/addImagensGaleria", formData, {
-          headers: {
+          headers: {  
             "Content-Type": `multipart/form-data=${formData}`,
           },
         })
         .then((response) => {
-          addToast("Imagem adicionada com sucesso!", {
-            appearance: "success",
-            autoDismiss: true,
-          });
+          toast.notify('Dados gravados com sucesso!',{
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          })   
         })
         .catch((error) => {
-          addToast(error, {
-            appearance: "error",
-            autoDismiss: true,
-          });
+          toast.notify('Erro ao gravar dados!',{
+            title: "Erro!",
+            duration: 7,
+            type: "error",
+          })   
         });
     }
-    Router.reload();
+    
     setModalVisible(false);
   }
 
@@ -178,10 +184,11 @@ export default function Postagens({ galerias }: GaleriaProps) {
     const resDelete = await api.delete("deleteImagem", {
       params: { id_imagem: id_imagem },
     });
-    addToast("Galeria removida com sucesso!", {
-      appearance: "warning",
-      autoDismiss: true,
-    });
+    toast.notify('Os dados foram removidos!',{
+      title: "Atenção!",
+      duration: 7,
+      type: "error",
+    })  
     handleModalGaleriaOpen({ id_galeria: idGaleria });
   }
 
@@ -203,7 +210,14 @@ export default function Postagens({ galerias }: GaleriaProps) {
     console.log(data);
   }
 
-  function handleOnChange() {}
+  function handleOnChange(event) {
+    const files = event.target.files;
+    const imagem = []
+      imagem[0] = URL.createObjectURL(files[0]);
+   
+     setImagem(imagem);                             
+    
+  }
 
   function handleAddGaleria() {
     Router.push("/addGaleria");
@@ -297,37 +311,27 @@ export default function Postagens({ galerias }: GaleriaProps) {
                           <CloseModalButton onClick={handleCloseModal}>
                             Fechar
                           </CloseModalButton>
-                          <FormModal onSubmit={handleSubmit(handleAddImagens)}>
+                          <Form onSubmit={handleSubmit(handleAddImagens)}>
+                          <SubmitButton type="submit">Gravar</SubmitButton>
                             <ConteudoModal>
                               <input
                                 {...register("id_galeria")}
                                 type="hidden"
                                 value={isGaleria.id_galeria}
                               />
-                              <label>Insira uma imagem ao mesmo tempo!</label>
+                              <label>Insira uma imagem!</label>
                               <input
                                 {...register("imagem")}
                                 type="file"
                                 accept="image/*"
-                                //multiple
-                                onChange={(event) => {
-                                  const files = event.target.files;
-                                  if (files) {
-                                    let lista = [];
-                                    for (let i = 0; i < files.length; i++) {
-                                      let f = i;
-                                      lista[i] = URL.createObjectURL(files[f]);
-                                    }
-                                    setImagem(lista);
-                                  }
-                                }}
+                                //onChange={handleOnChange}
                               />
-                              {imagem?.map((file, key) => (
+                              {/* {imagem?.map((file, key) => (
                                 <img key={key} src={file} alt="TedPlan" />
-                              ))}
+                              ))} */}
                             </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
-                          </FormModal>
+                            
+                          </Form>
                         </Modal>
                       </ContainerModal>
                     )}
@@ -339,7 +343,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
                             Fechar
                           </CloseModalButton>
 
-                          <ConteudoModal>
+                          <ContainerImagems>
                             {imagensGaleria.map((imagem, key) => (
                               <ImagensGaleria key={key}>
                                 <button
@@ -352,7 +356,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
                                 </p>
                               </ImagensGaleria>
                             ))}
-                          </ConteudoModal>
+                          </ContainerImagems>
                         </ModalGaleria>
                       </ContainerModal>
                     )}
@@ -397,7 +401,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
           })}
         </ListPost>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados </Footer>
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer> </Footer>
     </Container>
   );
 }

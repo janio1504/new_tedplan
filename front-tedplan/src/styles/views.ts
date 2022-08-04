@@ -211,6 +211,7 @@ export const DivCenter = styled.div`
   background: #fff;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: 50px;
   text-align: left;
   justify-content: left;
   align-items: left;

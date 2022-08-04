@@ -358,7 +358,7 @@ export const DivColRelatorios = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 30%;
+  width: 25%;
   height: 100%;
   color: #666;
   padding: 20px;

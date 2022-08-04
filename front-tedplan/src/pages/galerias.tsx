@@ -157,6 +157,9 @@ export default function Galerias({
           responseType: "blob",
         }).then((response) => {
           return { imagen: URL.createObjectURL(response.data), id: imagem.id };
+        }).catch(error=>{
+          console.log(error);
+          
         });
         return img;
       })

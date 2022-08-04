@@ -106,6 +106,10 @@ Route.post("addPsFinanceiro", "PsFinanceiroController.store");
 Route.post("getPsFinanceiro", "PsFinanceiroController.getDadosFinanceiros");
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
+
+Route.get("getNormas", "NormaController.index");
+Route.get("getNorma", "NormaController.getNorma");
+
 // Rotas autenticadas ------------------------------- //
 Route.group(() => {
   Route.post("addPost", "PostsController.store");
@@ -136,8 +140,7 @@ Route.group(() => {
   Route.post("updateNorma", "NormaController.update");
   Route.post("updateImagemNorma", "NormaController.updateImagem");
   Route.delete("deleteNorma", "NormaController.destroy");
-  Route.get("getNormas", "NormaController.index");
-  Route.get("getNorma", "NormaController.getNorma");
+
   Route.get("getPorFiltroNormas", "NormaController.buscaPorFiltro");
   Route.get("listTipoNorma", "NormaController.listTipoNormas");
 
