@@ -26,8 +26,11 @@ Route.get("getEscalas", "EscalaController.index");
 Route.get("getFile", "FileController.showFile");
 Route.get("getImagem", "FileController.showImagem");
 Route.get("getImagens", "FileController.show");
-Route.get("getGalerias", "GaleriaController.index");
 Route.delete("deleteImagem", "FileController.destroyImagem");
+
+Route.get("getGalerias", "GaleriaController.index");
+Route.post("getPorFiltroGaleria", "GaleriaController.getGaleriaPorFiltro");
+
 
 Route.post(
   "addRepresentanteServicos",
@@ -109,6 +112,8 @@ Route.get("getUsuario", "UsuariosController.getUsuario");
 
 Route.get("getNormas", "NormaController.index");
 Route.get("getNorma", "NormaController.getNorma");
+Route.get("getPorFiltroNormas", "NormaController.buscaPorFiltro");
+Route.get("listTipoNorma", "NormaController.listTipoNormas");
 
 // Rotas autenticadas ------------------------------- //
 Route.group(() => {
@@ -141,8 +146,7 @@ Route.group(() => {
   Route.post("updateImagemNorma", "NormaController.updateImagem");
   Route.delete("deleteNorma", "NormaController.destroy");
 
-  Route.get("getPorFiltroNormas", "NormaController.buscaPorFiltro");
-  Route.get("listTipoNorma", "NormaController.listTipoNormas");
+
 
   Route.post("addFile", "FileController.store");
   Route.post("addGaleria", "GaleriaController.store");

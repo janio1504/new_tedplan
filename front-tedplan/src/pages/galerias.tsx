@@ -80,31 +80,22 @@ export default function Galerias({
     }
   }, [galerias]);
 
-  async function handlebuscaFiltrada({
-    titulo,
-    id_eixo,
-    id_municipio,
-  }: IGaleria) {
+  async function handlebuscaFiltrada(data) {
+    
     const apiClient = getAPIClient();
 
-    const resBusca = await apiClient.get("/getPorFiltroGaleria", {
-      params: { titulo, id_eixo, id_municipio },
-    });
+    const resBusca = await apiClient.post("/getPorFiltroGaleria",  
+    { titulo: data.titulo, id_eixo: data.id_eixo, id_municipio: data.id_municipio },
+    );
     const galerias = resBusca.data;
-    if (!galerias[0])
-      return (
-        reset({
-          titulo: "",
-          id_municipio: "",
-          id_eixo: "",
-        }),
-        toast.notify('Nenhum resutado foi encontrado!',{
-          title: "Atenção!",
-          duration: 7,
-          type: "warning",
-        })
-      );
-
+    if (!galerias[0]){
+      toast.notify('Nenhum resultado encontrado para a busca!',{
+        title: "Atenção",
+        duration: 7,
+        type: "error",
+      })
+      return
+    }
     getGalerias(galerias);
 
     reset({
@@ -266,7 +257,7 @@ export default function Galerias({
           </ContainerModal>
         )}
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados</Footer>
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
     </Container>
   );
 }

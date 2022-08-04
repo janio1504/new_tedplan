@@ -16,7 +16,7 @@ export default function Estatistica() {
     
   return (
     <Container>
-      <HeadPublico></HeadPublico>  
+      <HeadPublico></HeadPublico>
       <DivCenter>     
       <DivEixosEstatisticas>
           <DivColEstatisticas>

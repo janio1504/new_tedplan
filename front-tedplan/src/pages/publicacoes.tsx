@@ -92,16 +92,14 @@ export default function ViewPublicacoes({
       params: { titulo, id_eixo, id_tipo_publicacao, id_municipio },
     });
     const publicacoes = resBusca.data;
-    if (!publicacoes[0])
-      return (
-        reset({
-          titulo: "",
-          id_municipio: "",
-          id_tipo_publicacao: "",
-          id_eixo: "",
-        })
-       
-      );
+    if (!publicacoes[0]){
+      toast.notify('Nenhum resultado encontrado para a busca!',{
+        title: "Atenção",
+        duration: 7,
+        type: "error",
+      })
+      return
+    }
 
     getPublicacoes(publicacoes);
     reset({
@@ -230,7 +228,7 @@ export default function ViewPublicacoes({
           ))}
         </DivFormConteudo>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados</Footer>
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
     </Container>
   );
 }

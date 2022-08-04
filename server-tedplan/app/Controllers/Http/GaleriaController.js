@@ -12,6 +12,57 @@ class GaleriaController {
     return galeria;
   }
 
+  async getGaleriaPorFiltro({ request }){
+    const { id_municipio, id_eixo, titulo } = request.all()
+
+    if(id_municipio && !id_eixo && !titulo){
+      const res = await Galeria.query()
+      .from("tedplan.galeria as g")
+      .where("g.id_municipio", id_municipio)
+      .fetch()
+      return res
+    }
+    if(!id_municipio && id_eixo && !titulo){
+      const res = await Galeria.query()
+      .from("tedplan.galeria as g")
+      .where("g.id_municipio", id_municipio)
+      .fetch()
+      return res
+    }
+    if(!id_municipio && !id_eixo && titulo){
+      const res = await Galeria.query()
+      .from("tedplan.galeria as g")
+      .where("g.titulo","ilike","%" + titulo + "%")
+      .fetch()
+      return res
+    }
+
+    if(id_municipio && id_eixo && !titulo){
+      const res = await Galeria.query()
+      .from("tedplan.galeria as g")
+      .where("g.id_municipio", id_municipio)
+      .where("g.id_eixo", id_eixo)
+      .fetch()
+      return res
+    }
+    if(id_municipio && !id_eixo && titulo){
+      const res = await Galeria.query()
+      .from("tedplan.galeria as g")
+      .where("g.id_municipio", id_municipio)
+      .where("g.titulo","ilike","%" + titulo + "%")
+      .fetch()
+      return res
+    }
+    if(!id_municipio && id_eixo && titulo){
+      const res = await Galeria.query()
+      .from("tedplan.galeria as g")
+      .where("g.titulo","ilike","%" + titulo + "%")
+      .where("g.id_eixo", id_eixo)
+      .fetch()
+      return res
+    }
+  }
+
   async imagensGaleria({ request, response }) {
     const { id_galeria } = request.all();
     const imagens = await Galeria.query()

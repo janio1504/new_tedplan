@@ -533,7 +533,7 @@ export const Footer = styled.div`
 `;
 
 export const ContainerModal = styled.div`
-  position: absolute;
+  position: fixed;
   z-index: 9;
   top: 0;
   right: 0;
@@ -543,6 +543,7 @@ export const ContainerModal = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
 `;
 
 export const Modal = styled.div`

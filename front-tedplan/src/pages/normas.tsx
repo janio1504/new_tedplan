@@ -65,18 +65,15 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
     
     const resBusca = await apiClient.get('/getPorFiltroNormas', {params: {titulo, id_eixo, id_tipo_norma, id_escala}})
     const normas = resBusca.data
-    if(!normas[0]) return (reset({
-      titulo: '',
-      id_municipio: '',
-      id_tipo_publicacao: '',
-      id_eixo: ''
-    }), 
-    toast.notify('Nenhum resultado encontrado para a busca!',{
-      title: "Atenção!",
-      duration: 7,
-      type: "error",
-    })
-    )
+    if(!normas[0]){
+      toast.notify('Nenhum resultado encontrado para a busca!',{
+        title: "Atenção",
+        duration: 7,
+        type: "error",
+      })
+      
+      return
+    }
    
     getNormas(normas)
     reset({
@@ -214,7 +211,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
          </DivFormConteudo>         
        
       </DivCenter>
-       <Footer>&copy; Todos os direitos reservados</Footer>
+       <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
      </Container>
       )
 }
