@@ -218,8 +218,7 @@ export default function Postagens({ normas }: NormasProps) {
   }
 
   async function handleUpdateImagem(data: INorma) {
-    console.log(data.imagem);
-    return
+   
     const apiClient = getAPIClient();
     const formData = new FormData();
 

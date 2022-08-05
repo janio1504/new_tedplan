@@ -63,6 +63,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
    if(data.indicador == 'txEmpregPopUrb'){
     txEmpregPopUrb(data)
    }
+
    if(data.indicador == 'despMediaEmprAlocadosServManejoRSU'){
     despMediaEmprAlocadosServManejoRSU(data)
    }
@@ -95,6 +96,9 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
    }
    if(data.indicador == 'taxaCoberturaRegServColetaRDOPopUrbMun'){
     taxaCoberturaRegServColetaRDOPopUrbMun(data)
+   }
+   if(data.indicador == 'taxaCoberturaRegServColetaRDORelacaoPopUrb'){
+    taxaCoberturaRegServColetaRDORelacaoPopUrb(data)
    }
   }
 
@@ -204,7 +208,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     
     const TB013 = rsRsc?.tb013
     const TB014 = rsRsc?.tb014
-    const result = (TB013 + TB014) / TB013
+    const result = (TB013 + TB014) / TB013 * 100
     const ano = data.ano
     const dados = [
       ['Ano', 'Dados'],
@@ -219,7 +223,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     
     const TB013 = rsRsc?.tb013
     const TB014 = rsRsc?.tb014
-    const result = (TB013 + TB014) / TB014
+    const result = (TB013 + TB014) / TB014 * 100
     const ano = data.ano
     const dados = [
       ['Ano', 'Dados'],
@@ -232,9 +236,11 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     const rsRsc = await api.post('getPsResiduosColeta', {id_municipio: data.id_municipio, ano: data.ano})
     .then(response=>{ return response.data[0] })
     
+    const TB011 = rsRsc?.tb011
+    const TB012 = rsRsc?.tb011
     const TB013 = rsRsc?.tb013
     const TB014 = rsRsc?.tb014
-    const result = (TB013 + TB014) / TB014
+    const result = (TB011 + TB012) / (TB013 + TB014) * 100
     const ano = data.ano
     const dados = [
       ['Ano', 'Dados'],
@@ -294,6 +300,43 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     setData(dados)
   }
 
+  async function taxaCoberturaRegServColetaRDORelacaoPopUrb(data){     
+    const rsDd = await api.get('getMunicipio', {params: {id_municipio: data.id_municipio}})
+    .then(response=>{ return response.data[0] })
+    const rsGe = await api.post('get-geral', {id_municipio: data.id_municipio, ano: data.ano })
+    .then(response=>{ return response.data[0] })    
+    
+    const CO050 = rsGe?.co050
+    const POP_URB = rsDd?.dd_populacao_urbana
+    const result = (CO050 / POP_URB) * 100
+    const ano = data.ano
+    const dados = [
+      ['Ano', 'Dados'],
+      [ano, result],
+    ]
+    setData(dados)
+  }
+
+  async function taxaTeceirizacaoServColetaRdoRpuQuantidadeColeta(data){     
+    const rsDd = await api.get('getMunicipio', {params: {id_municipio: data.id_municipio}})
+    .then(response=>{ return response.data[0] })
+    const rsGe = await api.post('getPsResiduosColeta', {id_municipio: data.id_municipio, ano: data.ano })
+    .then(response=>{ return response.data[0] })    
+    
+    const CO050 = rsGe?.co050
+    const CO051 = rsGe?.co050
+    const CO052 = rsGe?.co050
+    const CO053 = rsGe?.co050
+    const POP_URB = rsDd?.dd_populacao_urbana
+    const result = (CO050 / POP_URB) * 100
+    const ano = data.ano
+    const dados = [
+      ['Ano', 'Dados'],
+      [ano, result],
+    ]
+    setData(dados)
+  }
+
 
   return (
     
@@ -326,16 +369,19 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
                 <td>
                 <select {...register("indicador")}>
                    <option>Indicardor</option>
-                   <option value="txEmpregPopUrb">Taxa de empregados em relação à população urbana</option>
-                   <option value="despMediaEmprAlocadosServManejoRSU">Despesa média por empregado alocado nos serviços do manejo de rsu</option>
-                   <option value="incidenciaDespManejoRSUDespCorrentePref">Incidência das despesas com o manejo de rsu nas despesas correntes da prefeitura</option>
-                   <option value="incidenciaDespEmprContratadasExecServManejoRsu">Incidência das despesas com empresas contratadas para execução de serviços de manejo rsu nas despesas com manejo de rsu</option>
-                   <option value="autoSufienciaFincPrefManejoRSU">Auto-suficiência financeira da prefeitura com o manejo de rsu</option>
-                   <option value="incidenciaEmpregadosPropriosTotalManejoRSU">Incidência de empregados próprios no total de empregados no manejo de rsu</option>
-                   <option value="incidenciaEmpregadosGerenciasAdmistrativosTotalEmpregadosManejoRSU">Incidência de empregados gerenciais e administrativos no total de empregados no manejo de rsu</option>
-                   <option value="receitaArrecadadaPercapitaOutrasFormasCobPrestServManejo">Receita arrecadada per capita com taxas ou outras formas de cobrança pela prestação de serviços de manejo rsu</option>
-                   <option value="taxaCoberturaRegServColetaRDOPopUrbMun">Taxa de cobertura regular do serviço de coleta de rdo em relação à população total do município</option>
-                   <option value=""></option>
+                   <option value="txEmpregPopUrb">IN001 - Taxa de empregados em relação à população urbana</option>
+                   <option value="despMediaEmprAlocadosServManejoRSU">N002 - Despesa média por empregado alocado nos serviços do manejo de rsu</option>
+                   <option value="incidenciaDespManejoRSUDespCorrentePref">IN003 - Incidência das despesas com o manejo de rsu nas despesas correntes da prefeitura</option>
+                   <option value="incidenciaDespEmprContratadasExecServManejoRsu">004 - Incidência das despesas com empresas contratadas para execução de serviços de manejo rsu nas despesas com manejo de rsu</option>
+                   <option value="autoSufienciaFincPrefManejoRSU">IN005 - Auto-suficiência financeira da prefeitura com o manejo de rsu</option>
+                   <option value="despPerCaptaManejoRSURelacaoPopurb">IN006 - Despesa per capita com manejo de rsu em relação à população urbana</option>
+                   <option value="incidenciaEmpregadosPropriosTotalManejoRSU">IN007 - Incidência de empregados próprios no total de empregados no manejo de rsu</option>
+                   <option value="incidenciaEmpregadosEmpreContradaTotalManejoRSU">IN008 - Incidência de empregados de empresas contratadas no total de empregados no manejo de rsu</option>
+                   <option value="incidenciaEmpregadosGerenciasAdmistrativosTotalEmpregadosManejoRSU">IN010 - Incidência de empregados gerenciais e administrativos no total de empregados no manejo de rsu</option>
+                   <option value="receitaArrecadadaPercapitaOutrasFormasCobPrestServManejo">IN011 - Receita arrecadada per capita com taxas ou outras formas de cobrança pela prestação de serviços de manejo rsu</option>
+                   <option value="taxaCoberturaServColetaDomiciliarPortaPortaPopUrbMun">IN014 - Taxa de cobertura do serviço de coleta domiciliar direta (porta-a-porta) da população urbana do município.</option>
+                   <option value="taxaCoberturaRegServColetaRDOPopUrbMun">IN015 - Taxa de cobertura regular do serviço de coleta de rdo em relação à população total do município</option>
+                   <option value="taxaCoberturaRegServColetaRDORelacaoPopUrb">IN016 - Taxa de cobertura regular do serviço de coleta de rdo em relação à população urbana</option>
                    <option value=""></option>
                    <option value=""></option>
                    <option value=""></option>

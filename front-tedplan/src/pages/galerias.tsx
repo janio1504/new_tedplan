@@ -28,6 +28,7 @@ import HeadPublico from "../components/headPublico";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
+import { ImagenAmpliada, ModalImgAmpliada } from "../styles/dashboard";
 
 type IGaleria = {
   id_galeria: string;
@@ -72,7 +73,8 @@ export default function Galerias({
   const [isGaleria, setGaleria] = useState<IGaleria | any>(galerias);
   const [imagensGaleria, setImagensGaleria] = useState(null);
   const [isModalGaleria, setModalGaleria] = useState(false);
-  
+  const [modalImagemAmpliada, setModalImagemAmpliada] = useState(false);
+  const [imagemAmpliada, setImagemAmpliada] = useState(null);
 
   useEffect(() => {
     if (galerias) {
@@ -164,6 +166,14 @@ export default function Galerias({
     setModalGaleria(false)
   }
 
+  function handleImagemAmpliada(imagem){
+    setImagemAmpliada(imagem)
+    setModalImagemAmpliada(true)
+  }
+  function handleCloseModalImgAmpliada() {
+    setModalImagemAmpliada(false)
+  }
+
   return (
     <Container>
       <HeadPublico></HeadPublico>
@@ -248,7 +258,7 @@ export default function Galerias({
                 {imagensGaleria.map((imagem, key) => (
                   <ImagensGaleria key={key}>
                     <p>
-                      <img src={imagem.imagen} alt="TedPlan" />
+                      <img onClick={()=>handleImagemAmpliada(imagem.imagen)} src={imagem.imagen} alt="TedPlan" />
                     </p>
                   </ImagensGaleria>
                 ))}
@@ -256,6 +266,21 @@ export default function Galerias({
             </ModalGaleria>
           </ContainerModal>
         )}
+
+                    {modalImagemAmpliada && (
+                      <ContainerModal>
+                        <ModalImgAmpliada>
+                          <CloseModalButton onClick={handleCloseModalImgAmpliada}>
+                            Fechar
+                          </CloseModalButton>
+                          <ConteudoModal>
+                          <ImagenAmpliada>
+                            <img src={`${imagemAmpliada}`} />
+                          </ImagenAmpliada>
+                          </ConteudoModal>
+                        </ModalImgAmpliada>
+                      </ContainerModal>
+                    )}
       </DivCenter>
       <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
     </Container>

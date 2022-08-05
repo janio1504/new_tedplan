@@ -43,6 +43,8 @@ import {
   ImagemGaleria,
   ImagensGaleria,
   ContainerImagems,
+  ModalImgAmpliada,
+  ImagenAmpliada,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 import image from "next/image";
@@ -77,6 +79,9 @@ export default function Postagens({ galerias }: GaleriaProps) {
   const [idImagem, setIdImagen] = useState(null);
   const [imagem, setImagem] = useState(null);
   const [imagensGaleria, setImagensGaleria] = useState(null);
+  const [modalImagemAmpliada, setModalImagemAmpliada] = useState(false);
+  const [imagemAmpliada, setImagemAmpliada] = useState(null);
+
  
 
   const fileInputRef = useRef<HTMLInputElement>();
@@ -84,6 +89,14 @@ export default function Postagens({ galerias }: GaleriaProps) {
   async function handleShowModal(galeria) {
     setGaleria(galeria);
     setModalVisible(true);
+  }
+
+  function handleImagemAmpliada(imagem){
+    setImagemAmpliada(imagem)
+    setModalImagemAmpliada(true)
+  }
+  function handleCloseModalImgAmpliada() {
+    setModalImagemAmpliada(false)
   }
 
   function handleCloseModal() {
@@ -324,11 +337,18 @@ export default function Postagens({ galerias }: GaleriaProps) {
                                 {...register("imagem")}
                                 type="file"
                                 accept="image/*"
-                                //onChange={handleOnChange}
+                                onChange={(event) => {
+                                  const files = event.target.files;
+                                  if (files) {                                    
+                                    setImagem(URL.createObjectURL(files[0]));
+                                  }
+                                }}
                               />
-                              {/* {imagem?.map((file, key) => (
-                                <img key={key} src={file} alt="TedPlan" />
-                              ))} */}
+
+                                    <ImagemModal>
+                                      <img src={`${imagem}`} alt="TedPlan" />
+                                    </ImagemModal>  
+                            
                             </ConteudoModal>
                             
                           </Form>
@@ -352,7 +372,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
                                   <b>Remover</b>
                                 </button>
                                 <p>
-                                  <img src={imagem.imagen} alt="TedPlan" />
+                                  <img onClick={()=>handleImagemAmpliada(imagem.imagen)} src={imagem.imagen} alt="TedPlan" />
                                 </p>
                               </ImagensGaleria>
                             ))}
@@ -360,6 +380,20 @@ export default function Postagens({ galerias }: GaleriaProps) {
                         </ModalGaleria>
                       </ContainerModal>
                     )}
+
+                  {modalImagemAmpliada && (
+                      <ContainerModal>
+                        <ModalImgAmpliada>
+                          <CloseModalButton onClick={handleCloseModalImgAmpliada}>
+                            Fechar
+                          </CloseModalButton>
+                          <ImagenAmpliada>
+                            <img src={`${imagemAmpliada}`} />
+                          </ImagenAmpliada>
+                        </ModalImgAmpliada>
+                      </ContainerModal>
+                    )}
+
 
                     {isModalUpdateVisible && (
                       <ContainerModal>

@@ -50,7 +50,7 @@ interface NormaProps {
 
 export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProps ){
   const { register, handleSubmit, reset, formState: { errors } } = useForm()
-
+  const [imagem, setImagem] = useState(null);
    
   async function handleAddNorma(data: INorma){
     
@@ -66,6 +66,7 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
       const response = await apiClient.post('addNorma', formData, {
         headers: {
           "Content-Type": `multipart/form-data=${formData}`,
+          "Access-Control-Allow-Origin": "*",
           }
       }).then((response) =>{
         toast.notify('Dados gravados com sucesso!',{
@@ -155,9 +156,15 @@ export default function AddNorma({ eixos, normas, escalas, tipoNorma}: NormaProp
          <input 
          aria-invalid={errors.value ? "true" : "false"}
          {...register('imagem', {required: true})}
-         type='file'  
-         name='imagem'
-         accept='image/*'
+         type="file"
+         accept="image/*"
+         onChange={(event) => {
+          const files = event.target.files;
+          if (files) {
+            setImagem(URL.createObjectURL(files[0]));
+          }
+        }}
+
           />
           {errors.arquivo && errors.arquivo.type && <span>Selecionar uma imagem é obrigatório!</span>}
        

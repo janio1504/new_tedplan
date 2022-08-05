@@ -523,6 +523,30 @@ export const ImagensGaleria = styled.div`
   }
 `;
 
+export const ModalImgAmpliada = styled.div`
+  width: 600px;
+  min-height: 700px;
+  background-color: #ffffff;
+  border: 1px solid #bebebe;
+  border-radius: 5px;
+  padding: 12px 16px;
+  
+`;
+
+export const ImagenAmpliada = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  
+  margin: 10px;
+  img{
+    display: flex;
+    width: 90%;
+  }
+ 
+`;
+
+
 export const TituloModal = styled.div`
   flex-direction: column;
   display: flex;

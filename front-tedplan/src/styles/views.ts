@@ -570,6 +570,7 @@ export const ImagensGaleria = styled.div`
     float: left;
     width: 160px;
     margin: 10px 10px 10px -10px;
+    cursor: pointer;
   }
   button {
     border: none;
