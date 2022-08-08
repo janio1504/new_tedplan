@@ -5,7 +5,6 @@ const PsFinanceiro = use("App/Models/PsFinanceiro");
 class PsFinanceiroController {
   async getDadosFinanceiros({ request }) {
     const { id_municipio, ano } = request.all();
-    console.log(request.all());
     return await PsFinanceiro.query()
       .select('*', 'fn_aes.fn003 as aes_fn003',
       'fn_aes.fn004 as aes_fn004',

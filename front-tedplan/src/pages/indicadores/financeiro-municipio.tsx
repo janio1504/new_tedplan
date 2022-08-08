@@ -62,18 +62,10 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   const [contentSR, setContentSR] = useState("");
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(municipio);
   const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
-  const [contentCTNC, setContentCTNC] = useState("");
-  const [contentCTD, setContentCTD] = useState("");
-  const editor = useRef();
-  const firstRender = useRef(true);
-  const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
-
-  const getSunEditorInstance = (sunEditor) => {
-    editor.current = sunEditor;
-  };
 
   useEffect(() => {   
-      setDadosMunicipio(municipio[0])     
+      setDadosMunicipio(municipio[0])
+      getFinaceiroMunicipio()
   }, [municipio]);
  
 
@@ -206,7 +198,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
             
     
     const resCad = await api
-      .post("addPsFinanceiro", data
+      .post("getPsFinanceiro", data
       )
       .then((response) => {
         toast.notify('Dados gravados com sucesso!',{
@@ -239,11 +231,13 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   function handleReporte() {
     Router.push("/indicadores/gestao");
   }
-  async function handleSelect(ano){
+  async function getFinaceiroMunicipio(){
+    const ano = new Date().getFullYear()
     
     await api.post('getPsFinanceiro',     
-    {id_municipio: dadosMunicipio.id_municipio, ano: parseInt(ano)})
-    .then(response=>{
+    {id_municipio: dadosMunicipio.id_municipio, ano: ano})
+    .then(response=>{     
+      
       setDadosFinanceiros(response.data[0])
       console.log(response.data[0])
     })
