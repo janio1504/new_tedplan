@@ -27,6 +27,7 @@ import { DivCenter, DivForm, DivTituloForm } from "../../styles/financeiro";
 import PrestacaoServicos from "../../img/icone_servicos.png"
 import Gestao from "../../img/icone_gestao.png"
 import Cadastro from "../../img/icone_cadastro.png"
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -140,19 +141,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Bem vindos Municipio de {nomeMunicipio}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleSignOut}>Manuais</li>
-            <li onClick={handleReporte}>Relatorios</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
-
+      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <DivForm>

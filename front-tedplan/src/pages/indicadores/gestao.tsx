@@ -43,6 +43,7 @@ import {
   faRadiation,
 } from "@fortawesome/free-solid-svg-icons";
 import api from "../../services/api";
+import MenuHorizontal from "../../components/MenuHorizontal";
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -382,18 +383,7 @@ export default function GestaoIndicadores({
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Bem vindos Municipio de {nomeMunicipio}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleSignOut}>Manuais</li>
-            <li onClick={handleReporte}>Relatorios</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>

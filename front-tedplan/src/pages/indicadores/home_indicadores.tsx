@@ -21,6 +21,7 @@ import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -139,7 +140,7 @@ interface MunicipioProps {
 
 export default function HomeIndicadores({municipio}: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext)
-  const [ isMunicipio, setMunicipio] = useState('')
+  const [ nomeMunicipio, setMunicipio] = useState('')
   useEffect(()=>{
    municipio.map((value)=>{
      setMunicipio(value.municipio_nome)
@@ -165,22 +166,7 @@ export default function HomeIndicadores({municipio}: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>
-          Bem vindos Municipio de {isMunicipio}
-        </Municipio>
-        <MenuMunicipioItem>
-             <ul>    
-
-               <li onClick={handleGestao}>Gestão</li>
-               <li onClick={handleIndicadores}>Indicadores</li>
-               <li onClick={handleManuais}>Manuais</li>
-               <li onClick={handleReporte}>Relatorios</li>
-               <li onClick={handleSignOut}>Sair</li>
-
-             </ul>
-           </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={nomeMunicipio}></MenuHorizontal>
       <StatusMunicipio>
         Relatório SIMISAB correspondente ao ano 2022 - Estado PENDENTE
       </StatusMunicipio>

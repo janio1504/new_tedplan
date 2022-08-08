@@ -67,6 +67,7 @@ import {
 } from "../../styles/indicadores";
 import api from "../../services/api";
 import { BotaoEditar } from "../../styles/dashboard";
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -274,18 +275,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Municipio: {}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleHome}>Home</li>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleReporte}>Reporte</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         

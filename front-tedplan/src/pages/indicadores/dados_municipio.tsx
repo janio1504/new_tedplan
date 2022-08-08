@@ -33,6 +33,7 @@ import { parseCookies } from "nookies";
 import Router from "next/router";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -620,18 +621,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Bem vindos Municipio de {nomeMunicipio}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleSignOut}>Manuais</li>
-            <li onClick={handleReporte}>Relatorios</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)} autoComplete="off">

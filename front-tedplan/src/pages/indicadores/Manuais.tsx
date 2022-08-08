@@ -26,6 +26,7 @@ import  Router  from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import { parseCookies } from "nookies";
 import ImgManuais from "../../img/manuais.png"
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 
 
@@ -127,18 +128,7 @@ export default function Manuais({
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Bem vindos Municipio de {dadosMunicipio?.municipio_nome}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleSignOut}>Manuais</li>
-            <li onClick={handleReporte}>Relatorios</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <DivCenter>     
 
         <DivFormConteudo>

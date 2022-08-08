@@ -38,6 +38,7 @@ import Residuos from "../../img/residuos.png"
 import Qualidade from "../../img/qualidade.png"
 import Balanco from "../../img/balanco.png"
 import Tarifas from "../../img/tarifas.png"
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -120,19 +121,7 @@ export default function HomeIndicadores({ municipio }: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Bem vindos Municipio de {isMunicipio}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleManuais}>Manuais</li>
-            <li onClick={handleReporte}>Relatórios</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
-
+      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <ContainerPs>
         <Ps1>

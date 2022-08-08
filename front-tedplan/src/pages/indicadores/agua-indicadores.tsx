@@ -28,6 +28,7 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -112,18 +113,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Bem vindos Município de {dadosMunicipio.municipio_nome}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleSignOut}>Manuais</li>
-            <li onClick={handleReporte}>Relatorios</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={dadosMunicipio.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
