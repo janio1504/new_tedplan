@@ -452,6 +452,11 @@ export const Tabela = styled.div`
     text-align: center;
   }
 `;
+export const Actions= styled.div`
+display: flex;
+flex-direction: row;
+justify-content: space-around;
+`;
 
 export const DivBotaoAdicionar= styled.div`
    width: 100%;
@@ -499,7 +504,7 @@ export const SubmitButtonModal = styled.button`
   border-radius: 5px;
   flex-direction: row;
   cursor: pointer;
-  width: 80px;
+  width: auto;
   display: flex;
   justify-content: center;
   align-items: center;

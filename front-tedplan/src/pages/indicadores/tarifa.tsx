@@ -171,7 +171,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivFormResiduo>
-            <DivTituloFormResiduo>Tarifa Social</DivTituloFormResiduo>    
+            <DivTituloFormResiduo>Tarifa</DivTituloFormResiduo>    
             <DivFormEixo>
               <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
             
@@ -270,7 +270,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>TR013</InputSNIS></td>
-                    <td>Quantas economias residencias são contempladas coma tarifa mínima? </td>
+                    <td>Quantas economias residencias são contempladas com a tarifa mínima? </td>
                     <td><InputP><input {...register('TR013')}
                     defaultValue={dadosTarifa?.tr013}
                     onChange={handleOnChange}
@@ -314,7 +314,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                 <tbody>                 
                 <tr>
                     <td><InputSNIS>TR015</InputSNIS></td>
-                    <td>O prestador de serviços tem em sua estrutura sanitária cobrança de tarifa social?  </td>
+                    <td><InputG>O prestador de serviços tem em sua estrutura sanitária cobrança de tarifa social? </InputG> </td>
                     <td><InputP><select {...register('TR015')}>
                       <option
                       defaultValue={dadosTarifa?.tr015}
@@ -327,7 +327,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                   <td><InputSNIS>TR016</InputSNIS></td>
-                    <td>A tarifa social é regulamentada por lei, decreto, resolução ou outro instrumento formal? </td>
+                    <td><InputG>A tarifa social é regulamentada por lei, decreto, resolução ou outro instrumento formal?</InputG> </td>
                     <td><InputP><select {...register('TR016')}>
                       <option
                        defaultValue={dadosTarifa?.tr016}
@@ -338,35 +338,52 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                       </select></InputP></td>
                     <td></td>
                   </tr>
+                    </tbody>
+                  </table>
+                  <table>
+                    <tbody>                 
                   <tr>
                     <td><InputSNIS>TR017</InputSNIS></td>
                     <td>Qual o tipo, numero e ano da tarifa social adotada? </td>
-                    <td><InputP><input {...register('TR017')}
+                    <td><InputGG><input {...register('TR017')}
                     defaultValue={dadosTarifa?.tr017}
                     onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    type="text"></input></InputGG></td>
                     <td></td>
                   </tr> 
+                  </tbody>
+                  </table>
+                  <table>
+                    <tbody>   
                   <tr>
                     <td><InputSNIS>TR018</InputSNIS></td>
                     <td>Cosumo de volume máximo pré-determinado pelo prestador?</td>
-                    <td><InputP><input {...register('TR018')}
+                    <td><InputP><select {...register('TR018')}
                     defaultValue={dadosTarifa?.tr018}
                     onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    >
+                      <option></option>
+                      <option>Sim</option>
+                      <option>Não</option>
+                      </select></InputP></td>
                     <td></td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR019</InputSNIS></td>
                     <td>Os descontos oferecidos via tarifa social variam em função da faixa de consumo? </td>
-                    <td><InputP><input {...register('TR019')}
+                    <td><InputP><select {...register('TR019')}
                     defaultValue={dadosTarifa?.tr019}
-                    onChange={handleOnChange} type="text"></input></InputP></td>
+                    onChange={handleOnChange}
+                    >
+                      <option></option>
+                      <option>Sim</option>
+                      <option>Não</option>
+                      </select></InputP></td>
                     <td></td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR020</InputSNIS></td>
-                    <td>Qual o volume mensal MÍNIMO de água consumida para o qual se oferece desconto em relação à tarifa normal?</td>
+                    <td><InputG>Qual o volume mensal MÍNIMO de água consumida para o qual se oferece desconto em relação à tarifa normal?</InputG></td>
                     <td><InputP><input {...register('TR020')}
                     defaultValue={dadosTarifa?.tr020}
                     onChange={handleOnChange}
@@ -375,7 +392,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr> 
                   <tr>
                   <td><InputSNIS>TR021</InputSNIS></td>
-                    <td>Qual o volume mensal MÁXIMO de água consumida para o qual se oferece desconto em relação à tarifa normal?</td>
+                    <td><InputG>Qual o volume mensal MÁXIMO de água consumida para o qual se oferece desconto em relação à tarifa normal?</InputG></td>
                     <td><InputP><input {...register('TR021')}
                     defaultValue={dadosTarifa?.tr021}
                     onChange={handleOnChange}
@@ -384,18 +401,24 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                   <td><InputSNIS>TR022</InputSNIS></td>
-                    <td>O domicílio deve apresentar característas construtivas determinadas (material, número de cômodos
+                    <td><InputG>
+                    O domicílio deve apresentar característas construtivas determinadas (material, número de cômodos
                       ou metragem, por exemplo)
+                    </InputG>
                     </td>
-                    <td><InputP><input {...register('TR022')}
+                    <td><InputP><select {...register('TR022')}
                     defaultValue={dadosTarifa?.tr022}
                     onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    >
+                      <option></option>
+                      <option>Sim</option>
+                      <option>Não</option>
+                      </select></InputP></td>
                     <td></td>
                   </tr>
                   <tr>
                   <td><InputSNIS>TR023</InputSNIS></td>
-                    <td>Os descontos oferecidos via tarifa social variam em função das características construtivas?
+                    <td><InputG>Os descontos oferecidos via tarifa social variam em função das características construtivas?</InputG>
                     </td>
                     <td><InputP><select {...register('TR023')}>
                       <option
@@ -409,7 +432,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr> 
                   <tr>
                   <td><InputSNIS>TR024</InputSNIS></td>
-                    <td>O domicílio deve estar localizado em determinados locais caracteriticos como de baixa renda?
+                    <td><InputG>O domicílio deve estar localizado em determinados locais caracteriticos como de baixa renda?</InputG>
                     </td>
                     <td><InputP><select {...register('TR024')}>
                        <option
@@ -423,7 +446,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                   <td><InputSNIS>TR025</InputSNIS></td>
-                  <td>Os descontos oferecidos via tarifa social variam em função da localização da residência?
+                  <td><InputG>Os descontos oferecidos via tarifa social variam em função da localização da residência?</InputG>
                     </td>
                     <td><InputP><select {...register('TR025')}>
                        <option
@@ -437,8 +460,9 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr> 
                   <tr>
                     <td><InputSNIS>TR026</InputSNIS></td>
-                    <td>O consumidor deve estar inscrito no cadastro único para programas sociais - cadúnico?
-                      (opção válida para os não beneficiários do bolsa família)
+                    <td><InputG>
+                    O consumidor deve estar inscrito no cadastro único para programas sociais - cadúnico?
+                      (opção válida para os não beneficiários do bolsa família)</InputG>
                      </td>
                     <td><InputP><select {...register('TR026')}>
                          <option
@@ -465,8 +489,10 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                   <td><InputSNIS>TR028</InputSNIS></td>
-                    <td>O consumidor deve estar inscrito em programas sociais estaduais ou municipais ou em outros
-                      registros administrativos estaduais ou municipais? </td>
+                    <td><InputG>
+                    O consumidor deve estar inscrito em programas sociais estaduais ou municipais ou em outros
+                      registros administrativos estaduais ou municipais?
+                    </InputG> </td>
                     <td><InputP><select {...register('TR028')}>
                          <option
                          defaultValue={dadosTarifa?.tr028}
@@ -492,8 +518,8 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                   <td><InputSNIS>TR030</InputSNIS></td>
-                    <td>O consumidor deve possuir ligação de energia elétrica monofásica, com consumo mensal 
-                      (média anual) dentro de limite instituído pelo prestador?</td>
+                    <td><InputG>O consumidor deve possuir ligação de energia elétrica monofásica, com consumo mensal 
+                      (média anual) dentro de limite instituído pelo prestador?</InputG></td>
                     <td><InputP><select {...register('TR030')}>
                          <option
                          defaultValue={dadosTarifa?.tr030}
@@ -507,10 +533,14 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   <tr>
                     <td><InputSNIS>TR031</InputSNIS></td>
                     <td>Outros </td>
-                    <td><InputP><input {...register('TR031')}
+                    <td><InputP><select {...register('TR031')}
                     defaultValue={dadosTarifa?.tr031}
                     onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    >
+                      <option></option>
+                      <option>Sim</option>
+                      <option>Não</option>
+                      </select></InputP></td>
                     <td></td>
                   </tr> 
                   <tr>
@@ -524,7 +554,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>TR033</InputSNIS></td>
-                    <td>Especifique outra forma de conceder o benefício </td>
+                    <td>Quantas economias residenciais são contempladas com a tarifa social? </td>
                     <td><InputP><input {...register('TR033')}
                     defaultValue={dadosTarifa?.tr033}
                     onChange={handleOnChange}

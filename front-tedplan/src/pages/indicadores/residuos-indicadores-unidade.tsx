@@ -46,6 +46,8 @@ import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
 import unidade_escuro from "../../img/Icono-unidadeDeProcessamento.png"
 import coleta_claro from "../../img/Icono-coleta-claro.png"
 import Image from "next/image";
+import Editar from "../../img/editar.png"
+import Excluir from "../../img/excluir.png"
 import {
   Tabela,
   ContainerModal,
@@ -61,6 +63,7 @@ import {
   DivBotao,
   IconeColeta,
   BotaoResiduos,
+  Actions,
 } from "../../styles/indicadores";
 import api from "../../services/api";
 import { BotaoEditar } from "../../styles/dashboard";
@@ -166,7 +169,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastro(data) {
-
+    
     data.UP079a ? data.UP079 = data.UP079a : data.UP079
     data.UP051a ? data.UP051 = data.UP051a : data.UP051
     data.UP001a ? data.UP001 = data.UP001a : data.UP001    
@@ -223,11 +226,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       setVisibleUnidade(true);
       getUnidadesProcessamento()
       setVisibleCadastro(false)
-      console.log(res[0]);
+
   }
 
   async function handleDelete(id){
-    const del = confirm('Vôçe tem certeza que quer remover o item?')
+    const del = confirm('Voçê tem certeza que quer remover o item?')
     if(del){
     await api.delete('detete-unidade-processamento/'+id)
     .then(response=>{
@@ -325,17 +328,29 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td><InputM><input {...register("UP079a")}
-                    ></input></InputM></td>
-                    <td><InputM><input {...register("UP001a")}
-                    ></input></InputM></td>
+                    <td><InputM><input
+                    aria-invalid={errors.value ? "true" : "false"}
+                    {...register("UP079a", { required: true })}
+                    />
+                     {errors.UP079a && errors.UP079a.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                    </InputM></td>
+                    <td><InputM><input
+                    aria-invalid={errors.value ? "true" : "false"}
+                    {...register("UP001a")}
+                    ></input>
+                    {errors.UP079a && errors.UP079a.type && (
+                      <span>O campo é obrigatório!</span>
+                    )}
+                    </InputM></td>
                     <td><InputG><input {...register("UP051a")}
                     ></input></InputG></td>
                   </tr>
                 </tbody>
               </table>   
 
-              <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>          
+              <SubmitButtonModal type="submit">ADICIONAR UNIDADE</SubmitButtonModal>          
               </Form>
             </DivFormConteudo>}
 
@@ -358,9 +373,13 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           <td>{unidade.up079}</td>
                           <td>{unidade.up001}</td>
                           <td>{unidade.up051}</td>
-                          <td>                          
-                              <FaRegEdit  onClick={() => {getUnidadeProcessamento(unidade.id_residuos_unidade_processamento)}} />
-                              <FaTrashAlt  onClick={() => {handleDelete(unidade.id_residuos_unidade_processamento)}} />                          
+                          <td>  
+                            <Actions>                             
+                                 <Image 
+                                    title="Editar"  onClick={() => {getUnidadeProcessamento(unidade.id_residuos_unidade_processamento)}} width={30} height={30} src={Editar} alt="" />
+                                  <Image onClick={()=>handleDelete(unidade.id_residuos_unidade_processamento)}
+                                    title="Excluir" width={30} height={30} src={Excluir} alt="" />                                                     
+                            </Actions>                        
                           </td>
                         </tr>                        
                       </>
@@ -431,10 +450,25 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
                     <td>
                       <InputM>
-                        <input {...register("UP003")}
+                        <select {...register("UP003")}
                         defaultValue={dadosUnidade?.up003}
-                        onChange={handleOnChange}
-                        type="text"></input>
+                        onChange={handleOnChange}>
+                          <option>Lixão</option>
+                          <option>Queima em forno de qualquer tipo</option>
+                          <option>Unidade de manejo de galhadas e podas </option>
+                          <option>Unidade de transbordo </option>
+                          <option>Área de reciclagem de RCC (unidade de reciclagem de entulho) </option>
+                          <option>Aterro de resíduos da construção civil (inertes)</option>
+                          <option>Área de transbordo e triagem de RCC e volumosos (ATT)</option>
+                          <option>Aterro controlado </option>
+                          <option>Aterro sanitário </option>
+                          <option>Vala específica de RSS</option>
+                          <option>Unidade de triagem (galpão ou usina)</option>
+                          <option>Unidade de compostagem (pátio ou usina) </option>
+                          <option>Unidade de tratamento por incineração</option>
+                          <option>Unidade de tratamento por microondas ou autoclave </option>
+                          <option>Outra</option>
+                        </select>
                       </InputM>
                     </td>
                   </tr>
@@ -551,10 +585,17 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     </td>
                     <td>
                       <InputM>
-                        <input {...register("UP004")}
+                        <select {...register("UP004")}
                         defaultValue={dadosUnidade?.up004}
                         onChange={handleOnChange}
-                        type="text"></input>
+                        >
+                          <option></option>
+                          <option>Prefeitura</option>
+                          <option>Empresa privada</option>
+                          <option>Associação de catadores</option>
+                          <option>Consórcio intermunicipal</option>
+                          <option>Outro</option>
+                        </select>
                       </InputM>
                     </td>
                   </tr>
@@ -587,10 +628,17 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     </td>
                     <td>
                       <InputP>
-                        <input {...register("UP050")}
+                        <select {...register("UP050")}
                          defaultValue={dadosUnidade?.up050}
                          onChange={handleOnChange}
-                        type="text"></input>
+                        >
+                          <option></option>
+                          <option>Operação</option>
+                          <option>Instalação</option>
+                          <option>Prévia</option>
+                          <option>Não existe</option>
+                          <option>Outro tipo.</option>
+                        </select>
                       </InputP>
                     </td>
                   </tr>
@@ -619,7 +667,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     <td>UP085</td>
                     <td>
                       <InputG>
-                        Nome do titular da licença de operação(Prefeitura ou Empresa)
+                        Nome do titular da licença de operação (Prefeitura ou Empresa)
                       </InputG>
                     </td>
                     <td>
@@ -735,8 +783,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         defaultValue={dadosUnidade?.up030}
                         onChange={handleOnChange}
                         >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
+                          <option></option>
+                          <option>Não e realizado</option>
+                          <option>Diária</option>
+                          <option>Semanal</option>
+                          <option>Quinzenal</option>
                         </select>
                       </InputP>
                     </td>
@@ -980,7 +1031,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     <td>UP082</td>
                     <td>
                       <InputXL>
-                        Quantidade de catadores de materiais até 14 anos?
+                      Quantidade de catadores até 14 anos?
                       </InputXL>
                     </td>
                     <td>
@@ -991,13 +1042,14 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                        type="text"></input>
                       </InputP>
                     </td>
+                    <td>Catadores</td>
                   </tr>
                   
                   <tr>
                     <td>UP083</td>
                     <td>
                       <InputXL>
-                        Quantidade de catadores de materiais maiores de 14 anos?
+                      Quantidade de catadores maiores de 14 anos?
                       </InputXL>
                     </td>
                     <td>
@@ -1008,6 +1060,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                       type="text"></input> 
                       </InputP>
                     </td>
+                    <td>Catadores</td>
                   </tr>
 
                   <tr>
@@ -1044,6 +1097,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                       type="text"></input>
                       </InputP>
                     </td>
+                    <td>Domicílios</td>
                   </tr>
 
                 </tbody>

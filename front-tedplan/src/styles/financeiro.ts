@@ -494,6 +494,10 @@ export const InputM = styled.div`
   margin-left: 20px;
   padding: 22px 0;
   }
+  span{
+    margin-left: 20px;
+    color: red;
+  }
 `;
 
 export const InputG = styled.div`

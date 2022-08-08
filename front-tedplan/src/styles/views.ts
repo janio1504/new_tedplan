@@ -213,10 +213,11 @@ export const DivCenter = styled.div`
   margin-right: auto;
   margin-bottom: 50px;
   text-align: left;
-  justify-content: left;
-  align-items: left;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
   display: flex;
+  flex-direction: row;
 `;
 
 export const MenuLateral = styled.div`
@@ -249,10 +250,12 @@ export const MenuLateral = styled.div`
 export const DivFormConteudo = styled.div`
   width: 100%;
   height: 100%;
-  margin-left: 10px;
+  margin-left: 0px;
   padding: 10px 0px 10px 0px;
   color: #666;
-  float: left;
+ display: flex;
+ justify-content: center;
+ flex-direction: column;
 `;
 
 export const Lista = styled.div`

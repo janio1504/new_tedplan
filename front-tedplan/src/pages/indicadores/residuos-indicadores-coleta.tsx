@@ -472,7 +472,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 defaultValue={dadosResiduos?.tb011}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("TB013")} type="text"
+                <input {...register("TB013")} disabled={true} type="text"
                 defaultValue={dadosResiduos?.tb013}
                 onChange={handleOnChange}
                 ></input>
@@ -500,11 +500,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 defaultValue={dadosResiduos?.tb012}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("TB014")} type="text"
+                <input {...register("TB014")} disabled={true} type="text"
                 defaultValue={dadosResiduos?.tb014}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("TB015")} type="text"
+                <input {...register("TB015")} disabled={true} type="text"
                 defaultValue={dadosResiduos?.tb015}
                 onChange={handleOnChange}
                 ></input>
@@ -551,7 +551,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>Quantidades de trabalhadores Frente !</p>
                 <p>Duração de frente 1</p>
                 <p>Atuam em mais de um tipo de serviço, Frente 1?</p>
-                <p>Iipo de serviços predominate de Frente 1</p>
+                <p>Tipo de serviço predominate de Frente 1</p>
                 <p>Quantidade de trabalhadores Frente 2</p>
                 <p>Duração de Frente 2</p>
                 <p>Atuam em mais de um tipo de serviço, Frente 2?</p>
@@ -562,10 +562,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>Tipo de serviços predominante da Frente 3</p>
               </InputXL>
               <InputP>
-                <input {...register("TB016")} type="text"
-                defaultValue={dadosResiduos?.tb016}
-                onChange={handleOnChange}
-                ></input>
+                <select {...register("TB016")} >
+                  <option>{dadosResiduos?.tb016}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
                 <input {...register("TB017")} type="text"
                 defaultValue={dadosResiduos?.tb017}
                 onChange={handleOnChange}
@@ -574,14 +575,18 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 defaultValue={dadosResiduos?.tb020}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("TB023")} type="text"
-                defaultValue={dadosResiduos?.tb023}
-                onChange={handleOnChange}
-                ></input>
-                <input {...register("TB026")} type="text"
-                defaultValue={dadosResiduos?.tb026}
-                onChange={handleOnChange}
-                ></input>
+                <select {...register("TB023")} >
+                  <option>{dadosResiduos?.tb023}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+                <select {...register("TB026")} >
+                  <option>{dadosResiduos?.tb026}</option>
+                  <option value="Limpeza pública">Limpeza pública</option>
+                  <option value="Coleta de resíduos domiciliares">Coleta de resíduos domiciliares</option>
+                  <option value="Coleta seletiva domiciliares">Coleta seletiva domiciliares</option>
+                  <option value="Tratamento e disposição de RSU ">Tratamento e disposição de RSU </option>
+                </select>
                 <input {...register("TB018")} type="text"
                 defaultValue={dadosResiduos?.tb018}
                 onChange={handleOnChange}
@@ -590,14 +595,18 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 defaultValue={dadosResiduos?.tb021}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("TB024")} type="text"
-                defaultValue={dadosResiduos?.tb024}
-                onChange={handleOnChange}
-                ></input>
-                <input {...register("TB027")} type="text"
-                defaultValue={dadosResiduos?.tb027}
-                onChange={handleOnChange}
-                ></input>
+                 <select {...register("TB024")} >
+                  <option>{dadosResiduos?.tb024}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+                <select {...register("TB027")} >
+                  <option>{dadosResiduos?.tb027}</option>
+                  <option value="Limpeza pública">Limpeza pública</option>
+                  <option value="Coleta de resíduos domiciliares">Coleta de resíduos domiciliares</option>
+                  <option value="Coleta seletiva domiciliares">Coleta seletiva domiciliares</option>
+                  <option value="Tratamento e disposição de RSU ">Tratamento e disposição de RSU </option>
+                </select>
                 <input {...register("TB019")} type="text"
                 defaultValue={dadosResiduos?.tb019}
                 onChange={handleOnChange}
@@ -606,27 +615,31 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 defaultValue={dadosResiduos?.tb022}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("TB025")} type="text"
-                defaultValue={dadosResiduos?.tb025}
-                onChange={handleOnChange}
-                ></input>
-                <input {...register("TB028")} type="text"
-                defaultValue={dadosResiduos?.tb028}
-                onChange={handleOnChange}
-                ></input>
+               <select {...register("TB025")} >
+                  <option>{dadosResiduos?.tb025}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+                <select {...register("TB028")} >
+                  <option>{dadosResiduos?.tb028}</option>
+                  <option value="Limpeza pública">Limpeza pública</option>
+                  <option value="Coleta de resíduos domiciliares">Coleta de resíduos domiciliares</option>
+                  <option value="Coleta seletiva domiciliares">Coleta seletiva domiciliares</option>
+                  <option value="Tratamento e disposição de RSU ">Tratamento e disposição de RSU </option>
+                </select>
               </InputP>
               <InputSNIS>
+                <p>.</p>
                 <p>Empregados</p>
+                <p>Meses</p>
                 <p>Empregados</p>
+                <p>.</p>
+                <p>.</p>
+                <p>Meses</p>
+                <p>.</p>
+                <p>.</p>
                 <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
+                <p>meses</p>
                 <p>Empregados</p>
                 <p>Empregados</p>
               </InputSNIS>
@@ -641,21 +654,21 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
               <InputM>
                 <label>
-                  <span>Tipo de veiculo(Qualidade)</span>
+                  <span>Tipo de veiculo(Quantidade)</span>
                 </label>
                 <label>.</label>
                 <label>.</label>
-                <p>Arrecadação total operacional indireta</p>
+                <p>Caminhão compactador</p>
                 <label>.</label>
-                <p>Créditos de contas a receber</p>
+                <p>Caminhão basculante, baú ou carroceria</p>
                 <label>.</label>
-                <p>Arrecadação total operacional indireta</p>
+                <p>Caminhão poliguindastes (brook)</p>
                 <label>.</label>
-                <p>Créditos de contas a receber</p>
+                <p>Trator agrícola com reboque</p>
                 <label>.</label>
-                <p>Arrecadação total operacional indireta</p>
+                <p>Tração animal</p>
                 <label>.</label>
-                <p>Créditos de contas a receber</p>
+                <p>Veículos aquáticos (embarcações)</p>
                 <label>.</label>
                 <p>Outros veículos</p>
               </InputM>
@@ -932,10 +945,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
               <InputP>
                 <label>Ano: 2022</label>
-                <input {...register("CO154")} type="text"
-                 defaultValue={dadosResiduos?.co154}
-                 onChange={handleOnChange}
-                ></input>
+                <select {...register("CO154")} >
+                  <option>{dadosResiduos?.co154}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
                 <input {...register("CO012")} type="text"
                  defaultValue={dadosResiduos?.co012}
                  onChange={handleOnChange}
@@ -944,22 +958,25 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                  defaultValue={dadosResiduos?.co146}
                  onChange={handleOnChange}
                 ></input>
-                <input {...register("CO148")} type="text"
-                 defaultValue={dadosResiduos?.co148}
-                 onChange={handleOnChange}
-                ></input>
-                <input {...register("CO149")} type="text"
-                defaultValue={dadosResiduos?.co149}
-                onChange={handleOnChange}
-                ></input>
+                <select {...register("CO148")} >
+                  <option>{dadosResiduos?.co148}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+                <select {...register("CO149")} >
+                  <option>{dadosResiduos?.co149}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
                 <input {...register("CO150")} type="text"
                 defaultValue={dadosResiduos?.co150}
                 onChange={handleOnChange}
                 ></input>
-                <input {...register("CO151")} type="text"
-                defaultValue={dadosResiduos?.co151}
-                onChange={handleOnChange}
-                ></input>
+                <select {...register("CO151")} >
+                  <option>{dadosResiduos?.co151}</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
                 <input {...register("CO152")} type="text"
                 defaultValue={dadosResiduos?.co152}
                 onChange={handleOnChange}
@@ -1169,7 +1186,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     ></input></InputP>
                     </td>
                     <td>
-                    <InputP><input {...register("CS048")} type="text"
+                    <InputP><input {...register("CS048B")} disabled={true} type="text"
                     defaultValue={dadosResiduos?.cs048}
                     onChange={handleOnChange}
                     ></input></InputP>
@@ -1289,7 +1306,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
-                  Serviços de coleta noturna com uso de container
+                  Serviços de coleta noturna com uso de contêiner
                 </DivTituloConteudo>
               </DivTitulo>
               <table>
@@ -1421,7 +1438,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CS054</td>
                     <td>
                       <InputXL>
-                        Valor contratual(preço unitário) do serviço de coleta
+                        Valor contratual (preço unitário) do serviço de coleta
                         seletiva porta a porta contratado às empresas (PREENCHER
                         VALOR MÉDIO SE HOUVER MAIS DE UM)
                       </InputXL>
@@ -1484,8 +1501,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CS056</td>
                     <td>
                       <InputXL>
-                        Valor contratual(preço unitário) do serviço de triagem
-                        de materias reciclaveis contratado às empresas(PREENCHER
+                        Valor contratual (preço unitário) do serviço de triagem
+                        de materias reciclaveis contratado às empresas (PREENCHER
                         VALOR MÉDIO SE HOUVER MAIS DE UM)
                       </InputXL>
                     </td>
@@ -1525,9 +1542,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CS058</td>
                     <td>
                       <InputXL>
-                        Valor contratual(preço unitário) do serviço de coleta
+                        Valor contratual (preço unitário) do serviço de coleta
                         seletiva porta a porta contratado às
-                        associações/cooperativas(PREENCHER VALOR MÉDIO SE HOUVER
+                        associações/cooperativas (PREENCHER VALOR MÉDIO SE HOUVER
                         MAIS DE UM)
                       </InputXL>
                     </td>
@@ -2036,7 +2053,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </td>
                     <td>
                       <InputP>
-                        <input {...register("CS026")}
+                        <input {...register("CS026")} disabled={true}
                          defaultValue={dadosResiduos?.cs026}
                          onChange={handleOnChange}
                         type="text"></input>
@@ -2223,7 +2240,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>RS020</td>
                     <td>
                       <InputGG>
-                        Existe no município coleta diferenciada de resíduos sólidos da saúde
+                        Existe no município coleta diferenciada de resíduos sólidos da saúde?
                       </InputGG>
                     </td>
                     <td>
@@ -2314,6 +2331,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         defaultValue={dadosResiduos?.rs003}
                         onChange={handleOnChange}
                       >
+                        <option>Selecionar</option>
                         <option value="Sim">Sim</option>
                         <option value="Não">Não</option>
                       </select>
@@ -2637,7 +2655,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>CC020</InputSNIS></td>
-                    <td><InputGG>Há empresas especializadas(caçambeiros) que prestam serviço de coleta de RCC? </InputGG></td>
+                    <td><InputGG>Há empresas especializadas (caçambeiros) que prestam serviço de coleta de RCC? </InputGG></td>
                     <td><InputP><select {...register('CC020')} 
                      defaultValue={dadosResiduos?.cc020}
                      onChange={handleOnChange}
@@ -2685,7 +2703,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>CC014</InputSNIS></td>
-                    <td><InputGG>Quantidade de RCC coletados por empresas especializadas(caçambeiros) ou autônomos contratados pelo gerados </InputGG></td>
+                    <td><InputGG>Quantidade de RCC coletados por empresas especializadas (caçambeiros) ou autônomos contratados pelo gerados </InputGG></td>
                     <td><InputP><input {...register('CC014')} type="text"
                     defaultValue={dadosResiduos?.cc014}
                     onChange={handleOnChange}
@@ -2755,8 +2773,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>VA039</InputSNIS></td>
-                    <td>Extensão de sarjetas varridas pelos executores</td>
-                    <td><InputP><input {...register('VA039')} type="text"
+                    <td>Extensão total de sarjetas varridas pelos executores</td>
+                    <td><InputP><input {...register('VA039')} disabled={true} type="text"
                     defaultValue={dadosResiduos?.va039}
                     onChange={handleOnChange}
                     ></input></InputP></td>
@@ -2764,7 +2782,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>                
                   <tr>
                     <td><InputSNIS>VA016</InputSNIS></td>
-                    <td>Valor contratual(preço unitário) do serviço de varrição manual </td>
+                    <td>Há algum tipo de varrição mecanizada no município? </td>
                     <td><InputP><select {...register('VA016')} 
                     defaultValue={dadosResiduos?.va016}
                     onChange={handleOnChange}
@@ -2776,7 +2794,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>VA020</InputSNIS></td>
-                    <td>Há algum tipo de varrição mecanizada no município </td>
+                    <td>Valor contratual (preço unitário) do serviço de varrição manual. E favor tomar atenção com o seguinte</td>
                     <td><InputP><input {...register('VA020')} type="text"
                      defaultValue={dadosResiduos?.va020}
                      onChange={handleOnChange}
@@ -3766,7 +3784,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                  
                   <tr>
                     <td><InputSNIS>CA004</InputSNIS></td>
-                    <td>Existem catadores de materiais recicláveis que trabalham dispersos na cidade? </td>
+                    <td><InputG>Existem catadores de materiais recicláveis que trabalham dispersos na cidade? </InputG></td>
                     <td><InputP><select {...register('CA004')}
                      defaultValue={dadosResiduos?.ca004}
                      onChange={handleOnChange}
@@ -3782,14 +3800,36 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     
                     > <option
                     defaultValue={dadosResiduos?.ca008}
-                    onChange={handleOnChange}>{dadosResiduos?.ca008}</option>
+                    onChange={handleOnChange}>Selecionar</option>
                       <option value={"Sim"}>Sim</option>
                       <option value={"Não"}>Não</option>
                     </select></InputP></td>
-                  </tr>              
+                  </tr>  
+              </tbody>    
+              </table> 
+              <table>
+                <tbody>
+                  <tr>
+                    <td>
+                    <InputSNIS>CA009</InputSNIS>
+                    </td>
+                    <td><InputG>
+                    Descrição sucinta dos trabalhos (por exemplo: bolsa-escola para filhos, programa de alfabetização, etc...)
+                    </InputG></td>
+                    <td>
+                      <textarea {...register('CA009')}
+                      defaultValue={dadosResiduos?.ca009}
+                      onChange={handleOnChange}
+                      ></textarea>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <table>
+                <tbody>       
                   <tr>
                     <td><InputSNIS>CA006</InputSNIS></td>
-                    <td>Quantidade de entidades associativas(cooperativas ou associações) </td>
+                    <td><InputG>Quantidade de entidades associativas(cooperativas ou associações) </InputG></td>
                     <td><InputP><input {...register('CA006')} type="text"
                     defaultValue={dadosResiduos?.ca006}
                     onChange={handleOnChange}

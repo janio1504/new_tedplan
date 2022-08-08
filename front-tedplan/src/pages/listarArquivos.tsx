@@ -93,7 +93,7 @@ export default function ArquivosOndrive({
   const [isModalUpdateVisible, setModalUpdateVisible] = useState(false);
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [imagem, setImagem] = useState<String | ArrayBuffer>(null);
-  const { addToast } = useToasts();
+  
 
 
   async function handlebuscaFiltrada(data: IArquivo) {}

@@ -158,7 +158,9 @@ export default function HomeIndicadores({municipio}: MunicipioProps) {
    async function handleReporte(){
     Router.push("/indicadores/gestao");
    }
-
+   async function handleManuais() {
+    Router.push("/indicadores/Manuais");
+  }
    
   return (
     <Container>
@@ -172,7 +174,7 @@ export default function HomeIndicadores({municipio}: MunicipioProps) {
 
                <li onClick={handleGestao}>Gestão</li>
                <li onClick={handleIndicadores}>Indicadores</li>
-               <li onClick={handleSignOut}>Manuais</li>
+               <li onClick={handleManuais}>Manuais</li>
                <li onClick={handleReporte}>Relatorios</li>
                <li onClick={handleSignOut}>Sair</li>
 

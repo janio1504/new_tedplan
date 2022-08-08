@@ -229,15 +229,23 @@ export const DivColEstatisticas = styled.div`
   height: 100%;
   color: #666;
   padding: 20px;
-  li {
-    color: blue;
-    cursor: pointer;
-    font-size: 16px;
-    padding: 5px;
-  }
+  margin-right: 40px;
+  cursor: pointer;
 `;
 
-export const BotaoResiduosClaro = styled.div`
+export const BotaoResiduosSolidoEscuro = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #667778;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoResiduosSolido = styled.div`
 width: 100px;
 text-align: center;
 margin-top: 10px;
@@ -261,6 +269,42 @@ padding: 7px 20px;
 cursor: pointer;
 `;
 
+export const BotaoAgua = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #12b2d5;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoEsgotoEscuro = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #667778;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoEsgoto = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #235460;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
 export const BotaoDrenagemEscuro = styled.div`
 width: 100px;
 text-align: center;
@@ -271,6 +315,31 @@ color: #fff;
 border-radius: 5px;
 padding: 7px 20px;
 cursor: pointer;
+`;
+
+export const BotaoDrenagem = styled.div`
+width: 100px;
+text-align: center;
+margin-top: 10px;
+background-color: #0f4c81;
+font-size: 14px;
+color: #fff;
+border-radius: 5px;
+padding: 7px 20px;
+cursor: pointer;
+`;
+
+export const BotaoResiduosEscuro = styled.div`
+width: 150px;
+text-align: center;
+margin-top: 10px;
+background-color: #667778;
+font-size: 18px;
+color: #fff;
+border-radius: 5px;
+padding: 5px 20px;
+cursor: pointer;
+font-weight: bolder;
 `;
 
 export const BotaoResiduos = styled.div`

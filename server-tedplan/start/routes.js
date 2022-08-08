@@ -31,6 +31,8 @@ Route.delete("deleteImagem", "FileController.destroyImagem");
 Route.get("getGalerias", "GaleriaController.index");
 Route.post("getPorFiltroGaleria", "GaleriaController.getGaleriaPorFiltro");
 
+Route.get("getManuais", "ManualController.index");
+Route.post("addManual", "ManualController.store");
 
 Route.post(
   "addRepresentanteServicos",

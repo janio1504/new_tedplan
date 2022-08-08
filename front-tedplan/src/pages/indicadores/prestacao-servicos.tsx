@@ -65,7 +65,7 @@ export default function HomeIndicadores({ municipio }: MunicipioProps) {
   const [isMunicipio, setMunicipio] = useState("");
   
   useEffect(() => {
-    municipio.map((value) => {
+    municipio?.map((value) => {
       setMunicipio(value.municipio_nome);
     });
     
@@ -81,9 +81,8 @@ export default function HomeIndicadores({ municipio }: MunicipioProps) {
     Router.push("/indicadores/gestao");
   }
   async function handleReporte() {
-    Router.push("/indicadores/gestao");
+    Router.push("/indicadores/Relatorios");
   }
-
   async function handleFinaceiro() {
     Router.push("/indicadores/financeiro-municipio");
   }
@@ -114,7 +113,9 @@ export default function HomeIndicadores({ municipio }: MunicipioProps) {
   async function handleTarifa() {
     Router.push("/indicadores/tarifa");
   }
-  
+  async function handleManuais() {
+    Router.push("/indicadores/Manuais");
+  }
 
   return (
     <Container>
@@ -125,8 +126,8 @@ export default function HomeIndicadores({ municipio }: MunicipioProps) {
           <ul>
             <li onClick={handleGestao}>Gestão</li>
             <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleSignOut}>Manuais</li>
-            <li onClick={handleReporte}>Relatorios</li>
+            <li onClick={handleManuais}>Manuais</li>
+            <li onClick={handleReporte}>Relatórios</li>
             <li onClick={handleSignOut}>Sair</li>
           </ul>
         </MenuMunicipioItem>

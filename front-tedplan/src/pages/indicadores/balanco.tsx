@@ -178,6 +178,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl002}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL001</InputSNIS></td>
@@ -186,6 +187,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl001}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL010</InputSNIS></td>
@@ -194,6 +196,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl010}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL005</InputSNIS></td>
@@ -202,6 +205,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl005}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL003</InputSNIS></td>
@@ -210,6 +214,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl003}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr> 
                   <tr>
                     <td><InputSNIS>BL008</InputSNIS></td>
@@ -218,6 +223,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl008}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL006</InputSNIS></td>
@@ -226,6 +232,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl006}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL007</InputSNIS></td>
@@ -234,6 +241,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl007}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL009</InputSNIS></td>
@@ -242,6 +250,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl009}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL012</InputSNIS></td>
@@ -250,6 +259,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl012}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>      
                   <tr>
                     <td><InputSNIS>BL004</InputSNIS></td>
@@ -258,6 +268,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl004}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
+                    <td>1000 R$/ano</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>BL011</InputSNIS></td>
@@ -266,7 +277,12 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     defaultValue={dadosBalanco?.bl011}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                  </tr>  
+                    <td>1000 R$/ano</td>
+                  </tr> 
+                  </tbody>
+                  </table>
+                  <table>
+                  <tbody> 
                   <tr>
                     <td><InputSNIS>BL099</InputSNIS></td>
                     <td><InputG>Observação, esclarecimentos ou sugestões</InputG></td>
