@@ -198,7 +198,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
             
     
     const resCad = await api
-      .post("getPsFinanceiro", data
+      .post("addPsFinanceiro", data
       )
       .then((response) => {
         toast.notify('Dados gravados com sucesso!',{
