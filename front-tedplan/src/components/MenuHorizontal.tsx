@@ -100,7 +100,7 @@ export default function MenuHorizontal({municipio}) {
     <Container>
    
       <MenuMunicipio>
-        <Municipio>Bem vindos Municipio de {municipio}</Municipio>
+        <Municipio>Bem vindos Município de {municipio}</Municipio>
         <MenuMunicipioItem>
           <ul>
             <li onClick={handleGestao}>Gestão</li>
