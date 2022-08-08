@@ -64,6 +64,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
 
   useEffect(() => {   
+    
       setDadosMunicipio(municipio[0])
       getFinaceiroMunicipio()
   }, [municipio]);
@@ -235,11 +236,10 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     const ano = new Date().getFullYear()
     
     await api.post('getPsFinanceiro',     
-    {id_municipio: dadosMunicipio.id_municipio, ano: ano})
-    .then(response=>{     
-      
+    {id_municipio: dadosMunicipio[0]?.id_municipio, ano: ano})
+    .then(response=>{      
       setDadosFinanceiros(response.data[0])
-      console.log(response.data[0])
+      
     })
     .catch((error)=>{
       console.log(error);      
