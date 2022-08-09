@@ -362,7 +362,8 @@ class GestaoIndicadoresController {
         }
       }
     } catch (error) {
-      return new CustomException().handle(error, { response });
+      console.log(error);
+      //return new CustomException().handle(error, { response });
     }
   }
 

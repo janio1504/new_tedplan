@@ -28,7 +28,7 @@ import DadosMunicipio from "../../components/DadosMunicipio";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useEffect } from "react";
 import api from "../../services/api";
-import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from 'react-nextjs-toast'
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import { GetServerSideProps } from "next";
@@ -590,10 +590,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     const res = await api
       .post("addMunicipio", data)
       .then((response) => {
-     
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })       
       })
       .catch((error) => {
-  
+        console.log(error);
       });
   }
 
@@ -620,6 +624,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   return (
     <Container>
+      <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>

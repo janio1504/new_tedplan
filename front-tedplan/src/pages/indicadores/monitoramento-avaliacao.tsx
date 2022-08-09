@@ -2,13 +2,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import {
   Container,
-  DivConteudo,
   DivColRelatorios,
-  MenuMunicipio,
-  Municipio,
-  MenuMunicipioItem,
   DivRelatorios,
-  DivBotaoMenu,
   BaixarRelatorio,
   TituloRelatorios,
 } from "../../styles/indicadores";
@@ -58,6 +53,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [concessionarias, setConcessionarias] = useState(null);
   const [financeiro, setFinanceiro] = useState(null);
   const [dadosAgua, setDadosAgua] = useState(null);
+  const [dadosEsgoto, setDadosEsgoto] = useState(null);
+  const [dadosDrenagem, setDadosDrenagem] = useState(null);
   useEffect(() => {
     setDadosMunicipio(municipio[0]);
     
@@ -68,6 +65,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     getConcessionarias()
     getDadosFinanceiros()
     getDadosAgua()
+    getDadosEsgoto()
+    getDadosDrenagem()
   }, [municipio]);
 
   async function getDadosGerais(){
@@ -97,6 +96,36 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
       setDadosAgua(res[0])
   }
+
+  async function getDadosEsgoto() {  
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()  
+    const res = await api
+      .post("get-esgoto", {id_municipio: id_municipio, ano: ano})
+      .then((response) => {        
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+      setDadosEsgoto(res[0])
+  }
+
+  async function getDadosDrenagem() {  
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()  
+    const res = await api
+      .post("get-drenagem", {id_municipio: id_municipio, ano: ano})
+      .then((response) => {        
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      setDadosDrenagem(res[0])
+  }
+
   async function getConcessionarias(){
     const id_municipio = municipio[0].id_municipio
     const ano = new Date().getFullYear()
@@ -172,7 +201,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
           </TituloRelatorios>
           <Image src={PrestacaoServicos} alt='Prestação de Serviços' />
           <BaixarRelatorio onClick={()=>prestacaoServicos(dadosGeral,
-             concessionarias, financeiro, dadosAgua)}>Baixar</BaixarRelatorio>
+             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         
         </DivRelatorios>
