@@ -296,18 +296,7 @@ export default function GestaoIndicadores({
       });
   }
 
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
+ 
 
   function handleOnChange(content) {
     setContent(content);
@@ -379,6 +368,28 @@ export default function GestaoIndicadores({
       });
   }
 
+  async function handleRemoverRepresentante({ id }) {
+    await api
+      .delete("remover-representante", {
+        params: { id: id },
+      })
+      .then((response) => {
+        toast.notify("Representante removido com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        Router.push("/indicadores/gestao");
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel remover o plano municipal! ", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -394,8 +405,7 @@ export default function GestaoIndicadores({
               <label>Nome da associação</label>
               <input
                 {...register("nome_associacao")}
-                defaultValue={isGestao?.ga_nome}
-                onChange={handleOnChange}
+                
                 type="text"
               ></input>
             </InputG>
@@ -405,8 +415,7 @@ export default function GestaoIndicadores({
               </label>
               <input
                 {...register("norma_associacao")}
-                defaultValue={isGestao?.ga_norma}
-                onChange={handleOnChange}
+                
                 type="text"
               ></input>
             </InputG>
@@ -437,7 +446,8 @@ export default function GestaoIndicadores({
                         <td>{representante.id_representante_servicos_ga}</td>
                         <td >{representante.nome}</td>
                         <td>
-                          <Image src={Excluir} alt="Excluir" width={20} height={20}/>
+                          <Image 
+                          onClick={()=>handleRemoverRepresentante({id: representante.id_representante_servicos_ga})} src={Excluir} alt="Excluir" width={20} height={20}/>
                         </td>
                       </tr>
                     </>

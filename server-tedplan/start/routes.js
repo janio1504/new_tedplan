@@ -43,6 +43,7 @@ Route.get(
   "GestaoIndicadoresController.getRepresentantesServicos"
 );
 
+Route.delete("remover-representante", "GestaoIndicadoresController.destroyRepresentante");
 Route.delete("remover-politica", "GestaoIndicadoresController.destroyPolitica");
 Route.delete("remover-plano", "GestaoIndicadoresController.destroyPlano");
 Route.delete(

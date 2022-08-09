@@ -386,6 +386,17 @@ class GestaoIndicadoresController {
       return new CustomException().handle(error, { response });
     }
   }
+
+  async destroyRepresentante({ request }){
+    const { id } = request.all();
+    try {
+      const representante = await RepresentanteServicos.findBy(
+        "id_representante_servicos_ga", id)
+      await representante.delete()
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 module.exports = GestaoIndicadoresController;

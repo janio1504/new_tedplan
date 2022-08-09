@@ -29,6 +29,7 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { toast, ToastContainer } from 'react-nextjs-toast'
 
 interface IMunicipio {
   id_municipio: string;
@@ -65,12 +66,18 @@ export default function Agua({ municipio }: MunicipioProps) {
   }  
 
   async function handleCadastro(data) {  
+    
     data.id_agua = dadosAgua?.id_agua
     data.id_municipio = municipio[0].id_municipio
     data.ano = new Date().getFullYear()  
     const resCad = await api
       .post("create-agua", data)
-      .then((response) => {        
+      .then((response) => { 
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })       
         return response.data;
       })
       .catch((error) => {
@@ -112,6 +119,7 @@ export default function Agua({ municipio }: MunicipioProps) {
 
   return (
     <Container>
+      <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={dadosMunicipio.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
