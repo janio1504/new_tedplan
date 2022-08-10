@@ -661,6 +661,54 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         },
         layout: 'headerLineOnly'
        },
+
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
+                ['CO021', 'É utilizada balança para pesagem rotineira dos residuos sólidos coletados?', dadosResiduosColeta.co021 ],
+                ['CO019', 'Os resíduos sólidos DOMICILIARES coletados são enviados para outro município?', dadosResiduosColeta.co019 ],
+                ['CO020', 'Município(s) de destino de RDO e RPU exportado', '' ],
+               
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+       {
+        table: {
+            headerRows: 1,
+            body: [   
+                [{text: 'Municípios'}],            
+                [concessionarias.map((value: { razao_social: string; cnpj: string; ano_inicio: string; duracao: string; vigente: string; capina_e_rocada: string; coleta_res_construcao_civil: string; coleta_res_domiciliar: string; coleta_res_servicos_saude: string; coleta_res_publico: string; operacao_aterro_sanitario: string; operacao_incinerador: string; operacao_outras_unidades_processamento: string; operacao_unidade_compostagem: string; operacao_triagem: string; outros: string; tipo_desconhecido: string; varricao_logradouros_publicos: string })=>(                    
+                    [                                                 
+                        ['Razão Social Concessionária: '+ value.razao_social],
+                        ['CNPJ: '+ value.cnpj],
+                        ['Ano de inicio: '+ value.ano_inicio],
+                        ['Duração(em anos): '+ value.duracao],
+                        ['Vigente?: '+ value.vigente],
+                        ['Capina e roçada: '+ value.capina_e_rocada],
+                        ['Coleta de res. contrucão civil: '+ value.coleta_res_construcao_civil],
+                        ['Coleta de res. Domiciliar: '+ value.coleta_res_domiciliar],
+                        ['Coleta de res. dos Serviços da Saúde:'+ value.coleta_res_servicos_saude],
+                        ['Coleta de res. Público:'+ value.coleta_res_publico],
+                        ['Operação de aterro sanitário:'+ value.operacao_aterro_sanitario],
+                        ['Operação de incinerador:'+ value.operacao_incinerador],
+                        ['Operação de outras unidades de processamento:'+ value.operacao_outras_unidades_processamento],
+                        ['Operação de unidade de compostagem:'+ value.operacao_unidade_compostagem],
+                        ['Operação de triagem:'+ value.operacao_triagem],
+                        ['Outros:'+ value.outros],
+                        ['Tipo desconhecido:'+ value.tipo_desconhecido],
+                        ['Varrição de logradouros públicos:'+ value.varricao_logradouros_publicos],
+
+
+                        ['-----------------------------------------------------------------------------------------------------------']
+                    ]
+                ))]
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
        
     ]
    

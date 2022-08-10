@@ -29,6 +29,8 @@ import {
   SubmitButton,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
+import { InputP } from "../styles/financeiro";
+
 
 interface IUsuario {
   id_usuario: string;
@@ -40,6 +42,7 @@ interface IUsuario {
   id_tipo_usuario: string;
   id_imagem: string;
   id_sistema: string;
+  senha: string;
 }
 
 interface ITipoUsuario {
@@ -134,18 +137,30 @@ export default function Postagens({
   }
 
   async function handleUpdateUsuario(data: IUsuario) {
+    console.log(data);
+    
     const usuario = await api
       .post("updatePermissoes", {
         id_usuario: data.id_usuario,
         id_sistema: data.id_sistema,
         ativo: data.ativo,
         id_tipo_usuario: data.id_tipo_usuario,
+        senha: data.senha,
       })
       .then((response) => {
-     
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })     
+        setTimeout(()=>{
+          setModalVisible(false)},
+          2000
+        ) 
       })
       .catch((error) => {
-     
+        console.log(error);
+        
       });
   }
 
@@ -160,7 +175,7 @@ export default function Postagens({
 
   return (
     <Container>
-      <ToastContainer align={"center"} position={"button"}  />
+      
       <MenuSuperior usuarios={[]}></MenuSuperior>
 
       <DivCenter>
@@ -224,6 +239,7 @@ export default function Postagens({
                           <FormModal
                             onSubmit={handleSubmit(handleUpdateUsuario)}
                           >
+                            <SubmitButton type="submit">Gravar</SubmitButton>
                             <ConteudoModal>
                               <input
                                 type="hidden"
@@ -275,8 +291,9 @@ export default function Postagens({
                                   </option>
                                 ))}
                               </select>
+                              <InputP><input {...register("senha")} type="password"></input></InputP>
                             </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
+                            
                           </FormModal>
                         </Modal>
                       </ContainerModal>
@@ -288,7 +305,7 @@ export default function Postagens({
           })}
         </ListPost>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados </Footer>
+      <Footer>&copy; Todos os direitos reservados <ToastContainer align={"center"} position={"button"}  /></Footer>
     </Container>
   );
 }

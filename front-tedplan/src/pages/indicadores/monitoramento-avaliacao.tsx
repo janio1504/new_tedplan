@@ -56,6 +56,9 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [dadosEsgoto, setDadosEsgoto] = useState(null);
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [dadosResiduosColeta, setDadosResiduosColeta] = useState(null);
+  const [unidadesRsc, setDadosUnidadesRsc] = useState(null);
+  const [unidadesRss, setDadosUnidadesRss] = useState(null);
+  const [associacoes, setAssociacoes] = useState(null);
   useEffect(() => {
     setDadosMunicipio(municipio[0]);
     
@@ -163,6 +166,44 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       .post("getPsFinanceiro", { id_municipio: id_municipio, ano: ano})
       .then((response) => {         
         setFinanceiro(response.data[0])
+      })
+      .catch((error) => {    
+        console.log(error);
+      });
+  }
+  async function getUnidadesRsc(){
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()
+    const res = await api
+      .post("list-unidades-rsc", { id_municipio: id_municipio, ano: ano})
+      .then((response) => {         
+        setDadosUnidadesRsc(response.data[0])
+      })
+      .catch((error) => {    
+        console.log(error);
+      });
+  }
+
+  async function getUnidadesRss(){
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()
+    const res = await api
+      .post("list-unidades-rss", { id_municipio: id_municipio, ano: ano})
+      .then((response) => {         
+        setDadosUnidadesRss(response.data[0])
+      })
+      .catch((error) => {    
+        console.log(error);
+      });
+  }
+
+  async function getCooperativas(){
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()
+    const res = await api
+      .post("list-cooperativas-catadores", { id_municipio: id_municipio, ano: ano})
+      .then((response) => {         
+        setDadosUnidadesRss(response.data[0])
       })
       .catch((error) => {    
         console.log(error);

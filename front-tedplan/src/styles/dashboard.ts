@@ -334,7 +334,8 @@ export const SubmitButton = styled.button`
   border-radius: 3px;
   flex-direction: row;
   cursor: pointer;
-  width: 80px;
+  width: auto;
+  height: 37px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -418,7 +419,7 @@ export const ConteudoModal = styled.div`
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
-    width: 580px;
+    width: 100%;
     color: #666;
     float: left;
   }

@@ -95,7 +95,7 @@ class UsuariosController {
 
   async updatePermissoesUsuario({ request, response }) {
     try {
-      const { id_usuario, id_sistema, ativo, id_tipo_usuario } = request.all();
+      const { id_usuario, id_sistema, ativo, id_tipo_usuario, senha } = request.all();
 
       if (ativo) {
         const usuarioAtivo = await Usuario.query()
@@ -120,6 +120,13 @@ class UsuariosController {
         const usuario = await Usuario.query()
           .from("tedplan.permissao_sistema")
           .insert({ id_usuario: id_usuario, id_sistema: id_sistema });
+      }
+
+      if (senha) {
+        const usuarioAtivo = await Usuario.query()
+          .from("tedplan.usuario")
+          .where("id_usuario", id_usuario)
+          .update({ senha: md5(senha) });
       }
 
       return sistema;
