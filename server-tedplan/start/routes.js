@@ -66,9 +66,11 @@ Route.post("getPsResiduosColeta", "PsResiduosColetaController.getRsc");
 
 Route.post("create-unidade-rsc", "PsResiduosColetaController.createUnidadeRsc");
 Route.post("list-unidades-rsc", "PsResiduosColetaController.getUnidadesRsc");
+Route.delete("remover-unidade-rsc", "PsResiduosColetaController.removerUnidadeRsc");
 
 Route.post("create-unidade-rss", "PsResiduosColetaController.createUnidadeRss");
 Route.post("list-unidades-rss", "PsResiduosColetaController.getUnidadesRss");
+Route.delete("remover-unidade-rss", "PsResiduosColetaController.removerUnidadeRss");
 
 Route.post("create-cooperativa-catadores", "PsResiduosColetaController.createCooperativaCatadores");
 Route.post("list-cooperativas-catadores", "PsResiduosColetaController.getCooperativasCatadores");

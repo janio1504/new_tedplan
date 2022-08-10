@@ -34,15 +34,12 @@ import {
   LabelCenter,
 } from "../../styles/financeiro";
 import HeadIndicadores from "../../components/headIndicadores";
-import dynamic from "next/dynamic";
-import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
-import { FaRegEdit, FaTrashAlt } from 'react-icons/fa';
 import unidade_escuro from "../../img/Icono-unidadeDeProcessamento.png"
 import coleta_claro from "../../img/Icono-coleta-claro.png"
 import Image from "next/image";

@@ -55,6 +55,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [dadosAgua, setDadosAgua] = useState(null);
   const [dadosEsgoto, setDadosEsgoto] = useState(null);
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
+  const [dadosResiduosColeta, setDadosResiduosColeta] = useState(null);
   useEffect(() => {
     setDadosMunicipio(municipio[0]);
     
@@ -67,6 +68,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     getDadosAgua()
     getDadosEsgoto()
     getDadosDrenagem()
+    getDadosResiduosColeta()
   }, [municipio]);
 
   async function getDadosGerais(){
@@ -125,6 +127,21 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       });
       setDadosDrenagem(res[0])
   }
+
+  async function getDadosResiduosColeta() {  
+    const id_municipio = municipio[0].id_municipio
+    const ano = new Date().getFullYear()  
+    const res = await api
+      .post("getPsResiduosColeta", {id_municipio: id_municipio, ano: ano})
+      .then((response) => {        
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      setDadosResiduosColeta(res[0])
+  }
+
 
   async function getConcessionarias(){
     const id_municipio = municipio[0].id_municipio
@@ -201,7 +218,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
           </TituloRelatorios>
           <Image src={PrestacaoServicos} alt='Prestação de Serviços' />
           <BaixarRelatorio onClick={()=>prestacaoServicos(dadosGeral,
-             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem)}>Baixar</BaixarRelatorio>
+             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem, dadosResiduosColeta)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         
         </DivRelatorios>

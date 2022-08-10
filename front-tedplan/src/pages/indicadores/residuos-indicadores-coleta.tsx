@@ -50,6 +50,7 @@ import {
   IconeColeta,
   TabelaModal,
   BotaoResiduos,
+  Actions,
 } from "../../styles/indicadores";
 import Image from "next/image";
 import api from "../../services/api";
@@ -150,8 +151,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     })
   }
 
-  async function deleteCooperativa(id){
-    console.log(id);
+  async function deleteCooperativa(id){    
     
     await api.delete('delete-cooperativa-catadores',{ params: { id: id }})
     .then(response=>{
@@ -201,6 +201,29 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     data.VA039 = (data.VA010 ? parseFloat((data.VA010).replace('.','').replace(',','.')) : dadosResiduos?.va010 ? parseFloat(dadosResiduos?.va010) : 0)
     + (data.VA011 ? parseFloat((data.VA011).replace('.','').replace(',','.')) : dadosResiduos?.va011 ? parseFloat(dadosResiduos?.va011) : 0 )
     
+    data.CO116 = (data.CO108 ? parseFloat((data.CO108).replace('.','').replace(',','.')) : dadosResiduos?.co108 ? parseFloat(dadosResiduos?.co108) : 0)
+    + (data.CO112 ? parseFloat((data.CO112).replace('.','').replace(',','.')) : dadosResiduos?.co112? parseFloat(dadosResiduos?.co112) : 0)
+    
+    data.CO117 = (data.CO109 ? parseFloat((data.CO109).replace('.','').replace(',','.')) : dadosResiduos?.co109 ? parseFloat(dadosResiduos?.co109) : 0)
+    + (data.CO113 ? parseFloat((data.CO113).replace('.','').replace(',','.')) : dadosResiduos?.co113 ? parseFloat(dadosResiduos?.co113) : 0)
+    
+    data.CS048A = (data.CS048 ? (data.CS048).replace('.','').replace(',','.') : dadosResiduos?.cs048 ? parseFloat(dadosResiduos?.cs048) : 0)
+    
+    data.CO142 = (data.CO140 ? parseFloat((data.CO140).replace('.','').replace(',','.')) : dadosResiduos?.co140 ? parseFloat(dadosResiduos?.co140) : 0)
+    + (data.CO141 ? parseFloat((data.CO141).replace('.','').replace(',','.')) : dadosResiduos?.co141 ? parseFloat(dadosResiduos?.co141) : 0)
+
+    data.CO111 = (data.CO108 ? parseFloat((data.CO108).replace('.','').replace(',','.')) : dadosResiduos?.co108 ? parseFloat(dadosResiduos?.co108) : 0)
+    + (data.CO109 ? parseFloat((data.CO109).replace('.','').replace(',','.')) : dadosResiduos?.co109 ? parseFloat(dadosResiduos?.co109) : 0)
+    + (data.CS048 ? parseFloat((data.CS048).replace('.','').replace(',','.')) : dadosResiduos?.cs048 ? parseFloat(dadosResiduos?.cs048) : 0)
+    + (data.CO140 ? parseFloat((data.CO140).replace('.','').replace(',','.')) : dadosResiduos?.co140 ? parseFloat(dadosResiduos?.co140) : 0)
+
+    data.CO115 = (data.CO112 ? parseFloat((data.CO112).replace('.','').replace(',','.')) : dadosResiduos?.co112? parseFloat(dadosResiduos?.co112) : 0)
+    + (data.CO113 ? parseFloat((data.CO113).replace('.','').replace(',','.')) : dadosResiduos?.co113 ? parseFloat(dadosResiduos?.co113) : 0)
+    + (data.CO141 ? parseFloat((data.CO141).replace('.','').replace(',','.')) : dadosResiduos?.co141 ? parseFloat(dadosResiduos?.co141) : 0)
+
+    data.CO119 = (parseFloat(data.CO116) + parseFloat(data.CO117) + parseFloat(data.CS048A)
+     + parseFloat(data.CO142) + parseFloat(data.CO111) + parseFloat(data.CO115))
+
 
     data.id_residuos_solidos_coleta = dadosResiduos?.id_residuos_solidos_coleta
     data.id_municipio = municipio[0]?.id_municipio
@@ -276,6 +299,51 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     })
   }
 
+  async function removerUnidadeRss(id){
+    await api.delete('remover-unidade-rss',{ params: { id: id }})
+    .then(response=>{
+      toast.notify('Dados deletados com sucesso!',{
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      })  
+      getUnidadesRss()           
+    })
+    .catch((error)=>{
+      console.log(error);      
+    })
+
+  }
+
+
+  async function getRsc(){
+    
+    await api.post('getPsResiduosColeta',     
+    {id_municipio: municipio[0]?.id_municipio, ano: new Date().getFullYear()})
+    .then(response=>{
+      setDadosResiduos(response.data[0])            
+    })
+    .catch((error)=>{
+      console.log(error);      
+    })
+  }
+
+  async function removerUnidadeRsc(id){
+    await api.delete('remover-unidade-rsc',{ params: { id: id }})
+    .then(response=>{
+      toast.notify('Dados deletados com sucesso!',{
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      })  
+      getUnidadesRsc()           
+    })
+    .catch((error)=>{
+      console.log(error);      
+    })
+
+  }
+
   async function handleCadastroUnidadeRss(data){
     data.id_residuos_solidos_coleta = dadosResiduos?.id_residuos_solidos_coleta
     data.id_municipio = municipio[0]?.id_municipio
@@ -303,19 +371,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
   }
 
-  async function getRsc(){
-    
-    await api.post('getPsResiduosColeta',     
-    {id_municipio: municipio[0]?.id_municipio, ano: new Date().getFullYear()})
-    .then(response=>{
-      setDadosResiduos(response.data[0])            
-    })
-    .catch((error)=>{
-      console.log(error);      
-    })
-    
-    
-  }
+ 
 
   function handleOnChange(content) {
     setContent(content);
@@ -324,20 +380,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   async function handleSignOut() {
     signOut();
   }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
-
-  
+   
 
   function unidadeProcessamento() {
     Router.push("/indicadores/residuos-indicadores-unidade");
@@ -988,7 +1031,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <thead>
                   <tr>
                     <th>
-                      <span>Tipo de resíduos(Qualidade em toneladas)</span>
+                      <span>Tipo de resíduos(Quantidade em toneladas)</span>
                     </th>
                     <th>
                       <span>Prefeitura ou SLU</span>
@@ -1072,6 +1115,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <InputP><input {...register("CO111")} type="text"
                     defaultValue={dadosResiduos?.co111}
                     onChange={handleOnChange}
+                    disabled={true}
                     ></input></InputP>
                     </td>
                   </tr>
@@ -1128,6 +1172,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <InputP><input {...register("CO115")} type="text"
                     defaultValue={dadosResiduos?.co115}
                     onChange={handleOnChange}
+                    disabled={true}
                     ></input></InputP>
                     </td>
                   </tr>
@@ -1164,7 +1209,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <p>Total</p>
                     </td>
                     <td>
-                    <InputP><input {...register("CO116")} type="text"
+                    <InputP><input {...register("CO116")}
+                     type="text" disabled={true}
                     defaultValue={dadosResiduos?.co116}
                     onChange={handleOnChange}
                     ></input></InputP>
@@ -1173,11 +1219,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <InputP><input {...register("CO117")} type="text"
                     defaultValue={dadosResiduos?.co117}
                     onChange={handleOnChange}
+                    disabled={true}
                     ></input></InputP>
                     </td>
                     <td>
-                    <InputP><input {...register("CS048B")} disabled={true} type="text"
-                    defaultValue={dadosResiduos?.cs048}
+                    <InputP><input {...register("CS048A")} disabled={true} type="text"
+                    defaultValue={dadosResiduos?.cs048a}
                     onChange={handleOnChange}
                     ></input></InputP>
                     </td>
@@ -1185,12 +1232,14 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <InputP><input {...register("CO142")} type="text"
                     defaultValue={dadosResiduos?.co142}
                     onChange={handleOnChange}
+                    disabled={true}
                     ></input></InputP>
                     </td>
                     <td>
                     <InputP><input {...register("CO119")} type="text"
                     defaultValue={dadosResiduos?.co119}
                     onChange={handleOnChange}
+                    disabled={true}
                     ></input></InputP>
                     </td>
                   </tr>
@@ -1267,11 +1316,15 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </table>
 
               <Tabela>
-                <table>
+                <table cellSpacing={0}>
                   <thead>
                     <tr>
                       <th>Município</th>
                       <th>Unidade</th>
+                      <th>Tipo de unidade</th>
+                      <th>Operador da unidade</th>
+                      <th>CNPJ da unidade</th>
+                      <th>Quant. resíduos exportados</th>
                       <th>Ações</th>
                     </tr>                   
                   </thead>
@@ -1282,7 +1335,18 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         <tr key={key}>
                             <td>{unidade.municipio}</td>
                             <td>{unidade.nome_unidade}</td>
-                            <td></td>
+                            <td>{unidade.tipo_unidade}</td>
+                            <td>{unidade.operador_unidade}</td>
+                            <td>{unidade.cnpj_unidade}</td>
+                            <td>{unidade.quant_residuos_exportados}</td>
+                            <td>
+                            <Actions>
+                                
+                                <span><Image onClick={()=>removerUnidadeRsc(unidade.id_unidade_residuo_solido)}
+                                  title="Excluir" width={30} height={30} src={Excluir} alt="" />
+                                </span>
+                                </Actions>
+                            </td>
                          </tr>
                          </>
                       ))
@@ -1601,8 +1665,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </td>
                     <td>
                       <InputP>
-                        <input {...register("CS057")} type="text"
-                          defaultValue={dadosResiduos?.cs057}
+                        <input {...register("CS057A")} type="text"
+                          defaultValue={dadosResiduos?.cs057a}
                           onChange={handleOnChange}
                         ></input>
                       </InputP>
@@ -2008,8 +2072,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </td>
                     <td>
                       <InputP>
-                        <input {...register("CS048")}
-                         defaultValue={dadosResiduos?.cs048}
+                        <input {...register("CS048B")}
+                         defaultValue={dadosResiduos?.cs048b}
                          onChange={handleOnChange}
                         type="text"></input>
                       </InputP>
@@ -2580,11 +2644,15 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tbody>
               </table>
               <Tabela>
-                <table>
+              <table cellSpacing={0}>
                   <thead>
                     <tr>
                       <th>Município</th>
                       <th>Unidade</th>
+                      <th>Tipo de unidade</th>
+                      <th>Operador da unidade</th>
+                      <th>CNPJ da unidade</th>
+                      <th>Quant. resíduos exportados</th>
                       <th>Ações</th>
                     </tr>                   
                   </thead>
@@ -2595,7 +2663,18 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         <tr key={key}>
                             <td>{unidade.municipio}</td>
                             <td>{unidade.nome_unidade}</td>
-                            <td></td>
+                            <td>{unidade.tipo_unidade}</td>
+                            <td>{unidade.operador_unidade}</td>
+                            <td>{unidade.cnpj_unidade}</td>
+                            <td>{unidade.quant_residuos_exportados}</td>
+                            <td>
+                            <Actions>
+                                
+                                <span><Image onClick={()=>removerUnidadeRss(unidade.id_unidade_residuo_solido_rss)}
+                                  title="Excluir" width={30} height={30} src={Excluir} alt="" />
+                                </span>
+                                </Actions>
+                            </td>
                          </tr>
                          </>
                       ))
@@ -3887,12 +3966,14 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               <td>{coop.nome_associacao}</td>
                               <td>{coop.numero_associados}</td>
                               <td>
+                                <Actions>
                                 <span><Image 
                                   title="Editar" width={30} height={30} src={Editar} alt="" />
                                 </span>
                                 <span><Image onClick={()=>deleteCooperativa(coop.id_cooperativa_associacao_catadores)}
                                   title="Excluir" width={30} height={30} src={Excluir} alt="" />
                                 </span>
+                                </Actions>
                               </td>
                             </tr>
                           </>

@@ -442,6 +442,11 @@ export const Tabela = styled.div`
     border: solid 1px #008080;
     color: #667778;
   }
+  td a{
+    font-size: 24px;
+    margin-bottom: -6px;
+  }
+  
   }
   
   span{

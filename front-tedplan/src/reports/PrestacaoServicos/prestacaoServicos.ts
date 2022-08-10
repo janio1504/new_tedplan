@@ -2,7 +2,7 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any,
-    dadosAgua: any, dadosEsgoto: any, dadosDrenagem: any){
+    dadosAgua: any, dadosEsgoto: any, dadosDrenagem: any, dadosResiduosColeta: any){
     pdfMake.vfs = pdfFonts.pdfMake.vfs 
     
     const reportTitle: any = [
@@ -492,7 +492,44 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
              headerRows: 1,
              body: [
                  [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados.ano}],
-                
+                 ['IE017', 'Extensão total das vias públicas urbanas', dadosDrenagem.ie017 ],
+                 ['IE018', 'Extensão total das vias públicas urbanas implantadas', dadosDrenagem.ie018 ],
+                 ['IE019', 'Extensão total das vias públicas com pavimento e meio-fio(ou semelhante)', dadosDrenagem.ie019 ],
+                 ['IE020', 'Extensão total das vias públicas com pavimento e meio-fio(ou semelhante) implantadas no ano de referência', dadosDrenagem.ie020 ],
+                 ['IE021', 'Quantidade de bocas de lobo existentes', dadosDrenagem.ie021 ],
+                 ['IE022', 'Quantidade de bocas de leão ou de bocas de lobo múltiplas(duas ou mais bocas de lobo conjugadas) existentes', dadosDrenagem.ie022 ],
+                 ['IE023', 'Quantidade de poços de visita (PV) existentes', dadosDrenagem.ie023 ],
+                 ['IE024', 'Extensão total das vias públicas urbanas com redes de águas pluviais subterrâneos', dadosDrenagem.ie024 ],
+                 ['IE025', 'Extensão total das vias públicas urbanas com redes de águas pluviais subterrâneos implantados no ano de referência', dadosDrenagem.ie025 ],
+                 ['IE026', 'Existem vias públicas urbanas com canais artificiais abertos?', dadosDrenagem.ie026 ],
+                 ['IE027', 'Existem vias públicas urbanas com soluções de drenagem natural(faixas ou valas de infiltração)?', dadosDrenagem.ie027 ],
+                 ['IE028', 'Extensão total das vias públicas urbanas com soluções de drenagem natural(faixas ou valas de infiltração)', dadosDrenagem.ie028 ],
+                 ['IE029', 'Existem estenções elevatórias de águas pluviais na rede de drenagem?', dadosDrenagem.ie029 ],
+                 ['IE032', 'Extensão total dos cursos de águas naturais perenes', dadosDrenagem.ie032 ],
+                 ['IE040', 'Extensão total dos cursos de águas naturais perenes copm outro tipo de intervenção', dadosDrenagem.ie040 ],
+                 ['IE033', 'Extensão total dos cursos de águas naturais perenes com diques', dadosDrenagem.ie033 ],
+                 ['IE034', 'Extensão total dos cursos de águas naturais perenes canalizados abertos', dadosDrenagem.ie034 ],
+                 ['IE035', 'Extensão total dos cursos de águas naturais perenes canalizados fechados', dadosDrenagem.ie035 ],
+                 ['IE036', 'Extensão total dos cursos de águas naturais perenes com retificação', dadosDrenagem.ie036 ],
+                 ['IE037', 'Extensão total dos cursos de águas naturais perenes com desenrocamento ou rebaixamento do leito', dadosDrenagem.ie037 ],
+                 ['IE041', 'Existe serviço de drenagem ou desassoreamento dos cursos de águas naturais perenes?', dadosDrenagem.ie041 ],
+                 ['IE044', 'Extensão total de parques lineares ao longo de cursos de águas perenes', dadosDrenagem.ie044 ],
+                 ['IE050', 'Existem algum tipo de tratamento das águas pluviais?', dadosDrenagem.ie050 ],
+                 ['IE050A', 'Especifique qual é o outro tipo de tratamento das águas pluviais', dadosDrenagem.ie050a ],
+                 ['IE999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem.ie999 ],
+                 ['RI023', 'Numero de enxuradas na área urbana do município', dadosDrenagem.ri023 ],
+                 ['RI025', 'Numero de alagementos na área urbana do município', dadosDrenagem.ri025 ],
+                 ['RI027', 'Numero de inundações na área urbana do município', dadosDrenagem.ri027 ],
+                 ['RI029', 'Numero de pessoas desabrigadas ou desalojadas, na área urbana do município', dadosDrenagem.ri029 ],
+                 ['RI031', 'Numero de óbtos, na área urbana do município', dadosDrenagem.ri031 ],
+                 ['RI032', 'Numero de imóveis urbanos atingidos', dadosDrenagem.ri032 ],
+                 ['RI042', 'Houve alojamento ou reassentamento de população residente em área de risco hidrológico, durante ou após eventos hidrológicos impactantes', dadosDrenagem.ri042 ],
+                 ['RI043', 'Quantidade de pessoas tranferidas para habitações provisórias durante ou após os eventos hidrológicos impactantes', dadosDrenagem.ri043 ],
+                 ['RI044', 'Quantidade de pessoas realocadas para habitações permanentes durante ou após os eventos hidrológicos impactantes', dadosDrenagem.ri044 ],
+                 ['RI045', 'Houve atuação (federal, estadual ou municipal) para reassentamento da população e/ou para recuperação de imóveis urbanos afetados por eventos hidrológicos impactantes?', dadosDrenagem.ri045 ],
+                 ['RI999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem.ri999 ],
+               
+                 
                 
                  
              ]
@@ -500,6 +537,130 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
          layout: 'headerLineOnly'
         },
 
+        {text: 'Resíduos Sólidos Coleta', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados.ano}],
+                ['TB001', 'Coletores e Motoristas de agentes PÚBLICOS, alocados na coleta', dadosResiduosColeta.tb001],
+                ['TB003', 'Agentes PÚBLICOS envolvidos na varrição', dadosResiduosColeta.tb003],
+                ['TB005', 'Agentes PÚBLICOS envolvidos com a capina e roçada', dadosResiduosColeta.tb005],
+                ['TB007', 'Agentes PÚBLICOS alocados nas unidades de manejo, tratamento ou disposição final', dadosResiduosColeta.tb007],
+                ['TB009', 'Agentes PÚBLICOS envolvidos nos demais serviços quando não especificados acima', dadosResiduosColeta.tb009],
+                ['TB011', 'Agentes PÚBLICOS alocados na Gerencia ou Administração(Planejamento ou Fiscalização)', dadosResiduosColeta.tb011],
+                ['TB013', 'Total de Agentes PÚBLICOS envolvidos', dadosResiduosColeta.tb013],
+                ['TB002', 'Coletores e Motoristas de agentes PRIVADOS, alocados na coleta', dadosResiduosColeta.tb002],
+                ['TB004', 'Agentes PRIVADOS envolvidos na varrição', dadosResiduosColeta.tb004],
+                ['TB006', 'Agentes PRIVADOS envolvidos com a capina e roçada', dadosResiduosColeta.tb006],
+                ['TB008', 'Agentes PRIVADOS alocados nas unidades de manejo, tratamento ou disposição final', dadosResiduosColeta.tb008],
+                ['TB010', 'Agentes PRIVADOS envolvidos nos demais serviços quando não especificados acima', dadosResiduosColeta.tb010],
+                ['TB012', 'Agentes PRIVADOS alocados na Gerencia ou Administração(Planejamento ou Fiscalização)', dadosResiduosColeta.tb012],
+                ['TB014', 'Total de Agentes PRIVADOS envolvidos', dadosResiduosColeta.tb014],
+                ['TB015', 'Total de trabalhadores envolvidos nos servicos de Manejo de RSU', dadosResiduosColeta.tb015],
+                ['TB016', 'Existem frentes de trabalho temporário?', dadosResiduosColeta.tb016],
+                ['TB017', 'Quantidades de trabalhadores Frente !', dadosResiduosColeta.tb017],
+                ['TB020', 'Duração de frente 1', dadosResiduosColeta.tb020],
+                ['TB023', 'Atuam em mais de um tipo de serviço, Frente 1?', dadosResiduosColeta.tb023],
+                ['TB026', 'Tipo de serviço predominate de Frente 1', dadosResiduosColeta.tb026],
+                ['TB018', 'Quantidade de trabalhadores Frente 2', dadosResiduosColeta.tb018],
+                ['TB021', 'Duração de Frente 2', dadosResiduosColeta.tb021],
+                ['TB024', 'Atuam em mais de um tipo de serviço, Frente 2?', dadosResiduosColeta.tb024],
+                ['TB027', 'Tipo de serviço predominante da Frente 2', dadosResiduosColeta.tb027],
+                ['TB019', 'Quantidade de trabalhadores Frente 3', dadosResiduosColeta.tb019],
+                ['TB022', 'Duração de Frente 3', dadosResiduosColeta.tb022],
+                ['TB025', 'Atuam em mais de um tipo de serviços, Frente 3?', dadosResiduosColeta.tb025],
+                ['TB028', 'Tipo de serviços predominante da Frente 3', dadosResiduosColeta.tb028],
+                           
+                
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+
+       {text: 'Frota de coleta domiciliar e pública', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},      
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Tipo de veiculos(Quant.)'},{text: ''},{text: 'Prefeitura SLU'},{text: ''},{text: ''}, {text: 'Empr. Contratada'},{text: ''}],
+                [' ', '0 a 5 anos', '5 a 10 anos','Maior que 10 anos','0 a 5 anos','5 a 10 anos','Maior que 10 anos' ],
+                [' ', 'CO054', 'CO055','CO056','CO057','CO058','CO059' ],
+                ['Caminhão compactador', dadosResiduosColeta.co054, dadosResiduosColeta.co055
+                ,dadosResiduosColeta.co056,dadosResiduosColeta.co057,dadosResiduosColeta.co058,dadosResiduosColeta.co059 ],
+                [' ', 'CO063', 'CO064','CO065','CO066','CO067','CO068' ],
+                ['Caminhão basculante, baú ou carroceria', dadosResiduosColeta.co063, dadosResiduosColeta.co064
+                ,dadosResiduosColeta.co065,dadosResiduosColeta.co066,dadosResiduosColeta.co067,dadosResiduosColeta.co068 ],
+                [' ', 'CO072', 'CO073','CO074','CO075','CO076','CO077' ],
+                ['Caminhão poliguindastes (brook)', dadosResiduosColeta.co072, dadosResiduosColeta.co073
+                ,dadosResiduosColeta.co074,dadosResiduosColeta.co075,dadosResiduosColeta.co076,dadosResiduosColeta.co077 ],
+                [' ', 'CO071', 'CO082','CO083','CO084','CO085','CO086' ],
+                ['Trator agrícola com reboque', dadosResiduosColeta.co071, dadosResiduosColeta.co082
+                ,dadosResiduosColeta.co083,dadosResiduosColeta.co084,dadosResiduosColeta.co085,dadosResiduosColeta.co086 ],
+                [' ', 'CO090', 'CO091','CO092','CO093','CO094','CO095' ],
+                ['Tração animal', dadosResiduosColeta.co090, dadosResiduosColeta.co091
+                ,dadosResiduosColeta.co092,dadosResiduosColeta.co093,dadosResiduosColeta.co094,dadosResiduosColeta.co095 ],
+                [' ', 'CO155', 'CO156','CO157','CO158','CO159','CO160' ],
+                ['Tração animal', dadosResiduosColeta.co155, dadosResiduosColeta.co156
+                ,dadosResiduosColeta.co157,dadosResiduosColeta.co158,dadosResiduosColeta.co159,dadosResiduosColeta.co160 ],
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+
+            
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                
+                ['CO163','Outros veículos', dadosResiduosColeta.co163],
+               
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+
+       
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
+                ['CO154', 'Os residuos provenientes da varrição ou limpeza de logradouros públicos são recolhidos junto com os residuos domiciliares?', dadosResiduosColeta.co154 ],
+                ['CO012', 'Valor contratado (preço unitário) do serviço de RDO e RPU diurna', dadosResiduosColeta.co012 ],
+                ['CO146', 'Valor contratual (preço unitário) do serviço de transporte de RDO e RPU até a unidade de destinação final', dadosResiduosColeta.co146 ],
+                ['CO148', 'No preço acima está incluido o transporte de RDO e RPU coletados até a destinação final?', dadosResiduosColeta.co148 ],
+                ['CO149', 'A distancia média do centro de massa à unidade de destinação final é superior a 15 km?', dadosResiduosColeta.co149 ],
+                ['CO150', 'Especifique a distancia do centro de massa à unidade de destinação final superior a 15km', dadosResiduosColeta.co150 ],
+                ['CO151', 'A distancia média de transporte à unidade de destinação final é superior a 15km?', dadosResiduosColeta.co151 ],
+                ['CO152', 'Especifique a distancia de transporte à unidade de destinação final superior a 15km', dadosResiduosColeta.co152 ],
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
+
+       {
+        table: {
+            headerRows: 1,
+            body: [
+                [{text: 'Tipo de resíduos(Quantidade em toneladas)'},{text: 'Prefeitura ou SLU'}
+                ,{text: 'Empresas ou autônomos contratados'},{text: 'Assoc. ou Coop. de Catadores c/ coleta seletiva'}
+                ,{text: 'Outros (inclusive proprios gerad. exceto catadores)'}, {text: 'Total'}],                
+                [' ', 'CO108', 'CO109','CS048','CO140','CO111' ],
+                ['Domiciliar e Comercial', dadosResiduosColeta.co108, dadosResiduosColeta.co109
+                ,dadosResiduosColeta.cs048,dadosResiduosColeta.co140,dadosResiduosColeta.co111 ],
+                [' ', 'CO112', 'CO113',' ','CO141','CO115' ],
+                ['Público(Limpeza de logradouros)', dadosResiduosColeta.co112, dadosResiduosColeta.co113
+                ,' ',dadosResiduosColeta.co141,dadosResiduosColeta.co115 ],
+                [' ', 'CO116', 'CO117','CS048','CO142','CO119' ],
+                ['Total', dadosResiduosColeta.co116, dadosResiduosColeta.co117
+                ,dadosResiduosColeta.cs048,dadosResiduosColeta.co142,dadosResiduosColeta.co117 ],
+              
+            ]
+        },
+        layout: 'headerLineOnly'
+       },
        
     ]
    

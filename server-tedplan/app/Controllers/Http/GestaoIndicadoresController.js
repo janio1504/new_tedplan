@@ -94,6 +94,7 @@ class GestaoIndicadoresController {
           titulo: pcs_titulo,
           ano: pcs_ano,
           id_municipio: id_municipio,
+          id_arquivo: file.id,
         });
       }
       async function updateParticipacaoControleSocial() {

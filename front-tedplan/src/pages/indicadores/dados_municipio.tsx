@@ -1841,7 +1841,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
           <DivForm>
             <DivTituloForm>
-              Controle Social dos Serços Municipais de Saneamento
+              Controle Social dos Serviços Municípais de Saneamento
             </DivTituloForm>
             <input
               {...register("id_controle_social_sms")}

@@ -21,6 +21,30 @@ class PsResiduosColetaController {
     }
   }
 
+  async removerUnidadeRsc({ request }){
+    try {
+      const { id } = request.all()
+      const res = await PsFinanceiro.query()
+      .from('tedplan.unidades_residuos_solidos')
+      .where('id_unidade_residuo_solido', id)
+      .delete()
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async removerUnidadeRss({ request }){
+    try {
+      const { id } = request.all()
+      const res = await PsFinanceiro.query()
+      .from('tedplan.unidades_residuos_solidos_rss')
+      .where('id_unidade_residuo_solido_rss', id)
+      .delete()
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async createUnidadeRsc({request}){
     const { municipio, nome_unidade, operador_unidade,
     cnpj_unidade, quant_residuos_exportados, ano, id_municipio }
@@ -210,6 +234,8 @@ class PsResiduosColetaController {
           cs046: dados.CS046,
           cs047: dados.CS047,
           cs048: dados.CS048,
+          cs048a: dados.CS048A,
+          cs048b: dados.CS048B,
           cs049: dados.CS049,
           cs051: dados.CS051,
           cs053: dados.CS053,
@@ -444,6 +470,8 @@ class PsResiduosColetaController {
           cs046: dados.CS046 ? dados.CS046: rsc.CS046,
           cs047: dados.CS047 ? dados.CS047: rsc.CS047,
           cs048: dados.CS048 ? dados.CS048: rsc.CS048,
+          cs048a: dados.CS048A ? dados.CS048A: rsc.CS048a,
+          cs048b: dados.CS048B ? dados.CS048B: rsc.CS048B,
           cs049: dados.CS049 ? dados.CS049: rsc.CS049,
           cs051: dados.CS051 ? dados.CS051: rsc.CS051,
           cs053: dados.CS053 ? dados.CS053: rsc.CS053,
@@ -451,7 +479,7 @@ class PsResiduosColetaController {
           cs055: dados.CS055 ? dados.CS055: rsc.CS055,
           cs056: dados.CS056 ? dados.CS056: rsc.CS056,
           cs057: dados.CS057 ? dados.CS057: rsc.CS057,
-          cs057a: dados.CS057a ? dados.CS057a: rsc.CS057a,
+          cs057a: dados.CS057A ? dados.CS057A: rsc.CS057a,
           cs058: dados.CS058 ? dados.CS058: rsc.CS058,
           cs059: dados.CS059 ? dados.CS059: rsc.CS059,
           cs061: dados.CS061 ? dados.CS061: rsc.CS061,
