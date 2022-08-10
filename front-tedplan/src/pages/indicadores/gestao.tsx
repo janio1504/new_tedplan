@@ -232,6 +232,17 @@ export default function GestaoIndicadores({
         getPlanos()
         getParticipacoes()
         getRepresentantes()
+        reset({
+          pcs_ano: '',
+          pcs_titulo: '',
+          pcs_arquivo: '',
+          plano_ano: '',
+          plano_titulo: '',
+          plano_arquivo: '',
+          politica_ano: '',
+          politica_titulo: '',
+          politica_arquivo: '',
+        })
       })
       .catch((error) => {
         toast.notify("Não foi possivel cadastrar o representante! ", {
