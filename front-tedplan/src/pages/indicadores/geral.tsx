@@ -596,7 +596,6 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputP><input {...register('GE010')}
                     defaultValue={dadosGeral?.ge016}
                     onChange={handleOnChange}></input></InputP></td>
-                    <td>Sede</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>GE011</InputSNIS></td>
@@ -617,7 +616,6 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
                       </select></InputP></td>
-                    <td>Localidades</td>
                   </tr> 
                              
                 </tbody>                
