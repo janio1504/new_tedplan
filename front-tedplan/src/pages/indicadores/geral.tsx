@@ -1228,7 +1228,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.co134}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Pessoas</td>
+                    <td>%</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>CO135</InputSNIS></td>
@@ -1237,7 +1237,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.co135}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Pessoas</td>
+                    <td>%</td>
                   </tr>       
                   <tr>
                     <td><InputSNIS>CO136</InputSNIS></td>
@@ -1246,7 +1246,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.co136}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Pessoas</td>
+                    <td>%</td>
                   </tr>  
                   <tr>
                     <td><InputSNIS>CS050</InputSNIS></td>
