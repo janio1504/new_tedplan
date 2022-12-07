@@ -314,22 +314,40 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td>Localidades</td>
                   </tr>    
                   <tr>
+
+
                     <td><InputSNIS>GE019</InputSNIS></td>
                     <td>Onde atende com abastecimento de água</td>
-                    <td><InputP><input {...register('GE019')}
-                    defaultValue={dadosGeral?.ge019}
-                    onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    <td>
+                      <InputP>
+                        <select {...register('GE019')}>
+                          <option > {dadosGeral?.ge019} </option>
+                          <option value="Sede Municipal"> Sede Municipal  </option>
+                          <option value="Localidades"> Localidades  </option>
+                          <option value="Ambos"> Ambos</option>
+                        </select>
+                      </InputP>
+                    </td>
                     <td>Localidades</td>
+
                   </tr>   
                   <tr>
+
                     <td><InputSNIS>GE020</InputSNIS></td>
                     <td>Onde atende com esgotamento sanitário</td>
-                    <td><InputP><input {...register('GE020')}
-                    defaultValue={dadosGeral?.ge020}
-                    onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    <td>
+                      <InputP>
+                        
+                        <select {...register('GE020')}>
+                          <option > {dadosGeral?.ge020} </option>
+                          <option value="Sede Municipal"> Sede Municipal  </option>
+                          <option value="Localidades"> Localidades  </option>
+                          <option value="Ambos"> Ambos</option>
+                        </select>
+                        
+                      </InputP></td>
                     <td>Localidades</td>
+                    
                   </tr>             
                 </tbody>                
               </table>            
