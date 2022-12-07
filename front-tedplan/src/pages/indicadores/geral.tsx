@@ -594,7 +594,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputSNIS>GE010</InputSNIS></td>
                     <td>Região Hidrográfica em que se encontra o município (Fonte:ANA)</td>
                     <td><InputP><input {...register('GE010')}
-                    defaultValue={dadosGeral?.ge016}
+                    defaultValue={dadosGeral?.ge010}
                     onChange={handleOnChange}></input></InputP></td>
                   </tr>
                   <tr>
