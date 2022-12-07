@@ -1090,7 +1090,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <tbody>
                   <tr>
                     <td><InputSNIS>GE201</InputSNIS></td>
-                    <td>O oŕgão(Prestador) é também o prestador - direto ou indireto - de outros serviços de Saneamento?</td>
+                    <td>O oŕgão (Prestador) é também o prestador - direto ou indireto - de outros serviços de Saneamento?</td>
                     <td><InputP><select {...register('GE201')}
                     defaultValue={dadosGeral?.ge201}
                     onChange={handleOnChange}
