@@ -1074,7 +1074,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
           <DivFormEixo>           
-            <DivTituloEixo>Dados hidrográficos</DivTituloEixo>            
+            <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>            
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Informações gerais</DivTituloConteudo>
