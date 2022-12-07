@@ -1136,7 +1136,6 @@ export default function Geral({ municipio }: MunicipioProps) {
                                   <option value="1">Sim</option>
                                   <option value="0">Não</option>
                       </select></InputP></td>
-                    <td>Localidades</td>
                   </tr> 
                     <tr>
                       <td></td>
