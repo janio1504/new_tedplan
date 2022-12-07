@@ -988,12 +988,11 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputSNIS>RI010</InputSNIS></td>
                     <td>O mapeamento é parcial ou integral?</td>
                     <td><InputP><select {...register('RI010')}
-                    defaultValue={dadosGeral?.ri010}
                     onChange={handleOnChange}
                     >
-                                  <option value=""></option>
-                                  <option value="1">Sim</option>
-                                  <option value="0">Não</option>
+                                  <option value=""> {(dadosGeral?.ri010 == 1) ? "Integral" : "Parcial"}  </option>
+                                  <option value="1">Integral </option>
+                                  <option value="0">Parcial</option>
                                 </select></InputP></td>                   
                   </tr>   
                   <tr>
