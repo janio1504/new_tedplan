@@ -1017,11 +1017,17 @@ export default function Geral({ municipio }: MunicipioProps) {
                    
                   <tr>
                     <td><InputSNIS>RI012</InputSNIS></td>
-                    <td>Tempo de recorrência(ou periodo de retorno) adotado para o mapeamento</td>
-                    <td colSpan={4}><input {...register('RI012')}
-                    defaultValue={dadosGeral?.ri012}
-                    onChange={handleOnChange}
-                    type="text"></input></td>    
+                    <td>Tempo de recorrência (ou periodo de retorno) adotado para o mapeamento</td>
+                  
+                    <td colSpan={4}>
+                      <input
+                        {...register('RI012')}
+                        defaultValue={dadosGeral?.ri012}
+                        onChange={handleOnChange}
+                        type="text">
+                      </input>
+                    </td>
+
                     <td>Anos</td>                
                   </tr>   
                   <tr>
