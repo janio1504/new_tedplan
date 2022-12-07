@@ -1095,11 +1095,17 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.ge201}
                     onChange={handleOnChange}
                     >
-                                  <option value=""></option>
-                                  <option value="1">Sim</option>
-                                  <option value="0">Não</option>
+                                  <option value=""> {dadosGeral?.ge201} </option>
+                                  <option value="Não">Não</option>
+                                  <option value="Abastecimento de água potável">Abastecimento de água potável</option>
+                                  <option value="Esgotamento Sanitário">Esgotamento Sanitário</option>
+                                  <option value="Abastecimento de água potável e Esgotamento Sanitário">Abastecimento de água potável e Esgotamento Sanitário</option>
+                                  <option value="Drenagem e manejo de águas pluviais">Drenagem e manejo de águas pluviais</option>
+                                  <option value="Abast. água potável e Drenagem e manejo de águas pluviais">Abast. água potável e Drenagem e manejo de águas pluviais</option>
+                                  <option value="Esgot. Sanitário e Drenagem e manejo de águas pluviais">Esgot. Sanitário e Drenagem e manejo de águas pluviais</option>
+                                  <option value="Abast. água potável, Esgot. Sanitário e Drenagem e manejo de águas pluviais">Abast. água potável, Esgot. Sanitário e Drenagem e manejo de águas pluviais</option>
+
                       </select></InputP></td>
-                    <td>Localidades</td>
                   </tr> 
                              
                 </tbody>                
