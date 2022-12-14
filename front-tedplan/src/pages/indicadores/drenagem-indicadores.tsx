@@ -476,7 +476,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                   Numero de pessoas desabrigadas ou desalojadas, na área urbana
                   do município
                 </p>
-                <p>Numero de óbtos, na área urbana do município</p>
+                <p>Numero de óbitos, na área urbana do município</p>
                 <p>Numero de imóveis urbanos atingidos</p>
               </InputXL>
 
@@ -513,7 +513,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>alagamentos</p>
                 <p>inundações</p>
                 <p>pessoas</p>
-                <p>óbtos</p>
+                <p>óbitos</p>
                 <p>imóveis</p>
               </InputSNIS>
               <DivSeparadora></DivSeparadora>

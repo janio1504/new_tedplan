@@ -521,7 +521,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                  ['RI025', 'Numero de alagementos na área urbana do município', dadosDrenagem.ri025 ],
                  ['RI027', 'Numero de inundações na área urbana do município', dadosDrenagem.ri027 ],
                  ['RI029', 'Numero de pessoas desabrigadas ou desalojadas, na área urbana do município', dadosDrenagem.ri029 ],
-                 ['RI031', 'Numero de óbtos, na área urbana do município', dadosDrenagem.ri031 ],
+                 ['RI031', 'Numero de óbitos, na área urbana do município', dadosDrenagem.ri031 ],
                  ['RI032', 'Numero de imóveis urbanos atingidos', dadosDrenagem.ri032 ],
                  ['RI042', 'Houve alojamento ou reassentamento de população residente em área de risco hidrológico, durante ou após eventos hidrológicos impactantes', dadosDrenagem.ri042 ],
                  ['RI043', 'Quantidade de pessoas tranferidas para habitações provisórias durante ou após os eventos hidrológicos impactantes', dadosDrenagem.ri043 ],
