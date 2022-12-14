@@ -245,22 +245,37 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 defaultValue={dadosDrenagem?.ie025}
                 onChange={handleOnChange}
                 type="text"></input>
-                <input {...register("IE026")}
-                defaultValue={dadosDrenagem?.ie026}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE027")}
-                defaultValue={dadosDrenagem?.ie027}
-                onChange={handleOnChange}
-                type="text"></input>
+                
+                <select {...register('IE026')}
+                defaultValue={dadosDrenagem?.ie041}
+                  onChange={handleOnChange}
+                >
+                  <option value={dadosDrenagem?.ie026}></option>
+                  <option value="1">Sim</option>
+                  <option value="0">Não</option>
+                </select>
+
+                <select {...register('IE027')}
+                  onChange={handleOnChange}
+                >
+                  <option value={dadosDrenagem?.ie027}></option>
+                  <option value="1">Sim</option>
+                  <option value="0">Não</option>
+                </select>
+
                 <input {...register("IE028")}
                 defaultValue={dadosDrenagem?.ie028}
                 onChange={handleOnChange}
                 type="text"></input>
-                <input {...register("IE029")}
-                defaultValue={dadosDrenagem?.ie029}
-                onChange={handleOnChange}
-                type="text"></input>
+
+                <select {...register('IE029')}
+                  onChange={handleOnChange}
+                >
+                  <option value={dadosDrenagem?.ie029}></option>
+                  <option value="1">Sim</option>
+                  <option value="0">Não</option>
+                </select>
+
               </InputP>
               <InputSNIS>
                 <label>.</label>
@@ -283,7 +298,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
-                  Cursos de água-aŕeas urbanas
+                  Cursos d’água - áreas urbanas
                 </DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>

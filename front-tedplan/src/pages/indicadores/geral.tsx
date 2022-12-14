@@ -1128,14 +1128,18 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <tr>
                     <td><InputSNIS>GE202</InputSNIS></td>
                     <td>Há empresa com contrato de DELEGAÇÂO (conceção ou contrato de programa) para algum ou todos os serviços de limpeza urbana?</td>
-                    <td><InputP><select {...register('GE202')}
-                    defaultValue={dadosGeral?.ge202}
-                    onChange={handleOnChange}
-                    >
-                                  <option value=""></option>
-                                  <option value="1">Sim</option>
-                                  <option value="0">Não</option>
-                      </select></InputP></td>
+                    <td>
+                    <InputP>
+                      <select {...register('GE202')}
+                        defaultValue={dadosGeral?.ge202}
+                        onChange={handleOnChange}
+                      >
+                        <option value=""></option>
+                        <option value="1">Sim</option>
+                        <option value="0">Não</option>
+                      </select>
+                    </InputP>
+                    </td>
                   </tr> 
                     <tr>
                       <td></td>
