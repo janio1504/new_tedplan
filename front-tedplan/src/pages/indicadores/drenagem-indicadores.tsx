@@ -469,7 +469,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputSNIS>
               <InputXL>
                 <label>Descrição</label>
-                <p>Numero de enxuradas na área urbana do município</p>
+                <p>Numero de enxurradas na área urbana do município</p>
                 <p>Numero de alagementos na área urbana do município</p>
                 <p>Numero de inundações na área urbana do município</p>
                 <p>
@@ -509,7 +509,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputP>
               <InputSNIS>
                 <label>.</label>
-                <p>enxuradas</p>
+                <p>enxurradas</p>
                 <p>alagamentos</p>
                 <p>inundações</p>
                 <p>pessoas</p>

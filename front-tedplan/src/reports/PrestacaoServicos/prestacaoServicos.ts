@@ -517,7 +517,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                  ['IE050', 'Existem algum tipo de tratamento das águas pluviais?', dadosDrenagem.ie050 ],
                  ['IE050A', 'Especifique qual é o outro tipo de tratamento das águas pluviais', dadosDrenagem.ie050a ],
                  ['IE999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem.ie999 ],
-                 ['RI023', 'Numero de enxuradas na área urbana do município', dadosDrenagem.ri023 ],
+                 ['RI023', 'Numero de enxurradas na área urbana do município', dadosDrenagem.ri023 ],
                  ['RI025', 'Numero de alagementos na área urbana do município', dadosDrenagem.ri025 ],
                  ['RI027', 'Numero de inundações na área urbana do município', dadosDrenagem.ri027 ],
                  ['RI029', 'Numero de pessoas desabrigadas ou desalojadas, na área urbana do município', dadosDrenagem.ri029 ],
