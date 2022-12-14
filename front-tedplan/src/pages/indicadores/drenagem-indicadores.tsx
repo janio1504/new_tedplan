@@ -420,10 +420,10 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>km</p>
                 <p>km</p>
                 <p>km</p>
-                <p>km</p>
-                <p>km</p>
                 <p>.</p>
                 <p>km</p>
+                <p>.</p>
+                <p>.</p>
               </InputSNIS>
             </DivFormConteudo>
 
