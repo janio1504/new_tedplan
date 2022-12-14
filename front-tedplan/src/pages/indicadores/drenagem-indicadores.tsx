@@ -170,11 +170,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>Extensão total das vias públicas urbanas</p>
                 <p>Extensão total das vias públicas urbanas implantadas</p>
                 <p>
-                  Extensão total das vias públicas com pavimento e meio-fio(ou
+                  Extensão total das vias públicas com pavimento e meio-fio (ou
                   semelhante)
                 </p>
                 <p>
-                  Extensão total das vias públicas com pavimento e meio-fio(ou
+                  Extensão total das vias públicas com pavimento e meio-fio (ou
                   semelhante) implantadas no ano de referência
                 </p>
                 <p>Quantidade de bocas de lobo existentes</p>
