@@ -317,28 +317,28 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputSNIS>
               <InputXL>
                 <label>Descrição</label>
-                <p>Extensão total dos cursos de águas naturais perenes</p>
+                <p>Extensão total dos Cursos d’água naturais perenes</p>
                 <p>
-                  Extensão total dos cursos de águas naturais perenes copm outro
+                  Extensão total dos Cursos d’água naturais perenes copm outro
                   tipo de intervenção
                 </p>
                 <p>
-                  Extensão total dos cursos de águas naturais perenes com diques
+                  Extensão total dos Cursos d’água naturais perenes com diques
                 </p>
                 <p>
-                  Extensão total dos cursos de águas naturais perenes
+                  Extensão total dos Cursos d’água naturais perenes
                   canalizados abertos
                 </p>
                 <p>
-                  Extensão total dos cursos de águas naturais perenes
+                  Extensão total dos Cursos d’água naturais perenes
                   canalizados fechados
                 </p>
                 <p>
-                  Extensão total dos cursos de águas naturais perenes com
+                  Extensão total dos Cursos d’água naturais perenes com
                   retificação
                 </p>
                 <p>
-                  Extensão total dos cursos de águas naturais perenes com
+                  Extensão total dos Cursos d’água naturais perenes com
                   desenrocamento ou rebaixamento do leito
                 </p>
                 <p>
@@ -346,7 +346,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                   águas naturais perenes?
                 </p>
                 <p>
-                  Extensão total de parques lineares ao longo de cursos de águas
+                  Extensão total de parques lineares ao longo de Cursos d’água
                   perenes
                 </p>
                 <p>Existem algum tipo de tratamento das águas pluviais?</p>
