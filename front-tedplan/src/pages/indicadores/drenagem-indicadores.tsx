@@ -319,7 +319,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <label>Descrição</label>
                 <p>Extensão total dos Cursos d’água naturais perenes</p>
                 <p>
-                  Extensão total dos Cursos d’água naturais perenes copm outro
+                  Extensão total dos Cursos d’água naturais perenes com outro
                   tipo de intervenção
                 </p>
                 <p>
