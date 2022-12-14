@@ -293,7 +293,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputSNIS>
                 <InputGG>
                   <label>Descrição</label>
-                  <p>Consumo total de energia elétrica nos sistemas de água</p>
+                  <p>Consumo total de energia elétrica nos sistemas de esgoto</p>
                 </InputGG>
                
                 <InputP>
