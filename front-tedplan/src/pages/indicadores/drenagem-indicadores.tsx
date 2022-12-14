@@ -179,7 +179,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
                 <p>Quantidade de bocas de lobo existentes</p>
                 <p>
-                  Quantidade de bocas de leão ou de bocas de lobo múltiplas(duas
+                  Quantidade de bocas de leão ou de bocas de lobo múltiplas (duas
                   ou mais bocas de lobo conjugadas) existentes
                 </p>
                 <p>Quantidade de poços de visita (PV) existentes</p>
