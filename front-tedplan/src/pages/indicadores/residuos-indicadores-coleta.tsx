@@ -667,7 +667,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>Meses</p>
                 <p>Empregados</p>
                 <p>.</p>
-                <p>.</p>
+                <p>Empregados</p>
                 <p>Meses</p>
                 <p>.</p>
                 <p>.</p>
