@@ -1263,8 +1263,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>.</p>
                   <p>.</p>
                   <p>.</p>
-                  <p>Imóveis</p>
-                  <p>R$/unid./mês</p>
+                  <p>.</p>
+                  <p>.</p>
                 </InputP>
                 
               </DivFormConteudo>
