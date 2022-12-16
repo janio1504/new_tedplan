@@ -2441,6 +2441,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         <input {...register("RS044")} type="text"
                           defaultValue={dadosResiduos?.rs044}
                           onChange={handleOnChange}
+                          disabled
                         ></input>
                       </InputP>
                     </td>
