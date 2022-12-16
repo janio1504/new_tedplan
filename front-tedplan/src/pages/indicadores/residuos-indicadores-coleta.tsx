@@ -1396,7 +1396,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CO131</td>
                     <td>
                       <InputG>
-                        há execução de coleta com elevação de contêineres por
+                        Há execução de coleta com elevação de contêineres por
                         caminhão compactador, mesmo implantada em caráter de
                         experiência?{" "}
                       </InputG>
