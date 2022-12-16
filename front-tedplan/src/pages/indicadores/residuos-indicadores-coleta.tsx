@@ -2865,7 +2865,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>VA020</InputSNIS></td>
-                    <td>Valor contratual (preço unitário) do serviço de varrição manual. E favor tomar atenção com o seguinte</td>
+                    <td>Valor contratual (preço unitário) do serviço de varrição manual.</td>
                     <td><InputP><input {...register('VA020')} type="text"
                      defaultValue={dadosResiduos?.va020}
                      onChange={handleOnChange}
