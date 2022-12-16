@@ -2786,6 +2786,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td><InputP><input {...register('CC015')} type="text"
                     defaultValue={dadosResiduos?.cc015}
                     onChange={handleOnChange}
+                    disabled
                     ></input></InputP></td>
                     <td>Toneladas</td>
                   </tr>
