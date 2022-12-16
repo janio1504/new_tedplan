@@ -1031,7 +1031,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <thead>
                   <tr>
                     <th>
-                      <span>Tipo de resíduos(Quantidade em toneladas)</span>
+                      <span>Tipo de resíduos (Quantidade em toneladas)</span>
                     </th>
                     <th>
                       <span>Prefeitura ou SLU</span>
