@@ -2534,7 +2534,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         <td><InputSNIS>RS040</InputSNIS></td>
                         <td>
                           <InputGG>
-                            o serviço de coleta diferenciada dos RSS é executado por empresa(s) contratada(s)?
+                            O serviço de coleta diferenciada dos RSS é executado por empresa(s) contratada(s)?
                           </InputGG>
                         </td>
                         <td>
