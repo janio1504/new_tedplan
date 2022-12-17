@@ -196,11 +196,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
                 <p>
                   Existem vias públicas urbanas com soluções de drenagem
-                  natural(faixas ou valas de infiltração)?
+                  natural (faixas ou valas de infiltração)?
                 </p>
                 <p>
                   Extensão total das vias públicas urbanas com soluções de
-                  drenagem natural(faixas ou valas de infiltração)
+                  drenagem natural (faixas ou valas de infiltração)
                 </p>
                 <p>
                   Existem estenções elevatórias de águas pluviais na rede de
