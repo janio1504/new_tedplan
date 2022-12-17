@@ -1435,7 +1435,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
-                  Serviços de coleta seletiva
+                  Características das unidades registradas como ATERROS ou LIXÕES
                 </DivTituloConteudo>
               </DivTitulo>
               <table>
