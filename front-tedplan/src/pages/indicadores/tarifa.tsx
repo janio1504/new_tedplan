@@ -231,7 +231,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     defaultValue={dadosTarifa?.tr003}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>R$/mês</td>
+                    <td>m³/mês</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR006</InputSNIS></td>
@@ -258,7 +258,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     defaultValue={dadosTarifa?.tr007}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>R$/mês</td>
+                    <td>m³/mês</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR010</InputSNIS></td>
@@ -285,7 +285,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     defaultValue={dadosTarifa?.tr011}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>R$/mês</td>
+                    <td>m³/mês</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR014</InputSNIS></td>
