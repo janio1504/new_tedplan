@@ -1517,7 +1517,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
             </DivFormConteudo>
             <DivFormConteudo>
             <DivTitulo>
-                <DivTituloConteudo>Quantidade de resíduos recebidos(toneladas)</DivTituloConteudo>
+                <DivTituloConteudo>Quantidade de resíduos recebidos (toneladas)</DivTituloConteudo>
               </DivTitulo>
               <DivBotaoAdicionar>
                         <span
