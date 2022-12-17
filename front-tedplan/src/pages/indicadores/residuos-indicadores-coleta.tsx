@@ -1658,7 +1658,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CS057</td>
                     <td>
                       <InputXL>
-                        Valor contratual(preço unitário) do serviço de materiais
+                        Valor contratual (preço unitário) do serviço de materiais
                         recicláveis contratado às associações de
                         catadores (PREENCHER VALOR MÉDIO SE HOUVER MAIS DE UM)
                       </InputXL>
