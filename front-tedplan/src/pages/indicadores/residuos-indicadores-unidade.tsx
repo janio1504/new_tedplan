@@ -1100,7 +1100,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 <thead>
                   <tr>
                     <th>
-                      <span>Tipo de esteiras</span>
+                      <span>Tipo de equipamentos</span>
                     </th>
                     <th></th>
                     <th>
