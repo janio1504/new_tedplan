@@ -452,7 +452,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </p>
                 <p>
                   Agentes PÚBLICOS alocados na Gerencia ou
-                  Administração(Planejamento ou Fiscalização)
+                  Administração (Planejamento ou Fiscalização)
                 </p>
                 <p>Total de Agentes PÚBLICOS envolvidos</p>
                 <p>
@@ -470,7 +470,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </p>
                 <p>
                   Agentes PRIVADOS alocados na Gerencia ou
-                  Administração(Planejamento ou Fiscalização)
+                  Administração (Planejamento ou Fiscalização)
                 </p>
                 <p>Total de Agentes PRIVADOS envolvidos</p>
                 <p>
