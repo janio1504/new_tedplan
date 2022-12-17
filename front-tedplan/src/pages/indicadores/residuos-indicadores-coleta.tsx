@@ -1147,7 +1147,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td>
-                      <p>Público(Limpeza de logradouros)</p>
+                      <p>Público (Limpeza de logradouros)</p>
                     </td>
                     <td>
                     <InputP><input {...register("CO112")} type="text"

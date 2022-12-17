@@ -644,7 +644,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Tipo de resíduos(Quantidade em toneladas)'},{text: 'Prefeitura ou SLU'}
+                [{text: 'Tipo de resíduos (Quantidade em toneladas)'},{text: 'Prefeitura ou SLU'}
                 ,{text: 'Empresas ou autônomos contratados'},{text: 'Assoc. ou Coop. de Catadores c/ coleta seletiva'}
                 ,{text: 'Outros (inclusive proprios gerad. exceto catadores)'}, {text: 'Total'}],                
                 [' ', 'CO108', 'CO109','CS048','CO140','CO111' ],
