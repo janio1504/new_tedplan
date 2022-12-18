@@ -150,7 +150,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>ES009</p>
                   <p>ES002</p>
                   <p>ES003</p>
@@ -158,7 +158,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                  
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Quantidade de ligações totais de esgoto</p>
                   <p>Quantidade de ligações ativas de esgoto</p>
                   <p>Quantidade de economias ativas de esgoto</p>
@@ -166,7 +166,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputGG>
            
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label><b>Ano:</b> 2022</label>
                   <input {...register("ES009")}
                   defaultValue={dadosEsgoto?.es009}
                   onChange={handleOnChange}
@@ -199,7 +199,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Volumes</DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>ES005</p>
                   <p>ES006</p>
                   <p>ES007</p>
@@ -208,7 +208,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                                   
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Volume de esgoto coletado</p>
                   <p>Volume de esgoto tratado</p>
                   <p>Volume de esgoto faturado</p>
@@ -218,7 +218,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputGG>
              
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label><b>Ano:</b> 2022</label>
                   <input {...register("ES005")}
                   defaultValue={dadosEsgoto?.es005}
                   onChange={handleOnChange}
@@ -261,15 +261,15 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>ES004</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Extenção da rede</p>
                 </InputGG>          
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label><b>Ano:</b> 2022</label>
                   <input {...register("ES004")}
                   defaultValue={dadosEsgoto?.es004}
                   onChange={handleOnChange}
@@ -288,16 +288,16 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>ES028</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Consumo total de energia elétrica nos sistemas de esgoto</p>
                 </InputGG>
                
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label><b>Ano:</b> 2022</label>
                   <input {...register("ES028")}
                   defaultValue={dadosEsgoto?.es028}
                   onChange={handleOnChange}
@@ -318,7 +318,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>ES098</p>
                   <p></p>
                   <p></p>
@@ -328,7 +328,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <p>ES099</p>
                 </InputSNIS>
                 <InputM>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Campo de justificativa</p>
                   <p></p>
                   <p></p>
@@ -339,7 +339,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputM>
 
                 <InputG>
-                  <label>Ano: 2022</label>
+                  <label><b>Ano:</b> 2022</label>
                   <textarea {...register("ES098")}
                   defaultValue={dadosEsgoto?.es098}
                   onChange={handleOnChange}

@@ -220,7 +220,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
         <DivInstrucoes>
           <b>Cadastro de galeria: </b>
           <p>Adicione uma galeria com os dados solicitados abaixo, escolha uma imagem de capa 
-          que será mostrada no portal galerias, e se desejar, escreva uma descrição.</p>
+          que será mostrada no portal galerias, e se desejar, escreva uma <b>Descrição</b>.</p>
           <p>Após gravar a galeria clique no menu galerias e na lista clique no botão Adicionar imagens!</p>
           
         </DivInstrucoes>

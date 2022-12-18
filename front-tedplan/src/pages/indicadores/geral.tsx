@@ -236,8 +236,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -271,8 +271,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -360,8 +360,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -413,8 +413,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -466,8 +466,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -518,8 +518,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -584,8 +584,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -629,8 +629,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -673,8 +673,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -763,8 +763,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -812,8 +812,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1051,8 +1051,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1082,8 +1082,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1119,8 +1119,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1183,8 +1183,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1272,8 +1272,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1308,8 +1308,8 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                   </tr>
                 </thead>
@@ -1356,7 +1356,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <thead>
                     <tr>
                    
-                    <th>Descrição</th>
+                    <th><b>Descrição</b></th>
                     <th>Ano 2022</th>
                     </tr>
                   </thead>

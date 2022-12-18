@@ -150,7 +150,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <DivTituloConteudo>Vias urbanas</DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label>Código SNIS</label>
+                <label><b>Código SNIS</b></label>
                 <p>IE017</p>
                 <p>IE018</p>
                 <p>IE019</p>
@@ -166,7 +166,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>IE029</p>
               </InputSNIS>
               <InputXL>
-                <label>Descrição</label>
+                <label><b>Descrição</b></label>
                 <p>Extensão total das vias públicas urbanas</p>
                 <p>Extensão total das vias públicas urbanas implantadas</p>
                 <p>
@@ -208,7 +208,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
               </InputXL>
               <InputP>
-                <label>Ano: 2022</label>
+                <label><b>Ano:</b> 2022</label>
                 <input {...register("IE017")}
                  defaultValue={dadosDrenagem?.ie017}
                  onChange={handleOnChange}
@@ -302,7 +302,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label>Código SNIS</label>
+                <label><b>Código SNIS</b></label>
                 <p>IE032</p>
                 <p>IE040</p>
                 <p>IE033</p>
@@ -316,7 +316,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>IE050A</p>
               </InputSNIS>
               <InputXL>
-                <label>Descrição</label>
+                <label><b>Descrição</b></label>
                 <p>Extensão total dos Cursos d’água naturais perenes</p>
                 <p>
                   Extensão total dos Cursos d’água naturais perenes com outro
@@ -356,7 +356,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
               </InputXL>
               <InputP>
-                <label>Ano: 2022</label>
+                <label><b>Ano:</b> 2022</label>
                 <input {...register("IE032")}
                 defaultValue={dadosDrenagem?.ie032}
                 onChange={handleOnChange}
@@ -434,16 +434,16 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label>Código SNIS</label>
+                <label><b>Código SNIS</b></label>
                 <p>IE999</p>
               </InputSNIS>
               <InputM>
-                <label>Descrição</label>
+                <label><b>Descrição</b></label>
                 <p>Observações, esclarecimentos ou sugestões</p>
               </InputM>
 
               <InputGG>
-                <label>Ano: 2022</label>
+                <label><b>Ano:</b> 2022</label>
 
                 <textarea {...register("IE999")}
                 defaultValue={dadosDrenagem?.ie999}
@@ -459,7 +459,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label>Código SNIS</label>
+                <label><b>Código SNIS</b></label>
                 <p>RI023</p>
                 <p>RI025</p>
                 <p>RI027</p>
@@ -468,7 +468,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>RI032</p>
               </InputSNIS>
               <InputXL>
-                <label>Descrição</label>
+                <label><b>Descrição</b></label>
                 <p>Numero de enxurradas na área urbana do município</p>
                 <p>Numero de alagementos na área urbana do município</p>
                 <p>Numero de inundações na área urbana do município</p>
@@ -481,7 +481,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputXL>
 
               <InputP>
-                <label>Ano: 2022</label>
+                <label><b>Ano:</b> 2022</label>
                 <input {...register("RI023")}
                 defaultValue={dadosDrenagem?.ri023}
                 onChange={handleOnChange}

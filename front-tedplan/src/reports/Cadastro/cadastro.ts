@@ -19,7 +19,7 @@ export function cadastroPDF(dadosMunicipio: any){
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Descrição'},{text: 'Valor'}],
+                [{text: '<b>Descrição</b>'},{text: 'Valor'}],
                 ['Código do IBGE', dadosMunicipio.municipio_codigo_ibge],
                 ['Município', dadosMunicipio.municipio_nome],
                 ['CNPJ', dadosMunicipio.municipio_cnpj],
@@ -40,7 +40,7 @@ export function cadastroPDF(dadosMunicipio: any){
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Descrição'},{text: 'Valor'}],
+                [{text: '<b>Descrição</b>'},{text: 'Valor'}],
                 ['Setor Responsável', dadosMunicipio.ts_setor_reponsavel],
                 ['Nome Responsável', dadosMunicipio.ts_responsavel],
                 ['Cargo', dadosMunicipio.ts_cargo],
@@ -56,7 +56,7 @@ export function cadastroPDF(dadosMunicipio: any){
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Descrição'},{text: 'Valor'}],
+                [{text: '<b>Descrição</b>'},{text: 'Valor'}],
                 ['Setor Responsável', dadosMunicipio.rf_setor_responsavel],
                 ['Telefone Comercial', dadosMunicipio.rf_telefone_comercial],
                 ['Nome Responsável', dadosMunicipio.rf_responsavel],
@@ -74,7 +74,7 @@ export function cadastroPDF(dadosMunicipio: any){
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Descrição'},{text: 'Valor'}],
+                [{text: '<b>Descrição</b>'},{text: 'Valor'}],
                 ['Secretaria ou Setor Responsável', dadosMunicipio.es_secretaria_setor_responsavel],
                 ['Abrangência', dadosMunicipio.es_abrangencia],
                 ['Natureza jurídica', dadosMunicipio.es_natureza_juridica],
@@ -95,7 +95,7 @@ export function cadastroPDF(dadosMunicipio: any){
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Descrição'},{text: 'Valor'}],
+                [{text: '<b>Descrição</b>'},{text: 'Valor'}],
                 ['Secretaria ou Setor Responsável', dadosMunicipio.da_secretaria_setor_responsavel],
                 ['Abrangência', dadosMunicipio.da_abrangencia],
                 ['Natureza jurídica', dadosMunicipio.da_natureza_juridica],
@@ -116,7 +116,7 @@ export function cadastroPDF(dadosMunicipio: any){
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Descrição'},{text: 'Valor'}],
+                [{text: '<b>Descrição</b>'},{text: 'Valor'}],
                 ['Secretaria ou Setor Responsável', dadosMunicipio.rs_secretaria_setor_responsavel],
                 ['Abrangência', dadosMunicipio.rs_abrangencia],
                 ['Natureza jurídica', dadosMunicipio.rs_natureza_juridica],

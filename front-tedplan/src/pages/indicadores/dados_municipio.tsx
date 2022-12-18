@@ -1832,7 +1832,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               ></input>
             </InputG>
             <DivTextArea>
-              <label>Descrição detalhada das funções e responsabilidades<span> *</span></label>
+              <label><b>Descrição</b> detalhada das funções e responsabilidades<span> *</span></label>
               <TextArea>
                 <textarea
                   {...register("rf_descricao")}
