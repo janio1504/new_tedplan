@@ -87,6 +87,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
         return response.data;
       })
       .catch((error) => {
+        toast.notify('Erro ao gravar os dados!',{
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        })
         console.log(error);
       });
       getDadosEsgoto()
