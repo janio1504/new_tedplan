@@ -195,7 +195,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>QD004</InputSNIS></td>
-                    <td>Quantidade de amostras analisadas para aferição de coliformes totais.</td>
+                    <td>Quantidade de economias ativas atingidas.</td>
                     <td><InputP><input {...register('QD004')}
                     defaultValue={dadosQualidade?.qd004}
                     onChange={handleOnChange}
@@ -466,7 +466,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>QD026</InputSNIS></td>
-                    <td>Quantidade de amostras analisadas para aferição de coliformes fecais totais</td>
+                    <td>Quantidade de amostras analisadas para aferição de coliformes totais</td>
                     <td><InputP><input {...register('QD026')}
                     defaultValue={dadosQualidade?.qd026}
                     onChange={handleOnChange}

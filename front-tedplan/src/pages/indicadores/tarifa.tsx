@@ -231,7 +231,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     defaultValue={dadosTarifa?.tr003}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>R$/mês</td>
+                    <td>m³/mês</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR006</InputSNIS></td>
@@ -258,7 +258,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     defaultValue={dadosTarifa?.tr007}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>R$/mês</td>
+                    <td>m³/mês</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR010</InputSNIS></td>
@@ -285,7 +285,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     defaultValue={dadosTarifa?.tr011}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>R$/mês</td>
+                    <td>m³/mês</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>TR014</InputSNIS></td>
@@ -462,7 +462,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     <td><InputSNIS>TR026</InputSNIS></td>
                     <td><InputG>
                     O consumidor deve estar inscrito no cadastro único para programas sociais - cadúnico?
-                      (opção válida para os não beneficiários do bolsa família)</InputG>
+                      (opção válida para os não beneficiários do auxílio Brasil)</InputG>
                      </td>
                     <td><InputP><select {...register('TR026')}>
                          <option
@@ -476,7 +476,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                   <td><InputSNIS>TR027</InputSNIS></td>
-                    <td>O consumidor deve ser beneficíario do bolsa família? </td>
+                    <td>O consumidor deve ser beneficíario do auxílio Brasil? </td>
                     <td><InputP><select {...register('TR027')}>
                          <option
                          defaultValue={dadosTarifa?.tr027}

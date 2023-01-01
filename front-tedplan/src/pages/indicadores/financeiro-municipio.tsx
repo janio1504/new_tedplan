@@ -1198,14 +1198,14 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN204</p>
                   <p>FN205</p>
                 </InputSNIS>
-                <InputGG>
+                <InputXL>
                   <label>Descrição</label>
                   <p>A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?</p>
                   <p>Principal forma adotada</p>
                   <p>Descrição da outra forma adotada</p>
                   <p>Unidade adotada para a cobrança (No caso de tarifa)</p>
                   <p>A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?</p>
-                </InputGG>
+                </InputXL>
             
                 <InputP>
                   <label>Ano: 2022</label>
@@ -1263,8 +1263,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>.</p>
                   <p>.</p>
                   <p>.</p>
-                  <p>Imóveis</p>
-                  <p>R$/unid./mês</p>
+                  <p>.</p>
+                  <p>.</p>
                 </InputP>
                 
               </DivFormConteudo>
@@ -1309,7 +1309,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </p>
                   <p>Despesas total com todos os agentes executores dos demais serviços quando não especificado sem campo próprio</p>
                   <p>Despesa dos agentes públicos executores de serviços de manejo de RSU</p>
-                  <p>Despesa dos agentes privados executores de serviços de manejo de RSU</p>                  
+                  <p>Despesa dos agentes privados executores de serviços de manejo de RSSU</p>                  
                   <p>Despesa  total com os serviços de manejo de RSU</p>
                   <p>Despesa corrente da prefeitura durante o ano com todos os serviços do município (Saúde, educação, pagamento de pessoal, etc...)</p>
                 </InputXL>                

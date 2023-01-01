@@ -1208,11 +1208,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <option value={dadosMunicipio.es_natureza_juridica}>
                           {dadosMunicipio.es_natureza_juridica}
                         </option>
-                              <option value="Administração Pública Direta">Administração Pública Direta</option>
-                              <option value="Autarquia">Autarquia</option>
-                              <option value="Empresa pública">Empresa pública</option>
-                              <option value="Sociedade de economia mista com administração privada">Sociedade de economia mista com administração privada</option>
-                              <option value="Sociedade de economia mista com administração pública">Sociedade de economia mista com administração pública</option>
+                        <option value="Administração Pública Direta">Administração Pública Direta</option>
+                        <option value="Autarquia">Autarquia</option>
+                        <option value="Empresa pública">Empresa pública</option>
+                        <option value="Sociedade de economia mista com administração privada">Sociedade de economia mista com administração privada</option>
+                        <option value="Sociedade de economia mista com administração pública">Sociedade de economia mista com administração pública</option>
                       </select>
                     </InputG>
                   </td>
@@ -1403,16 +1403,19 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <tbody>
                 <tr>
                   <td>
+
                   <InputG>
                       <label>
                         Natureza jurídica<span> *</span>
                       </label>
                       <select {...register("da_natureza_juridica")}>
-                        <option value={dadosMunicipio.da_natureza_juridica}>
-                          {dadosMunicipio.da_natureza_juridica}
-                        </option>
-                        <option value="PESSOA FISICA">PESSOA FISICA</option>
-                        <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
+                        <option value={dadosMunicipio.da_natureza_juridica}> {dadosMunicipio.da_natureza_juridica} </option>
+                        <option value="Administração Pública Direta">Administração Pública Direta</option>
+                        <option value="Autarquia">Autarquia</option>
+                        <option value="Empresa pública">Empresa pública</option>
+                        <option value="Sociedade de economia mista com administração privada">Sociedade de economia mista com administração privada</option>
+                        <option value="Sociedade de economia mista com administração pública">Sociedade de economia mista com administração pública</option>
+
                       </select>
                     </InputG>
                   </td>
@@ -1606,11 +1609,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         Natureza jurídica<span> *</span>
                       </label>
                       <select {...register("rs_natureza_juridica")}>
-                        <option value={dadosMunicipio.rs_natureza_juridica}>
-                          {dadosMunicipio.rs_natureza_juridica}
-                        </option>
-                        <option value="PESSOA FISICA">PESSOA FISICA</option>
-                        <option value="PESSOA JURIDICA">PESSOA JURIDICA</option>
+                      <option value={dadosMunicipio.rs_natureza_juridica}> {dadosMunicipio.rs_natureza_juridica} </option>
+                        <option value="Administração Pública Direta">Administração Pública Direta</option>
+                        <option value="Autarquia">Autarquia</option>
+                        <option value="Empresa pública">Empresa pública</option>
+                        <option value="Sociedade de economia mista com administração privada">Sociedade de economia mista com administração privada</option>
+                        <option value="Sociedade de economia mista com administração pública">Sociedade de economia mista com administração pública</option>
                       </select>
                     </InputG>
                   </td>
@@ -2015,5 +2019,4 @@ export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (ctx
     }
   }
 }
-
 

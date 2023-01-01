@@ -452,7 +452,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </p>
                 <p>
                   Agentes PÚBLICOS alocados na Gerencia ou
-                  Administração(Planejamento ou Fiscalização)
+                  Administração (Planejamento ou Fiscalização)
                 </p>
                 <p>Total de Agentes PÚBLICOS envolvidos</p>
                 <p>
@@ -470,7 +470,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </p>
                 <p>
                   Agentes PRIVADOS alocados na Gerencia ou
-                  Administração(Planejamento ou Fiscalização)
+                  Administração (Planejamento ou Fiscalização)
                 </p>
                 <p>Total de Agentes PRIVADOS envolvidos</p>
                 <p>
@@ -667,14 +667,14 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>Meses</p>
                 <p>Empregados</p>
                 <p>.</p>
-                <p>.</p>
+                <p>Empregados</p>
                 <p>Meses</p>
                 <p>.</p>
                 <p>.</p>
                 <p>Empregados</p>
-                <p>meses</p>
-                <p>Empregados</p>
-                <p>Empregados</p>
+                <p>Meses</p>
+                <p>.</p>
+                <p>.</p>
               </InputSNIS>
             </DivFormConteudo>
 
@@ -687,7 +687,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
               <InputM>
                 <label>
-                  <span>Tipo de veiculo(Quantidade)</span>
+                  <b>Tipo de veículo (Quantidade)</b>
                 </label>
                 <label>.</label>
                 <label>.</label>
@@ -707,7 +707,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </InputM>
               <InputP>
                 <label>.</label>
-                <label>0 a 5 anos</label>
+                <label><b>0 a 5 anos</b></label>
                 <label>CO054</label>
                 <input {...register("CO054")} type="text"
                 defaultValue={dadosResiduos?.co054}
@@ -741,9 +741,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </InputP>
               <InputP>
                 <label>
-                  <span>Prefeitura ou SLU</span>
+                <b>Prefeitura ou SLU</b>
                 </label>
-                <label>5 a 10 anos</label>
+                <label><b>5 a 10 anos</b></label>
                 <label>CO055</label>
                 <input {...register("CO055")} type="text"
                  defaultValue={dadosResiduos?.co055}
@@ -777,7 +777,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </InputP>
               <InputP>
                 <label>.</label>
-                <label>Maior que 10 anos</label>
+                <label><b>Maior que 10 anos</b></label>
                 <label>CO056</label>
                 <input {...register("CO056")} type="text"
                  defaultValue={dadosResiduos?.co056}
@@ -812,7 +812,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <DivBorder></DivBorder>
               <InputP>
                 <label> .</label>
-                <label>0 a 5 anos</label>
+                <label> <b>0 a 5 anos</b> </label>
                 <label>CO057</label>
                 <input {...register("CO057")} type="text"
                  defaultValue={dadosResiduos?.co057}
@@ -846,9 +846,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </InputP>
               <InputP>
                 <label>
-                  <span>Empr. Contratada</span>
+                  <b>Empr. Contratada</b> 
                 </label>
-                <label>5 a 10 anos</label>
+                <label> <b>5 a 10 anos</b> </label>
                 <label>CO058</label>
                 <input {...register("CO058")} type="text"
                  defaultValue={dadosResiduos?.co058}
@@ -882,7 +882,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </InputP>
               <InputP>
                 <label>.</label>
-                <label>Maior que 10 anos</label>
+                <label> <b>Maior que 10 anos</b> </label>
                 <label>CO059</label>
                 <input {...register("CO059")} type="text"
                  defaultValue={dadosResiduos?.co059}
@@ -1031,7 +1031,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <thead>
                   <tr>
                     <th>
-                      <span>Tipo de resíduos(Quantidade em toneladas)</span>
+                      <span>Tipo de resíduos (Quantidade em toneladas)</span>
                     </th>
                     <th>
                       <span>Prefeitura ou SLU</span>
@@ -1147,7 +1147,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td>
-                      <p>Público(Limpeza de logradouros)</p>
+                      <p>Público (Limpeza de logradouros)</p>
                     </td>
                     <td>
                     <InputP><input {...register("CO112")} type="text"
@@ -1396,7 +1396,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CO131</td>
                     <td>
                       <InputG>
-                        há execução de coleta com elevação de contêineres por
+                        Há execução de coleta com elevação de contêineres por
                         caminhão compactador, mesmo implantada em caráter de
                         experiência?{" "}
                       </InputG>
@@ -1435,7 +1435,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
-                  Serviços de coleta seletiva
+                  Características das unidades registradas como ATERROS ou LIXÕES
                 </DivTituloConteudo>
               </DivTitulo>
               <table>
@@ -1658,9 +1658,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CS057</td>
                     <td>
                       <InputXL>
-                        Valor contratual(preço unitário) do serviço de materiais
-                        recicláveis contratado às associações de
-                        catadores(PREENCHER VALOR MÉDIO SE HOUVER MAIS DE UM)
+                        Valor contratual (preço unitário) do serviço de materiais
+                        recicláveis secos contratado às associações de
+                        catadores (PREENCHER VALOR MÉDIO SE HOUVER MAIS DE UM)
                       </InputXL>
                     </td>
                     <td>
@@ -2441,6 +2441,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         <input {...register("RS044")} type="text"
                           defaultValue={dadosResiduos?.rs044}
                           onChange={handleOnChange}
+                          disabled
                         ></input>
                       </InputP>
                     </td>
@@ -2534,7 +2535,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         <td><InputSNIS>RS040</InputSNIS></td>
                         <td>
                           <InputGG>
-                            o serviço de coleta diferenciada dos RSS é executado por empresa(s) contratada(s)?
+                            O serviço de coleta diferenciada dos RSS é executado por empresa(s) contratada(s)?
                           </InputGG>
                         </td>
                         <td>
@@ -2785,6 +2786,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td><InputP><input {...register('CC015')} type="text"
                     defaultValue={dadosResiduos?.cc015}
                     onChange={handleOnChange}
+                    disabled
                     ></input></InputP></td>
                     <td>Toneladas</td>
                   </tr>
@@ -2863,7 +2865,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td><InputSNIS>VA020</InputSNIS></td>
-                    <td>Valor contratual (preço unitário) do serviço de varrição manual. E favor tomar atenção com o seguinte</td>
+                    <td>Valor contratual (preço unitário) do serviço de varrição manual.</td>
                     <td><InputP><input {...register('VA020')} type="text"
                      defaultValue={dadosResiduos?.va020}
                      onChange={handleOnChange}

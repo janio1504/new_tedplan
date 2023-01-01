@@ -314,22 +314,40 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td>Localidades</td>
                   </tr>    
                   <tr>
+
+
                     <td><InputSNIS>GE019</InputSNIS></td>
                     <td>Onde atende com abastecimento de água</td>
-                    <td><InputP><input {...register('GE019')}
-                    defaultValue={dadosGeral?.ge019}
-                    onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    <td>
+                      <InputP>
+                        <select {...register('GE019')}>
+                          <option > {dadosGeral?.ge019} </option>
+                          <option value="Sede Municipal"> Sede Municipal  </option>
+                          <option value="Localidades"> Localidades  </option>
+                          <option value="Ambos"> Ambos</option>
+                        </select>
+                      </InputP>
+                    </td>
                     <td>Localidades</td>
+
                   </tr>   
                   <tr>
+
                     <td><InputSNIS>GE020</InputSNIS></td>
                     <td>Onde atende com esgotamento sanitário</td>
-                    <td><InputP><input {...register('GE020')}
-                    defaultValue={dadosGeral?.ge020}
-                    onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    <td>
+                      <InputP>
+                        
+                        <select {...register('GE020')}>
+                          <option > {dadosGeral?.ge020} </option>
+                          <option value="Sede Municipal"> Sede Municipal  </option>
+                          <option value="Localidades"> Localidades  </option>
+                          <option value="Ambos"> Ambos</option>
+                        </select>
+                        
+                      </InputP></td>
                     <td>Localidades</td>
+                    
                   </tr>             
                 </tbody>                
               </table>            
@@ -576,9 +594,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputSNIS>GE010</InputSNIS></td>
                     <td>Região Hidrográfica em que se encontra o município (Fonte:ANA)</td>
                     <td><InputP><input {...register('GE010')}
-                    defaultValue={dadosGeral?.ge016}
+                    defaultValue={dadosGeral?.ge010}
                     onChange={handleOnChange}></input></InputP></td>
-                    <td>Sede</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>GE011</InputSNIS></td>
@@ -599,7 +616,6 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
                       </select></InputP></td>
-                    <td>Localidades</td>
                   </tr> 
                              
                 </tbody>                
@@ -972,12 +988,11 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputSNIS>RI010</InputSNIS></td>
                     <td>O mapeamento é parcial ou integral?</td>
                     <td><InputP><select {...register('RI010')}
-                    defaultValue={dadosGeral?.ri010}
                     onChange={handleOnChange}
                     >
-                                  <option value=""></option>
-                                  <option value="1">Sim</option>
-                                  <option value="0">Não</option>
+                                  <option value=""> {(dadosGeral?.ri010 == 1) ? "Integral" : "Parcial"}  </option>
+                                  <option value="1">Integral </option>
+                                  <option value="0">Parcial</option>
                                 </select></InputP></td>                   
                   </tr>   
                   <tr>
@@ -1002,11 +1017,17 @@ export default function Geral({ municipio }: MunicipioProps) {
                    
                   <tr>
                     <td><InputSNIS>RI012</InputSNIS></td>
-                    <td>Tempo de recorrência(ou periodo de retorno) adotado para o mapeamento</td>
-                    <td colSpan={4}><input {...register('RI012')}
-                    defaultValue={dadosGeral?.ri012}
-                    onChange={handleOnChange}
-                    type="text"></input></td>    
+                    <td>Tempo de recorrência (ou periodo de retorno) adotado para o mapeamento</td>
+                  
+                    <td colSpan={4}>
+                      <input
+                        {...register('RI012')}
+                        defaultValue={dadosGeral?.ri012}
+                        onChange={handleOnChange}
+                        type="text">
+                      </input>
+                    </td>
+
                     <td>Anos</td>                
                   </tr>   
                   <tr>
@@ -1053,7 +1074,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
           <DivFormEixo>           
-            <DivTituloEixo>Dados hidrográficos</DivTituloEixo>            
+            <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>            
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Informações gerais</DivTituloConteudo>
@@ -1069,16 +1090,22 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <tbody>
                   <tr>
                     <td><InputSNIS>GE201</InputSNIS></td>
-                    <td>O oŕgão(Prestador) é também o prestador - direto ou indireto - de outros serviços de Saneamento?</td>
+                    <td>O oŕgão (Prestador) é também o prestador - direto ou indireto - de outros serviços de Saneamento?</td>
                     <td><InputP><select {...register('GE201')}
                     defaultValue={dadosGeral?.ge201}
                     onChange={handleOnChange}
                     >
-                                  <option value=""></option>
-                                  <option value="1">Sim</option>
-                                  <option value="0">Não</option>
+                                  <option value=""> {dadosGeral?.ge201} </option>
+                                  <option value="Não">Não</option>
+                                  <option value="Abastecimento de água potável">Abastecimento de água potável</option>
+                                  <option value="Esgotamento Sanitário">Esgotamento Sanitário</option>
+                                  <option value="Abastecimento de água potável e Esgotamento Sanitário">Abastecimento de água potável e Esgotamento Sanitário</option>
+                                  <option value="Drenagem e manejo de águas pluviais">Drenagem e manejo de águas pluviais</option>
+                                  <option value="Abast. água potável e Drenagem e manejo de águas pluviais">Abast. água potável e Drenagem e manejo de águas pluviais</option>
+                                  <option value="Esgot. Sanitário e Drenagem e manejo de águas pluviais">Esgot. Sanitário e Drenagem e manejo de águas pluviais</option>
+                                  <option value="Abast. água potável, Esgot. Sanitário e Drenagem e manejo de águas pluviais">Abast. água potável, Esgot. Sanitário e Drenagem e manejo de águas pluviais</option>
+
                       </select></InputP></td>
-                    <td>Localidades</td>
                   </tr> 
                              
                 </tbody>                
@@ -1101,15 +1128,18 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <tr>
                     <td><InputSNIS>GE202</InputSNIS></td>
                     <td>Há empresa com contrato de DELEGAÇÂO (conceção ou contrato de programa) para algum ou todos os serviços de limpeza urbana?</td>
-                    <td><InputP><select {...register('GE202')}
-                    defaultValue={dadosGeral?.ge202}
-                    onChange={handleOnChange}
-                    >
-                                  <option value=""></option>
-                                  <option value="1">Sim</option>
-                                  <option value="0">Não</option>
-                      </select></InputP></td>
-                    <td>Localidades</td>
+                    <td>
+                    <InputP>
+                      <select {...register('GE202')}
+                        defaultValue={dadosGeral?.ge202}
+                        onChange={handleOnChange}
+                      >
+                        <option value=""></option>
+                        <option value="1">Sim</option>
+                        <option value="0">Não</option>
+                      </select>
+                    </InputP>
+                    </td>
                   </tr> 
                     <tr>
                       <td></td>
@@ -1202,7 +1232,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.co134}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Pessoas</td>
+                    <td>%</td>
                   </tr>
                   <tr>
                     <td><InputSNIS>CO135</InputSNIS></td>
@@ -1211,7 +1241,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.co135}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Pessoas</td>
+                    <td>%</td>
                   </tr>       
                   <tr>
                     <td><InputSNIS>CO136</InputSNIS></td>
@@ -1220,7 +1250,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     defaultValue={dadosGeral?.co136}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
-                    <td>Pessoas</td>
+                    <td>%</td>
                   </tr>  
                   <tr>
                     <td><InputSNIS>CS050</InputSNIS></td>
