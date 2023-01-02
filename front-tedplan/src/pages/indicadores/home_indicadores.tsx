@@ -168,7 +168,7 @@ export default function HomeIndicadores({municipio}: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={nomeMunicipio}></MenuHorizontal>
       <StatusMunicipio>
-        Relatório SIMISAB correspondente ao ano 2022 - Estado PENDENTE
+        Relatório SIMISAB correspondente ao ano {new Date().getFullYear()} - Estado PENDENTE
       </StatusMunicipio>
       <MenuIndicadores></MenuIndicadores>
       <DivConteudo>

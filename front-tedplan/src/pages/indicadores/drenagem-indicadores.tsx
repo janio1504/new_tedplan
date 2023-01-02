@@ -211,7 +211,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
               </InputXL>
               <InputP>              
-                <label>Ano: 2022</label>
+                <label>Ano: {new Date().getFullYear()}</label>
                 <input {...register("IE017")}
                  defaultValue={dadosDrenagem?.ie017}
                  onChange={handleOnChange}
@@ -359,7 +359,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
               </InputXL>
               <InputP>
-                <label>Ano: 2022</label>
+                <label>Ano: {new Date().getFullYear()}</label>
                 <input {...register("IE032")}
                 defaultValue={dadosDrenagem?.ie032}
                 onChange={handleOnChange}
@@ -446,7 +446,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputM>
 
               <InputGG>
-                <label>Ano: 2022</label>
+                <label>Ano: {new Date().getFullYear()}</label>
 
                 <textarea {...register("IE999")}
                 defaultValue={dadosDrenagem?.ie999}
@@ -484,7 +484,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputXL>
 
               <InputP>
-                <label>Ano: 2022</label>
+                <label>Ano: {new Date().getFullYear()}</label>
                 <input {...register("RI023")}
                 defaultValue={dadosDrenagem?.ri023}
                 onChange={handleOnChange}

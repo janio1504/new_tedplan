@@ -359,7 +359,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
        
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("FN006")} type="text"
                   defaultValue={dadosFinanceiros?.fn006}
                   onChange={handleOnChange}
@@ -426,7 +426,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
           
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("FN010")} type="text"
                   defaultValue={dadosFinanceiros?.fn010}
                   onChange={handleOnChange}
@@ -576,7 +576,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
              
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("AES_FN018")} type="text"
                   defaultValue={dadosFinanceiros?.aes_fn018}
                   onChange={handleOnChange}
@@ -667,7 +667,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
               
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("FN041")} type="text"
                   defaultValue={dadosFinanceiros?.fn041}
                   onChange={handleOnChange}
@@ -757,7 +757,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
             
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("FN051")} type="text"
                   defaultValue={dadosFinanceiros?.fn051}
                   onChange={handleOnChange}
@@ -833,7 +833,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputM>
 
                 <InputGG>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <textarea {...register("FN098")} 
                   defaultValue={dadosFinanceiros?.fn098}
                   onChange={handleOnChange}
@@ -872,7 +872,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
             
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <select
                     {...register("CB001")}
                     defaultValue={dadosFinanceiros?.cb001}
@@ -960,7 +960,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
             
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("FN003")} type="text"
                   defaultValue={dadosFinanceiros?.fn003}
                   onChange={handleOnChange}
@@ -1029,7 +1029,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
             
                 <InputP>
-                  <label>Ano: 2022</label>            
+                  <label>Ano: {new Date().getFullYear()}</label>            
                   <input {...register("FN012")} type="text"
                   defaultValue={dadosFinanceiros?.fn012}
                   onChange={handleOnChange}
@@ -1070,7 +1070,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     <tr>
                       <th>Código SNIS</th>
                       <th>Descrição</th>
-                      <th>Ano: 2022</th>
+                      <th>Ano: {new Date().getFullYear()}</th>
                       <th></th>
                     </tr>
                   </thead>
@@ -1170,7 +1170,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputM>
 
                 <InputGG>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <textarea {...register("DRENAGEM_FN999")} 
                   defaultValue={dadosFinanceiros?.drenagem_fn999}
                   onChange={handleOnChange}
@@ -1208,7 +1208,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputXL>
             
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                 
                   <select
                     {...register("FN201")}>
@@ -1314,7 +1314,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>Despesa corrente da prefeitura durante o ano com todos os serviços do município (Saúde, educação, pagamento de pessoal, etc...)</p>
                 </InputXL>                
                 <InputP>
-                  <label>Ano: 2022</label>
+                  <label>Ano: {new Date().getFullYear()}</label>
                   <input {...register("FN206")} type="text"
                   defaultValue={dadosFinanceiros?.fn206}
                   onChange={handleOnChange}
@@ -1421,7 +1421,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
             
                 <InputP>
-                  <label>Ano: 2022</label>              
+                  <label>Ano: {new Date().getFullYear()}</label>              
                   <input {...register("FN221")} type="text"
                   defaultValue={dadosFinanceiros?.fn221}
                   onChange={handleOnChange}
@@ -1452,7 +1452,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     <tr>
                       <th>Código SNIS</th>
                       <th>Descrição</th>
-                      <th>Ano: 2022</th>
+                      <th>Ano: {new Date().getFullYear()}</th>
                       <th></th>
                     </tr>                  
                   </thead>
@@ -1516,7 +1516,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     <tr>
                       <th>Código SNIS</th>
                       <th>Descrição</th>
-                      <th>Ano: 2022</th>
+                      <th>Ano: {new Date().getFullYear()}</th>
                       <th></th>
                     </tr>                  
                   </thead>

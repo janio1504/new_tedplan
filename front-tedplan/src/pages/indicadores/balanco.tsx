@@ -156,7 +156,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                   <tr>
                     <th>Código SNIS</th>
                     <th>Descrição</th>
-                    <th>Ano 2022</th>
+                    <th>Ano {new Date().getFullYear()}</th>
                   </tr>
                 </thead>
                 <tbody>
