@@ -254,6 +254,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     await api.post('list-unidades-rsc',     
     {id_municipio: municipio[0]?.id_municipio, ano: new Date().getFullYear()})
     .then(response=>{
+      console.log(response.data);
+      
       setUnidadesRsc(response.data)             
     })
     .catch((error)=>{

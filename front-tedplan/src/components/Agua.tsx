@@ -72,6 +72,114 @@ export default function Agua({ municipio }: MunicipioProps) {
      if(data.indicador == 'IN005'){
       IN005(data)
      }
+     if(data.indicador == 'IN006'){
+      IN006(data)
+     }
+     if(data.indicador == 'IN006'){
+      IN007(data)
+     }
+     if(data.indicador == 'IN008'){
+      IN008(data)
+     }
+     if(data.indicador == 'IN012'){
+      IN012(data)
+     }
+     if(data.indicador == 'IN018'){
+      IN018(data)
+     }
+     if(data.indicador == 'IN019'){
+      IN019(data)
+     }
+     if(data.indicador == 'IN026'){
+      IN026(data)
+     }
+     if(data.indicador == 'IN027'){
+      IN027(data)
+     }
+     if(data.indicador == 'IN029'){
+      IN029(data)
+     }
+     if(data.indicador == 'IN030'){
+      IN030(data)
+     }
+     if(data.indicador == 'IN031'){
+      IN031(data)
+     }
+     if(data.indicador == 'IN032'){
+      IN032(data)
+     }
+     if(data.indicador == 'IN033'){
+      IN033(data)
+     }
+     if(data.indicador == 'IN034'){
+      IN034(data)
+     }
+     if(data.indicador == 'IN035'){
+      IN035(data)
+     }
+     if(data.indicador == 'IN036'){
+      IN036(data)
+     }
+     if(data.indicador == 'IN037'){
+      IN037(data)
+     }
+     if(data.indicador == 'IN038'){
+      IN038(data)
+     }
+     if(data.indicador == 'IN039'){
+      IN039(data)
+     }
+     if(data.indicador == 'IN040'){
+      IN040(data)
+     }
+     if(data.indicador == 'IN041'){
+      IN041(data)
+     }
+     if(data.indicador == 'IN042'){
+      IN042(data)
+     }
+     if(data.indicador == 'IN045'){
+      IN045(data)
+     }
+     if(data.indicador == 'IN048'){
+      IN048(data)
+     }
+     if(data.indicador == 'IN054'){
+      IN054(data)
+     }
+     if(data.indicador == 'IN060'){
+      IN060(data)
+     }
+     if(data.indicador == 'IN101'){
+      IN101(data)
+     }
+     if(data.indicador == 'IN102'){
+      IN102(data)
+     }
+     if(data.indicador == 'IN001'){
+      IN001(data)
+     }
+     if(data.indicador == 'IN009'){
+      IN009(data)
+     }
+     if(data.indicador == 'IN010'){
+      IN010(data)
+     }
+     if(data.indicador == 'IN011'){
+      IN011(data)
+     }
+     if(data.indicador == 'IN013'){
+      IN013(data)
+     }
+     if(data.indicador == 'IN014'){
+      IN014(data)
+     }
+     if(data.indicador == 'IN017'){
+      IN017(data)
+     }
+     if(data.indicador == 'IN020'){
+      IN020(data)
+     }
   }
 
 
@@ -849,26 +957,46 @@ export default function Agua({ municipio }: MunicipioProps) {
                 <td>
                 <select {...register("indicador")}>
                    <option>Indicardor</option>
-                   <option value="txEmpregPopUrb">IN001 - Taxa de empregados em relação à população urbana</option>
-                   <option value="despMediaEmprAlocadosServManejoRSU">N002 - Despesa média por empregado alocado nos serviços do manejo de rsu</option>
-                   <option value="incidenciaDespManejoRSUDespCorrentePref">IN003 - Incidência das despesas com o manejo de rsu nas despesas correntes da prefeitura</option>
-                   <option value="incidenciaDespEmprContratadasExecServManejoRsu">004 - Incidência das despesas com empresas contratadas para execução de serviços de manejo rsu nas despesas com manejo de rsu</option>
-                   <option value="autoSufienciaFincPrefManejoRSU">IN005 - Auto-suficiência financeira da prefeitura com o manejo de rsu</option>
-                   <option value="despPerCaptaManejoRSURelacaoPopurb">IN006 - Despesa per capita com manejo de rsu em relação à população urbana</option>
-                   <option value="incidenciaEmpregadosPropriosTotalManejoRSU">IN007 - Incidência de empregados próprios no total de empregados no manejo de rsu</option>
-                   <option value="incidenciaEmpregadosEmpreContradaTotalManejoRSU">IN008 - Incidência de empregados de empresas contratadas no total de empregados no manejo de rsu</option>
-                   <option value="incidenciaEmpregadosGerenciasAdmistrativosTotalEmpregadosManejoRSU">IN010 - Incidência de empregados gerenciais e administrativos no total de empregados no manejo de rsu</option>
-                   <option value="receitaArrecadadaPercapitaOutrasFormasCobPrestServManejo">IN011 - Receita arrecadada per capita com taxas ou outras formas de cobrança pela prestação de serviços de manejo rsu</option>
-                   <option value="taxaCoberturaServColetaDomiciliarPortaPortaPopUrbMun">IN014 - Taxa de cobertura do serviço de coleta domiciliar direta (porta-a-porta) da população urbana do município.</option>
-                   <option value="taxaCoberturaRegServColetaRDOPopUrbMun">IN015 - Taxa de cobertura regular do serviço de coleta de rdo em relação à população total do município</option>
-                   <option value="taxaCoberturaRegServColetaRDORelacaoPopUrb">IN016 - Taxa de cobertura regular do serviço de coleta de rdo em relação à população urbana</option>
-                   <option value=""></option>
-                   <option value=""></option>
-                   <option value=""></option>
-                   <option value=""></option>
-                   <option value=""></option>
-                   <option value=""></option>
-
+                   <option value="IN002">IN001 - Taxa de empregados em relação à população urbana</option>
+                   <option value="IN003">N002 - Despesa média por empregado alocado nos serviços do manejo de rsu</option>
+                   <option value="IN004">IN003 - Incidência das despesas com o manejo de rsu nas despesas correntes da prefeitura</option>
+                   <option value="IN005">004 - Incidência das despesas com empresas contratadas para execução de serviços de manejo rsu nas despesas com manejo de rsu</option>
+                   <option value="IN006">IN005 - Auto-suficiência financeira da prefeitura com o manejo de rsu</option>
+                   <option value="IN006">IN006 - Despesa per capita com manejo de rsu em relação à população urbana</option>
+                   <option value="IN008">IN007 - Incidência de empregados próprios no total de empregados no manejo de rsu</option>
+                   <option value="IN012">IN008 - Incidência de empregados de empresas contratadas no total de empregados no manejo de rsu</option>
+                   <option value="IN018">IN010 - Incidência de empregados gerenciais e administrativos no total de empregados no manejo de rsu</option>
+                   <option value="IN019">IN011 - Receita arrecadada per capita com taxas ou outras formas de cobrança pela prestação de serviços de manejo rsu</option>
+                   <option value="IN026">IN014 - Taxa de cobertura do serviço de coleta domiciliar direta (porta-a-porta) da população urbana do município.</option>
+                   <option value="IN027">IN015 - Taxa de cobertura regular do serviço de coleta de rdo em relação à população total do município</option>
+                   <option value="IN029">IN016 - Taxa de cobertura regular do serviço de coleta de rdo em relação à população urbana</option>
+                   <option value="IN030"></option>
+                   <option value="IN031"></option>
+                   <option value="IN032"></option>
+                   <option value="IN033"></option>
+                   <option value="IN034"></option>
+                   <option value="IN035"></option>
+                   <option value="IN036"></option>
+                   <option value="IN037"></option>
+                   <option value="IN038"></option>
+                   <option value="IN039"></option>
+                   <option value="IN040"></option>
+                   <option value="IN041"></option>
+                   <option value="IN042"></option>
+                   <option value="IN045"></option>
+                   <option value="IN048"></option>
+                   <option value="IN054"></option>
+                   <option value="IN060"></option>
+                   <option value="IN101"></option>
+                   <option value="IN102"></option>
+                   <option value="IN001"></option>
+                   <option value="IN009"></option>
+                   <option value="IN010"></option>
+                   <option value="IN011"></option>
+                   <option value="IN013"></option>
+                   <option value="IN014"></option>
+                   <option value="IN017"></option>
+                   <option value="IN020"></option>
                 
                 </select>
                 </td>

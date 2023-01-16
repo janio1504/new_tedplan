@@ -87,6 +87,7 @@ export const Footer = styled.div`
     text-align: center;
     padding: 5px;
     font-size: 11px;
+    z-index: 9;
   `;
 
 export const DivMenu = styled.div`

@@ -85,13 +85,13 @@ export default function Financeiro({ municipio }: MunicipioProps) {
    + (data.FN038 ? parseFloat((data.FN038).replace('.','').replace(',','.')) : dadosFinanceiros?.fn038 ?  parseFloat(dadosFinanceiros?.fn038) : 0 )
    + (data.AES_FN004 ? parseFloat((data.AES_FN004).replace('.','').replace(',','.')) : dadosFinanceiros?.aes_fn004 ?  parseFloat(dadosFinanceiros?.aes_fn004) : 0 )
     console.log(data.AES_FN005);
-       
-    
-    data.AES_FN001 = (data.FN002 ? parseFloat((data.FN002).replace('.','').replace(',','.')) : dadosFinanceiros?.aes_fn002 ?  parseFloat(dadosFinanceiros?.aes_fn002) : 0)
+        
+    data.FN001 = (data.FN002 ? parseFloat((data.FN002).replace('.','').replace(',','.')) : dadosFinanceiros?.fn002 ?  parseFloat(dadosFinanceiros?.fn002) : 0)
     + (data.AES_FN003 ? parseFloat((data.AES_FN003).replace('.','').replace(',','.')) : dadosFinanceiros?.aes_fn003 ?  parseFloat(dadosFinanceiros?.aes_fn003) : 0 )
     + (data.FN007 ? parseFloat((data.FN007).replace('.','').replace(',','.')) : dadosFinanceiros?.fn007 ?  parseFloat(dadosFinanceiros?.fn007) : 0 )
     + (data.FN038 ? parseFloat((data.FN038).replace('.','').replace(',','.')) : dadosFinanceiros?.fn038 ?  parseFloat(dadosFinanceiros?.fn038) : 0 )
-     
+    
+    
     data.AES_FN015 = (data.FN010 ? parseFloat((data.FN010).replace('.','').replace(',','.')) : dadosFinanceiros?.fn010 ?  parseFloat(dadosFinanceiros?.fn010) : 0)
     + (data.FN011 ? parseFloat((data.FN011).replace('.','').replace(',','.')) : dadosFinanceiros?.fn011 ?  parseFloat(dadosFinanceiros?.fn011) : 0 )
     + (data.FN013 ? parseFloat((data.FN013).replace('.','').replace(',','.')) : dadosFinanceiros?.fn013 ?  parseFloat(dadosFinanceiros?.fn013) : 0 )
