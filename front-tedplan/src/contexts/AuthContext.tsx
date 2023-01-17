@@ -47,7 +47,7 @@ export function AuthProvider({ children }){
                setUser(response[0])
            })        
         }
-    }, [])
+    }, [usuario])
 
     
     
