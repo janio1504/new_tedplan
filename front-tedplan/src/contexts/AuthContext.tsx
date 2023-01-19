@@ -99,7 +99,7 @@ export function AuthProvider({ children }){
             
         })
 
-    return usuarioLogado       
+         return usuarioLogado       
 
     }
 

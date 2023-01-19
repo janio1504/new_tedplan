@@ -17,6 +17,7 @@ import api from "../../services/api";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
 import { cadastroPDF } from "../../reports/Cadastro/cadastro"
+import { gestaoPDF } from "../../reports/Gestao/gestao"
 import { prestacaoServicos } from "../../reports/PrestacaoServicos/prestacaoServicos"
 import { DivCenter, DivForm, DivTituloForm } from "../../styles/financeiro";
 import PrestacaoServicos from "../../img/icone_servicos.png"
@@ -59,6 +60,13 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [unidadesRsc, setDadosUnidadesRsc] = useState(null);
   const [unidadesRss, setDadosUnidadesRss] = useState(null);
   const [associacoes, setAssociacoes] = useState(null);
+
+  const [ listPoliticas, setPoliticas] = useState(null)
+  const [ listPlanos, setPlanos] = useState(null)
+  const [ listParticipacoes, setListParticipacoes]= useState(null)
+  const [ gestao, setGestao ] = useState(null);
+  const [ representantes, setRepresentantes] = useState(null);
+
   useEffect(() => {
     setDadosMunicipio(municipio[0]);
     
@@ -72,8 +80,16 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     getDadosEsgoto()
     getDadosDrenagem()
     getDadosResiduosColeta()
+
+    getPoliticas();
+    getPlanos();
+    getRepresentantes();
+    getGestao();
+    getParticipacoes()
+    
   }, [municipio]);
 
+  
   async function getDadosGerais(){
     const id_municipio = municipio[0].id_municipio
     const ano = new Date().getFullYear()
@@ -210,6 +226,51 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       });
   }
 
+
+  //FUNÇÕES QUE CARREGAM OS DADOS DA GESTÃO
+
+  async function getPoliticas(){
+    
+    const resPoliticas = await api.get("getPoliticas", {
+      params: { id_municipio: municipio[0]?.id_municipio },
+    });
+    const politicas = resPoliticas.data
+    setPoliticas(politicas)
+  }
+
+  async function getPlanos(){
+    const resPlanos = await api.get("getPlanos", {
+      params: { id_municipio: municipio[0]?.id_municipio },
+    });
+    const planos = await resPlanos.data
+    setPlanos(planos)
+  }
+
+  async function getParticipacoes(){
+    const resParticipacao = await api.get("getParticipacaoControleSocial", {
+      params: { id_municipio: municipio[0]?.id_municipio },
+    });
+   const participacao = await resParticipacao.data;
+   setListParticipacoes(participacao)
+  }
+
+  async function getRepresentantes(){
+    const resRepresentantes = await api.get("getRepresentantesServicos", {
+      params: { id_municipio: municipio[0]?.id_municipio },
+    });
+    const representantes = await resRepresentantes.data;
+        
+    setRepresentantes(representantes)
+  }
+
+  async function getGestao(){
+    const resGestao = await api.get("getGestao", {
+      params: { id_municipio: municipio[0]?.id_municipio },
+    });
+    const rsGestao = await resGestao.data;
+    setGestao(rsGestao)
+  }
+
   async function handleSignOut() {
     signOut();
   }
@@ -250,7 +311,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
               GESTÃO
           </TituloRelatorios> 
             <Image src={Gestao} alt='Gestão' />
-            <BaixarRelatorio onClick={()=>cadastroPDF(dadosMunicipio)}>Baixar</BaixarRelatorio>
+            <BaixarRelatorio onClick={()=>gestaoPDF(gestao, listParticipacoes, listPlanos, listPoliticas, representantes)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         <DivColRelatorios>
           <TituloRelatorios>
