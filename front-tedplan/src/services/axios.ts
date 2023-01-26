@@ -5,9 +5,9 @@ export function getAPIClient(ctx?: any) {
   
   const { "tedplan.token": token } = parseCookies(ctx);
   const api = axios.create({
-   // baseURL: "http://172.18.119.37/api",
+    //baseURL: "http://172.29.126.26/api",
     baseURL: "http://simisab.saneamento.unifap.br/api",
-    
+   //baseURL: "http://localhost:3333",
   });
 
   if (token) {

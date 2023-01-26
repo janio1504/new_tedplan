@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from "react";
 import api from "../../services/api";
 import { Iframe } from "../../styles/index";
 import Router, { useRouter } from 'next/router'
-import { isNumber } from "util";
 
 export default function Pdf(){
     const [pdf, setPdf] = useState('')

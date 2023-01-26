@@ -4,13 +4,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any,
     dadosAgua: any, dadosEsgoto: any, dadosDrenagem: any, dadosResiduosColeta: any){
     pdfMake.vfs = pdfFonts.pdfMake.vfs 
-    console.log(dados);
-    console.log(concessionarias);
-    console.log(financeiro);
-    console.log(dadosAgua);
-    console.log(dadosEsgoto);
-    console.log(dadosDrenagem);
-    console.log(dadosResiduosColeta);
+    
     if(dados.length == 0){
         alert("Não existem dados gerais cadastrados para gerar o relatório!")
         return
