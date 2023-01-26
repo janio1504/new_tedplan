@@ -99,7 +99,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Código SNIS'},{text: 'Descrição'}],
+                [{text: 'Código SNIS'},{text: '<b>Descrição</b>'}],
                 ['OP001','Quais da seguintes intervenções ou manutenções foram realizadas?'],
                 ['Não houve intervenção ou manutenção',dados?.qp001_1 ? "Sim" : "Não"],
                 ['Manutenção ou recuperação de sarjetas',dados?.qp001_2 ? "Sim" : "Não"],
@@ -121,7 +121,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Código SNIS'},{text: 'Descrição'}],
+                [{text: 'Código SNIS'},{text: '<b>Descrição</b>'}],
                 ['RI001','Indique quais das seguintes instituições existem'],
                 ['Não há instituições relacionadas com à gestão de riscos ou respostas a desastres',dados?.ri001_1 ? "Sim" : "Não"],
                 ['Unidades de corpos de bombeiros',dados?.ri001_2 ? "Sim" : "Não"],
@@ -143,7 +143,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Código SNIS'},{text: 'Descrição'}],
+                [{text: 'Código SNIS'},{text: '<b>Descrição</b>'}],
                 ['RI002','Quais da intervenções ou situações a seguir existem na área rural a montante das áreas urbanas?'],
                 ['Nenhuma intervenção ou situação',dados?.ri002_1 ? "Sim" : "Não"],
                 ['Barragens',dados?.ri002_2 ? "Sim" : "Não"],
@@ -165,7 +165,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Código SNIS'},{text: 'Descrição'}],
+                [{text: 'Código SNIS'},{text: '<b>Descrição</b>'}],
                 ['RI003','Instrumento de controle e monitoramento hidrlólicos existentes'],
                 ['Nenhum instrumento',dados?.ri003_1 ? "Sim" : "Não"],
                 ['Pluviômetro',dados?.ri003_2 ? "Sim" : "Não"],
@@ -187,7 +187,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
-                [{text: 'Código SNIS'},{text: 'Descrição'}],
+                [{text: 'Código SNIS'},{text: '<b>Descrição</b>'}],
                 ['RI004','Dados hidrolólicos monitorados e metodologia de monitoramento'],
                 ['Quantidade chuva por registro auto..',dados?.ri004_1 ? "Sim" : "Não"],
                 ['Quantidade chuva por frequência diária',dados?.ri004_2 ? "Sim" : "Não"],

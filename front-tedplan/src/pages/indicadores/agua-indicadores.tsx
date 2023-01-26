@@ -133,7 +133,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>AG021</p>
                   <p>AG002</p>
                   <p>AG004</p>
@@ -143,7 +143,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>AG022</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Quantidade de ligações totais de água</p>
                   <p>Quantidade de ligações ativas de água</p>
                   <p>Quantidade de ligações ativas de água micromedidas</p>
@@ -201,7 +201,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Volumes</DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>AG006</p>
                   <p>AG024</p>
                   <p>AG016</p>
@@ -219,7 +219,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Volume de água produzido</p>
                   <p>Volume de água de serviço</p>
                   <p>Volume de água bruta importado</p>
@@ -323,11 +323,11 @@ export default function Agua({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>AG005</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Extenção da rede de água</p>
                 </InputGG>
              
@@ -351,11 +351,11 @@ export default function Agua({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>AG028</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Consumo total de energia elétrica nos sistemas de água</p>
                 </InputGG>
                
@@ -381,7 +381,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>AG098</p>
                   <p></p>
                   <p></p>
@@ -391,7 +391,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>AG099</p>
                 </InputSNIS>
                 <InputM>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Campo de justificativa</p>
                   <p></p>
                   <p></p>

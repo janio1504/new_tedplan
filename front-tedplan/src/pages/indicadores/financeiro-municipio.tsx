@@ -270,7 +270,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </DivTitulo>  
                 
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN002</p>
                   <p>FN003</p>
                   <p>FN007</p>
@@ -280,7 +280,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN005</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Receita operacional direta de Água</p>
                   <p>Receita operacional direta de Esgoto</p>
                   <p>
@@ -294,7 +294,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
            
                 <InputP>
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label><b>Ano:</b> {new Date().getFullYear()}</label>
                   
                   <input {...register("FN002")} type="text"
                   defaultValue={dadosFinanceiros?.fn002}
@@ -348,12 +348,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN006</p>
                   <p>FN008</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Arrecadação total operacional indireta</p>
                   <p>Créditos de contas a receber</p>
                 </InputGG>
@@ -381,7 +381,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Despesas</DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN010</p>
                   <p>FN011</p>
                   <p>FN013</p>
@@ -402,7 +402,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN037</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Despesa com pessoal próprio</p>
                   <p>Despesa com produtos químicos</p>
                   <p>Despesa com energia elétrica</p>
@@ -534,7 +534,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN018</p>
                   <p>FN023</p>
                   <p>FN024</p>
@@ -545,7 +545,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN033</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>
                     Despesas capitalizáveis realizadas pelo prestador de
                     serviços
@@ -631,7 +631,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN041</p>
                   <p>FN042</p>
                   <p>FN043</p>
@@ -642,7 +642,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN048</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Despesas capitalizáveis realizadas pelo munícipio</p>
                   <p>
                     Investimentos realizados em abastecimento de água pelo
@@ -722,7 +722,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN051</p>
                   <p>FN052</p>
                   <p>FN053</p>
@@ -733,7 +733,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN058</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Despesas capitalizáveis realizadas pelo estado</p>
                   <p>
                     Investimentos realizados em abastecimento de água pelo
@@ -812,7 +812,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN098</p>
                   <p></p>
                   <p></p>
@@ -822,7 +822,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN099</p>
                 </InputSNIS>
                 <InputM>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Campo de justificativa</p>
                   <p></p>
                   <p></p>
@@ -855,7 +855,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>CB001</p>
                   <p>CB002</p>
                   <p>CB002A</p>
@@ -863,7 +863,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>CB004</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Existe alguma forma de cobrança pelos serviços de drenagem e manejo das APU</p>
                   <p>Qual é a forma de cobrança adotada?</p>
                   <p>Especifique qual é a forma de cobrança adotada</p>
@@ -941,7 +941,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN003</p>
                   <p>FN004</p>
                   <p>FN004A</p>
@@ -950,7 +950,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN009</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Receita total (Saúde, Educação, Pagamento de pessoal, etc...)</p>
                   <p>Fontes de recursos para custeio dos serviços de drenagem e manejo de APU</p>
                   <p>Especifique qual é a outra fonte de recursos para custeio dos serviços</p>
@@ -1013,14 +1013,14 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN012</p>                
                   <p>FN013</p>
                   <p>FN015</p>
                   <p>FN016</p>
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Despesa total do município (Saúde, Educação, pagamento de pessoal, etc...)</p>
                   <p>Despesas de Exploração(DEX) diretas ou de custeio total dos serviços de Drenagem e Manejo de APU</p>
                   <p>Despesa total com serviço da dívida para os serviços de drenagem e Manejo de APU</p>
@@ -1159,12 +1159,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN999</p>
                 
                 </InputSNIS>
                 <InputM>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Observações, esclarecimentos ou sugestões</p>
               
                 </InputM>
@@ -1191,7 +1191,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN201</p>
                   <p>FN202</p>
                   <p>FN203</p>
@@ -1199,10 +1199,10 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN205</p>
                 </InputSNIS>
                 <InputXL>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?</p>
                   <p>Principal forma adotada</p>
-                  <p>Descrição da outra forma adotada</p>
+                  <p><b>Descrição</b> da outra forma adotada</p>
                   <p>Unidade adotada para a cobrança (No caso de tarifa)</p>
                   <p>A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?</p>
                 </InputXL>
@@ -1274,7 +1274,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Despesas</DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN206</p>
                   <p>FN207</p>
                   <p>FN208</p>
@@ -1293,7 +1293,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN223</p>
                 </InputSNIS>
                 <InputXL>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Despesa dos agentes públicos com o serviço de coleta de RDO e RPU</p>
                   <p>Despesa com agentes privados para execução do serviço de coleta de RDO e RPU</p>
                   <p>Despesa com o serviço de coleta de RDO e RPU</p>
@@ -1408,13 +1408,13 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputSNIS>
-                  <label>Código SNIS</label>
+                  <label><b>Código SNIS</b></label>
                   <p>FN221</p>
                   <p>FN222</p>
               
                 </InputSNIS>
                 <InputGG>
-                  <label>Descrição</label>
+                  <label><b>Descrição</b></label>
                   <p>Receita orçada com a cobrança de taxas e tarifas referentes á getão e manejo de RSU</p>
                   <p>Receita arrecadada com taxas e tarifas referentes á gestão e manejo de RSU  </p>
                

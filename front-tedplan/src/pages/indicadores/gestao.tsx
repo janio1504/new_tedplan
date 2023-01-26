@@ -731,7 +731,7 @@ export default function GestaoIndicadores({
           <DivForm>
             <DivTituloForm>Saneamento Rural</DivTituloForm>
             <DivTextArea>
-              <label>Breve descrição</label>
+              <label>Breve <b>Descrição</b></label>
               <TextArea>
                 <textarea
                   ref={txtArea}
@@ -756,7 +756,7 @@ export default function GestaoIndicadores({
                 ></textarea>
               </TextArea>
 
-              <label>Breve descrição</label>
+              <label>Breve <b>Descrição</b></label>
               <TextArea>
                 <textarea
                   ref={txtArea}

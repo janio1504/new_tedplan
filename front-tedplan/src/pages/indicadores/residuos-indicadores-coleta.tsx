@@ -420,7 +420,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <DivTituloConteudo>Trabalhadores remunerados</DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label>Código SNIS</label>
+                <label><b>Código SNIS</b></label>
                 <p>TB001</p>
                 <p>TB003</p>
                 <p>TB005</p>
@@ -438,7 +438,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>TB015</p>
               </InputSNIS>
               <InputXL>
-                <label>Descrição</label>
+                <label><b>Descrição</b></label>
                 <p>
                   Coletores e Motoristas de agentes PÚBLICOS, alocados na coleta
                 </p>
@@ -481,7 +481,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </p>
               </InputXL>
               <InputP>
-                <label>Ano: {dadosResiduos?.ano}</label>
+                <label><b>Ano:</b> {dadosResiduos?.ano}</label>
               
                 <input {...register("TB001")} type="text"
                 defaultValue={dadosResiduos?.tb001}
@@ -932,7 +932,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label>Código SNIS</label>
+                <label><b>Código SNIS</b></label>
                 <p>CO154</p>
                 <p>CO012</p>
                 <p>CO146</p>
@@ -943,7 +943,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>CO152</p>
               </InputSNIS>
               <InputXL>
-                <label>Descrição</label>
+                <label><b>Descrição</b></label>
                 <p>
                   Os residuos provenientes da varrição ou limpeza de logradouros
                   públicos são recolhidos junto com os residuos domiciliares?
@@ -2267,6 +2267,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <InputP>
                         <input {...register("CS009")} type="text"
                          defaultValue={dadosResiduos?.cs009}
+                         disabled
                          onChange={handleOnChange}
                         ></input>
                       </InputP>
@@ -2820,8 +2821,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano {dadosResiduos?.ano}</th>
                   </tr>
                 </thead>
@@ -2971,7 +2972,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <thead>
                   <tr>
                     <th>
-                      <span>Descrição</span>
+                      <span><b>Descrição</b></span>
                     </th>
                     <th></th>
                     <th>
@@ -3848,8 +3849,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
+                    <th><b>Código SNIS</b></th>
+                    <th><b>Descrição</b></th>
                     <th>Ano {dadosResiduos?.ano}</th>
                   </tr>
                 </thead>
@@ -3887,7 +3888,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <InputSNIS>CA009</InputSNIS>
                     </td>
                     <td><InputG>
-                    Descrição sucinta dos trabalhos (por exemplo: bolsa-escola para filhos, programa de alfabetização, etc...)
+                    <b>Descrição</b> sucinta dos trabalhos (por exemplo: bolsa-escola para filhos, programa de alfabetização, etc...)
                     </InputG></td>
                     <td>
                       <textarea {...register('CA009')}
