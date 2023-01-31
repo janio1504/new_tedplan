@@ -157,7 +157,9 @@ export default function Geral({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {
     data.id_geral_da_ae_dh = dadosGeral?.id_geral_da_ae_dh
     data.id_municipio = municipio[0].id_municipio
-    data.ano = new Date().getFullYear()     
+    data.ano = new Date().getFullYear() 
+    console.log(data);
+        
     const resCad = await api
       .post("create-geral", data)
       .then((response) => {
