@@ -114,7 +114,7 @@ class GeralController {
         .where("id_geral_da_ae_dh", dados.id_geral_da_ae_dh)
         .fetch()
         const ge = resGe.toJSON()[0]
-        console.log(dados.OP001_1);
+        console.log(dados.AD002);
         await Geral.query()
         .table('tedplan.geral_da_ae_dh')
         .where("id_geral_da_ae_dh", dados.id_geral_da_ae_dh)

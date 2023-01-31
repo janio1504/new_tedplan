@@ -124,7 +124,7 @@ export default function Geral({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("get-geral", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
-        setDadosGeral(response.data[0])
+        setDadosGeral(response.data[0])        
       })
       .catch((error) => {
         toast.notify('Aconteceu o seguinte erro: ',{
@@ -649,8 +649,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <tr>
                     <td><InputSNIS>AD002</InputSNIS></td>
                     <td>Quantidade de pessoal terceirizado alocado</td>
-                    <td><InputP><input {...register('AD003')}
-                    defaultValue={dadosGeral?.ad003}
+                    <td><InputP><input {...register('AD002')}
+                    defaultValue={dadosGeral?.ad002}
                     onChange={handleOnChange}
                     type="text"></input></InputP></td>
                     <td>Pessoas</td>
