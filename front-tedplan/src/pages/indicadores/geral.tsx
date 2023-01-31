@@ -603,8 +603,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td><InputSNIS>GE011</InputSNIS></td>
                     <td>Nome da(s) bacia(s) hidrografica(s) a que pertence o município (Fonte: ANA) </td>
                     <td>
-                    <input {...register('GE011_1')} type="text"
-                        defaultValue={dadosGeral?.ge011_1}
+                    <input {...register('GE011')} type="text"
+                        defaultValue={dadosGeral?.ge011}
                         onChange={handleOnChange} />
                     </td>                    
                   </tr>
