@@ -415,9 +415,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>Outras despesas de exploração</p>
                   <p>Despesas de exploração (DEX)</p>
                   <p>Despesas com juros e encargos do serviço da divida</p>
-                  <p>
-                    Despesas com variações monetárias e cambiais das dividas
-                  </p>
+                  <p>Despesas com variações monetárias e cambiais das dividas</p>
                   <p>Despesas com juros e encargos do serviço da divida</p>
                   <p>Despesas com depreciação, amortização do ativo deferido</p>
                   <p>Despesas fiscais ou tributarias não computadas na dex</p>
@@ -1035,14 +1033,13 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>FN015</p>
                   <p>FN016</p>
                 </InputSNIS>
-                <InputGG>
+                <InputXL>
                   <label><b>Descrição</b></label>
                   <p>Despesa total do município (Saúde, Educação, pagamento de pessoal, etc...)</p>
                   <p>Despesas de Exploração(DEX) diretas ou de custeio total dos serviços de Drenagem e Manejo de APU</p>
                   <p>Despesa total com serviço da dívida para os serviços de drenagem e Manejo de APU</p>
                   <p>Despesa total com serviços de Drenagem e Manejo de APU</p>
-                
-                </InputGG>
+                </InputXL>
             
                 <InputP>
 
