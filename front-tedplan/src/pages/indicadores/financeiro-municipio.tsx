@@ -288,7 +288,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                     Tratada)
                   </p>
                   <p>Receita operacional direta - Esgoto bruto importado</p>
-                  <p>Receita operacional direta de Total</p>
+                  <p>Receita operacional direta Total</p>
                   <p>Receita operacional indireta</p>
                   <p>Receita operacional Total (Direta + Indireta)</p>
                 </InputGG>
