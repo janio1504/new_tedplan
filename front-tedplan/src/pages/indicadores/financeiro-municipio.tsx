@@ -1160,6 +1160,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       <td>Desembolsos total de investimentos em Drenagem e Manejo das APU realizados pelo Município no ano de referência</td>
                       <td><InputP><input {...register("FN023")} type="text"
                       defaultValue={dadosFinanceiros?.fn023}
+                      disabled
                       onChange={handleOnChange}
                       ></input></InputP></td>
                       <td>R$/ano</td>
