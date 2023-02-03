@@ -238,9 +238,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -273,9 +275,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -362,9 +366,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -415,9 +421,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -468,9 +476,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -520,9 +530,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -586,9 +598,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -631,9 +645,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -675,9 +691,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -765,9 +783,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                
@@ -814,9 +834,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                
@@ -1053,9 +1075,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -1084,9 +1108,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1121,9 +1147,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1185,9 +1213,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -1274,9 +1304,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1310,9 +1342,11 @@ export default function Geral({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -1358,8 +1392,10 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <thead>
                     <tr>
                    
+
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                     </tr>
                   </thead>
                   <tbody>

@@ -43,6 +43,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['GE05A', 'Quantidade de Municípios atendidos', dados?.ge05a],
                 ['GE05B','Quantidade de Municípios atendidos', dados?.ge05b],
@@ -62,6 +63,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['GD12B','População total residente no(s) município(s) com esgotamento sanitário (Fonte: IBGE)	',dados?.gd12b],
                 ['FN026','Quantidade de empregados próprios	',dados?.fn026],
                 ['GE099','Observações',dados?.ge099]
+
                 
             ]
         },
@@ -72,6 +74,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['GE001', 'Área territorial total do município (Fonte IBGE)	', dados?.ge001],               
                 ['GE002','Área urbana total, incluido áreas urbanas isoladas	',dados?.ge002],
@@ -90,6 +93,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['IE014','Existe obras ou projetos em andamento?',dados?.ie014],
                 ['IE016','Qual o tipo de sistema de Drenagem Urbana?',dados?.ie016],
                 ['IE016A','Especifique qual é o outro tipo de sistema de drenagem Urbana',dados?.ie016a],
+
              
             ]
         },
@@ -229,9 +233,11 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['GE201', 'O oŕgão(Prestador) é também o prestador - direto ou indireto - de outros serviços de Saneamento?	', dados?.ge201],               
                 ['GE202','Há empresa com contrato de DELEGAÇÂO (conceção ou contrato de programa) para algum ou todos os serviços de limpeza urbana?',dados?.ge202],
+
                
             ]
         },
@@ -276,6 +282,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['CO164', 'População total atendida no município', dados?.co164],               
                 ['CO050','População urbana atendida no município, abrangendo sede e localidades	',dados?.co050],
@@ -288,6 +295,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['CO162','Valor contratual (Preço unitario) do serviço de aterramento de RDO e RDU',dados?.co162],
                 ['CO178','Percentual da população atendida com a COLETA SELETIVA de porta a porta',dados?.co178],
                 ['GE999','Observações, esclarecimentos e sugestões',dados?.ge999dh],
+
 
              
             ]
@@ -303,6 +311,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['FN002', 'Receita operacional direta de Água', financeiro?.fn002],
                 ['FN003', 'Receita operacional direta de Esgoto', financeiro?.fn003],
@@ -369,6 +378,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['CB001', 'Existe alguma forma de cobrança pelos serviços de drenagem e manejo das APU', financeiro?.cb001],
                 ['CB002', 'Qual é a forma de cobrança adotada?', financeiro?.cb002],
@@ -395,6 +405,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['FN021', 'Desembolsos de investimentos com recursos não onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn021],
                 ['FN023', 'Desembolsos total de investimentos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn023],
                 ['FN999', 'Observações, esclarecimentos ou sugestões', financeiro?.drenagem_fn999],
+
            
             ]
         },
@@ -407,6 +418,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['FN201', 'A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?', financeiro?.fn201],
                 ['FN202', 'Principal forma adotada', financeiro?.fn202],
@@ -436,6 +448,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['FN226', 'Tipo de recurso', financeiro?.fn226],
                 ['FN227', 'Em que foi aplicado o recurso?', financeiro?.fn227],
                 ['FN999', 'Observações, esclarecimentos ou sugestões	', financeiro?.residuos_fn999],
+
               
            
             ]
@@ -448,6 +461,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['AG021', 'Quantidade de ligações totais de água', dadosAgua?.ag021],
                 ['AG002','Quantidade de ligações ativas de água',dadosAgua?.ag002],
@@ -474,6 +488,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['AG028','Consumo total de energia elétrica nos sistemas de água',dadosAgua?.ag028],
                 ['AG098','Campo de justificativa',dadosAgua?.ag098],
                 ['AG099','Observações',dadosAgua?.ag099],
+
                 
             ]
         },
@@ -486,6 +501,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['ES009', 'Quantidade de ligações totais de esgoto', dadosEsgoto?.es009 ],
                 ['ES002', 'Quantidade de ligações ativas de esgoto', dadosEsgoto?.es002 ],
@@ -500,6 +516,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['ES028', 'Consumo total de energia elétrica nos sistemas de água', dadosEsgoto?.es028 ],
                 ['ES098', 'Campo de justificativa', dadosEsgoto?.es098 ],
                 ['ES099', 'Observações', dadosEsgoto?.es099 ],
+
                
                
             ]
@@ -513,6 +530,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
          table: {
              headerRows: 1,
              body: [
+
                  [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                  ['IE017', 'Extensão total das vias públicas urbanas', dadosDrenagem?.ie017 ],
                  ['IE018', 'Extensão total das vias públicas urbanas implantadas', dadosDrenagem?.ie018 ],
@@ -550,7 +568,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                  ['RI044', 'Quantidade de pessoas realocadas para habitações permanentes durante ou após os eventos hidrológicos impactantes', dadosDrenagem?.ri044 ],
                  ['RI045', 'Houve atuação (federal, estadual ou municipal) para reassentamento da população e/ou para recuperação de imóveis urbanos afetados por eventos hidrológicos impactantes?', dadosDrenagem?.ri045 ],
                  ['RI999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem?.ri999 ],
-               
+
                  
                 
                  
@@ -564,6 +582,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
                 ['TB001', 'Coletores e Motoristas de agentes PÚBLICOS, alocados na coleta', dadosResiduosColeta?.tb001],
                 ['TB003', 'Agentes PÚBLICOS envolvidos na varrição', dadosResiduosColeta?.tb003],
@@ -593,6 +612,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['TB022', 'Duração de Frente 3', dadosResiduosColeta?.tb022],
                 ['TB025', 'Atuam em mais de um tipo de serviços, Frente 3?', dadosResiduosColeta?.tb025],
                 ['TB028', 'Tipo de serviços predominante da Frente 3', dadosResiduosColeta?.tb028],
+
                            
                 
             ]
@@ -648,6 +668,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
                 ['CO154', 'Os residuos provenientes da varrição ou limpeza de logradouros públicos são recolhidos junto com os residuos domiciliares?', dadosResiduosColeta?.co154 ],
                 ['CO012', 'Valor contratado (preço unitário) do serviço de RDO e RPU diurna', dadosResiduosColeta?.co012 ],
@@ -657,6 +678,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
                 ['CO150', 'Especifique a distancia do centro de massa à unidade de destinação final superior a 15km', dadosResiduosColeta?.co150 ],
                 ['CO151', 'A distancia média de transporte à unidade de destinação final é superior a 15km?', dadosResiduosColeta?.co151 ],
                 ['CO152', 'Especifique a distancia de transporte à unidade de destinação final superior a 15km', dadosResiduosColeta?.co152 ],
+
             ]
         },
         layout: 'headerLineOnly'
@@ -688,9 +710,11 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
         table: {
             headerRows: 1,
             body: [
+
                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
                 ['CO021', 'É utilizada balança para pesagem rotineira dos residuos sólidos coletados?', dadosResiduosColeta?.co021 ],
                 ['CO019', 'Os resíduos sólidos DOMICILIARES coletados são enviados para outro município?', dadosResiduosColeta?.co019 ],
+
                 ['CO020', 'Município(s) de destino de RDO e RPU exportado', '' ],
                
             ]

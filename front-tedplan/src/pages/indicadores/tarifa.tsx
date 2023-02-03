@@ -182,9 +182,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
@@ -306,9 +308,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
+
                     <th>Código SNIS</th>
                     <th>Descrição</th>
                     <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>                 
