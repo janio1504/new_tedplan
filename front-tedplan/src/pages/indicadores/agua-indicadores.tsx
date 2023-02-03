@@ -154,7 +154,9 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </InputGG>
              
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("AG021")}
                   defaultValue={dadosAgua?.ag021}
                   onChange={handleOnChange}
@@ -237,7 +239,9 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </InputGG>
                
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("AG006")}
                   defaultValue={dadosAgua?.ag006}
                   onChange={handleOnChange}
@@ -332,7 +336,9 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </InputGG>
              
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("AG005")}
                   defaultValue={dadosAgua?.ag005}
                   onChange={handleOnChange}
@@ -360,7 +366,9 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </InputGG>
                
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("AG028")}
                   defaultValue={dadosAgua?.ag028}
                   onChange={handleOnChange}
@@ -402,7 +410,9 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </InputM>
 
                 <InputG>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <textarea {...register("AG098")}
                   defaultValue={dadosAgua?.ag098}
                   onChange={handleOnChange}

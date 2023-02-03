@@ -1,4 +1,7 @@
 {
+    "compact": false,
     "presets": ["next/babel"],
     "plugins": []
+    
+   
   }

@@ -82,10 +82,10 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
   
   async function handleCadastro(data) {   
-    data.id_drenagem = dadosDrenagem?.id_drenagem
+    data.id_drenagem_aguas_pluviais = dadosDrenagem?.id_drenagem_aguas_pluviais
     data.id_municipio = municipio[0].id_municipio
-    data.ano = new Date().getFullYear() 
-
+    data.ano = new Date().getFullYear()     
+    
     const resCad = await api
       .post("create-drenagem", data)
       .then((response) => {
@@ -97,6 +97,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
         return response.data;
       })
       .catch((error) => {
+        toast.notify('Erro ao gravar os dados!',{
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        })
         console.log(error);
       });
   }
@@ -107,13 +112,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     const res = await api
       .post("get-drenagem", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
-        return response.data;
+        setDadosDrenagem(response.data[0])
       })
       .catch((error) => {
         console.log(error);
       });
-      console.log(res[0]);      
-      setDadosDrenagem(res[0])
   }
 
   async function handleSignOut() {
@@ -207,8 +210,10 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                   drenagem?
                 </p>
               </InputXL>
-              <InputP>
-                <label><b>Ano:</b> 2022</label>
+
+              <InputP>              
+                <label>Ano: {new Date().getFullYear()}</label>
+
                 <input {...register("IE017")}
                  defaultValue={dadosDrenagem?.ie017}
                  onChange={handleOnChange}
@@ -356,7 +361,9 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </p>
               </InputXL>
               <InputP>
-                <label><b>Ano:</b> 2022</label>
+
+                <label>Ano: {new Date().getFullYear()}</label>
+
                 <input {...register("IE032")}
                 defaultValue={dadosDrenagem?.ie032}
                 onChange={handleOnChange}
@@ -443,7 +450,9 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputM>
 
               <InputGG>
-                <label><b>Ano:</b> 2022</label>
+
+                <label>Ano: {new Date().getFullYear()}</label>
+
 
                 <textarea {...register("IE999")}
                 defaultValue={dadosDrenagem?.ie999}
@@ -481,7 +490,9 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputXL>
 
               <InputP>
-                <label><b>Ano:</b> 2022</label>
+
+                <label>Ano: {new Date().getFullYear()}</label>
+
                 <input {...register("RI023")}
                 defaultValue={dadosDrenagem?.ri023}
                 onChange={handleOnChange}

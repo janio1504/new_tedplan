@@ -204,7 +204,7 @@ class PsFinanceiroController {
           "id_fn_agua_esgoto_sanitario",
           dados.id_fn_agua_esgoto_sanitario
         ).fetch()
-
+        console.log(dados.FN001);
         await PsFinanceiro.query()
           .from("tedplan.fn_agua_esgoto_sanitario")
           .where(
@@ -268,6 +268,7 @@ class PsFinanceiroController {
 
           });
       } else {
+        console.log(dados.FN001);
         const resAes = await PsFinanceiro.query()
           .from("tedplan.fn_agua_esgoto_sanitario")
           .insert({

@@ -254,6 +254,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     await api.post('list-unidades-rsc',     
     {id_municipio: municipio[0]?.id_municipio, ano: new Date().getFullYear()})
     .then(response=>{
+      console.log(response.data);
+      
       setUnidadesRsc(response.data)             
     })
     .catch((error)=>{
@@ -977,7 +979,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </InputXL>
 
               <InputP>
-                <label><b>Ano:</b> 2022</label>
+
+                <label>Ano: {new Date().getFullYear()}</label>
+
                 <select {...register("CO154")} >
                   <option>{dadosResiduos?.co154}</option>
                   <option value="Sim">Sim</option>
@@ -1256,9 +1260,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1366,9 +1372,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1441,9 +1449,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -2022,9 +2032,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -2140,9 +2152,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -2285,9 +2299,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -2694,9 +2710,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -2885,9 +2903,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>

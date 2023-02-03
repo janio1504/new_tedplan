@@ -47,7 +47,7 @@ export function AuthProvider({ children }){
                setUser(response[0])
            })        
         }
-    }, [])
+    }, [usuario])
 
     
     
@@ -99,7 +99,7 @@ export function AuthProvider({ children }){
             
         })
 
-    return usuarioLogado       
+         return usuarioLogado       
 
     }
 

@@ -87,6 +87,7 @@ export const Footer = styled.div`
     text-align: center;
     padding: 5px;
     font-size: 11px;
+    z-index: 9;
   `;
 
 export const DivMenu = styled.div`
@@ -353,5 +354,10 @@ border-radius: 5px;
 padding: 5px 20px;
 cursor: pointer;
 font-weight: bolder;
+`;
+
+export const Iframe = styled.iframe`
+width: 100%;
+height: 800px;
 `;
 

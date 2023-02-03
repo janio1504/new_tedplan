@@ -65,6 +65,7 @@ import {
 import api from "../../services/api";
 import { BotaoEditar } from "../../styles/dashboard";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { Footer } from "../../styles";
 
 interface IMunicipio {
   id_municipio: string;
@@ -374,16 +375,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   }
                  </tbody>
                 </table>
-                <ToastContainer></ToastContainer>
+               
               </Tabela>
             </DivFormConteudo>
           </DivFormResiduo>      
         
       </DivCenter>
-
+      
       {visibleUnidade && (
         <ContainerModal>
-          <ToastContainer></ToastContainer>
+         
             <ModalFormUnidade>
                   <DivFormResiduo>
                     <DivTituloFormResiduo>Edição de cadastro de Concessionária</DivTituloFormResiduo> 
@@ -405,9 +406,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -696,9 +699,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               <table>
                 <thead>
                   <tr>
-                    <th><b>Código SNIS</b></th>
-                    <th><b>Descrição</b></th>
-                    <th>Ano 2022</th>
+
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano {new Date().getFullYear()}</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -1578,10 +1583,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
                 </DivFormResiduo>              
             </ModalFormUnidade>
-        
+          
         </ContainerModal>
+        
       )}
-
+      
 {visibleResiduosRecebidos && (
         <ContainerModal>
           <Modal>
@@ -1670,13 +1676,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 </DivFormConteudo>
               </ConteudoModal>
             </FormModal>
+            
           </Modal>
+          
         </ContainerModal>
       )}
 
-
-          
+     
+  
     </Container>
+    
   );
 }
 

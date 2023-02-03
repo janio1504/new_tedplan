@@ -18,9 +18,10 @@ class DrenagemController {
   }
 
   async createDrenagem({ request }){
+
     const dados = request.all()
    try {
-    if(!dados.id_drenagem){
+    if(!dados.id_drenagem_aguas_pluviais){
       await Drenagem.query()
       .from('tedplan.drenagem_aguas_pluviais')
       .insert({
@@ -70,7 +71,7 @@ class DrenagemController {
         .where('id_drenagem_aguas_pluviais', dados.id_drenagem_aguas_pluviais)
         .fetch()
         const rd = res.toJSON()[0]
-
+        console.log(rd);
         await Drenagem.query()
         .from('tedplan.drenagem_aguas_pluviais')
         .where('id_drenagem_aguas_pluviais', dados.id_drenagem_aguas_pluviais)
@@ -116,6 +117,7 @@ class DrenagemController {
       })
     }
    } catch (error) {
+    return error
     console.log(error);
    }
   }

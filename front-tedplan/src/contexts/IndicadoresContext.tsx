@@ -55,7 +55,7 @@ export function AuthProvider({ children }){
 
         console.log(login);
         
-        /*
+      
         const data = await signInRequest({
             login,
             senha,
@@ -89,7 +89,7 @@ export function AuthProvider({ children }){
             }
             return error
         })      
-        */
+     
     }
 
     async function signOut(){

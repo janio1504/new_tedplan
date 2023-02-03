@@ -28,7 +28,7 @@ export default function LoginIndicadores() {
   async function handleSignInIndicadores(data) {
     
     const res = await signIn(data)
-    .then((response)=>{     
+    .then((response)=>{ 
     })
     .catch((error)=>{   
       toast.notify('Usuário ou senha inválido!',{

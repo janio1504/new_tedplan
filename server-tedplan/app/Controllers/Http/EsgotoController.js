@@ -20,7 +20,7 @@ class EsgotoController {
   async createEsgoto({ request }){
     const dados = request.all()
    try {
-    if(!dados.id_agua){
+    if(!dados.id_esgoto){
       await Esgoto.query()
       .from('tedplan.esgoto')
       .insert({
@@ -34,7 +34,7 @@ class EsgotoController {
         es012: dados.ES012,
         es015: dados.ES015,
         es004: dados.ES004,
-        ag028: dados.ES028,
+        es028: dados.ES028,
         es098: dados.ES098,
         es099: dados.ES099,
         id_municipio: dados.id_municipio,
@@ -62,7 +62,7 @@ class EsgotoController {
           es012: dados.ES012 ? dados.ES012 : re.es012,
           es015: dados.ES015 ? dados.ES015 : re.es015,
           es004: dados.ES004 ? dados.ES004 : re.es004,
-          ag028: dados.ES028 ? dados.ES028 : re.ag028,
+          es028: dados.ES028 ? dados.ES028 : re.ag028,
           es098: dados.ES098 ? dados.ES098 : re.es098,
           es099: dados.ES099 ? dados.ES099 : re.es099,
           id_municipio: dados.id_municipio ? dados.id_municipio : ra.id_municipio,

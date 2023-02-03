@@ -87,6 +87,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
         return response.data;
       })
       .catch((error) => {
+        toast.notify('Erro ao gravar os dados!',{
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        })
         console.log(error);
       });
       getDadosEsgoto()
@@ -166,7 +171,9 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputGG>
            
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("ES009")}
                   defaultValue={dadosEsgoto?.es009}
                   onChange={handleOnChange}
@@ -218,7 +225,9 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputGG>
              
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("ES005")}
                   defaultValue={dadosEsgoto?.es005}
                   onChange={handleOnChange}
@@ -269,7 +278,9 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <p>Extenção da rede</p>
                 </InputGG>          
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("ES004")}
                   defaultValue={dadosEsgoto?.es004}
                   onChange={handleOnChange}
@@ -297,7 +308,9 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputGG>
                
                 <InputP>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <input {...register("ES028")}
                   defaultValue={dadosEsgoto?.es028}
                   onChange={handleOnChange}
@@ -339,7 +352,9 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputM>
 
                 <InputG>
-                  <label><b>Ano:</b> 2022</label>
+
+                  <label>Ano: {new Date().getFullYear()}</label>
+
                   <textarea {...register("ES098")}
                   defaultValue={dadosEsgoto?.es098}
                   onChange={handleOnChange}
