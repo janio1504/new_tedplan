@@ -1690,7 +1690,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </InputP>
                   </td>
                   <td>
-                  <InputG>
+                  <InputM>
                       <label>
                         Bairro<span> *</span>
                       </label>
@@ -1700,7 +1700,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         onChange={handleOnChange}
                         type="text"
                       ></input>
-                    </InputG>
+                    </InputM>
                   </td>
                 </tr>
               </tbody>
@@ -1735,7 +1735,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </InputP>
                   </td>
                   <td>
-                  <InputG>
+                  <InputM>
                       <label>
                         Email<span> *</span>
                       </label>
@@ -1745,7 +1745,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         onChange={handleOnChange}
                         type="text"
                       ></input>
-                    </InputG>
+                    </InputM>
                   </td>
                 </tr>
               </tbody>
