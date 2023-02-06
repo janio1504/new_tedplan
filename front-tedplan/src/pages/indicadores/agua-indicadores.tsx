@@ -125,7 +125,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
+          <DivForm style={{borderColor: "#12B2D5"}}>
             <DivTituloForm>Água</DivTituloForm>          
              
               <DivFormConteudo>
