@@ -124,8 +124,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
     const ano = new Date().getFullYear()  
     const res = await api
       .post("get-tarifa", {id_municipio: id_municipio, ano: ano})
-      .then((response) => { 
-        console.log(response.data);      
+      .then((response) => {   
         return response.data;
       })
       .catch((error) => {

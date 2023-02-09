@@ -71,7 +71,6 @@ class DrenagemController {
         .where('id_drenagem_aguas_pluviais', dados.id_drenagem_aguas_pluviais)
         .fetch()
         const rd = res.toJSON()[0]
-        console.log(rd);
         await Drenagem.query()
         .from('tedplan.drenagem_aguas_pluviais')
         .where('id_drenagem_aguas_pluviais', dados.id_drenagem_aguas_pluviais)
@@ -116,8 +115,7 @@ class DrenagemController {
           ano: dados.ano ? dados.ano : ra.ano,
       })
     }
-   } catch (error) {
-    return error
+   } catch (error) {    
     console.log(error);
    }
   }

@@ -37,6 +37,7 @@ import CurrencyInput from 'react-currency-masked-input'
 import { parseCookies } from "nookies";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { log } from "console";
 
 interface IMunicipio {
   id_municipio: string;
@@ -63,8 +64,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(municipio);
   const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
 
-  useEffect(() => {   
-    
+  useEffect(() => { 
       setDadosMunicipio(municipio[0])
       getFinaceiroMunicipio()
   }, [municipio]);
@@ -84,7 +84,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
    + (data.FN007 ? parseFloat((data.FN007).replace('.','').replace(',','.')) : dadosFinanceiros?.fn007 ?  parseFloat(dadosFinanceiros?.fn007) : 0 )
    + (data.FN038 ? parseFloat((data.FN038).replace('.','').replace(',','.')) : dadosFinanceiros?.fn038 ?  parseFloat(dadosFinanceiros?.fn038) : 0 )
    + (data.AES_FN004 ? parseFloat((data.AES_FN004).replace('.','').replace(',','.')) : dadosFinanceiros?.aes_fn004 ?  parseFloat(dadosFinanceiros?.aes_fn004) : 0 )
-    console.log(data.AES_FN005);
+    
         
     data.FN001 = (data.FN002 ? parseFloat((data.FN002).replace('.','').replace(',','.')) : dadosFinanceiros?.fn002 ?  parseFloat(dadosFinanceiros?.fn002) : 0)
     + (data.AES_FN003 ? parseFloat((data.AES_FN003).replace('.','').replace(',','.')) : dadosFinanceiros?.aes_fn003 ?  parseFloat(dadosFinanceiros?.aes_fn003) : 0 )
@@ -109,7 +109,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     + (data.AES_FN022 ? parseFloat((data.AES_FN022).replace('.','').replace(',','.')) : dadosFinanceiros?.aes_fn022 ?  parseFloat(dadosFinanceiros?.aes_fn022) : 0 )
     + (data.FN028 ? parseFloat((data.FN028).replace('.','').replace(',','.')) : dadosFinanceiros?.fn028 ?  parseFloat(dadosFinanceiros?.fn028) : 0 )
    
-    data.FN016 = (data.FN035 ? parseFloat((data.FN035).replace('.','').replace(',','.')) : dadosFinanceiros?.fn035 ?  parseFloat(dadosFinanceiros?.fn035) : 0)
+    data.AES_FN016 = (data.FN035 ? parseFloat((data.FN035).replace('.','').replace(',','.')) : dadosFinanceiros?.fn035 ?  parseFloat(dadosFinanceiros?.fn035) : 0)
     + (data.FN036 ? parseFloat((data.FN036).replace('.','').replace(',','.')) : dadosFinanceiros?.fn036 ?  parseFloat(dadosFinanceiros?.fn036) : 0 )
   
     data.FN037 = (data.FN017 ? data.FN017 : dadosFinanceiros?.fn017 ?  parseFloat(dadosFinanceiros?.fn017) : 0)
@@ -150,7 +150,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
 
     data.FN016 = (data.FN013 ? parseFloat((data.FN013).replace('.','').replace(',','.')) : dadosFinanceiros?.fn013 ?  parseFloat(dadosFinanceiros?.fn013) : 0)
     + (data.FN015 ? parseFloat((data.FN015).replace('.','').replace(',','.')) : dadosFinanceiros?.fn015 ?  parseFloat(dadosFinanceiros?.fn015) : 0 )
-
+    
 
     data.FN022 = (data.FN024 ? parseFloat((data.FN024).replace('.','').replace(',','.')) : dadosFinanceiros?.fn024 ?  parseFloat(dadosFinanceiros?.fn024) : 0)
     + (data.FN018 ? parseFloat((data.FN018).replace('.','').replace(',','.')) : dadosFinanceiros?.fn018 ?  parseFloat(dadosFinanceiros?.fn018) : 0 )
@@ -192,7 +192,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
      
     
     //const dados = Object.entries(data)     
-      data.id_municipio = dadosMunicipio.id_municipio
+      data.id_municipio = dadosMunicipio?.id_municipio
       data.id_fn_residuos_solidos = dadosFinanceiros?.id_fn_residuos_solidos ? dadosFinanceiros.id_fn_residuos_solidos : null
       data.id_fn_drenagem_aguas_pluviais = dadosFinanceiros?.id_fn_drenagem_aguas_pluviais ? dadosFinanceiros.id_fn_drenagem_aguas_pluviais : null
       data.id_fn_agua_esgoto_sanitario = dadosFinanceiros?.id_fn_agua_esgoto_sanitario ? dadosFinanceiros.id_fn_agua_esgoto_sanitario : null
@@ -207,7 +207,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
           duration: 7,
           type: "success",
         })
-        //console.log(response);
+       
         return response;
       })
       .catch((error) => {
@@ -233,13 +233,13 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     Router.push("/indicadores/gestao");
   }
   async function getFinaceiroMunicipio(){
-    const ano = new Date().getFullYear()
+    const ano = new Date().getFullYear()    
     
     await api.post('getPsFinanceiro',     
     {id_municipio: dadosMunicipio[0]?.id_municipio, ano: ano})
     .then(response=>{      
       setDadosFinanceiros(response.data[0])
-      
+      console.log(response.data[0])
     })
     .catch((error)=>{
       console.log(error);      
@@ -476,7 +476,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   ></input>
                   <input {...register("FN016")} type="text"
                   disabled={true}
-                  defaultValue={dadosFinanceiros?.fn016}
+                  defaultValue={dadosFinanceiros?.aes_fn016}
                   onChange={handleOnChange}
                   ></input>
                   <input {...register("AES_FN019")} type="text"
@@ -1059,7 +1059,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   ></input>
                   <input {...register("FN016")} type="text"
                   disabled={true}
-                  defaultValue={dadosFinanceiros?.fn016}
+                  defaultValue={dadosFinanceiros?.dap_fn016}
                   onChange={handleOnChange}
                   ></input>
                 </InputP>
@@ -1269,9 +1269,10 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </select>
                   <select
                     {...register("FN205")}
-                    defaultValue={dadosFinanceiros?.fn205}
+                    //defaultValue={dadosFinanceiros?.fn205}
                     onChange={handleOnChange}
                     >
+                    <option></option>
                     <option value="Sim">
                       Sim
                     </option>
@@ -1556,7 +1557,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       <td>FN999</td>
                       <td>Observações, esclarecimentos ou sugestões</td>
                       <td colSpan={4}><textarea {...register("RESIDUOS_FN999")} 
-                      defaultValue={dadosFinanceiros?.fn999}
+                      defaultValue={dadosFinanceiros?.residuos_fn999}
                       onChange={handleOnChange}
                       /></td>
                      

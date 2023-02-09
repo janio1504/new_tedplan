@@ -41,6 +41,7 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { log } from "console";
 
 interface IMunicipio {
   id_municipio: string;
@@ -83,6 +84,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   
   async function handleCadastro(data) {   
     data.id_drenagem_aguas_pluviais = dadosDrenagem?.id_drenagem_aguas_pluviais
+    console.log(data)
     data.id_municipio = municipio[0].id_municipio
     data.ano = new Date().getFullYear()     
     
@@ -109,10 +111,13 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   async function getDadosDrenagem() {  
     const id_municipio = municipio[0].id_municipio
     const ano = new Date().getFullYear()  
+    
+    
     const res = await api
       .post("get-drenagem", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
         setDadosDrenagem(response.data[0])
+        
       })
       .catch((error) => {
         console.log(error);
@@ -252,10 +257,10 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 type="text"></input>
                 
                 <select {...register('IE026')}
-                defaultValue={dadosDrenagem?.ie041}
+                //defaultValue={dadosDrenagem?.ie041}
                   onChange={handleOnChange}
                 >
-                  <option value={dadosDrenagem?.ie026}></option>
+                  <option ></option>
                   <option value="1">Sim</option>
                   <option value="0">Não</option>
                 </select>
@@ -404,6 +409,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 onChange={handleOnChange}
                 type="text"></input>
                 <select {...register("IE050")}>
+                  <option></option>
                   <option>Não existe tratamento</option>
                   <option>Barragens</option>
                   <option>Reservatórios de qualidade</option>

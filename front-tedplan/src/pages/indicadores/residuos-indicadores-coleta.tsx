@@ -221,6 +221,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     + (data.CO113 ? parseFloat((data.CO113).replace('.','').replace(',','.')) : dadosResiduos?.co113 ? parseFloat(dadosResiduos?.co113) : 0)
     + (data.CO141 ? parseFloat((data.CO141).replace('.','').replace(',','.')) : dadosResiduos?.co141 ? parseFloat(dadosResiduos?.co141) : 0)
 
+    data.CC015 = (data.CC014 ? parseFloat((data.CC014).replace('.','').replace(',','.')) : dadosResiduos?.cc014? parseFloat(dadosResiduos?.cc014) : 0)
+    + (data.CC013 ? parseFloat((data.CC013).replace('.','').replace(',','.')) : dadosResiduos?.cc013 ? parseFloat(dadosResiduos?.cc013) : 0)
+
     data.CO119 = (parseFloat(data.CO116) + parseFloat(data.CO117) + parseFloat(data.CS048A)
      + parseFloat(data.CO142) + parseFloat(data.CO111) + parseFloat(data.CO115))
 
