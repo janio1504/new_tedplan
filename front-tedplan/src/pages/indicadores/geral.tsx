@@ -1100,7 +1100,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
           <DivFormEixo>           
-            <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>            
+            <DivTituloEixo style={{backgroundColor: "#42895B"}} >Resíduos Sólidos</DivTituloEixo>            
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Informações gerais</DivTituloConteudo>

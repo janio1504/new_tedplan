@@ -21,6 +21,7 @@ class PsFinanceiroController {
       'fn_aes.fn022 as aes_fn022',
       'fn_aes.fn023 as aes_fn023',
       'fn_aes.fn024 as aes_fn024',
+      'fn_dap.fn016 as dap_fn016',
       'fn_rs.fn999 as residuos_fn999',
       'fn_dap.fn999 as drenagem_fn999')
       .from("tedplan.fn_residuos_solidos as fn_rs")
@@ -43,11 +44,15 @@ class PsFinanceiroController {
       const data = new Date();
       const dados = request.all();
       const ano = dados.ano ? dados.ano : data.getFullYear();
+
       if (dados.id_fn_residuos_solidos) {
         const rs = await PsFinanceiro.query()
         .from("tedplan.fn_residuos_solidos")
         .where("id_fn_residuos_solidos", dados.id_fn_residuos_solidos)
         .fetch()
+
+        
+
         await PsFinanceiro.query()
           .from("tedplan.fn_residuos_solidos")
           .where("id_fn_residuos_solidos", dados.id_fn_residuos_solidos)
@@ -195,7 +200,7 @@ class PsFinanceiroController {
             id_municipio: dados.id_municipio,
           });
       }
-
+      
       if (dados.id_fn_agua_esgoto_sanitario) {
 
         const resAes = await PsFinanceiro.query()
@@ -204,7 +209,7 @@ class PsFinanceiroController {
           "id_fn_agua_esgoto_sanitario",
           dados.id_fn_agua_esgoto_sanitario
         ).fetch()
-        console.log(dados.FN001);
+        console.log(dados.AES_FN004);
         await PsFinanceiro.query()
           .from("tedplan.fn_agua_esgoto_sanitario")
           .where(
@@ -277,7 +282,7 @@ class PsFinanceiroController {
             fn007: dados.FN007,
             fn038: dados.FN038,
             fn001: dados.FN001,
-            fn004: dados.FN004,
+            fn004: dados.AES_FN004,
             fn005: dados.FN005,
             fn006: dados.FN006,
             fn008: dados.FN008,

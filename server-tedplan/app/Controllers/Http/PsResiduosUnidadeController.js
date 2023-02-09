@@ -125,7 +125,6 @@ class PsResiduosUnidadeController {
           up022: dados.UP022 ? dados.UP022 : ruc.up022,
           up023: dados.UP023 ? dados.UP023 : ruc.up023,
           up024: dados.UP024 ? dados.UP024 : ruc.up024,
-          up025: dados.UP025 ? dados.UP025 : ruc.up025,
           up027: dados.UP027 ? dados.UP027 : ruc.up027,
           up028: dados.UP028 ? dados.UP028 : ruc.up028,
           up029: dados.UP029 ? dados.UP029 : ruc.up029,

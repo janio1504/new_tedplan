@@ -148,7 +148,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>
-            <DivTituloForm>Esgoto</DivTituloForm>          
+            <DivTituloForm style={{borderColor: "#235460"}}>Esgoto</DivTituloForm>          
              
               <DivFormConteudo>
                 <DivTitulo>
