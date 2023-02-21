@@ -25,7 +25,7 @@ class GaleriaController {
     if(!id_municipio && id_eixo && !titulo){
       const res = await Galeria.query()
       .from("tedplan.galeria as g")
-      .where("g.id_municipio", id_municipio)
+      .where("g.id_eixo", id_eixo)
       .fetch()
       return res
     }

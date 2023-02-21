@@ -90,7 +90,7 @@ export default function Galerias({
     { titulo: data.titulo, id_eixo: data.id_eixo, id_municipio: data.id_municipio },
     );
     const galerias = resBusca.data;
-    if (!galerias[0]){
+    if (galerias.length == 0){
       toast.notify('Nenhum resultado encontrado para a busca!',{
         title: "Atenção",
         duration: 7,

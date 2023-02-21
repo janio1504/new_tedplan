@@ -65,7 +65,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
     
     const resBusca = await apiClient.get('/getPorFiltroNormas', {params: {titulo, id_eixo, id_tipo_norma, id_escala}})
     const normas = resBusca.data
-    if(!normas[0]){
+    if(normas.length == 0){
       toast.notify('Nenhum resultado encontrado para a busca!',{
         title: "Atenção",
         duration: 7,
@@ -87,6 +87,8 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
   async function getNormas(normas?: any) {
     
     const apiClient = getAPIClient()
+    console.log(normas);
+    
     if(normas){           
     const norma = await Promise.all(
       normas?.map( async (p) =>{
@@ -107,7 +109,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
         }).then((response) => {
           return URL.createObjectURL(response.data);
         })      
-            p =  {
+            const n =  {
             id_norma: p.id_norma,
             titulo: p.titulo,
             id_eixo: p.id_eixo,
@@ -121,7 +123,7 @@ export default function Normas({ normas, tipoNorma, eixos, escala}: NormasProps 
             arquivo: arquivo,
           }   
      
-      return p
+      return n
     }))   
     
     setNormasList(norma)

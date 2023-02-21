@@ -1,7 +1,7 @@
 import {} from "next";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-//import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from 'react-nextjs-toast';
 
 import {
   Container,
@@ -83,11 +83,19 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
     const apiClient = getAPIClient();
     const response = await apiClient
       .post("addUsuario", { nome, login, senha, email, curriculo_lattes, id_sistema, id_municipio })
+      .then(response =>{
+        toast.notify('Dados gravados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })   
+      })
       .catch((error) => {
-        if (error) {
-        
-          return error;
-        }
+        toast.notify('Erro ao gravar dados!',{
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        })   
       });
 
     reset({
@@ -171,8 +179,8 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
           >
             aria-invalid={errors.value ? "true" : "false"}
             <option value="">Selecione um Sistema</option>
-            <option value="1">Simisab</option>
-            <option value="2">Indicadores</option>
+            <option value="1">Administrativo</option>
+            <option value="2">Simisab</option>
           </select>
           {errors.id_sistema && errors.id_sistema.type && (
             <span>Selecionar um Sistema é obrigatório!</span>
@@ -196,7 +204,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados</Footer>
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
     </Container>
   );
 }

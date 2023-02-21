@@ -294,7 +294,16 @@ export default function Postagens({ galerias }: GaleriaProps) {
                       Visualizar imagens
                     </BotaoVisualizar>
 
-                    {isModalConfirm && (
+                   
+                  </td>
+                </tr>
+              </tbody>
+            );
+          })}
+        </ListPost>
+      </DivCenter>
+      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer> </Footer>
+          {isModalConfirm && (
                       <ContainerModal>
                         <Modal>
                           <ConteudoModal>
@@ -327,6 +336,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
                           <Form onSubmit={handleSubmit(handleAddImagens)}>
                           <SubmitButton type="submit">Gravar</SubmitButton>
                             <ConteudoModal>
+                              <TituloModal>
                               <input
                                 {...register("id_galeria")}
                                 type="hidden"
@@ -346,9 +356,12 @@ export default function Postagens({ galerias }: GaleriaProps) {
                               />
 
                                     <ImagemModal>
-                                      <img src={`${imagem}`} alt="TedPlan" />
+                                      {imagem && (
+                                          <img src={`${imagem}`} alt="TedPlan" />
+                                          )
+                                      }
                                     </ImagemModal>  
-                            
+                                    </TituloModal>
                             </ConteudoModal>
                             
                           </Form>
@@ -428,14 +441,6 @@ export default function Postagens({ galerias }: GaleriaProps) {
                         </Modal>
                       </ContainerModal>
                     )}
-                  </td>
-                </tr>
-              </tbody>
-            );
-          })}
-        </ListPost>
-      </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer> </Footer>
     </Container>
   );
 }

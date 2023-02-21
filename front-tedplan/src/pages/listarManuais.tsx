@@ -7,17 +7,7 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import {
-  FaSearch,
-  FaDatabase,
-  FaHome,
-  FaSignOutAlt,
-  FaRegTimesCircle,
-} from "react-icons/fa";
 import { toast, ToastContainer } from 'react-nextjs-toast'
-import "suneditor/dist/css/suneditor.min.css";
-import { getData } from "./api/post";
-
 import {
   Container,
   NewButton,
@@ -42,8 +32,6 @@ import {
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 
-
-
 interface IManual {
   id_manual: string;
   nome: string;
@@ -60,62 +48,49 @@ export default function Postagens({ manuais }: ManuaisProps) {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModalUpdateVisible, setModalUpdateVisible] = useState(false);
   const [isModalConfirm, setModalConfirm] = useState(false);
-  const [isNorma, setNorma] = useState<null | any>(null);
-  const [imagem, setImagem] = useState<String | ArrayBuffer>(null);
+  const [manual, setManual] = useState<null | any>(null);
   const [arquivo, setArquivo] = useState<String | any>(null);
-  const [idNorma, setIdNorma] = useState(null);
+  const [idManual, setIdManual] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
   
 
-  useEffect(() => {});
+  useEffect(() => {
+        
+  },[manuais]);
+  
 
-  async function handleShowModal(id_imagem, id_norma) {
-    if (id_imagem) {
-      const file = await api({
-        method: "GET",
-        url: "getImagem",
-        params: { id: id_imagem },
-        responseType: "blob",
-      });
-      const img = URL.createObjectURL(file.data);
-      setImagem(img);
-    } else {
-      setImagem(null);
-    }
+  async function handleShowUpdateModal(id_arquivo, id_manual) {
+     
+    console.log(id_manual);
+     if (id_arquivo) {
+       const arquivo = await api({
+         method: "GET",
+         url: "getFile",
+         params: { id: id_arquivo },
+         responseType: "blob",
+       }).then((response) => {
+        
+         return URL.createObjectURL(response.data);
+       });
+       setArquivo(arquivo);
+     } else {
+       setArquivo(null);
+     }
 
-    setIdNorma(id_norma)
-    setIdImagem(id_imagem)
+     if (id_manual) {
+       const m = await api.get("getManual", { params: { id_manual: id_manual } });       
+            
+       setManual(m.data[0]);
+     }
 
-    setModalVisible(true);
+     setModalUpdateVisible(true);
   }
 
-  async function handleShowUpdateModal() {
-    // if (id_arquivo) {
-    //   const arquivo = await api({
-    //     method: "GET",
-    //     url: "getFile",
-    //     params: { id: id_arquivo },
-    //     responseType: "blob",
-    //   }).then((response) => {
-        
-    //     return URL.createObjectURL(response.data);
-    //   });
-    //   setArquivo(arquivo);
-    // } else {
-    //   setArquivo(null);
-    // }
+  async function handleShowModal({ id_manual }) {
+    setIdManual(id_manual);
 
-    // if (id_norma) {
-    //   const n = await api.get("getNorma", { params: { id_norma: id_norma } });
-    //   const norma = n.data.map((r) => {
-    //     return r;
-    //   });
-
-    //   setNorma(norma[0]);
-    // }
-
-    // setModalUpdateVisible(true);
+    setModalVisible(true);
   }
 
   function handleCloseModal() {
@@ -123,8 +98,8 @@ export default function Postagens({ manuais }: ManuaisProps) {
     setModalVisible(false);
   }
 
-  function handleOpenConfirm({ id_manual,  id_arquivo }) {
-  
+  function handleOpenConfirm({id_manual, id_arquivo }) {
+    setIdManual(id_manual)
     setIdArquivo(id_arquivo);
     setModalConfirm(true);
   }
@@ -133,15 +108,15 @@ export default function Postagens({ manuais }: ManuaisProps) {
     setModalConfirm(false);
   }
 
-  async function handleUpdateNorma(data) {
+  async function handleUpdateManual(data) {
     const formData = new FormData();
 
     formData.append("arquivo", data.arquivo[0]);
     formData.append("titulo", data.titulo);
     formData.append("id_arquivo", data.id_arquivo);
-    formData.append("id_norma", data.id_norma);
-    const resNorma = await api
-      .post("updateNorma", formData, {
+    formData.append("id_manual", data.id_manual);
+     await api
+      .post("updateManual", formData, {
         headers: {
           "Content-Type": `multipart/form-data=${formData}`,
         },
@@ -154,28 +129,59 @@ export default function Postagens({ manuais }: ManuaisProps) {
         })
       })
       .catch((error) => {
+        toast.notify('Erro ao gravar os dados!',{
+          title: "Erro!",
+          duration: 7,
+          type: "success",
+        })
         console.log(error);
         return error;
       });
   }
 
-  async function handleRemoverNorma() {
+  async function handleUpdateImagem(data) {
+    const apiClient = getAPIClient();
+    const formData = new FormData();
+
+    formData.append("imagem", data.imagem[0]);
+    formData.append("id_manual", data.id_manual);
+    formData.append("id_imagem", data.id_imagem);
+    const res = await apiClient
+      .post("updateImagemManual", formData, {
+        headers: {
+          "Content-Type": `multipart/form-data=${formData}`,
+        },
+      })
+      .then((response) => {
+        toast.notify('Imagem atualizada com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })
+      
+        return response;
+      })
+      .catch((error) => {
+        return error;
+      });
+  }
+
+  async function handleRemoverManual() {
     const resDelete = await api
-      .delete("deleteNorma", {
+      .delete("deleteManual", {
         params: {
-          id_norma: idNorma,
-          id_imagem: idImagem,
+          id_manual: idManual,
           id_arquivo: idArquivo,
         },
       })
       .then((response) => {
-        toast.notify('Norma removida com sucesso!',{
+        toast.notify('Manual removido com sucesso!',{
           title: "Sucesso!",
           duration: 7,
           type: "success",
         })
         setModalConfirm(false);
-        Router.push("/listarNormas");
+        Router.push("/listarManuais");
       })
       .catch((error) => {
         toast.notify('Aconteceu um erro!',{
@@ -184,7 +190,7 @@ export default function Postagens({ manuais }: ManuaisProps) {
           type: "error",
         })
         setModalConfirm(false);
-        Router.push("/listarNormas");
+        Router.push("/listarManuais");
       });
   }
 
@@ -201,7 +207,7 @@ export default function Postagens({ manuais }: ManuaisProps) {
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>
-      <ToastContainer></ToastContainer>
+      
       <DivCenter>
         <NewButton onClick={handleAddManual}>Adicionar Manual</NewButton>
         <ListPost>
@@ -221,8 +227,8 @@ export default function Postagens({ manuais }: ManuaisProps) {
                   <td>
                     <BotaoRemover
                       onClick={() =>
-                        handleOpenConfirm({
-                          id_manual: manual.id_manual,                          
+                        handleOpenConfirm({    
+                          id_manual: manual.id_manual,                      
                           id_arquivo: manual.id_arquivo,
                         })
                       }
@@ -230,15 +236,65 @@ export default function Postagens({ manuais }: ManuaisProps) {
                       Remover
                     </BotaoRemover>
                     <BotaoEditar
-                      onClick={() =>('')}
+                      onClick={() =>
+                        handleShowUpdateModal(manual.id_arquivo, manual.id_manual)
+                      }
                     >
                       Editar
                     </BotaoEditar>
+                    
+                    {isModalVisible && (
+                      
+                      <ContainerModal>
+                    
                     <BotaoVisualizar
-                      onClick={() =>('')}
+                      onClick={() =>
+                        handleShowModal({
+                          id_manual: manual.id_manual,
+                        })
+                      }
                     >
                       Editar Imagem
                     </BotaoVisualizar>
+
+
+                        <Modal>
+                          <CloseModalButton onClick={handleCloseModal}>
+                            Fechar
+                          </CloseModalButton>
+                          <FormModal
+                            onSubmit={handleSubmit(handleUpdateImagem)}
+                          >
+                            <ConteudoModal>
+                              <input
+                                type="hidden"
+                                {...register("id_manual")}
+                                defaultValue={idManual}
+                                onChange={handleOnChange}
+                                name="id_manual"
+                              />
+                              <input
+                                type="hidden"
+                                {...register("id_imagem")}
+                                defaultValue={idImagem}
+                                onChange={handleOnChange}
+                                name="id_imagem"
+                              />
+                              <label>
+                                Selecione uma imagem para substituir a atual!
+                              </label>
+
+                              <input
+                                {...register("imagem")}
+                                type="file"
+                                accept="image/*"
+                              />
+                            </ConteudoModal>
+                            <SubmitButton type="submit">Gravar</SubmitButton>
+                          </FormModal>
+                        </Modal>
+                      </ContainerModal>
+                    )}
 
              
                   </td>
@@ -248,8 +304,87 @@ export default function Postagens({ manuais }: ManuaisProps) {
           })}
         </ListPost>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados </Footer>
+      <Footer>&copy; Todos os direitos reservados <ToastContainer></ToastContainer></Footer>
+
+      {isModalUpdateVisible && (
+                      <ContainerModal>
+                        <Modal>
+                          <CloseModalButton onClick={handleCloseModal}>
+                            Fechar
+                          </CloseModalButton>
+                          <FormModal onSubmit={handleSubmit(handleUpdateManual)}>
+                            <ConteudoModal>
+                              <TituloModal>
+                                <input
+                                  type="hidden"
+                                  {...register("id_manual")}
+                                  value={manual?.id_manual}
+                                />
+                                <input
+                                  type="hidden"
+                                  {...register("id_arquivo")}
+                                  value={manual?.id_arquivo}
+                                />
+                                <ImagemModal></ImagemModal>
+                                <label>Nome</label>
+                                <input
+                                  {...register("titulo")}
+                                  defaultValue={manual?.nome}
+                                  name="titulo"
+                                  onChange={handleOnChange}
+                                />
+                                <button>
+                                  <a
+                                    href={arquivo}
+                                    rel="noreferrer"
+                                    target="_blank"
+                                  >
+                                    Clique aqui para ver o arquivo atual!
+                                  </a>
+                                </button>
+                                <label>
+                                  Para trocar o arquivo, selecione outro!
+                                </label>
+                                <input
+                                  {...register("arquivo")}
+                                  accept=".pdf, .doc, .docx, .xls, .xlsx"
+                                  type="file"
+                                  name="arquivo"
+                                />
+                              </TituloModal>
+                            </ConteudoModal>
+                            <SubmitButton type="submit">Gravar</SubmitButton>
+                          </FormModal>
+                        </Modal>
+                      </ContainerModal>
+                    )}
+
+                  {isModalConfirm && (
+                                        <ContainerModal>
+                                          <Modal>
+                                            <ConteudoModal>
+                                              <TituloModal>
+                                                <h3>
+                                                  <b>Você confirma a exclusão!</b>
+                                                </h3>
+                                              </TituloModal>
+                                              <ConfirmModal>
+                                                <CancelButton onClick={handleCloseConfirm}>
+                                                  <b>Cancelar</b>
+                                                </CancelButton>
+                                                <ConfirmButton
+                                                  onClick={() => handleRemoverManual()}
+                                                >
+                                                  <b>Confirmar</b>
+                                                </ConfirmButton>
+                                              </ConfirmModal>
+                                            </ConteudoModal>
+                                          </Modal>
+                                        </ContainerModal>
+                                      )}
+
     </Container>
+    
   );
 }
 

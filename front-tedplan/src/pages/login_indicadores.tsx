@@ -70,7 +70,7 @@ export default function LoginIndicadores() {
             {...register("id_sistema")}
             type="hidden"
             name="id_sistema"
-            value="1"
+            value="2"
           />
 
           <SubmitButton type="submit">Acessar</SubmitButton>

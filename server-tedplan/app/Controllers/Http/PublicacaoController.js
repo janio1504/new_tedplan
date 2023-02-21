@@ -11,6 +11,9 @@ const CustomException = use("App/Exceptions/CustomException");
 
 class PublicacaoController {
   async index({ request, response }) {
+    const { page } = request.all()
+    
+    
     try {
       const publicacoes = await Publicacoes.query()
         .select(
@@ -36,7 +39,7 @@ class PublicacaoController {
           "tp.id_tipo_publicacao"
         )
         .orderBy("p.id_publicacao", "desc")
-        .fetch();
+        .paginate(page, 5)
 
       return publicacoes;
     } catch (error) {
@@ -44,7 +47,7 @@ class PublicacaoController {
     }
   }
 
-  async getPublicacao({ request, response }) {
+  async getPublicacao({ request }) {
     try {
       const { id_publicacao } = request.all();
       const publicacoes = await Publicacoes.query()
@@ -71,7 +74,7 @@ class PublicacaoController {
           "p.id_tipo_publicacao",
           "tp.id_tipo_publicacao"
         )
-        .innerJoin(
+        .leftJoin(
           "tedplan.categorias as c",
           "p.id_categoria",
           "c.id_categoria"
@@ -86,20 +89,133 @@ class PublicacaoController {
   }
 
   async buscaPorFiltro({ request, response }) {
-    const { titulo, id_eixo, id_tipo_publicacao, id_municipio } = request.all();
-
+    const { titulo, id_eixo, id_tipo_publicacao, id_municipio, page } = request.all();
+    
     try {
-      let where = "";
+
+      if (!id_municipio && !id_eixo && !id_tipo_publicacao && !titulo) {
+        const publicacoes = await Publicacoes.query()
+        .select(
+          "p.id_publicacao",
+          "p.titulo",
+          "tp.nome as tipo_publicacao",
+          "e.nome as eixo",
+          "tp.nome as tipo",
+          "p.id_imagem",
+          "m.nome as municipio",
+          "p.id_arquivo"
+        )
+        .from("tedplan.publicacoes as p")
+        .innerJoin(
+          "tedplan.municipios as m",
+          "p.id_municipio",
+          "m.id_municipio"
+        )
+        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
+        .innerJoin(
+          "tedplan.tipo_publicacao as tp",
+          "p.id_tipo_publicacao",
+          "tp.id_tipo_publicacao"
+        )
+        .orderBy("p.id_publicacao", "desc")
+        .paginate(page, 5)
+
+        return publicacoes;
+      }
+      
       if (id_municipio && !id_eixo && !id_tipo_publicacao && !titulo) {
-        where = { "m.id_municipio": id_municipio };
+        const publicacoes = await Publicacoes.query()
+        .select(
+          "p.id_publicacao",
+          "p.titulo",
+          "tp.nome as tipo_publicacao",
+          "e.nome as eixo",
+          "tp.nome as tipo",
+          "p.id_imagem",
+          "m.nome as municipio",
+          "p.id_arquivo"
+        )
+        .from("tedplan.publicacoes as p")
+        .innerJoin(
+          "tedplan.municipios as m",
+          "p.id_municipio",
+          "m.id_municipio"
+        )
+        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
+        .innerJoin(
+          "tedplan.tipo_publicacao as tp",
+          "p.id_tipo_publicacao",
+          "tp.id_tipo_publicacao"
+        )
+        .orderBy("p.id_publicacao", "desc")
+        .where("m.id_municipio", id_municipio)
+        .paginate(page, 5)
+
+        return publicacoes;
       }
       if (id_eixo && !id_municipio && !id_tipo_publicacao && !titulo) {
-        where = { "e.id_eixo": id_eixo };
+        const publicacoes = await Publicacoes.query()
+        .select(
+          "p.id_publicacao",
+          "p.titulo",
+          "tp.nome as tipo_publicacao",
+          "e.nome as eixo",
+          "tp.nome as tipo",
+          "p.id_imagem",
+          "m.nome as municipio",
+          "p.id_arquivo"
+        )
+        .from("tedplan.publicacoes as p")
+        .innerJoin(
+          "tedplan.municipios as m",
+          "p.id_municipio",
+          "m.id_municipio"
+        )
+        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
+        .innerJoin(
+          "tedplan.tipo_publicacao as tp",
+          "p.id_tipo_publicacao",
+          "tp.id_tipo_publicacao"
+        )
+        .orderBy("p.id_publicacao", "desc")
+        .where("e.id_eixo", id_eixo)
+        .paginate(page, 5)
+
+        return publicacoes;
+        
       }
       if (id_tipo_publicacao && !id_municipio && !id_eixo && !titulo) {
-        where = { "tp.id_tipo_publicacao": id_tipo_publicacao };
+        const publicacoes = await Publicacoes.query()
+        .select(
+          "p.id_publicacao",
+          "p.titulo",
+          "tp.nome as tipo_publicacao",
+          "e.nome as eixo",
+          "tp.nome as tipo",
+          "p.id_imagem",
+          "m.nome as municipio",
+          "p.id_arquivo"
+        )
+        .from("tedplan.publicacoes as p")
+        .innerJoin(
+          "tedplan.municipios as m",
+          "p.id_municipio",
+          "m.id_municipio"
+        )
+        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
+        .innerJoin(
+          "tedplan.tipo_publicacao as tp",
+          "p.id_tipo_publicacao",
+          "tp.id_tipo_publicacao"
+        )
+        .orderBy("p.id_publicacao", "desc")
+        .where("tp.id_tipo_publicacao", id_tipo_publicacao)
+        .paginate(page, 5)
+
+        return publicacoes;
       }
       if (titulo && !id_tipo_publicacao && !id_municipio && !id_eixo) {
+        console.log(page);
         const publicacoes = await Publicacoes.query()
           .select(
             "p.id_publicacao",
@@ -125,7 +241,7 @@ class PublicacaoController {
           )
           .orderBy("p.id_publicacao", "desc")
           .where("p.titulo", "ilike", "%" + titulo + "%")
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -165,7 +281,7 @@ class PublicacaoController {
           .orderBy("p.id_publicacao", "desc")
           .where("p.titulo", "ilike", "%" + titulo + "%")
           .where("m.id_municipio", id_municipio)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -202,7 +318,7 @@ class PublicacaoController {
           .orderBy("p.id_publicacao", "desc")
           .where("p.titulo", "ilike", "%" + titulo + "%")
           .where("e.id_eixo", id_eixo)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -233,7 +349,7 @@ class PublicacaoController {
           .orderBy("p.id_publicacao", "desc")
           .where("p.titulo", "ilike", "%" + titulo + "%")
           .where("tp.id_tipo_publicacao", id_tipo_publicacao)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -272,7 +388,7 @@ class PublicacaoController {
           .where("p.titulo", "ilike", "%" + titulo + "%")
           .where("tp.id_tipo_publicacao", id_tipo_publicacao)
           .where("e.id_eixo", id_eixo)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -304,7 +420,7 @@ class PublicacaoController {
           .where("p.titulo", "ilike", "%" + titulo + "%")
           .where("tp.id_tipo_publicacao", id_tipo_publicacao)
           .where("m.id_municipio", id_municipio)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -336,7 +452,7 @@ class PublicacaoController {
           .where("p.titulo", "ilike", "%" + titulo + "%")
           .where("e.id_eixo", id_eixo)
           .where("m.id_municipio", id_municipio)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -369,7 +485,7 @@ class PublicacaoController {
           .where("e.id_eixo", id_eixo)
           .where("tp.id_tipo_publicacao", id_tipo_publicacao)
           .where("m.id_municipio", id_municipio)
-          .fetch();
+          .paginate(page, 5)
 
         return publicacoes;
       }
@@ -399,7 +515,7 @@ class PublicacaoController {
         )
         .orderBy("p.id_publicacao", "desc")
         .where(where)
-        .fetch();
+        .paginate(page, 5)
 
       return publicacoes;
     } catch (error) {
@@ -501,25 +617,25 @@ class PublicacaoController {
       } = request.all();
       if (titulo) {
         const resPub = await Publicacoes.query()
-          .from("tedplan.publicacaoes")
+          .from("tedplan.publicacoes")
           .where("id_publicacao", id_publicacao)
           .update({ titulo: titulo });
       }
       if (id_municipio) {
         const resPub = await Publicacoes.query()
-          .from("tedplan.publicacaoes")
+          .from("tedplan.publicacoes")
           .where("id_publicacao", id_publicacao)
           .update({ id_municipio: id_municipio });
       }
       if (id_categoria) {
         const resPub = await Publicacoes.query()
-          .from("tedplan.publicacaoes")
+          .from("tedplan.publicacoes")
           .where("id_publicacao", id_publicacao)
           .update({ id_categoria: id_categoria });
       }
       if (id_eixo) {
         const resPub = await Publicacoes.query()
-          .from("tedplan.publicacaoes")
+          .from("tedplan.publicacoes")
           .where("id_publicacao", id_publicacao)
           .update({ id_eixo: id_eixo });
       }
@@ -589,15 +705,16 @@ class PublicacaoController {
 
       if (id_imagem) {
         const imagem = await Imagem.findBy("id", id_imagem);
-        if (imagem) {
+        
+        if (!imagem) {
           Fs.unlinkSync(Helpers.tmpPath(`uploads/${imagem.file}`));
           imagem.delete();
         }
       }
-
+      
       if (id_arquivo) {
         const file = await File.findBy("id", id_arquivo);
-        if (id_arquivo) {
+        if (!file) {
           Fs.unlinkSync(Helpers.tmpPath(`uploads/${file.file}`));
           file.delete();
         }

@@ -31,8 +31,12 @@ Route.delete("deleteImagem", "FileController.destroyImagem");
 Route.get("getGalerias", "GaleriaController.index");
 Route.post("getPorFiltroGaleria", "GaleriaController.getGaleriaPorFiltro");
 
+Route.get("getManual", "ManualController.getManual");
 Route.get("getManuais", "ManualController.index");
 Route.post("addManual", "ManualController.store");
+Route.delete("deleteManual", "ManualController.destroy");
+Route.post("updateManual", "ManualController.update");
+Route.post("updateImagemManual", "ManualController.updateImagem");
 
 Route.post(
   "addRepresentanteServicos",
@@ -114,6 +118,8 @@ Route.post("addPsFinanceiro", "PsFinanceiroController.store");
 Route.post("getPsFinanceiro", "PsFinanceiroController.getDadosFinanceiros");
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
+
+
 
 Route.get("getNormas", "NormaController.index");
 Route.get("getNorma", "NormaController.getNorma");

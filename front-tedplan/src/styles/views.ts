@@ -212,10 +212,8 @@ export const DivCenter = styled.div`
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 50px;
-  text-align: left;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  text-align: left; 
+  padding: 10px;
   display: flex;
   flex-direction: row;
 `;
@@ -226,8 +224,7 @@ export const MenuLateral = styled.div`
   margin: 0;
   padding: 0;
   color: #666;
-  float: left;
-
+  display: flex;
   ul {
     margin-top: 20px;
     list-style-type: none;
@@ -237,7 +234,7 @@ export const MenuLateral = styled.div`
     border-radius: 5px;
     width: 150px;
     cursor: pointer;
-    margin-left: 20px;
+    margin-left: 0px;
     padding: 10px;
     color: #666;
 
@@ -250,12 +247,12 @@ export const MenuLateral = styled.div`
 export const DivFormConteudo = styled.div`
   width: 100%;
   height: 100%;
-  margin-left: 0px;
+  margin-left: 10px;
   padding: 10px 0px 10px 0px;
   color: #666;
- display: flex;
- justify-content: center;
- flex-direction: column;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 `;
 
 export const Lista = styled.div`
@@ -484,6 +481,7 @@ export const DivInput = styled.div`
   float: left;
   flex-direction: column;
   display: flex;
+  margin-right: 10px;
 `;
 export const SubmitButton = styled.button`
  padding: 10px 15px;
@@ -495,6 +493,25 @@ export const SubmitButton = styled.button`
   flex-direction: row;
   cursor: pointer;
   width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  float: left;
+  svg {
+    margin-right: 8px;
+  }
+`;
+
+export const LimparFiltro = styled.div`
+ padding: 10px 15px;
+  margin-top: 38px;
+  color: #fff;
+  border: 0px;
+  background: #008080;
+  border-radius: 3px;
+  flex-direction: row;
+  cursor: pointer;
+  width: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -609,6 +626,7 @@ export const CloseModalButton = styled.button`
 export const ModalGaleria = styled.div`
   width: 1200px;
   min-height: 700px;
+  margin-top: 180px;
   background-color: #ffffff;
   border: 1px solid #bebebe;
   border-radius: 5px;
@@ -741,3 +759,16 @@ export const CancelButton = styled.button`
     margin-right: 8px;
   }
 `;
+
+export const Pagination = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 50px;
+  button {
+  border: none;
+  margin: 5px;
+  cursor: pointer;
+  }
+`;
+

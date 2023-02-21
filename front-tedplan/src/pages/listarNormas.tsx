@@ -92,20 +92,20 @@ export default function Postagens({ normas }: NormasProps) {
   const [idArquivo, setIdArquivo] = useState(null);
   
 
-  useEffect(() => {});
+  useEffect(() => {},[0]);
 
   async function handleShowModal(id_imagem, id_norma) {
     if (id_imagem) {
-      const file = await api({
+      await api({
         method: "GET",
         url: "getImagem",
         params: { id: id_imagem },
         responseType: "blob",
+      }).then((response) => {
+        setImagem(URL.createObjectURL(response.data));        
+      }).catch(()=>{
+        setImagem(null);
       });
-      const img = URL.createObjectURL(file.data);
-      setImagem(img);
-    } else {
-      setImagem(null);
     }
 
     setIdNorma(id_norma)
@@ -116,18 +116,17 @@ export default function Postagens({ normas }: NormasProps) {
 
   async function handleShowUpdateModal(id_arquivo, id_norma) {
     if (id_arquivo) {
-      const arquivo = await api({
+      await api({
         method: "GET",
         url: "getFile",
         params: { id: id_arquivo },
         responseType: "blob",
       }).then((response) => {
-        
-        return URL.createObjectURL(response.data);
+        setArquivo(URL.createObjectURL(response.data));        
+      }).catch(()=>{
+        setArquivo(null);
       });
-      setArquivo(arquivo);
-    } else {
-      setArquivo(null);
+      
     }
 
     if (id_norma) {
@@ -160,7 +159,8 @@ export default function Postagens({ normas }: NormasProps) {
 
   async function handleUpdateNorma(data: INorma) {
     const formData = new FormData();
-
+    console.log(data);
+    
     formData.append("arquivo", data.arquivo[0]);
     formData.append("titulo", data.titulo);
     formData.append("id_arquivo", data.id_arquivo);
@@ -218,7 +218,7 @@ export default function Postagens({ normas }: NormasProps) {
   }
 
   async function handleUpdateImagem(data: INorma) {
-   
+    console.log(data);
     const apiClient = getAPIClient();
     const formData = new FormData();
 
@@ -307,7 +307,17 @@ export default function Postagens({ normas }: NormasProps) {
                       Editar Imagem
                     </BotaoVisualizar>
 
-                    {isModalConfirm && (
+                    
+                  </td>
+                </tr>
+              </tbody>
+            );
+          })}
+        </ListPost>
+      </DivCenter>
+      <Footer>&copy; Todos os direitos reservados </Footer>
+
+      {isModalConfirm && (
                       <ContainerModal>
                         <Modal>
                           <ConteudoModal>
@@ -432,14 +442,6 @@ export default function Postagens({ normas }: NormasProps) {
                         </Modal>
                       </ContainerModal>
                     )}
-                  </td>
-                </tr>
-              </tbody>
-            );
-          })}
-        </ListPost>
-      </DivCenter>
-      <Footer>&copy; Todos os direitos reservados </Footer>
     </Container>
   );
 }

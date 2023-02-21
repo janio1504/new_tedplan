@@ -665,11 +665,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </td>
                   <td>
                   <InputM>
-                    <label>CNPJ</label>
+                    <label>CNPJ ( Somente numeros )</label>
                     <input
                       {...register("municipio_cnpj")}
                       defaultValue={dadosMunicipio.municipio_cnpj}
                       onChange={handleOnChange}
+                      placeholder={'Somente numeros'}
                       type="text"
                     ></input>
                   </InputM>
@@ -1765,82 +1766,134 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               onChange={handleOnChange}
               type="hidden"
             />
-            <InputG>
-              <label>
-                Setor Responsável<span> *</span>
-              </label>
-              <input
-                {...register("rf_setor_responsavel")}
-                defaultValue={dadosMunicipio.rf_setor_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>
-                Telefone Comercial<span> *</span>
-              </label>
-              <input
-                {...register("rf_telefone_comercial")}
-                defaultValue={dadosMunicipio.rf_telefone_comercial}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Nome Responsável<span> *</span>
-              </label>
-              <input
-                {...register("rf_responsavel")}
-                defaultValue={dadosMunicipio.rf_responsavel}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputM>
-              <label>
-                Cargo<span> *</span>
-              </label>
-              <input
-                {...register("rf_cargo")}
-                defaultValue={dadosMunicipio.rf_cargo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputM>
-            <InputP>
-              <label>
-                Telefone<span> *</span>
-              </label>
-              <input
-                {...register("rf_telefone")}
-                defaultValue={dadosMunicipio.rf_telefone}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputG>
-              <label>
-                Email<span> *</span>
-              </label>
-              <input
-                {...register("rf_email")}
-                defaultValue={dadosMunicipio.rf_email}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <DivTextArea>
-              <label><b>Descrição</b> detalhada das funções e responsabilidades<span> *</span></label>
-              <TextArea>
-                <textarea
-                  {...register("rf_descricao")}
-                  defaultValue={dadosMunicipio.rf_descricao}
-                  onChange={handleOnChange}
-                />
-              </TextArea>
-            </DivTextArea>
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                  <InputG>
+                    <label>
+                      Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("rf_setor_responsavel")}
+                      defaultValue={dadosMunicipio.rf_setor_responsavel}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                  <td>
+                  <InputP>
+                    <label>
+                      Telefone Comercial<span> *</span>
+                    </label>
+                    <input
+                      {...register("rf_telefone_comercial")}
+                      defaultValue={dadosMunicipio.rf_telefone_comercial}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            
+
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>
+                        Nome Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("rf_responsavel")}
+                        defaultValue={dadosMunicipio.rf_responsavel}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("rf_cargo")}
+                        defaultValue={dadosMunicipio.rf_cargo}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                  </td>
+                  <td>
+                  <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <input
+                        {...register("rf_telefone")}
+                        defaultValue={dadosMunicipio.rf_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            
+
+            <table>
+              <tbody>
+                <tr>
+                  <td>
+                   
+                  </td>
+                  <td>
+                  <InputG>
+                    <label>
+                      Email<span> *</span>
+                    </label>
+                    <input
+                      {...register("rf_email")}
+                      defaultValue={dadosMunicipio.rf_email}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+           
+            
+
+            <table>
+              <tbody>
+                <tr>
+                  <td colSpan={2}>
+                      <DivTextArea>
+                          <label><b>Descrição</b> detalhada das funções e responsabilidades<span> *</span></label>
+                          <TextArea>
+                            <textarea
+                              {...register("rf_descricao")}
+                              defaultValue={dadosMunicipio.rf_descricao}
+                              onChange={handleOnChange}
+                            />
+                          </TextArea>
+                        </DivTextArea>
+                  </td>
+                 
+                </tr>
+              </tbody>
+            </table>
+           
           </DivForm>
 
           <DivForm>

@@ -187,7 +187,7 @@ export default function HomeIndicadores({municipio}: MunicipioProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (ctx)=>{
-
+  console.log(ctx);
   const apiClient = getAPIClient(ctx);
   const { ["tedplan.token"]: token } = parseCookies(ctx);
   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
@@ -199,7 +199,8 @@ export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (ctx
       },
     };
   }
-
+ 
+ 
   const resUsuario = await apiClient.get("getUsuario", {params: {id_usuario: id_usuario}});
   const usuario = await resUsuario.data;
 
