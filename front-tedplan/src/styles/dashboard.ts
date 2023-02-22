@@ -391,7 +391,7 @@ export const ContainerModal = styled.div`
 export const Modal = styled.div`
   min-width: 520px;
   max-width: 1200px;
-  min-height: 100px;
+  min-height: 100px;  
   background-color: #ffffff;
   border: 1px solid #bebebe;
   border-radius: 5px;
@@ -402,6 +402,7 @@ export const Modal = styled.div`
 export const ModalGaleria = styled.div`
   width: 1200px;
   min-height: 700px;
+  margin-top: 180px;
   background-color: #ffffff;
   border: 1px solid #bebebe;
   border-radius: 5px;
@@ -527,6 +528,7 @@ export const ImagensGaleria = styled.div`
 export const ModalImgAmpliada = styled.div`
   width: 600px;
   min-height: 700px;
+  margin-top: 180px;
   background-color: #ffffff;
   border: 1px solid #bebebe;
   border-radius: 5px;

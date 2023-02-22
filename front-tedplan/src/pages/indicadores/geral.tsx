@@ -83,6 +83,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
   const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
+  const [check, setCheck] = useState(false);
   const [dadosGeral, setDadosGeral] = useState(null);
   const [dadosConcessionaria, setDadosConcessionaria] = useState(null);
   const [concessionarias, setConcessionarias] = useState(null);
@@ -117,6 +118,12 @@ export default function Geral({ municipio }: MunicipioProps) {
   function handleOnChange(content) {
     setContent(content);
   }
+  function checkOnChange(e) {
+    setCheck(e);
+    console.log(e);
+    
+  }
+
 
   async function getDadosGerais(){
     const id_municipio = municipio[0].id_municipio
@@ -155,6 +162,7 @@ export default function Geral({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastro(data) {
+    
     data.id_geral_da_ae_dh = dadosGeral?.id_geral_da_ae_dh
     data.id_municipio = municipio[0].id_municipio
     data.ano = new Date().getFullYear() 
@@ -799,15 +807,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                         <CheckBox>
                           <input {...register("OP001_1")}
                           type="checkbox"
-                          defaultChecked={dadosGeral?.op001_1 == "false" || false ? false : true}
+                          defaultChecked={dadosGeral?.op001_1 == "true" ? true : false}
                           />
                           <span>Não houve intervenção ou manutenção</span></CheckBox>
                         <CheckBox><input {...register("OP001_2")}
-                        defaultChecked={dadosGeral?.op001_2 == "false" || false ? false : true}
+                        defaultChecked={dadosGeral?.op001_2 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Manutenção ou recuperação de sarjetas</span></CheckBox>
                         <CheckBox><input {...register("OP001_3")}
-                        defaultChecked={dadosGeral?.op001_3 == "false" || false ? false : true}
+                        defaultChecked={dadosGeral?.op001_3 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Manutenção ou recuperação estrutural</span></CheckBox>
                     </DivChekbox>
@@ -848,15 +856,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td>
                       <DivChekbox>
                         <CheckBox><input {...register('RI001_1')}
-                         defaultChecked={dadosGeral?.ri001_1 == "false" || false ? false : true}
-                        type="checkbox"/>
+                         defaultChecked={dadosGeral?.ri001_1 == "true" ? true : false}
+                         type="checkbox"/>
                           <span>Não há instituições relacionadas com à gestão de riscos ou respostas a desastres</span></CheckBox>
                         <CheckBox><input {...register('RI001_2')}
-                          defaultChecked={dadosGeral?.ri001_2 == "false" || false ? false : true}
+                          defaultChecked={dadosGeral?.ri001_2 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Unidades de corpos de bombeiros</span></CheckBox>
                         <CheckBox><input {...register('RI001_3')}
-                          defaultChecked={dadosGeral?.ri001_2 == "false" || false ? false : true}
+                          defaultChecked={dadosGeral?.ri001_3 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Coordenação Municipal de Defesa Civil (COMDEC)</span></CheckBox>
                     </DivChekbox>
@@ -878,18 +886,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td>
                       <DivChekbox>
                         <CheckBox><input {...register('RI002_1')}
-                          defaultValue={dadosGeral?.ri002_1}
-                          onChange={handleOnChange}
+                          defaultChecked={dadosGeral?.ri002_1 == "true" ? true : false}                          
                         type="checkbox"/>
                           <span>Nenhuma intervenção ou situação</span></CheckBox>
                         <CheckBox><input {...register('RI002_2')}
-                          defaultValue={dadosGeral?.ri002_2}
-                          onChange={handleOnChange}
+                          defaultChecked={dadosGeral?.ri002_3 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Barragens</span></CheckBox>
                         <CheckBox><input {...register('RI002_3')}
-                        defaultValue={dadosGeral?.ri002_3}
-                        onChange={handleOnChange}
+                       defaultChecked={dadosGeral?.ri002_3 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Retificações de cursos de água naturais</span></CheckBox>
                     </DivChekbox>
@@ -911,18 +916,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td>
                       <DivChekbox>
                         <CheckBox><input {...register('RI003_1')}
-                        defaultValue={dadosGeral?.ri003_1}
-                        onChange={handleOnChange}
+                        defaultChecked={dadosGeral?.ri003_1 == "true" ? true : false}
                         type="checkbox"/>
                           <span>Nenhum instrumento</span></CheckBox>
                         <CheckBox><input {...register('RI003_2')}
-                        defaultValue={dadosGeral?.ri003_2}
-                        onChange={handleOnChange}
+                        defaultChecked={dadosGeral?.ri003_2 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Pluviômetro</span></CheckBox>
                         <CheckBox><input {...register('RI003_3')}
-                        defaultValue={dadosGeral?.ri003_3}
-                        onChange={handleOnChange}
+                        defaultChecked={dadosGeral?.ri003_3 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Pluviógrafo</span></CheckBox>
                     </DivChekbox>
@@ -943,18 +945,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <td>
                       <DivChekbox>
                         <CheckBox><input {...register('RI004_1')}
-                        defaultValue={dadosGeral?.ri004_1}
-                        onChange={handleOnChange}
+                        defaultChecked={dadosGeral?.ri004_1 == "true" ? true : false}
                         type="checkbox"/>
                           <span>Quantidade chuva por registro auto..</span></CheckBox>
                         <CheckBox><input {...register('RI004_2')}
-                        defaultValue={dadosGeral?.ri004_2}
-                        onChange={handleOnChange}
+                        defaultChecked={dadosGeral?.ri004_2 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Quantidade chuva por frequência diária</span></CheckBox>
                         <CheckBox><input {...register('RI004_3')}
-                        defaultValue={dadosGeral?.ri004_3}
-                        onChange={handleOnChange}
+                        defaultChecked={dadosGeral?.ri004_1 == "true" ? true : false}
                         type="checkbox"/>
                         <span>Quantidade chuva por frequência hora..</span></CheckBox>
                     </DivChekbox>

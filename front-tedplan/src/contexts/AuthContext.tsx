@@ -56,8 +56,8 @@ export function AuthProvider({ children }){
             login,
             senha,
             id_sistema,
-        }).then((response)=>{
-           
+        }).then((response)=>{            
+            
             if(response.token && response.id_usuario){
             setCookie(undefined, 'tedplan.token', response.token, {
                 maxAge: 60 * 60 * 1, // 1 hora
@@ -67,13 +67,15 @@ export function AuthProvider({ children }){
                 maxAge: 60 * 60 * 1, // 1 hora
             })
             
-              
+            
             api.defaults.headers['Authorization'] = `Bearer ${response.token}`;
     
                 recoverUserInformation(response.id_usuario).then(value => {
                     setUser(value[0])
+                    
                 })             
                 
+            
                 //Router.push('/listarPublicacoes')
             }      
             return response
@@ -85,15 +87,15 @@ export function AuthProvider({ children }){
             }
             return error
         })
-
+        
         const resUsuarioLogado = await api.get('getUsuario', {params: {id_usuario: data.id_usuario}})
         const usuarioLogado = await resUsuarioLogado.data
-
+        
         usuarioLogado.map((user)=>{
             if(user.id_tipo_usuario === 1){
                 Router.push('/listarUsuarios')                
             }
-            if(user.id_sistema === 2){
+            if(user.id_tipo_usuario === 2){                
                 Router.push('/indicadores/home_indicadores')                
             }
             

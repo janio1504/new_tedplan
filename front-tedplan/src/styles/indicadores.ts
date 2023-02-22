@@ -404,13 +404,13 @@ font-weight: bolder;
 `;
 
 export const DivForm = styled.div`
-  float: left;
-  width: 100%;
+  float: left;  
   padding: 10px 8px 10px 10px;
   border: solid #008080 2px;
   border-radius: 5px;
   margin-top: 20px;
   color: #fff;
+  
 `;
 
 export const DivTituloForm = styled.div`
@@ -565,18 +565,16 @@ export const DivTextArea = styled.div`
   flex-direction: column;
   display: flex;
 `;
-export const TextArea = styled.div`
-  float: left;
+export const TextArea = styled.div`  
   flex-direction: column;
   display: flex;
-  width: 990px;
+  width: 960px;
   border: #2dd9d0 solid 2px;
   margin: 10px;
   border-radius: 5px;
 `;
 
-export const DivEixo = styled.div`
-  float: left;
+export const DivEixo = styled.div`  
   flex-direction: row;
   margin: 10px;
   display: flex;
@@ -605,6 +603,7 @@ export const Form = styled.form`
     color: #666;
     float: left;
   }
+  
   input:focus-within {
     border-color: 2px solid #008080;
   }

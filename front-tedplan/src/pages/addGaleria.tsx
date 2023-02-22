@@ -2,9 +2,7 @@ import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
 import { toast, ToastContainer } from 'react-nextjs-toast';
-import dynamic from "next/dynamic";
-import "suneditor/dist/css/suneditor.min.css";
-//import suneditor from "suneditor";
+
 import {
   Container,
   Form,
@@ -160,58 +158,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
     setContent(content);
   }
 
-  const setOptions = {
-    buttonList: [
-      // Default
-      ["undo", "redo"],
-      ["font", "fontSize", "formatBlock"],
-      ["paragraphStyle", "blockquote"],
-      ["bold", "underline", "italic", "strike", "subscript", "superscript"],
-      ["fontColor", "hiliteColor", "textStyle"],
-      ["removeFormat"],
-      ["outdent", "indent"],
-      ["align", "horizontalRule", "list", "lineHeight"],
-      ["table", "link", "image", "video", "audio"],
-      ["imageGallery"],
-      ["fullScreen", "showBlocks", "codeView"],
-      ["preview", "print"],
-      ["save", "template"],
-    ],
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
-
-  useEffect(() => {
-    /*
-    editor.current = suneditor.create(txtArea.current, {
-      height: "300px",
-      width: "800px",
-
-      buttonList: [
-        // Default
-        ["undo", "redo"],
-        ["font", "fontSize", "formatBlock"],
-        ["paragraphStyle", "blockquote"],
-        ["bold", "underline", "italic", "strike", "subscript", "superscript"],
-        ["fontColor", "hiliteColor", "textStyle"],
-        ["removeFormat"],
-        ["outdent", "indent"],
-        ["align", "horizontalRule", "list", "lineHeight"],
-        ["table", "link", "image", "video", "audio"],
-        ["imageGallery"],
-        ["fullScreen", "showBlocks", "codeView"],
-        ["preview", "print"],
-        ["save", "template"],
-      ],
-      attributesWhitelist: {
-        all: "data-id|data-type",
-      },
-    });
-    */
-  }, []);
-
+  
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>

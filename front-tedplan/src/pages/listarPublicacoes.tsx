@@ -1,21 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import { GetServerSideProps } from "next";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import {
-  FaSearch,
-  FaDatabase,
-  FaHome,
-  FaSignOutAlt,
-  FaRegTimesCircle,
-} from "react-icons/fa";
-import { toast, ToastContainer } from 'react-nextjs-toast';
-import Image from "next/image";
+import { toast, ToastContainer } from 'react-nextjs-toast'
 
 import {
   Container,
@@ -41,6 +33,7 @@ import {
   FormModal,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
+import { log } from "console";
 
 type IPublicacao = {
   id_publicacao: string;
@@ -82,12 +75,10 @@ interface PublicacaoProps {
   eixos: IEixos[];
   municipios: IMunicipios[];
   tipoPublicacao: ITipoPublicacao[];
-  categorias: ICategorias[];
 }
 
 export default function Publicacoes({
   tipoPublicacao,
-  categorias,
   municipios,
   eixos,
   publicacoes,
@@ -109,6 +100,12 @@ export default function Publicacoes({
   const [idImagem, setIdImagem] = useState(null);
   const [idPublicacao, setIdPublicacao] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
+  const [listPublicacoes, setListPublicacoes] = useState(null);
+
+  useEffect(()=>{
+    setListPublicacoes(publicacoes);
+    
+  }, [publicacoes])
   
 
   function handleOnChange(content) {
@@ -122,6 +119,7 @@ export default function Publicacoes({
   }
 
   async function handleShowUpdateModal({ id_publicacao, id_imagem }) {
+    
     const apiClient = getAPIClient();
     if (id_imagem) {
       const file = await apiClient({
@@ -135,11 +133,12 @@ export default function Publicacoes({
     } else {
       setImagem(null);
     }
-
+    
     const pub = await api.get("getPublicacao", {
       params: { id_publicacao: id_publicacao },
     });
-    const publicacao = pub.data.map((value) => {
+    
+    await pub.data.map((value) => {
       setIsPublicacao(value);
     });
     setModalUpdateVisible(true);
@@ -162,16 +161,15 @@ export default function Publicacoes({
   }
 
   async function handleRemoverPublicacao() {
-    const resDelete = await api.delete("deletePublicacao", {
+    await api.delete("deletePublicacao", {
       params: {
         id_publicacao: idPublicacao,
         id_imagem: idImagem,
         id_arquivo: idArquivo,
       },
+    }).then(response =>{
     });
-    if (resDelete) {
-    
-    }
+    setModalConfirm(false)
     Router.push("/listarPublicacoes");
   }
 
@@ -190,13 +188,18 @@ export default function Publicacoes({
         titulo: data.titulo,
       })
       .then((response) => {
+        toast.notify('Dados atualizados com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })
         return response;
       });
   }
 
-  async function handleUpdateImagem(data: IPublicacao) {
+  async function handleUpdateImagem(data) {
     const apiClient = getAPIClient();
-    const formData = new FormData();
+    const formData = new FormData();   
 
     formData.append("imagem", data.imagem[0]);
     formData.append("id_publicacao", data.id_publicacao);
@@ -208,7 +211,11 @@ export default function Publicacoes({
         },
       })
       .then((response) => {
-      
+        toast.notify('Imagem atualizada com sucesso!',{
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        })
         return response;
       })
       .catch((error) => {
@@ -247,7 +254,7 @@ export default function Publicacoes({
               <th>Ações</th>
             </tr>
           </thead>
-          {publicacoes.map((publicacao) => {
+          {listPublicacoes?.data.map((publicacao) => {
             return (
               <tbody key={publicacao.id_publicacao}>
                 <tr>
@@ -286,47 +293,16 @@ export default function Publicacoes({
                     >
                       Editar Imagem
                     </BotaoVisualizar>
-                    {isModalVisible && (
-                      <ContainerModal>
-                        <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
-                          <FormModal
-                            onSubmit={handleSubmit(handleUpdateImagem)}
-                          >
-                            <ConteudoModal>
-                              <input
-                                type="hidden"
-                                {...register("id_publicacao")}
-                                defaultValue={idPublicacao}
-                                onChange={handleOnChange}
-                                name="id_publicacao"
-                              />
-                              <input
-                                type="hidden"
-                                {...register("id_imagem")}
-                                defaultValue={idImagem}
-                                onChange={handleOnChange}
-                                name="id_imagem"
-                              />
-                              <label>
-                                Selecione uma imagem para substituir a atual!
-                              </label>
-
-                              <input
-                                {...register("imagem")}
-                                type="file"
-                                accept="image/*"
-                              />
-                            </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
-                          </FormModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
-
-                    {isModalConfirm && (
+                   
+                  </td>
+                </tr>
+              </tbody>
+            );
+          })}
+        </ListPost>
+      </DivCenter>
+      <Footer>&copy; Todos os direitos reservados <ToastContainer></ToastContainer></Footer>
+      {isModalConfirm && (
                       <ContainerModal>
                         <Modal>
                           <ConteudoModal>
@@ -350,7 +326,8 @@ export default function Publicacoes({
                       </ContainerModal>
                     )}
 
-                    {isModalUpdateVisible && (
+
+      {isModalUpdateVisible && (
                       <ContainerModal>
                         <Modal>
                           <CloseModalButton onClick={handleCloseModal}>
@@ -376,6 +353,7 @@ export default function Publicacoes({
                                   onChange={handleOnChange}
                                 />
                               </TituloModal>
+                              <label>Tipo de publicação</label>
                               <select
                                 {...register("id_tipo_publicacao")}
                                 name="id_tipo_publicacao"
@@ -383,6 +361,7 @@ export default function Publicacoes({
                                 <option value="">
                                   {isPublicacao.tipo_publicacao}
                                 </option>
+                                <option>{}</option>
                                 {tipoPublicacao.map((tipo) => (
                                   <option
                                     key={tipo.id_tipo_publicacao}
@@ -393,6 +372,8 @@ export default function Publicacoes({
                                 ))}
                               </select>
 
+
+                              <label>Município</label>
                               <select
                                 {...register("id_municipio")}
                                 name="id_municipio"
@@ -409,7 +390,8 @@ export default function Publicacoes({
                                   </option>
                                 ))}
                               </select>
-
+                              
+                              <label>Eixo</label>
                               <select {...register("id_eixo")} name="id_eixo">
                                 <option value="">{isPublicacao.eixo}</option>
                                 {eixos.map((eixo, key) => (
@@ -424,14 +406,50 @@ export default function Publicacoes({
                         </Modal>
                       </ContainerModal>
                     )}
-                  </td>
-                </tr>
-              </tbody>
-            );
-          })}
-        </ListPost>
-      </DivCenter>
-      <Footer>&copy; Todos os direitos reservados </Footer>
+
+      {isModalVisible && (
+                      <ContainerModal>
+                        <Modal>
+                          <CloseModalButton onClick={handleCloseModal}>
+                            Fechar
+                          </CloseModalButton>
+                          <FormModal
+                            onSubmit={handleSubmit(handleUpdateImagem)}
+                          >
+                            <ConteudoModal>
+                            <TituloModal>
+                              <input
+                                type="hidden"
+                                {...register("id_publicacao")}
+                                defaultValue={idPublicacao}
+                                onChange={handleOnChange}
+                                name="id_publicacao"
+                              />
+                              <input
+                                type="hidden"
+                                {...register("id_imagem")}
+                                defaultValue={idImagem}
+                                onChange={handleOnChange}
+                                name="id_imagem"
+                              />
+                              <label>
+                                Selecione uma imagem para substituir a atual!
+                              </label>
+
+                              <input
+                                {...register("imagem")}                               
+                                accept="image/*"
+                                type="file"
+                                name="imagem"
+                              />
+                              
+                              </TituloModal>
+                            </ConteudoModal>
+                            <SubmitButton type="submit">Gravar</SubmitButton>
+                          </FormModal>
+                        </Modal>
+                      </ContainerModal>
+                    )}
     </Container>
   );
 }
@@ -464,8 +482,6 @@ export const getServerSideProps: GetServerSideProps<PublicacaoProps> = async (
   const resPublicacoes = await apiClient.get("/getPublicacoes");
   const publicacoes = await resPublicacoes.data;
 
-  const resCategorias = await apiClient.get("/getCategorias");
-  const categorias = await resCategorias.data;
 
   return {
     props: {
@@ -473,7 +489,6 @@ export const getServerSideProps: GetServerSideProps<PublicacaoProps> = async (
       municipios,
       tipoPublicacao,
       eixos,
-      categorias,
     },
   };
 };

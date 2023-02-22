@@ -233,13 +233,18 @@ export default function Postagens({
                     {isModalVisible && (
                       <ContainerModal>
                         <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
+                          
+                         
                           <FormModal
                             onSubmit={handleSubmit(handleUpdateUsuario)}
                           >
-                            <SubmitButton type="submit">Gravar</SubmitButton>
+                            
+                            <TextoModal>
+                                  <CloseModalButton onClick={handleCloseModal}>
+                                    Fechar
+                                  </CloseModalButton>
+                                  <SubmitButton type="submit">Gravar</SubmitButton>
+                            
                             <ConteudoModal>
                               <input
                                 type="hidden"
@@ -248,7 +253,7 @@ export default function Postagens({
                               />
                               <p>Nome: {usuarioModal.nome}</p>
                               <p>Login: {usuarioModal.login}</p>
-
+                              <label>Status Usuário</label>
                               <select {...register("ativo")} name="ativo">
                                 <option value="">
                                   {usuarioModal.ativo ? "Ativo" : "Inativo"}
@@ -259,7 +264,7 @@ export default function Postagens({
                                   {usuarioModal.ativo ? "Inativar" : "Ativar"}
                                 </option>
                               </select>
-
+                              <label>Tipo Usuário</label>
                               <select
                                 {...register("id_tipo_usuario")}
                                 name="id_tipo_usuario"
@@ -276,7 +281,7 @@ export default function Postagens({
                                   </option>
                                 ))}
                               </select>
-
+                              <label>Sistema</label>
                               <select
                                 {...register("id_sistema")}
                                 name="id_sistema"
@@ -291,9 +296,10 @@ export default function Postagens({
                                   </option>
                                 ))}
                               </select>
+                              <label>Senha</label>
                               <InputP><input {...register("senha")} type="password"></input></InputP>
                             </ConteudoModal>
-                            
+                            </TextoModal>
                           </FormModal>
                         </Modal>
                       </ContainerModal>

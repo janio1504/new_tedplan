@@ -13,6 +13,8 @@ import {
   DivInput,
   ImagemLista,
   TextoLista,
+  Pagination,
+  LimparFiltro,
 } from "../styles/views";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
@@ -20,6 +22,7 @@ import HeadPublico from "../components/headPublico";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
+import  Router  from "next/router";
 
 type IPublicacao = {
   id_publicacao: string;
@@ -70,29 +73,90 @@ export default function ViewPublicacoes({
     reset,
     formState: { errors },
   } = useForm();
-  const [publicacoesList, setPublicacoesList] = useState<IPublicacao[] | any>(
-    publicacoes
-  );
-  
+  const [publicacoesList, setPublicacoesList] = useState(null);
+  const [paginacao, setPaginacao] = useState(null);
+  const [idEixo, setIdEixo] = useState(null);
+  const [idMunicipio, setIdMunicipio] = useState(null);
+  const [idTipo, setIdTipo] = useState(null);
+  const [titulo, setTitulo] = useState(null);
   useEffect(() => {
+   
     if (publicacoes) {
-      getPublicacoes(publicacoes);
+      const page = 1      
+      pagination(publicacoes)
+      getPublicacoes(publicacoes, page);
     }
   }, [publicacoes]);
 
-  async function handlebuscaFiltrada({
-    titulo,
-    id_eixo,
-    id_tipo_publicacao,
-    id_municipio,
-  }: IPublicacao) {
+  async function handlebuscaFiltrada(data) {
+    setIdEixo(data.id_eixo)
+    setIdMunicipio(data.id_municipio)
+    setTitulo(data.titulo)
+    setIdTipo(data.id_tipo_publicacao)
     const apiClient = getAPIClient();
 
     const resBusca = await apiClient.get("/getPorFiltroPublicacoes", {
-      params: { titulo, id_eixo, id_tipo_publicacao, id_municipio },
+      params: { titulo: data.titulo, id_eixo: data.id_eixo, 
+        id_tipo_publicacao: data.id_tipo_publicacao, id_municipio: data.id_municipio, page: data.page },
     });
+    
     const publicacoes = resBusca.data;
-    if (!publicacoes[0]){
+        
+    if (publicacoes.length == 0){
+      toast.notify('Nenhum resultado encontrado para a busca!',{
+        title: "Atenção",
+        duration: 7,
+        type: "error",
+      })
+      return
+    }    
+    
+    getPublicacoes(publicacoes)
+    pagination(publicacoes)      
+  
+  }
+
+  async function pagination(publicacoes){
+   
+    const pages = {
+      ultimaPagina: publicacoes.lastPage,
+      anterior: publicacoes.page > 1 ? publicacoes.page - 1 : 1,
+      proximo: publicacoes.page < publicacoes.lastPage ? publicacoes.page + 1 : publicacoes.lastPage,
+      primeiraPagina: 1
+    }
+    
+    setPaginacao(pages);
+    
+  }
+
+  async function handleLimparFiltro(){
+    reset({
+      id_municipio: '',
+      id_eixo: '',
+      id_tipo_publicacao: '',
+      titulo: ''
+    })
+    setIdEixo('')
+    setIdMunicipio('')
+    setIdTipo('')
+    setTitulo('')
+    Router.push("/publicacoes");
+    getPublicacoes(publicacoes)
+    
+  }
+
+  async function handlegetPubPaginate(page?) {
+    const apiClient = getAPIClient();
+    
+    const resBusca = await apiClient.get("/getPorFiltroPublicacoes", {
+      params: { titulo: titulo ? titulo : '', id_eixo: idEixo ? idEixo : '', 
+      id_tipo_publicacao: idTipo ? idTipo : '', id_municipio: idMunicipio ? idMunicipio : '',
+      page: page ? page : 1 },
+    });
+    
+    const publicacoes = resBusca.data;
+
+    if (publicacoes.length == 0){
       toast.notify('Nenhum resultado encontrado para a busca!',{
         title: "Atenção",
         duration: 7,
@@ -100,21 +164,19 @@ export default function ViewPublicacoes({
       })
       return
     }
-
-    getPublicacoes(publicacoes);
-    reset({
-      titulo: "",
-      id_municipio: "",
-      id_tipo_publicacao: "",
-      id_eixo: "",
-    });
+    
+    
+    getPublicacoes(publicacoes)
+    pagination(publicacoes)
+    
   }
 
-  async function getPublicacoes(publicacoes?: any) {
+  async function getPublicacoes(publicacoes?: any, page?) {
     const apiClient = getAPIClient();
-    if (publicacoes) {
+    
+    if (publicacoes.data) {
       const pub = await Promise.all(
-        publicacoes.map(async (p) => {
+        publicacoes.data.map(async (p: { id_imagem: any; id_arquivo: any; }) => {
           const imagem = await apiClient({
             method: "GET",
             url: "getImagem",
@@ -141,7 +203,7 @@ export default function ViewPublicacoes({
           return publicacao;
         })
       );
-
+            
       setPublicacoesList(pub);
     }
   }
@@ -202,11 +264,14 @@ export default function ViewPublicacoes({
               ></input>
             </DivInput>
             <DivInput>
-              <SubmitButton>Filtrar</SubmitButton>
+              <SubmitButton>Filtrar</SubmitButton>              
+            </DivInput>
+            <DivInput>
+              <LimparFiltro onClick={()=>handleLimparFiltro()}>Limpar filtro</LimparFiltro>
             </DivInput>
           </Form>
 
-          {publicacoesList.map((publicacao) => (
+          {publicacoesList?.map((publicacao) => (
             <Lista key={publicacao.id_publicacao}>
               <ImagemLista>
                 <img src={publicacao.imagem} alt="TedPlan" />
@@ -226,7 +291,14 @@ export default function ViewPublicacoes({
               </TextoLista>
             </Lista>
           ))}
+           <Pagination>
+          <button onClick={()=>handlegetPubPaginate(paginacao.primeiraPagina)}>Primeiro</button>
+          <button onClick={()=>handlegetPubPaginate(paginacao.anterior)}>Anterior</button>
+          <button onClick={()=>handlegetPubPaginate(paginacao.proximo)}>Proximo</button>
+          <button onClick={()=>handlegetPubPaginate(paginacao.ultimaPagina)}>Ultimo</button>
+        </Pagination>
         </DivFormConteudo>
+       
       </DivCenter>
       <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
     </Container>
@@ -250,6 +322,8 @@ export const getServerSideProps: GetServerSideProps<PublicacaoProps> = async (
   const resPublicacoes = await apiClient.get("/getPublicacoes");
   const publicacoes = await resPublicacoes.data;
 
+  
+  
   return {
     props: {
       municipios,
