@@ -170,26 +170,26 @@ export default function GestaoIndicadores({
     formData.append("id_municipio", dadosMunicipio.id_municipio);
     formData.append(
       "id_gestao_associada",
-      isGestao.id_gestao_associada ? isGestao.id_gestao_associada : ""
+      isGestao?.id_gestao_associada ? isGestao?.id_gestao_associada : ""
     );
     formData.append(
       "id_saneamento_rural",
-      isGestao.id_saneamento_rural ? isGestao.id_saneamento_rural : ""
+      isGestao?.id_saneamento_rural ? isGestao?.id_saneamento_rural : ""
     );
     formData.append(
       "id_comunidades_tradicionais",
-      isGestao.id_comunidades_tradicionais
-        ? isGestao.id_comunidades_tradicionais
+      isGestao?.id_comunidades_tradicionais
+        ? isGestao?.id_comunidades_tradicionais
         : ""
     );
 
     formData.append(
       "nome_associacao",
-      data.nome_associacao ? data.nome_associacao : isGestao.ga_nome
+      data.nome_associacao ? data.nome_associacao : isGestao?.ga_nome
     );
     formData.append(
       "norma_associacao",
-      data.norma_associacao ? data.norma_associacao : isGestao.ga_norma
+      data.norma_associacao ? data.norma_associacao : isGestao?.ga_norma
     );
     formData.append("pcs_ano", data.pcs_ano);
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
@@ -202,17 +202,17 @@ export default function GestaoIndicadores({
     formData.append("politica_titulo", data.politica_titulo);
     formData.append(
       "sr_descricao",
-      data.sr_descricao ? data.sr_descricao : isGestao.sr_descricao
+      data.sr_descricao ? data.sr_descricao : isGestao?.sr_descricao
     );
     formData.append(
       "ct_nomes_comunidades",
       data.ct_nomes_comunidades
         ? data.ct_nomes_comunidades
-        : isGestao.nomes_comunidades_beneficiadas
+        : isGestao?.nomes_comunidades_beneficiadas
     );
     formData.append(
       "ct_descricao",
-      data.ct_descricao ? data.ct_descricao : isGestao.ct_descricao
+      data.ct_descricao ? data.ct_descricao : isGestao?.ct_descricao
     );
 
     const apiClient = getAPIClient();
@@ -297,6 +297,7 @@ export default function GestaoIndicadores({
           type: "error",
         });
       });
+      getRepresentantes()
   }
 
  
@@ -478,6 +479,7 @@ export default function GestaoIndicadores({
     });
     const representantes = await resRepresentantes.data;
         
+        
     setRepresentantes(representantes)
   }
 
@@ -491,17 +493,21 @@ export default function GestaoIndicadores({
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>
             <DivTituloForm>Gestão Associada</DivTituloForm>
-
-            <InputG>
-              <label>Nome da associação</label>
-              <input
-                {...register("nome_associacao")}
-                defaultValue={isGestao?.ga_nome}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputG>
+            <table>
+              <tr>
+                <td>
+                <InputG>
+                  <label>Nome da associação</label>
+                  <input
+                    {...register("nome_associacao")}
+                    defaultValue={isGestao?.ga_nome}
+                    onChange={handleOnChange}
+                    type="text"
+                  ></input>
+                </InputG>
+                </td>
+                <td>
+                <InputG>
               <label>
                 Norma da associação<span> *</span>
               </label>
@@ -512,7 +518,9 @@ export default function GestaoIndicadores({
                 type="text"
               ></input>
             </InputG>
-
+                </td>
+              </tr>
+            </table>
             <DivEixo>
               Representantes{" "}
               <span
@@ -523,24 +531,23 @@ export default function GestaoIndicadores({
                 Adicionar
               </span>{" "}
             </DivEixo>
+            
             <Tabela>
               <table cellSpacing={0}>
-                <thead>
-                  <tr>
+              <tbody>
+                  {representantes && <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Cargo</th>
                     <th>Telefone</th>
                     <th>email</th>
                     <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
+                  </tr>}
+
                   {representantes?.map((representante, index) => (
-                    <>
                       <tr role="row" key={index}>
                         <td>{representante.id_representante_servicos_ga}</td>
-                        <td >{representante.nome}</td>
+                        <td ><InputM>{representante.nome}</InputM></td>
                         <td >{representante.cargo}</td>
                         <td>{representante.telefone}</td>
                         <td>{representante.email}</td>
@@ -552,52 +559,61 @@ export default function GestaoIndicadores({
                           </Actions>
                         </td>
                       </tr>
-                    </>
-                  ))}
+                    ))}
                 </tbody>
               </table>
             </Tabela>
+            
           </DivForm>
           <DivForm>
             <DivTituloForm>
               Politica Municipal de Saneamento Básico
             </DivTituloForm>
-            <InputG>
-              <label>Titulo</label>
-              <input
-                {...register("politica_titulo")}
-                defaultValue={isGestao?.politica_titulo}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputG>
-            <InputP>
-              <label>Ano</label>
-              <input
-                {...register("politica_ano")}
-                defaultValue={isGestao?.politica_ano}
-                onChange={handleOnChange}
-                type="text"
-              ></input>
-            </InputP>
-            <InputM>
-              <label>Arquivo</label>
-              <input {...register("politica_arquivo")} type="file"></input>
-            </InputM>
+            <table>
+              <tr>
+                <td>
+                  <InputG>
+                    <label>Titulo</label>
+                    <input
+                      {...register("politica_titulo")}
+                      defaultValue={isGestao?.politica_titulo}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                </td>
+                <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input
+                        {...register("politica_ano")}
+                        defaultValue={isGestao?.politica_ano}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                </td>
+                <td>
+                  <InputM>
+                    <label>Arquivo</label>
+                    <input {...register("politica_arquivo")} type="file"></input>
+                  </InputM>
+                </td>
+              </tr>
+            </table>
+            
             <DivEixo>Atualizações</DivEixo>
+            
             <Tabela>
               <table cellSpacing={0}>
-                <thead>
-                  <tr>
+              <tbody>
+                  {listPoliticas && <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Ano</th>
                     <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
+                  </tr>}
                   {listPoliticas?.map((politica, index) => (
-                    <>
                       <tr key={index}>
                         <td>{politica.id_politica_municipal}</td>
                         <td ><InputG>{politica.titulo}</InputG></td>
@@ -617,40 +633,52 @@ export default function GestaoIndicadores({
                         
                         </td>
                       </tr>
-                    </>
-                  ))}
+                       ))}               
                 </tbody>
               </table>
             </Tabela>
+           
           </DivForm>
           <DivForm>
             <DivTituloForm>Plano Municipal de Saneamento Básico</DivTituloForm>
-            <InputG>
-              <label>Titulo</label>
-              <input {...register("plano_titulo")} type="text"></input>
-            </InputG>
-            <InputP>
-              <label>Ano</label>
-              <input {...register("plano_ano")} type="text"></input>
-            </InputP>
-            <InputM>
-              <label>Arquivo</label>
-              <input {...register("plano_arquivo")} type="file"></input>
-            </InputM>
+            <table>
+              <tr>
+                <td>
+                <InputG>
+                  <label>Titulo</label>
+                  <input {...register("plano_titulo")} type="text"></input>
+                </InputG>      
+                </td>
+                <td>
+                <InputP>
+                  <label>Ano</label>
+                  <input {...register("plano_ano")} type="text"></input>
+                </InputP>
+                </td>
+                <td>
+                <InputM>
+                  <label>Arquivo</label>
+                  <input {...register("plano_arquivo")} type="file"></input>
+                </InputM>
+                </td>
+              </tr>
+            </table>
+           
+            
+            
             <DivEixo>Atualizações</DivEixo>
+            
             <Tabela>
               <table cellSpacing={0}>
-                <thead>
-                  <tr>
+              <tbody>
+                  {listPlanos && <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Ano</th>
                     <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
+                  </tr>}
+
                   {listPlanos?.map((plano, index) => (
-                    <>
                       <tr key={index}>
                         <td>{plano.id_plano_municipal}</td>
                         <td ><InputG>{plano.titulo}</InputG></td>
@@ -669,41 +697,53 @@ export default function GestaoIndicadores({
                          </Actions>
                         </td>
                       </tr>
-                    </>
-                  ))}
+                       ))}
                 </tbody>
               </table>
             </Tabela>
+            
           </DivForm>
 
           <DivForm>
             <DivTituloForm>Participação e Controle Social</DivTituloForm>
-            <InputG>
-              <label>Titulo</label>
-              <input {...register("pcs_titulo")} type="text"></input>
-            </InputG>
-            <InputP>
-              <label>Ano</label>
-              <input {...register("pcs_ano")} type="text"></input>
-            </InputP>
-            <InputM>
-              <label>Arquivo</label>
-              <input {...register("pcs_arquivo")} type="file"></input>
-            </InputM>
+            <table>
+              <tr>
+                <td>
+                <InputG>
+                  <label>Titulo</label>
+                  <input {...register("pcs_titulo")} type="text"></input>
+                </InputG>
+                </td>
+                <td>
+                <InputP>
+                  <label>Ano</label>
+                  <input {...register("pcs_ano")} type="text"></input>
+                </InputP>
+                </td>
+                <td>
+                <InputM>
+                  <label>Arquivo</label>
+                  <input {...register("pcs_arquivo")} type="file"></input>
+                </InputM>
+                </td>
+              </tr>
+            </table>
+            
+           
+            
             <DivEixo>Atualizações</DivEixo>
+           
             <Tabela>
               <table cellSpacing={0}>
-                <thead>
-                  <tr>
+                <tbody>
+                  {listParticipacoes && <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Ano</th>
                     <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
+                  </tr>}
+
                   {listParticipacoes?.map((participacao, index) => (
-                    <>
                       <tr key={index}>
                         <td>{participacao.id_participacao_controle_social}</td>
                         <td ><InputG>{participacao.titulo}</InputG></td>
@@ -722,11 +762,11 @@ export default function GestaoIndicadores({
                         </Actions>
                         </td>
                       </tr>
-                    </>
-                  ))}
+                      ))}
                 </tbody>
               </table>
             </Tabela>
+            
           </DivForm>
           <DivForm>
             <DivTituloForm>Saneamento Rural</DivTituloForm>
@@ -736,7 +776,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("sr_descricao")}
-                  defaultValue={isGestao?.sr_descricao}
+                  defaultValue={isGestao?.sr_descricao ? isGestao?.sr_descricao : ''}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -751,7 +791,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_nomes_comunidades")}
-                  defaultValue={isGestao?.nomes_comunidades_beneficiadas}
+                  defaultValue={isGestao?.nomes_comunidades_beneficiadas ? isGestao?.nomes_comunidades_beneficiadas : ''}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -761,7 +801,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_descricao")}
-                  defaultValue={isGestao?.ct_descricao}
+                  defaultValue={isGestao?.ct_descricao ? isGestao?.ct_descricao : ''}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>

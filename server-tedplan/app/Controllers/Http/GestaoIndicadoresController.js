@@ -40,7 +40,6 @@ class GestaoIndicadoresController {
 
       if (id_gestao_associada) {
         updateGa();
-        console.log(id_gestao_associada);
       } else {
         addGa();
       }

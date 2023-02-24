@@ -148,11 +148,9 @@ export const DivCenter = styled.div`
   margin-left: auto;
   margin-right: auto;
   text-align: left;
-  justify-content: left;
-  align-items: left;
+  justify-content: center;
   padding: 0px;
   display: flex;
-  flex-direction: column;
 `;
 
 export const DivMenu = styled.div`
@@ -404,14 +402,22 @@ font-weight: bolder;
 `;
 
 export const DivForm = styled.div`
-  float: left;  
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  text-align: left;
   padding: 10px 8px 10px 10px;
   border: solid #008080 2px;
   border-radius: 5px;
   margin-top: 20px;
   color: #fff;
-  
+  table{
+    display: flex;
+    justify-content: left;
+  }
 `;
+
+
 
 export const DivTituloForm = styled.div`
   width: 100%;
@@ -423,15 +429,15 @@ export const DivTituloForm = styled.div`
 `;
 export const Tabela = styled.div`
   width: 100%;
-  float: left;
-  display: flex;
   margin-top: 20px;
-  table {
-    margin-left: auto;
-    margin-right: auto;
+  table {    
+    display: flex;
+    justify-content: center;
     border: -1px;
-   width: 90%;
+    width: 90%; 
+        
    th{
+    
     background: #008080;
     padding: 10px;
     color: #fff;
@@ -527,7 +533,7 @@ export const DivInput = styled.div`
 `;
 
 export const InputP = styled.div`
-  float: left;
+  
   flex-direction: column;
   display: flex;
   width: 150px;
@@ -539,7 +545,7 @@ export const InputP = styled.div`
 `;
 
 export const InputM = styled.div`
-  float: left;
+  
   flex-direction: column;
   display: flex;
   width: 350px;
@@ -550,7 +556,7 @@ export const InputM = styled.div`
 `;
 
 export const InputG = styled.div`
-  float: left;
+  
   flex-direction: column;
   display: flex;
   width: 500px;
@@ -594,6 +600,7 @@ export const DivEixo = styled.div`
 `;
 
 export const Form = styled.form`
+
   font-size: 14px;
   input {
     border: 2px solid #2dd9d0;
