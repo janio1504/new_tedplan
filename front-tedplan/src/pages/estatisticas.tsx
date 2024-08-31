@@ -22,10 +22,10 @@ import ResiduosComp from "../components/ResiduosSolidos";
 
 
 export default function Estatistica() {
-  const [aguaVisible, setAguaVisible ] = useState(false)
+  const [aguaVisible, setAguaVisible ] = useState(true)
   const [drenagemVisible, setDrenagemVisible ] = useState(false)
   const [esgotoVisible, setEsgotoVisible ] = useState(false)
-  const [residuosVisible, setResiduosVisible ] = useState(true)
+  const [residuosVisible, setResiduosVisible ] = useState(false)
   
   
   function handleAgua(){

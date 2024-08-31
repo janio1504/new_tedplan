@@ -287,7 +287,8 @@ class MunicipioController {
       dd_populacao_total,
       dd_total_moradias,
     } = request.all();
-
+    console.log(request.all());
+    
     try {
       const municipios = await Municipio.query()
         .from("tedplan.municipios")

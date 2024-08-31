@@ -36,6 +36,42 @@ class PsFinanceiroController {
         "fn_aes.id_municipio"
       )
       .where("fn_rs.id_municipio", id_municipio)
+      .fetch();
+  }
+
+  async getDadosFinanceirosPorAno({ request }) {
+    const { id_municipio, ano } = request.all();
+    return await PsFinanceiro.query()
+      .select('*', 'fn_aes.fn003 as aes_fn003',
+      'fn_aes.fn004 as aes_fn004',
+      'fn_aes.fn005 as aes_fn005',
+      'fn_aes.fn008 as aes_fn008',
+      'fn_aes.fn013 as aes_fn013',
+      'fn_aes.fn015 as aes_fn015',
+      'fn_aes.fn016 as aes_fn016',
+      'fn_aes.fn017 as aes_fn017',
+      'fn_aes.fn018 as aes_fn018',
+      'fn_aes.fn019 as aes_fn019',
+      'fn_aes.fn020 as aes_fn020',
+      'fn_aes.fn021 as aes_fn021',
+      'fn_aes.fn022 as aes_fn022',
+      'fn_aes.fn023 as aes_fn023',
+      'fn_aes.fn024 as aes_fn024',
+      'fn_dap.fn016 as dap_fn016',
+      'fn_rs.fn999 as residuos_fn999',
+      'fn_dap.fn999 as drenagem_fn999')
+      .from("tedplan.fn_residuos_solidos as fn_rs")
+      .innerJoin(
+        "tedplan.fn_drenagem_aguas_pluviais as fn_dap",
+        "fn_rs.id_municipio",
+        "fn_dap.id_municipio"
+      )
+      .innerJoin(
+        "tedplan.fn_agua_esgoto_sanitario as fn_aes",
+        "fn_rs.id_municipio",
+        "fn_aes.id_municipio"
+      )
+      .where("fn_rs.id_municipio", id_municipio)
       .where("fn_rs.ano", ano)
       .fetch();
   }

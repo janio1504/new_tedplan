@@ -30,16 +30,25 @@ export default function LoginIndicadores() {
     const res = await signIn(data)
     .then((response)=>{ 
     })
-    .catch((error)=>{   
+    .catch((error)=>{ 
+      if(error.message == 'Network Error'){
+        toast.notify('Sem conexão com a internet.',{
+          title: "Aconteceu o seguinte erro",
+          duration: 7,
+          type: "error",
+        })
+        return
+      }
+        
       toast.notify('Usuário ou senha inválido!',{
         title: "Aconteceu o seguinte erro",
         duration: 7,
         type: "error",
+      })    
+      reset({
+        senha: ''
       })
-    setTimeout(()=>{
-      reset()
-      Router.reload()
-    }, 3000)
+      
      
     });
     
@@ -47,7 +56,7 @@ export default function LoginIndicadores() {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <DivLogin>
         <Brasao>
           <Image src={logo} alt="Logo Tedplan" />
@@ -75,7 +84,7 @@ export default function LoginIndicadores() {
 
           <SubmitButton type="submit">Acessar</SubmitButton>
         </Form>
-        <Footer>&copy; Todos os direitos reservados</Footer>
+        <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
       </DivLogin>
      
     </Container>

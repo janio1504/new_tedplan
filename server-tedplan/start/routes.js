@@ -87,9 +87,11 @@ Route.delete("detete-unidade-processamento/:id", "PsResiduosUnidadeController.de
 
 Route.post("create-geral", "GeralController.store");
 Route.post("get-geral", "GeralController.getDadosGerais");
+Route.post("get-geral-por-ano", "GeralController.getDadosGeraisAno");
 
 Route.post("create-agua", "AguaController.createAgua");
 Route.post("get-agua", "AguaController.getAgua");
+Route.post("get-agua-por-ano", "AguaController.getAguaAno");
 
 Route.post("create-balanco", "BalancoController.createBalanco");
 Route.post("get-balanco", "BalancoController.getBalanco");
@@ -102,6 +104,7 @@ Route.post("get-qualidade", "QualidadeController.getQualidade");
 
 Route.post("create-esgoto", "EsgotoController.createEsgoto");
 Route.post("get-esgoto", "EsgotoController.getEsgoto");
+Route.post("get-esgoto-por-ano", "EsgotoController.getEsgotoAno");
 
 Route.post("create-tarifa", "TarifaController.createTarifa");
 Route.post("get-tarifa", "TarifaController.getTarifa");
@@ -115,7 +118,8 @@ Route.post("create-residuos-recebidos", "PsQuantResiduosRecebidoController.creat
 Route.post("list-residuos-recebidos", "PsQuantResiduosRecebidoController.getResiduosRecebidos");
 
 Route.post("addPsFinanceiro", "PsFinanceiroController.store");
-Route.post("getPsFinanceiro", "PsFinanceiroController.getDadosFinanceiros");
+Route.post("get-ps-financeiro", "PsFinanceiroController.getDadosFinanceiros");
+Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinanceiros");
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
 

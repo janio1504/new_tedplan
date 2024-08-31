@@ -52,20 +52,17 @@ export function AuthProvider({ children }){
     
     
     async function signIn({ login, senha, id_sistema }: SignInData) {
+        
         const data = await signInRequest({
             login,
             senha,
             id_sistema,
         }).then((response)=>{            
-            
+                        
             if(response.token && response.id_usuario){
-            setCookie(undefined, 'tedplan.token', response.token, {
-                maxAge: 60 * 60 * 1, // 1 hora
-            })
+            setCookie(undefined, 'tedplan.token', response.token)
     
-            setCookie(undefined, 'tedplan.id_usuario', response.id_usuario, {
-                maxAge: 60 * 60 * 1, // 1 hora
-            })
+            setCookie(undefined, 'tedplan.id_usuario', response.id_usuario)
             
             
             api.defaults.headers['Authorization'] = `Bearer ${response.token}`;
@@ -75,16 +72,10 @@ export function AuthProvider({ children }){
                     
                 })             
                 
-            
-                //Router.push('/listarPublicacoes')
             }      
             return response
         })
-        .catch((error) =>{
-            if(error){
-                Router.push('/')
-                return 
-            }
+        .catch((error) =>{            
             return error
         })
         

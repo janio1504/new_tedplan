@@ -6,24 +6,15 @@ type SignInRequestData = {
     id_sistema: string;
 }
 
-type Usuario = {
-    id_usuario: BigInteger;
-}
-
-
  export async function signInRequest({ login, senha, id_sistema}: SignInRequestData) {
     const api = getAPIClient()
     const res = await api.post('/login', { login, senha, id_sistema})
     .then((response)=>{
         return response
-    }).catch((error) => {          
-        return error.response
-    })
-    
-   if(res.data.error){
-       return res.data
-   }  
-    
+    }).catch((error) => {                       
+       return error
+    })  
+       
     return res.data
 
 }

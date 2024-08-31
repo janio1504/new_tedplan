@@ -235,7 +235,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   async function getFinaceiroMunicipio(){
     const ano = new Date().getFullYear()    
     
-    await api.post('getPsFinanceiro',     
+    await api.post('get-ps-financeiro-por-ano',     
     {id_municipio: dadosMunicipio[0]?.id_municipio, ano: ano})
     .then(response=>{      
       setDadosFinanceiros(response.data[0])
