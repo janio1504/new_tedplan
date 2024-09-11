@@ -138,31 +138,23 @@ interface MunicipioProps {
   municipio: IMunicipio[];
 }
 
-export default function HomeIndicadores({municipio}: MunicipioProps) {
+export default function HomeIndicadores() {
   const { usuario, signOut } = useContext(AuthContext)
-  const [ nomeMunicipio, setMunicipio] = useState('')
+  const [ nomeMunicipio, setNomeMunicipio] = useState<IMunicipio | undefined>()
   useEffect(()=>{
-   municipio.map((value)=>{
-     setMunicipio(value.municipio_nome)
-   })  
-  },[municipio])
-
-  async function handleSignOut(){
-    signOut()
+   getMunicipio()
+  },[usuario])
+  
+  
+   async function getMunicipio(){
+    const res = await api.get("getMunicipio", {params: {id_municipio: usuario?.id_municipio}});
+    const municipio = await res.data;
+    if(municipio[0]){
+      setNomeMunicipio(municipio[0].municipio_nome)
+    }
+    
    }
-   async function handleGestao(){
-    Router.push("/indicadores/gestao");
-   }
-   async function handleIndicadores(){
-    Router.push("/indicadores/gestao");
-   }
-   async function handleReporte(){
-    Router.push("/indicadores/gestao");
-   }
-   async function handleManuais() {
-    Router.push("/indicadores/Manuais");
-  }
-   
+     
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>

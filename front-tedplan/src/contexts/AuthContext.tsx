@@ -47,8 +47,9 @@ export function AuthProvider({ children }){
                setUser(response[0])
            })        
         }
-    }, [usuario])
+    }, [0])
 
+    
     
     
     async function signIn({ login, senha, id_sistema }: SignInData) {
