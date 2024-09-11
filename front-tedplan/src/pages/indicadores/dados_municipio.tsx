@@ -169,7 +169,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     setDadosMunicipio(municipio[0]);
     //setContentForEditor(municipio[0].rf_descricao);
     //setMunicipio(municipio[0].municipio_nome)
-  }, [municipio]);
+  }, []);
 
   async function handleGetMunicipio(id_municipio) {
     const resMunicipio = await api.get("getMunicipio", {
