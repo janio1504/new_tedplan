@@ -178,33 +178,6 @@ export default function HomeIndicadores() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (ctx)=>{
-  console.log(ctx);
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
- 
- 
-  const resUsuario = await apiClient.get("getUsuario", {params: {id_usuario: id_usuario}});
-  const usuario = await resUsuario.data;
 
-  const res = await apiClient.get("getMunicipio", {params: {id_municipio: usuario[0].id_municipio}});
-  const municipio = await res.data;
-  
-  
-  return {
-    props: {
-      municipio,
-    }
-  }
-}
 
 
