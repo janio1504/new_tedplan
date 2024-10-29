@@ -16,8 +16,13 @@ Use the adonis command to install the blueprint
 adonis new yardstick --api-only
 ```
 
-or manually clone the repo and then run `npm install`.
+or manually clone the repo and then run `npm install` or `yarn install`.
 
+Run the following command to run server
+
+```js
+node ace serve --watch
+```
 
 ### Migrations
 

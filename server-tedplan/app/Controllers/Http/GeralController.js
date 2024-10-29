@@ -7,6 +7,21 @@ class GeralController {
   }
 
   async getDadosGerais({ request }){
+    const { id_municipio } = request.all()
+    try {
+      const resGe = await Geral.query()
+        .from('tedplan.geral_da_ae_dh')
+        .where("id_municipio", id_municipio)
+        .where("ano", "is not", null)
+        .fetch()
+        return resGe
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  
+  async getDadosGeraisAno({ request }){
     const { ano, id_municipio } = request.all()
     try {
       const resGe = await Geral.query()

@@ -54,6 +54,7 @@ interface MunicipioProps {
 export default function Esgoto({ municipio }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
+  const [anoSelected, setAnoSelected] = useState(null);
   const {
     register,
     handleSubmit,
@@ -68,14 +69,14 @@ export default function Esgoto({ municipio }: MunicipioProps) {
  
 
   useEffect(() => {
-    getDadosEsgoto()
+    //getDadosEsgoto()
   }, [municipio]);
 
   async function handleCadastro(data) {  
     
     data.id_esgoto = dadosEsgoto?.id_esgoto
     data.id_municipio = municipio[0].id_municipio
-    data.ano = new Date().getFullYear()  
+    data.ano = anoSelected  
     const resCad = await api
       .post("create-esgoto", data)
       .then((response) => {     
@@ -94,14 +95,14 @@ export default function Esgoto({ municipio }: MunicipioProps) {
         })
         console.log(error);
       });
-      getDadosEsgoto()
+      getDadosEsgoto(anoSelected)
   }
 
-  async function getDadosEsgoto() {  
+  async function getDadosEsgoto(ano: any) {  
     const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()  
+     
     const res = await api
-      .post("get-esgoto", {id_municipio: id_municipio, ano: ano})
+      .post("get-esgoto-por-ano", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
         return response.data;
       })
@@ -123,20 +124,12 @@ export default function Esgoto({ municipio }: MunicipioProps) {
     setContent(content);
   }
  
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
+
+  function seletcAno(ano: any) {
+
+    setAnoSelected(ano)
+
+    getDadosEsgoto(ano)
   }
 
   return (
@@ -147,10 +140,24 @@ export default function Esgoto({ municipio }: MunicipioProps) {
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
-            <DivTituloForm style={{borderColor: "#235460"}}>Esgoto</DivTituloForm>          
+          <DivForm>            
+            <DivTituloForm style={{borderColor: "#235460"}}>Esgoto</DivTituloForm> 
+
+            <DivFormConteudo>
+                <DivTitulo>
+                  <DivTituloConteudo>Ano</DivTituloConteudo>
+                </DivTitulo>
+                <label>Selecione o ano desejado:</label>
+                <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
+                  <option >Selecionar</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                </select>
+              </DivFormConteudo>         
              
               <DivFormConteudo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
                 </DivTitulo>
@@ -172,7 +179,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
            
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES009")}
                   defaultValue={dadosEsgoto?.es009}
@@ -226,7 +233,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
              
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES005")}
                   defaultValue={dadosEsgoto?.es005}
@@ -279,7 +286,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputGG>          
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES004")}
                   defaultValue={dadosEsgoto?.es004}
@@ -309,7 +316,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES028")}
                   defaultValue={dadosEsgoto?.es028}
@@ -353,7 +360,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
                 <InputG>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <textarea {...register("ES098")}
                   defaultValue={dadosEsgoto?.es098}

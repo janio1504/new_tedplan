@@ -5,12 +5,12 @@ import {
   Container,
   DivCenter,
   DivForm,
-  DivTituloForm,  
+  DivTituloForm,
   Form,
   InputP,
   InputM,
   InputG,
-  SubmitButton,  
+  SubmitButton,
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
@@ -19,6 +19,7 @@ import {
   DivTituloConteudo,
   InputGG,
   InputSNIS,
+  DivFormEixo,
 } from "../../styles/financeiro";
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
@@ -44,6 +45,7 @@ interface MunicipioProps {
 export default function Agua({ municipio }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(municipio);
+  const [anoSelected, setAnoSelected] = useState(null);
   const {
     register,
     handleSubmit,
@@ -56,49 +58,50 @@ export default function Agua({ municipio }: MunicipioProps) {
 
   useEffect(() => {
     municipio.map((value) => {
-       setDadosMunicipio(value);
+      setDadosMunicipio(value);
     });
-    getDadosAgua()
   }, []);
 
   function handleOnChange(content) {
     setContent(content);
-  }  
+  }
 
-  async function handleCadastro(data) {  
-    
+  async function handleCadastro(data) {
+
     data.id_agua = dadosAgua?.id_agua
     data.id_municipio = municipio[0].id_municipio
-    data.ano = new Date().getFullYear()  
+    data.ano = anoSelected
+
     const resCad = await api
       .post("create-agua", data)
-      .then((response) => { 
-        toast.notify('Dados gravados com sucesso!',{
+      .then((response) => {
+        toast.notify('Dados gravados com sucesso!', {
           title: "Sucesso!",
           duration: 7,
           type: "success",
-        })       
+        })
         return response.data;
       })
       .catch((error) => {
         console.log(error);
       });
-      getDadosAgua()
+    getDadosAgua(anoSelected)
   }
 
-  async function getDadosAgua() {  
+  async function getDadosAgua(ano) {
     const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()  
+
     const res = await api
-      .post("get-agua", {id_municipio: id_municipio, ano: ano})
-      .then((response) => {        
+      .post("get-agua-por-ano", { id_municipio: id_municipio, ano: ano })
+      .then((response) => {
         return response.data;
       })
       .catch((error) => {
         console.log(error);
       });
 
-      setDadosAgua(res[0])
+
+    setDadosAgua(res[0])
   }
 
   async function handleSignOut() {
@@ -117,6 +120,13 @@ export default function Agua({ municipio }: MunicipioProps) {
     Router.push("/indicadores/gestao");
   }
 
+  function seletcAno(ano: any) {
+
+    setAnoSelected(ano)
+
+    getDadosAgua(ano)
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -125,9 +135,23 @@ export default function Agua({ municipio }: MunicipioProps) {
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm style={{borderColor: "#12B2D5"}}>
-            <DivTituloForm>Água</DivTituloForm>          
-             
+          <DivForm style={{ borderColor: "#12B2D5" }}>
+            <DivTituloForm>Água</DivTituloForm>
+            <DivFormEixo>
+              <DivFormConteudo>
+                <DivTitulo>
+                  <DivTituloConteudo>Ano</DivTituloConteudo>
+                </DivTitulo>
+                <label>Selecione o ano desejado:</label>
+                <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
+                  <option >Selecionar</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                </select>
+              </DivFormConteudo>
+            </DivFormEixo>
+            <DivFormEixo>
               <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
@@ -152,39 +176,39 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>Quantidade de economias residenciais ativas de água</p>
                   <p>Quantidade de economias residenciais ativas de água micromedidas</p>
                 </InputGG>
-             
+
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("AG021")}
-                  defaultValue={dadosAgua?.ag021}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag021}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG002")}
-                  defaultValue={dadosAgua?.ag002}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag002}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG004")}
-                  defaultValue={dadosAgua?.ag004}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag004}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG003")}
-                  defaultValue={dadosAgua?.ag003}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag003}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG014")}
-                  defaultValue={dadosAgua?.ag014}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag014}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG013")}
-                  defaultValue={dadosAgua?.ag013}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag013}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG022")}
-                  defaultValue={dadosAgua?.ag022}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag022}
+                    onChange={handleOnChange}
+                    type="text"></input>
                 </InputP>
                 <InputSNIS>
                   <label>.</label>
@@ -197,7 +221,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>economia</p>
                 </InputSNIS>
               </DivFormConteudo>
-              
+
               <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Volumes</DivTituloConteudo>
@@ -218,7 +242,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>AG010</p>
                   <p>AG011</p>
                   <p>AG020</p>
-                  
+
                 </InputSNIS>
                 <InputGG>
                   <label><b>Descrição</b></label>
@@ -237,68 +261,68 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>Volume de água faturado</p>
                   <p>Volume micromedido nas economias residenciais de água</p>
                 </InputGG>
-               
+
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("AG006")}
-                  defaultValue={dadosAgua?.ag006}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag006}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG024")}
-                  defaultValue={dadosAgua?.ag024}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag024}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG016")}
-                  defaultValue={dadosAgua?.ag016}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag016}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG018")}
-                  defaultValue={dadosAgua?.ag018}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag018}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG017")}
-                  defaultValue={dadosAgua?.ag017}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag017}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG019")}
-                  defaultValue={dadosAgua?.ag019}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag019}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG007")}
-                  defaultValue={dadosAgua?.ag007}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag007}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG015")}
-                  defaultValue={dadosAgua?.ag015}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag015}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG027")}
-                  defaultValue={dadosAgua?.ag027}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag027}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG012")}
-                  defaultValue={dadosAgua?.ag012}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag012}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG008")}
-                  defaultValue={dadosAgua?.ag008}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag008}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG010")}
-                  defaultValue={dadosAgua?.ag010}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag010}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG011")}
-                  defaultValue={dadosAgua?.ag011}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag011}
+                    onChange={handleOnChange}
+                    type="text"></input>
                   <input {...register("AG020")}
-                  defaultValue={dadosAgua?.ag020}
-                  onChange={handleOnChange}
-                  type="text"></input>
-                 
+                    defaultValue={dadosAgua?.ag020}
+                    onChange={handleOnChange}
+                    type="text"></input>
+
                 </InputP>
                 <InputSNIS>
                   <label>.</label>
@@ -316,7 +340,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <p>1.000m³/ano</p>
                   <p>1.000m³/ano</p>
                   <p>1.000m³/ano</p>
-                
+
                 </InputSNIS>
               </DivFormConteudo>
 
@@ -334,15 +358,15 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <label><b>Descrição</b></label>
                   <p>Extenção da rede de água</p>
                 </InputGG>
-             
+
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("AG005")}
-                  defaultValue={dadosAgua?.ag005}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag005}
+                    onChange={handleOnChange}
+                    type="text"></input>
                 </InputP>
                 <InputSNIS>
                   <label>.</label>
@@ -364,15 +388,15 @@ export default function Agua({ municipio }: MunicipioProps) {
                   <label><b>Descrição</b></label>
                   <p>Consumo total de energia elétrica nos sistemas de água</p>
                 </InputGG>
-               
+
                 <InputP>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <input {...register("AG028")}
-                  defaultValue={dadosAgua?.ag028}
-                  onChange={handleOnChange}
-                  type="text"></input>
+                    defaultValue={dadosAgua?.ag028}
+                    onChange={handleOnChange}
+                    type="text"></input>
                 </InputP>
                 <InputSNIS>
                   <label>.</label>
@@ -380,9 +404,9 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-             
 
-             <DivFormConteudo>
+
+              <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Observações, esclarecimentos ou sugestões
@@ -411,24 +435,26 @@ export default function Agua({ municipio }: MunicipioProps) {
 
                 <InputG>
 
-                  <label>Ano: {new Date().getFullYear()}</label>
+                  <label>Ano: {anoSelected}</label>
 
                   <textarea {...register("AG098")}
-                  defaultValue={dadosAgua?.ag098}
-                  onChange={handleOnChange}
+                    defaultValue={dadosAgua?.ag098}
+                    onChange={handleOnChange}
                   />
                   <textarea {...register("AG099")}
-                  defaultValue={dadosAgua?.ag099}
-                  onChange={handleOnChange}
+                    defaultValue={dadosAgua?.ag099}
+                    onChange={handleOnChange}
                   ></textarea>
                 </InputG>
               </DivFormConteudo>
-          
 
+            </DivFormEixo>
           </DivForm>
 
           <SubmitButton type="submit">Gravar</SubmitButton>
+
         </Form>
+
       </DivCenter>
     </Container>
   );
@@ -440,7 +466,7 @@ export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
   const apiClient = getAPIClient(ctx);
   const { ["tedplan.token"]: token } = parseCookies(ctx);
   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
- 
+
   if (!token) {
     return {
       redirect: {

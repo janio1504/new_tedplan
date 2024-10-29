@@ -5,10 +5,6 @@ type SignInRequestData = {
   id_sistema: string;
 };
 
-type Usuario = {
-  id_usuario: BigInteger;
-};
-
 export async function signInRequest({
   login,
   senha,
@@ -21,8 +17,10 @@ export async function signInRequest({
       return response;
     })
     .catch((error) => {
-      return error.response;
+      return error;
     });
+
+  return res.data;
 
   if (res.data.error) {
     return res.data;

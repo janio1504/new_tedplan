@@ -158,20 +158,18 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     formState: { errors },
   } = useForm();
   const { usuario, signOut } = useContext(AuthContext);
-  const [contentForEditor, setContentForEditor] = useState(null);
+  //const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>("");
-  const editor = useRef();
-  const firstRender = useRef(true);
-  const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
-  const [nomeMunicipio, setMunicipio] = useState("");
+  
+  //const [nomeMunicipio, setMunicipio] = useState("");
 
 
   useEffect(() => {    
     setDadosMunicipio(municipio[0]);
-    setContentForEditor(municipio[0].rf_descricao);
-    setMunicipio(municipio[0].municipio_nome)
-  }, [municipio]);
+    //setContentForEditor(municipio[0].rf_descricao);
+    //setMunicipio(municipio[0].municipio_nome)
+  }, []);
 
   async function handleGetMunicipio(id_municipio) {
     const resMunicipio = await api.get("getMunicipio", {
@@ -180,18 +178,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     const res = resMunicipio.data.map((mun: IMunicipio) => {
       return mun;
     });
-    console.log(res[0]);
 
     setDadosMunicipio(res[0]);
-    setContentForEditor(res[0].rf_descricao);
+    //setContentForEditor(res[0].rf_descricao);
   }
 
-  async function handleCadastro(data) {
-      if(typeof content === 'string'){
-        data.rf_descricao = content;
-      }else{
-        data.rf_descricao = "";
-      }  
+  async function handleCadastro(data) {    
 
       data.id_municipio = data.id_municipio ? data.id_municipio : dadosMunicipio.id_municipio 
 
@@ -1885,6 +1877,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               {...register("rf_descricao")}
                               defaultValue={dadosMunicipio.rf_descricao}
                               onChange={handleOnChange}
+                              name="rf_descricao"
                             />
                           </TextArea>
                         </DivTextArea>
@@ -1991,6 +1984,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               defaultValue={dadosMunicipio.id_dados_demograficos}
               onChange={handleOnChange}
               type="hidden"
+              name="id_dados_demograficos"
             />
             <InputM>
               <label>
@@ -2001,6 +1995,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 defaultValue={dadosMunicipio.dd_populacao_urbana}
                 onChange={handleOnChange}
                 type="text"
+                name="dd_populacao_urbana"
               ></input>
             </InputM>
             <InputM>
@@ -2012,6 +2007,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 defaultValue={dadosMunicipio.dd_populacao_rural}
                 onChange={handleOnChange}
                 type="text"
+                name="dd_populacao_rural"
               ></input>
             </InputM>
             <InputM>
@@ -2023,6 +2019,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 defaultValue={dadosMunicipio.dd_populacao_total}
                 onChange={handleOnChange}
                 type="text"
+                name="dd_populacao_total"
               ></input>
             </InputM>
             <InputM>
@@ -2034,6 +2031,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 defaultValue={dadosMunicipio.dd_total_moradias}
                 onChange={handleOnChange}
                 type="text"
+                name="dd_total_moradias"
               ></input>
             </InputM>
           </DivForm>

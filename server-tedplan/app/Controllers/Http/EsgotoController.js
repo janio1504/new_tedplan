@@ -3,6 +3,20 @@ const Esgoto = use('App/Models/Concessionaria')
 class EsgotoController {
 
   async getEsgoto({ request }){
+    const { id_municipio} = request.all()
+   try {
+    const res = await Esgoto.query()
+    .from('tedplan.esgoto')
+    .where('id_municipio', id_municipio)
+    .fetch()
+
+    return res
+   } catch (error) {
+    console.log(error);
+   }
+  }
+
+  async getEsgotoAno({ request }){
     const { id_municipio, ano } = request.all()
    try {
     const res = await Esgoto.query()

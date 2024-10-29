@@ -5,26 +5,26 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
     dadosAgua: any, dadosEsgoto: any, dadosDrenagem: any, dadosResiduosColeta: any){
     pdfMake.vfs = pdfFonts.pdfMake.vfs 
     
-    if(dados.length == 0){
+    if(dados?.length == 0){
         alert("Não existem dados gerais cadastrados para gerar o relatório!")
         return
     }
-    if(concessionarias.length == 0){
+    if(concessionarias?.length == 0){
         alert("Não existem dados de concessionarias cadastrados para gerar o relatório!")
     }
     if(financeiro.length == 0){
         alert("Não existem dados financeiros cadastrados para gerar o relatório!")
     }
-    if(dadosAgua.length == 0){
+    if(dadosAgua?.length == 0){
         alert("Não existem dados de aguas cadastrados para gerar o relatório!")
     }
-    if(dadosEsgoto.length == 0){
+    if(dadosEsgoto?.length == 0){
         alert("Não existem dados de esgotos cadastrados para gerar o relatório!")
     }
-    if(dadosDrenagem.length == 0){
+    if(dadosDrenagem?.length == 0){
         alert("Não existem dados de drenagem cadastrados para gerar o relatório!")
     }
-    if(dadosResiduosColeta.length == 0){
+    if(dadosResiduosColeta?.length == 0){
         alert("Não existem dados de residuos cadastrados para gerar o relatório!")
     }
     const reportTitle: any = [

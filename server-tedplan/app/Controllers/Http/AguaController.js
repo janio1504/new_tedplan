@@ -2,14 +2,31 @@
 const Agua = use('App/Models/Concessionaria')
 class AguaController {
   async getAgua({ request }){
+    const { id_municipio } = request.all()
+    
+   try {
+    const res = await Agua.query()
+    .from('tedplan.agua')
+    .where('id_municipio', id_municipio)
+    .orderBy('ano', 'asc')   
+    .fetch()
+    
+    return res
+   } catch (error) {
+    console.log(error);
+   }
+  }
+
+  async getAguaAno({ request }){
     const { id_municipio, ano } = request.all()
+    
    try {
     const res = await Agua.query()
     .from('tedplan.agua')
     .where('id_municipio', id_municipio)
     .where('ano', ano)
     .fetch()
-
+    
     return res
    } catch (error) {
     console.log(error);
