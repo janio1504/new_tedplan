@@ -15,8 +15,7 @@ import Router from "next/router";
 import { useEffect, useState } from "react";
 
 export default function HeadPublico() {
-
-  const [ rota, setRota ] = useState(null)
+  const [rota, setRota] = useState(null);
   function handleDadosMunicipio() {
     Router.push("/indicadores/dados_municipio");
   }
@@ -31,36 +30,55 @@ export default function HeadPublico() {
     Router.push("/indicadores/monitoramento-avaliacao");
   }
 
-  useEffect(()=>{
-    setRota(Router.pathname)
-  },[])
-  
+  useEffect(() => {
+    setRota(Router.pathname);
+  }, []);
 
   return (
     <DivMenu>
       <DivBotaoMenu>
         <NumeroMenu>01</NumeroMenu>
-        { rota == "/indicadores/dados_municipio" ? 
-        <BotaoMenuActive onClick={handleDadosMunicipio}>Cadastro</BotaoMenuActive>:
-        <BotaoMenu onClick={handleDadosMunicipio}>Cadastro</BotaoMenu>}
+        {rota == "/indicadores/dados_municipio" ? (
+          <BotaoMenuActive onClick={handleDadosMunicipio}>
+            Cadastro
+          </BotaoMenuActive>
+        ) : (
+          <BotaoMenu onClick={handleDadosMunicipio}>Cadastro</BotaoMenu>
+        )}
       </DivBotaoMenu>
       <DivBotaoMenu>
         <NumeroMenu>02</NumeroMenu>
-        { rota == "/indicadores/gestao" ? 
-        <BotaoMenuActive onClick={handleGestaoIndicadores}>Gestão</BotaoMenuActive>:
-        <BotaoMenu onClick={handleGestaoIndicadores}>Gestão</BotaoMenu>}
+        {rota == "/indicadores/gestao" ? (
+          <BotaoMenuActive onClick={handleGestaoIndicadores}>
+            Gestão
+          </BotaoMenuActive>
+        ) : (
+          <BotaoMenu onClick={handleGestaoIndicadores}>Gestão</BotaoMenu>
+        )}
       </DivBotaoMenu>
       <DivBotaoMenu>
         <NumeroMenu>03</NumeroMenu>
-        { rota == "/indicadores/prestacao-servicos" 
-        ?<BotaoMenuActive onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenuActive> : 
-        <BotaoMenu onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenu>}
+        {rota == "/indicadores/prestacao-servicos" ? (
+          <BotaoMenuActive onClick={handleGestaoPrestacaoServicos}>
+            Prestação de Serviços
+          </BotaoMenuActive>
+        ) : (
+          <BotaoMenu onClick={handleGestaoPrestacaoServicos}>
+            Prestação de Serviços
+          </BotaoMenu>
+        )}
       </DivBotaoMenu>
       <DivBotaoMenu>
-        <NumeroMenu>04</NumeroMenu>        
-        { rota == "/indicadores/monitoramento-avaliacao" ? 
-        <BotaoMenuActive onClick={handleMonitoramento}>Monitoramento e Avaliação</BotaoMenuActive>:
-        <BotaoMenu onClick={handleMonitoramento}>Monitoramento e Avaliação</BotaoMenu>}
+        <NumeroMenu>04</NumeroMenu>
+        {rota == "/indicadores/monitoramento-avaliacao" ? (
+          <BotaoMenuActive onClick={handleMonitoramento}>
+            Monitoramento e Avaliação
+          </BotaoMenuActive>
+        ) : (
+          <BotaoMenu onClick={handleMonitoramento}>
+            Monitoramento e Avaliação
+          </BotaoMenu>
+        )}
       </DivBotaoMenu>
     </DivMenu>
   );
