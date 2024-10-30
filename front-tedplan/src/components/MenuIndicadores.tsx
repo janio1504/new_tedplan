@@ -1,7 +1,4 @@
-import { Menu, Logo, Logo_si, TextoHead } from "../styles/views";
-import Image from "next/image";
-import logo from "../img/logo_tedplan_login.png";
-import logo_si from "../img/logo_si.png";
+
 import {
   Container,
   DivMenu,

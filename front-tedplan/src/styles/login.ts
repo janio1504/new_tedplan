@@ -10,6 +10,7 @@ export const Container = styled.div`
     margin: 0px;
     background: #fff;
 `;
+
 export const DivLogin = styled.div`
     color: #666;
     font-family: Arial, Helvetica, sans-serif;
@@ -85,5 +86,4 @@ export const Footer = styled.div`
     text-align: center;
     padding: 5px;
     font-size: 11px;
-  }
 `;

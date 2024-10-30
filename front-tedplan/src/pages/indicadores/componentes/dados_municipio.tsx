@@ -9,6 +9,7 @@ import {
   DivCenter,
   DivFormCadastro,
   DivTituloForm,
+  DivInput,
   Form,
   InputP,
   InputM,
@@ -17,29 +18,27 @@ import {
   SubmitButtonContainer,
   DivEixo,
   TextArea,
-  DivTextArea, 
-  StepButton,
-  StepContent,
-  StepLabel,
-  StepperNavigation,
-  StepperWrapper,
-  StepperContainer,
-  StepperButton,
+  DivTextArea,
+  MenuMunicipio,
+  Municipio,
+  MenuMunicipioItem,
+  ItensMenu,
+} from "../../../styles/indicadores";
+import HeadIndicadores from "../../../components/headIndicadores";
+import MenuIndicadores from "./MenuIndicadores";
 
-} from "../../styles/indicadores";
-import HeadIndicadores from "../../components/headIndicadores";
-import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
-
+import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
-import { AuthContext } from "../../contexts/AuthContext";
+import DadosMunicipio from "../../../components/DadosMunicipio";
+import { AuthContext } from "../../../contexts/AuthContext";
 import { useEffect } from "react";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import { GetServerSideProps } from "next";
-import { getAPIClient } from "../../services/axios";
-import MenuHorizontal from "../../components/MenuHorizontal";
-import api from "../../services/api";
+import { getAPIClient } from "../../../services/axios";
+import MenuHorizontal from "../../../components/MenuHorizontal";
+import api from "../../../services/api";
 
 interface IMunicipio {
   id_municipio: string;
@@ -168,25 +167,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   //const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>("");
-  const [activeStep, setActiveStep] = useState(0);
-  const steps = [
-    'Abastecimento de Água',
-    'Esgotamento Sanitário',
-    'Drenagem e Águas Pluviais',
-    'Resíduos Sólidos'
-  ];
-
-  const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
-
-  const handleStepClick = (step: number) => {
-    setActiveStep(step);
-  };
   
   //const [nomeMunicipio, setMunicipio] = useState("");
 
@@ -642,12 +622,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer style={{ 
-      zIndex: 9999,
-      position: 'fixed',
-      top: '16px',
-      right: '16px'
-    }}></ToastContainer>
+      <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
@@ -682,7 +657,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         >
           Controle Social & Responsavel pelo SIMISAB
         </SidebarItem>
-        
+        <SidebarItem 
+          active={activeForm === 'responsavelSIMISAB'} 
+          onClick={() => setActiveForm('responsavelSIMISAB')}
+        >
+          Responsável pelo SIMISAB
+        </SidebarItem>
         <SidebarItem 
           active={activeForm === 'dadosDemograficos'} 
           onClick={() => setActiveForm('dadosDemograficos')}
@@ -720,8 +700,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       </td>
                       <td>
                       <InputM>
-                        <label>Municipio</label>
-                        <input
+                        <label >Municipio</label>
+                        <input 
                           {...register("municipio_nome")}
                           defaultValue={dadosMunicipio.municipio_nome}
                           onChange={handleOnChange}
@@ -1018,27 +998,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
             <DivFormCadastro active={activeForm === 'prestadoresServicos'}>
               <DivTituloForm>Prestadores do Serviço de Saneamento Básico</DivTituloForm>
-              <div className="form-content">
-              <StepperContainer>
-        <StepperWrapper>
-          {steps.map((label, index) => (
-            <div key={label} style={{ position: 'relative' }}>
-              <StepButton
-                active={activeStep === index}
-                completed={activeStep > index}
-                onClick={() => handleStepClick(index)}
-              >
-                {index + 1}
-              </StepButton>
-              <StepLabel active={activeStep === index}>
-                {label}
-              </StepLabel>
-            </div>
-          ))}
-        </StepperWrapper>
-
-        <StepContent active={activeStep === 0}>
-        <DivEixo style={{color:'#000', marginTop: "60px"}}>Abastecimento de Água</DivEixo>
+              <DivEixo>Abastecimento de Água</DivEixo>
             <input
               {...register("id_ps_abastecimento_agua")}
               defaultValue={dadosMunicipio.id_ps_abastecimento_agua}
@@ -1234,11 +1194,10 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </tr>
               </tbody>
             </table>
-        </StepContent>
+        
+           
 
-        <StepContent active={activeStep === 1}>
-      
-          <DivEixo style={{color:'#000', marginTop: "60px"}}>Esgotamento Sanitário</DivEixo>
+            <DivEixo>Esgotamento Sanitário</DivEixo>
             <input
               {...register("id_ps_esgotamento_sanitario")}
               defaultValue={dadosMunicipio.id_ps_esgotamento_sanitario}
@@ -1436,10 +1395,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </tr>
               </tbody>
             </table>
-        </StepContent>
+      
+        
+          
 
-        <StepContent active={activeStep === 2}>
-          <DivEixo style={{color:'#000', marginTop:"60px"}}>Drenagem e Àguas pluviais</DivEixo>
+            <DivEixo>Drenagem e Àguas pluviais</DivEixo>
             <input
               {...register("id_ps_drenagem_aguas_pluviais")}
               defaultValue={dadosMunicipio.id_ps_drenagem_aguas_pluviais}
@@ -1639,10 +1599,10 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </tbody>
             </table>
        
-        </StepContent>
+         
+        
 
-        <StepContent active={activeStep === 3}>
-          <DivEixo style={{color:'#000', marginTop: "60px"}} >Resíduos Sólidos</DivEixo>
+            <DivEixo>Resíduos Sólidos</DivEixo>
             <table>
               <tbody>
                 <tr>
@@ -1832,24 +1792,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </tr>
               </tbody>
             </table>
-        </StepContent>
-
-        <StepperNavigation>
-          <StepperButton
-            secondary
-            onClick={handleBack}
-            disabled={activeStep === 0}
-          >
-            Voltar
-          </StepperButton>
-          <StepperButton
-            onClick={activeStep === steps.length - 1 ? () => handleSubmit(handleCadastro)() : handleNext}
-          >
-            {activeStep === steps.length - 1 ? 'Gravar' : 'Gravar'}
-          </StepperButton>
-        </StepperNavigation>
-      </StepperContainer>
-      </div>
+            <SubmitButtonContainer>
+                    <SubmitButton type="submit">Gravar</SubmitButton>
+                </SubmitButtonContainer>
             </DivFormCadastro>
             
             <DivFormCadastro active={activeForm === 'reguladorFiscalizador'}>
@@ -1946,17 +1891,19 @@ export default function Cadastro({ municipio }: MunicipioProps) {
             <table>
               <tbody>
                 <tr>
-                  
                   <td>
-                  <InputG>
+                   
+                  </td>
+                  <td >
+                  <InputG as="div">
                     <label>
-                      Email<span> *</span>
+                      Email<span>*</span>
                     </label>
                     <input
                       {...register("rf_email")}
                       defaultValue={dadosMunicipio.rf_email}
                       onChange={handleOnChange}
-                      type="text"
+                      type="email"
                     ></input>
                   </InputG>
                   </td>
@@ -1969,7 +1916,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
             <table>
               <tbody>
                 <tr>
-                  <td >
+                  <td colSpan={2}>
                       <DivTextArea>
                           <label><b>Descrição</b> detalhada das funções e responsabilidades<span> *</span></label>
                           <TextArea>
@@ -1978,23 +1925,20 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               defaultValue={dadosMunicipio.rf_descricao}
                               onChange={handleOnChange}
                               name="rf_descricao"
-                              
                             />
                           </TextArea>
                         </DivTextArea>
                   </td>
-
+                 
                 </tr>
               </tbody>
-            </table> 
-            <div style={{color:'#fff'}}>
-               ;
-            </div>
+            </table>
             <SubmitButtonContainer>
                     <SubmitButton type="submit">Gravar</SubmitButton>
                 </SubmitButtonContainer>
             </DivFormCadastro>
-            <DivFormCadastro active={activeForm === 'controleSocial'}>
+            
+            <DivFormCadastro active={activeForm === 'responsavelSIMISAB'}>
               <DivTituloForm>Controle Social dos Serviços Municipais de Saneamento</DivTituloForm>
               <input
               {...register("id_controle_social_sms")}
@@ -2039,7 +1983,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     <SubmitButton type="submit">Gravar</SubmitButton>
                 </SubmitButtonContainer>
             </DivFormCadastro>     
-            <DivFormCadastro active={activeForm === 'controleSocial'}>
+            <DivFormCadastro active={activeForm === 'responsavelSIMISAB'}>
               <DivTituloForm>Responsável pelo SIMISAB</DivTituloForm>
               <input
               {...register("id_responsavel_simisab")}
@@ -2086,7 +2030,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 
             </DivFormCadastro>
 
-            <DivFormCadastro active={activeForm === 'dadosDemograficos'}>
+            <DivFormCadastro active={activeForm === 'dadosDemograficos'} style={{}}>
               <DivTituloForm>Dados demográficos</DivTituloForm>
               <input
               {...register("id_dados_demograficos")}

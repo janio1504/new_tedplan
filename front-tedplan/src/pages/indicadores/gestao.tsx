@@ -30,7 +30,7 @@ import HeadIndicadores from "../../components/headIndicadores";
 import Image from "next/image";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
-import MenuIndicadores from "../../components/MenuIndicadores";
+import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import Router from "next/router";

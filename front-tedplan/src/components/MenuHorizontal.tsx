@@ -74,6 +74,9 @@ export default function MenuHorizontal({municipio}) {
   async function handleSignOut() {
     signOut();
   }
+  async function handleHome() {
+    Router.push("/indicadores/home_indicadores");
+  }
   async function handleGestao() {
     Router.push("/indicadores/gestao");
   }
@@ -103,6 +106,7 @@ export default function MenuHorizontal({municipio}) {
         <Municipio>Bem vindos Município de {municipio}</Municipio>
         <MenuMunicipioItem>
           <ul>
+          <li onClick={handleHome}>Pagina Inicial</li>
             <li onClick={handleGestao}>Gestão</li>
             <li onClick={handleIndicadores}>Indicadores</li>
             <li onClick={handleManuais}>Manuais</li>

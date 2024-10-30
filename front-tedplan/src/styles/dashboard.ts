@@ -128,7 +128,7 @@ export const Menu = styled.div`
   width: 100%;
   margin: 0;
   padding: 0;
-  background: #eee;
+  background: #fff;
   // border-bottom: solid 1px #ccc;
   color: #666;
   float: left;
