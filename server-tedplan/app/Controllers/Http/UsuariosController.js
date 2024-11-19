@@ -7,20 +7,30 @@ class UsuariosController {
   async index() {
     try {
       const usuarios = await Usuario.query()
-        .select(
-          "u.id_usuario",
-          "u.login",
-          "u.ativo",
-          "p.nome",
-          "tu.nome as tipo_usuario"
-        )
-        .from("tedplan.usuario as u")
-        .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
-        .leftJoin(
-          "tedplan.tipo_usuario as tu",
-          "u.id_tipo_usuario",
-          "tu.id_tipo_usuario"
-        )
+      .select(
+        "u.id_usuario",
+        "u.id_pessoa",
+        "u.login",
+        "u.ultimo_login",
+        "u.ativo",
+        "p.nome",
+        "u.id_municipio",
+        "ps.id_permissao",
+        "ps.id_sistema",
+        "pss.nome as permissao_usuario"
+      )
+      .from("tedplan.usuario as u")
+      .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
+      .leftJoin(
+        "tedplan.permissao_sistema as ps",
+        "u.id_usuario",
+        "ps.id_usuario"
+      )
+      .leftJoin(
+        "tedplan.permissoes as pss",
+        "ps.id_permissao",
+        "pss.id_permissao"
+      )
         .fetch();
 
       return usuarios;
@@ -31,7 +41,7 @@ class UsuariosController {
 
   async store({ request }) {
     try {
-      const { nome, email, telefone, login, senha, id_sistema, id_municipio } =
+      const { nome, email, telefone, login, senha, id_sistema, id_municipio, id_permissao } =
         request.all();
 
       const idPessoa = await Pessoa.query()
@@ -49,10 +59,8 @@ class UsuariosController {
           id_municipio: id_municipio,
         });
 
-      const idPermissao = await Usuario.query()
-        .returning("id_permissao_sistema")
-        .table("tedplan.permissao_sistema")
-        .insert({ id_sistema: id_sistema, id_usuario: idUsuario[0] });
+      await Usuario.query().table("tedplan.permissao_sistema")
+        .insert({ id_sistema: id_sistema, id_usuario: idUsuario[0], id_permissao: id_permissao });
 
       return idUsuario[0];
     } catch (error) {
@@ -62,8 +70,9 @@ class UsuariosController {
 
   async getUsuario({ request }) {
     const { id_usuario } = request.all();
-
-    const user = await Usuario.query()
+ 
+    try {
+      const user = await Usuario.query()
       .select(
         "u.id_usuario",
         "u.id_pessoa",
@@ -71,66 +80,81 @@ class UsuariosController {
         "u.ultimo_login",
         "p.nome",
         "u.id_municipio",
+        "ps.id_permissao",
         "ps.id_sistema",
-        "tu.id_tipo_usuario",
-        "tu.nome as tipo_usuario"
+        "pss.nome as permissao_usuario"
       )
       .from("tedplan.usuario as u")
       .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
-      .innerJoin(
-        "tedplan.tipo_usuario as tu",
-        "u.id_tipo_usuario",
-        "tu.id_tipo_usuario"
-      )
       .leftJoin(
         "tedplan.permissao_sistema as ps",
         "u.id_usuario",
         "ps.id_usuario"
       )
+      .leftJoin(
+        "tedplan.permissoes as pss",
+        "ps.id_permissao",
+        "pss.id_permissao"
+      )
       .where("u.id_usuario", id_usuario)
       .fetch();
+      
 
-    return user.toJSON();
+      return user.toJSON();
+    } catch (error) {
+      console.log(error);
+      
+    }
+
+   
   }
 
   async updatePermissoesUsuario({ request, response }) {
     try {
-      const { id_usuario, id_sistema, ativo, id_tipo_usuario, senha } = request.all();
+      const { id_usuario, id_sistema, ativo, id_permissao, id_municipio, senha } = request.all();
 
       if (ativo) {
-        const usuarioAtivo = await Usuario.query()
+        await Usuario.query()
           .from("tedplan.usuario")
           .where("id_usuario", id_usuario)
           .update({ ativo: ativo });
       }
-      if (id_tipo_usuario) {
-        const tipoUsuario = await Usuario.query()
+
+      if (id_municipio) {
+        await Usuario.query()
           .from("tedplan.usuario")
           .where("id_usuario", id_usuario)
-          .update({ id_tipo_usuario: id_tipo_usuario });
+          .update({ id_municipio: id_municipio });
+      }
+      
+      if (id_permissao) {
+        await Usuario.query().from("tedplan.permissao_sistema")
+          .where("id_usuario", id_usuario)
+          .update({ id_permissao: id_permissao,  id_sistema: id_sistema});
       }
 
-      const sistema = await Usuario.query()
-        .from("tedplan.permissao_sistema")
-        .where("id_usuario", id_usuario)
-        .where("id_sistema", id_sistema)
-        .fetch();
+      // const sistema = await Usuario.query()
+      //   .from("tedplan.permissao_sistema")
+      //   .where("id_usuario", id_usuario)
+      //   .where("id_sistema", id_sistema)
+      //   .fetch();
 
-      if (sistema.toJSON().length === 0) {
-        const usuario = await Usuario.query()
-          .from("tedplan.permissao_sistema")
-          .insert({ id_usuario: id_usuario, id_sistema: id_sistema });
-      }
+      // if (sistema.toJSON().length === 0) {
+      //   await Usuario.query().from("tedplan.permissao_sistema")
+      //     .insert({ id_usuario: id_usuario, id_sistema: id_sistema });
+      // }
 
       if (senha) {
-        const usuarioAtivo = await Usuario.query()
+        await Usuario.query()
           .from("tedplan.usuario")
           .where("id_usuario", id_usuario)
           .update({ senha: md5(senha) });
       }
 
-      return sistema;
+      return response().status(200).send('As permissões do usuário foram atualizadas!');
     } catch (error) {
+      console.log(error);
+      
       return error;
     }
   }
@@ -154,6 +178,13 @@ class UsuariosController {
     } catch (error) {
       return error;
     }
+  }
+
+  async getPermissoes() {
+    const sistema = await Usuario.query()
+      .from("tedplan.permissoes")
+      .fetch();
+    return sistema;
   }
 
   async getPermissaoSistema({ request }) {

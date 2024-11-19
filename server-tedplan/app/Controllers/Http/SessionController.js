@@ -15,7 +15,7 @@ class SessionController {
         .fetch();
 
       const usuario = resUsuario.toJSON();
-     
+      
       if (usuario.length == 0) {
         throw new CustomException("O login esta errado ou não existe!", 401);
       }
@@ -31,7 +31,7 @@ class SessionController {
         );
       }
 
-      if (usuario[0].id_tipo_usuario !== 1) {
+      if (usuario[0].id_permissao !== 1) {
         const resPermissao = await Usuario.query()
           .from("tedplan.permissao_sistema")
           .where("id_usuario", usuario[0].id_usuario)

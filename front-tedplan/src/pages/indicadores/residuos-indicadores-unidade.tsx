@@ -95,6 +95,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [visibleCadastro, setVisibleCadastro] = useState(true);
   const [visibleResiduosRecebidos, setVisibleResiduosRecebidos] = useState(false);
   const [up080, setUp080] = useState(null);
+  const [anoSelected, setAnoSelected] = useState(null);
   
   useEffect(() => {
     getResiduosRecebidos()
@@ -269,6 +270,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     Router.push("/indicadores/residuos-indicadores-coleta");
   }
 
+  function seletcAno(ano: any) {
+
+    setAnoSelected(ano)
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -396,7 +402,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         >
                           Fechar
                         </CloseModalButton> 
-                       
+              <DivFormConteudo>
+                <DivTitulo>
+                  <DivTituloConteudo>Ano</DivTituloConteudo>
+                </DivTitulo>
+                <label>Selecione o ano desejado:</label>
+                <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
+                  <option >Selecionar</option>
+                  <option value="2022">2022</option>
+                  <option value="2023">2023</option>
+                  <option value="2024">2024</option>
+                </select>
+              </DivFormConteudo>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>

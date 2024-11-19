@@ -119,7 +119,7 @@ Route.post("list-residuos-recebidos", "PsQuantResiduosRecebidoController.getResi
 
 Route.post("addPsFinanceiro", "PsFinanceiroController.store");
 Route.post("get-ps-financeiro", "PsFinanceiroController.getDadosFinanceiros");
-Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinanceiros");
+Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinanceirosPorAno");
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
 
@@ -146,6 +146,8 @@ Route.group(() => {
   Route.get("getSistemas", "UsuariosController.getSistemas");
   Route.post("updatePermissoes", "UsuariosController.updatePermissoesUsuario");
   Route.get("listGalerias", "GaleriaController.index");
+  
+  Route.get("get-permissoes", "UsuariosController.getPermissoes");
 
   Route.post("addImagensGaleria", "GaleriaController.storeImagens");
 

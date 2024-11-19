@@ -58,8 +58,8 @@ export default function MenuSuperior(usuarios: UsuarioProps){
         Router.push('/listarNormas')
       }
 
-      function handleManuais(){
-        Router.push('/listarManuais')
+      function handleDashboard(){
+        Router.push('/dashboard')
       }
 
     return (
@@ -85,10 +85,10 @@ export default function MenuSuperior(usuarios: UsuarioProps){
                   
             </UsuarioAvatar>
            <ItensMenu>
-             <ul>              
+             <ul>
+               <li onClick={handleDashboard}>Dashboard</li>              
                <li onClick={handlePostagens} >Postagens</li>
-               <li onClick={handlePublicacoes}>Publicações</li>
-               <li onClick={handleManuais}>Manuais</li>
+               <li onClick={handlePublicacoes}>Publicações</li>               
                <li onClick={handleGalerias}>Galerias</li>
                <li onClick={handleNormas}>Normas</li>
                <li onClick={handleUsuarios}>Usuários</li>              
