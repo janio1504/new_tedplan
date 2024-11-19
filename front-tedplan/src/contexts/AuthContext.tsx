@@ -91,44 +91,25 @@ export function AuthProvider({ children }) {
         Router.push("/dashboard");
       }
     });
-
-    usuarioLogado.map((user) => {
-      if (user.id_tipo_usuario === 1) {
-        Router.push("/listarUsuarios");
-      }
-      if (user.id_tipo_usuario === 2) {
-        Router.push("/indicadores/home_indicadores");
-      }
-    });
-
-    usuarioLogado.map((user) => {
-      if (user.id_tipo_usuario === 1) {
-        Router.push("/listarUsuarios");
-      }
-      if (user.id_tipo_usuario === 2) {
-        Router.push("/indicadores/home_indicadores");
-      }
-    });
-
-    async function signOut() {
-      destroyCookie(undefined, "tedplan.token", {});
-      destroyCookie(undefined, "tedplan.id_usuario", {});
-      localStorage.removeItem("usuario");
-      Router.push("/");
-    }
-
-    function setMunicipioUser(id) {
-      usuario.id_municipio = id;
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-      setUser(usuario);
-    }
-
-    return (
-      <AuthContext.Provider
-        value={{ usuario, isAuthenticated, signIn, signOut, setMunicipioUser }}
-      >
-        {children}
-      </AuthContext.Provider>
-    );
   }
+  async function signOut() {
+    destroyCookie(undefined, "tedplan.token", {});
+    destroyCookie(undefined, "tedplan.id_usuario", {});
+    localStorage.removeItem("usuario");
+    Router.push("/");
+  }
+
+  function setMunicipioUser(id) {
+    usuario.id_municipio = id;
+    localStorage.setItem("usuario", JSON.stringify(usuario));
+    setUser(usuario);
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{ usuario, isAuthenticated, signIn, signOut, setMunicipioUser }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
