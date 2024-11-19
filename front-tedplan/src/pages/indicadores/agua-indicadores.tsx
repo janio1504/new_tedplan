@@ -39,12 +39,12 @@ interface IMunicipio {
 }
 
 interface MunicipioProps {
-  municipio: IMunicipio[];
+  Imunicipio: IMunicipio[];
 }
 
-export default function Agua({ municipio }: MunicipioProps) {
+export default function Agua() {
   const { usuario, signOut } = useContext(AuthContext);
-  const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(municipio);
+  const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio>(null);
   const [anoSelected, setAnoSelected] = useState(null);
   const {
     register,
@@ -57,10 +57,17 @@ export default function Agua({ municipio }: MunicipioProps) {
   const [content, setContent] = useState(null);
 
   useEffect(() => {
-    municipio.map((value) => {
-      setDadosMunicipio(value);
-    });
+    getMunicipio()
   }, []);
+
+  async function getMunicipio(){
+    const res = await api.get("getMunicipio", {
+      params: { id_municipio: usuario.id_municipio },
+    }).then(response =>{
+      setDadosMunicipio(response.data)
+    })
+ 
+  }
 
   function handleOnChange(content) {
     setContent(content);
@@ -69,7 +76,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {
 
     data.id_agua = dadosAgua?.id_agua
-    data.id_municipio = municipio[0].id_municipio
+    data.id_municipio = dadosMunicipio[0]?.id_municipio
     data.ano = anoSelected
 
     const resCad = await api
@@ -89,8 +96,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function getDadosAgua(ano) {
-    const id_municipio = municipio[0].id_municipio
-
+    const id_municipio = dadosMunicipio[0]?.id_municipio
     const res = await api
       .post("get-agua-por-ano", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
@@ -100,25 +106,11 @@ export default function Agua({ municipio }: MunicipioProps) {
         console.log(error);
       });
 
-
+    
+    
     setDadosAgua(res[0])
   }
 
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
 
   function seletcAno(ano: any) {
 
@@ -131,7 +123,7 @@ export default function Agua({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={dadosMunicipio.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
@@ -460,36 +452,4 @@ export default function Agua({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
-
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
-
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
-
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
-
-  return {
-    props: {
-      municipio,
-    },
-  };
-};
 

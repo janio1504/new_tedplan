@@ -427,22 +427,20 @@ export const DivTituloForm = styled.div`
   border-radius: 2px;
   font-weight: bolder;
 `;
-export const Tabela = styled.div`
+export const Tabela = styled.table`
   width: 100%;
   margin-top: 20px;
-  table {    
-    display: flex;
+  table {
     justify-content: center;
     border: -1px;
-    width: 90%; 
-        
+    width: 99%; ; 
    th{
     
     background: #008080;
     padding: 10px;
     color: #fff;
     border: solid 1px #008080;
-  }
+  }   
   td {
     padding: 10px;
     border: solid 1px #008080;

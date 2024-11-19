@@ -12,8 +12,8 @@ const CustomException = use("App/Exceptions/CustomException");
 class PublicacaoController {
   async index({ request, response }) {
     const { page } = request.all()
-    
-    
+
+
     try {
       const publicacoes = await Publicacoes.query()
         .select(
@@ -90,11 +90,9 @@ class PublicacaoController {
 
   async buscaPorFiltro({ request, response }) {
     const { titulo, id_eixo, id_tipo_publicacao, id_municipio, page } = request.all();
-    
+
     try {
-
-      if (!id_municipio && !id_eixo && !id_tipo_publicacao && !titulo) {
-        const publicacoes = await Publicacoes.query()
+      let query = Publicacoes.query()
         .select(
           "p.id_publicacao",
           "p.titulo",
@@ -117,410 +115,30 @@ class PublicacaoController {
           "p.id_tipo_publicacao",
           "tp.id_tipo_publicacao"
         )
-        .orderBy("p.id_publicacao", "desc")
-        .paginate(page, 5)
+        .orderBy("p.id_publicacao", "desc");
 
-        return publicacoes;
+      // Aplicar filtros condicionalmente
+      if (id_municipio) {
+        query = query.where("m.id_municipio", id_municipio);
       }
-      
-      if (id_municipio && !id_eixo && !id_tipo_publicacao && !titulo) {
-        const publicacoes = await Publicacoes.query()
-        .select(
-          "p.id_publicacao",
-          "p.titulo",
-          "tp.nome as tipo_publicacao",
-          "e.nome as eixo",
-          "tp.nome as tipo",
-          "p.id_imagem",
-          "m.nome as municipio",
-          "p.id_arquivo"
-        )
-        .from("tedplan.publicacoes as p")
-        .innerJoin(
-          "tedplan.municipios as m",
-          "p.id_municipio",
-          "m.id_municipio"
-        )
-        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_publicacao as tp",
-          "p.id_tipo_publicacao",
-          "tp.id_tipo_publicacao"
-        )
-        .orderBy("p.id_publicacao", "desc")
-        .where("m.id_municipio", id_municipio)
-        .paginate(page, 5)
-
-        return publicacoes;
+      if (id_eixo) {
+        query = query.where("e.id_eixo", id_eixo);
       }
-      if (id_eixo && !id_municipio && !id_tipo_publicacao && !titulo) {
-        const publicacoes = await Publicacoes.query()
-        .select(
-          "p.id_publicacao",
-          "p.titulo",
-          "tp.nome as tipo_publicacao",
-          "e.nome as eixo",
-          "tp.nome as tipo",
-          "p.id_imagem",
-          "m.nome as municipio",
-          "p.id_arquivo"
-        )
-        .from("tedplan.publicacoes as p")
-        .innerJoin(
-          "tedplan.municipios as m",
-          "p.id_municipio",
-          "m.id_municipio"
-        )
-        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_publicacao as tp",
-          "p.id_tipo_publicacao",
-          "tp.id_tipo_publicacao"
-        )
-        .orderBy("p.id_publicacao", "desc")
-        .where("e.id_eixo", id_eixo)
-        .paginate(page, 5)
-
-        return publicacoes;
-        
+      if (id_tipo_publicacao) {
+        query = query.where("tp.id_tipo_publicacao", id_tipo_publicacao);
       }
-      if (id_tipo_publicacao && !id_municipio && !id_eixo && !titulo) {
-        const publicacoes = await Publicacoes.query()
-        .select(
-          "p.id_publicacao",
-          "p.titulo",
-          "tp.nome as tipo_publicacao",
-          "e.nome as eixo",
-          "tp.nome as tipo",
-          "p.id_imagem",
-          "m.nome as municipio",
-          "p.id_arquivo"
-        )
-        .from("tedplan.publicacoes as p")
-        .innerJoin(
-          "tedplan.municipios as m",
-          "p.id_municipio",
-          "m.id_municipio"
-        )
-        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_publicacao as tp",
-          "p.id_tipo_publicacao",
-          "tp.id_tipo_publicacao"
-        )
-        .orderBy("p.id_publicacao", "desc")
-        .where("tp.id_tipo_publicacao", id_tipo_publicacao)
-        .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (titulo && !id_tipo_publicacao && !id_municipio && !id_eixo) {
-        console.log(page);
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (id_municipio && id_eixo && !id_tipo_publicacao && !titulo) {
-        where = { "m.id_municipio": id_municipio, "e.id_eixo": id_eixo };
-      }
-      if (id_municipio && !id_eixo && id_tipo_publicacao && !titulo) {
-        where = {
-          "m.id_municipio": id_municipio,
-          "tp.id_tipo_publicacao": id_tipo_publicacao,
-        };
-      }
-      if (id_municipio && !id_eixo && !id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("m.id_municipio", id_municipio)
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (!id_municipio && id_eixo && id_tipo_publicacao && !titulo) {
-        where = {
-          "tp.id_tipo_publicacao": id_tipo_publicacao,
-          "e.id_eixo": id_eixo,
-        };
-      }
-      if (!id_municipio && id_eixo && !id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("e.id_eixo", id_eixo)
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (!id_municipio && !id_eixo && id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("tp.id_tipo_publicacao", id_tipo_publicacao)
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (id_municipio && id_eixo && id_tipo_publicacao && !titulo) {
-        where = {
-          "m.id_municipio": id_municipio,
-          "e.id_eixo": id_eixo,
-          "tp.id_tipo_publicacao": id_tipo_publicacao,
-        };
-      }
-      if (!id_municipio && id_eixo && id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("tp.id_tipo_publicacao", id_tipo_publicacao)
-          .where("e.id_eixo", id_eixo)
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (id_municipio && !id_eixo && id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("tp.id_tipo_publicacao", id_tipo_publicacao)
-          .where("m.id_municipio", id_municipio)
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (id_municipio && id_eixo && !id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("e.id_eixo", id_eixo)
-          .where("m.id_municipio", id_municipio)
-          .paginate(page, 5)
-
-        return publicacoes;
-      }
-      if (id_municipio && id_eixo && id_tipo_publicacao && titulo) {
-        const publicacoes = await Publicacoes.query()
-          .select(
-            "p.id_publicacao",
-            "p.titulo",
-            "tp.nome as tipo_publicacao",
-            "e.nome as eixo",
-            "tp.nome as tipo",
-            "p.id_imagem",
-            "m.nome as municipio",
-            "p.id_arquivo"
-          )
-          .from("tedplan.publicacoes as p")
-          .innerJoin(
-            "tedplan.municipios as m",
-            "p.id_municipio",
-            "m.id_municipio"
-          )
-          .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_publicacao as tp",
-            "p.id_tipo_publicacao",
-            "tp.id_tipo_publicacao"
-          )
-          .orderBy("p.id_publicacao", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("e.id_eixo", id_eixo)
-          .where("tp.id_tipo_publicacao", id_tipo_publicacao)
-          .where("m.id_municipio", id_municipio)
-          .paginate(page, 5)
-
-        return publicacoes;
+      if (titulo) {
+        query = query.where("p.titulo", "ilike", `%${titulo}%`);
       }
 
-      const publicacoes = await Publicacoes.query()
-        .select(
-          "p.id_publicacao",
-          "p.titulo",
-          "tp.nome as tipo_publicacao",
-          "e.nome as eixo",
-          "tp.nome as tipo",
-          "p.id_imagem",
-          "m.nome as municipio",
-          "p.id_arquivo"
-        )
-        .from("tedplan.publicacoes as p")
-        .innerJoin(
-          "tedplan.municipios as m",
-          "p.id_municipio",
-          "m.id_municipio"
-        )
-        .innerJoin("tedplan.eixos as e", "p.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_publicacao as tp",
-          "p.id_tipo_publicacao",
-          "tp.id_tipo_publicacao"
-        )
-        .orderBy("p.id_publicacao", "desc")
-        .where(where)
-        .paginate(page, 5)
+      // Executar a query com paginação
+      const publicacoes = await query.paginate(page, 5);
 
       return publicacoes;
+
     } catch (error) {
       console.log(error);
-      return error;
+      return response.status(500).json({ error: "Erro interno do servidor" });
     }
   }
 
@@ -602,7 +220,7 @@ class PublicacaoController {
         .fetch();
 
       return post;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async update({ request, response }) {
@@ -705,13 +323,13 @@ class PublicacaoController {
 
       if (id_imagem) {
         const imagem = await Imagem.findBy("id", id_imagem);
-        
+
         if (!imagem) {
           Fs.unlinkSync(Helpers.tmpPath(`uploads/${imagem.file}`));
           imagem.delete();
         }
       }
-      
+
       if (id_arquivo) {
         const file = await File.findBy("id", id_arquivo);
         if (!file) {

@@ -11,6 +11,7 @@ const CustomException = use("App/Exceptions/CustomException");
 
 class NormaController {
   async index({ request, response }) {
+    const { page } = request.all()
     try {
       const normas = await Normas.query()
         .select(
@@ -30,7 +31,8 @@ class NormaController {
           "n.id_tipo_norma",
           "tn.id_tipo_norma"
         )
-        .fetch();
+        .orderBy("n.id_norma", "desc")
+        .paginate(page, 5)
 
       return normas;
     } catch (error) {
@@ -40,7 +42,7 @@ class NormaController {
 
   async getNorma({ request, response }) {
     try {
-      const { id_norma, id_imagem, id_arquivo } = request.all();
+      const { id_norma } = request.all();
       const normas = await Normas.query()
         .select(
           "n.titulo",
@@ -68,146 +70,457 @@ class NormaController {
     }
   }
 
+  // async buscaPorFiltro({ request, response }) {
+  //   const { titulo, id_eixo, id_escala, id_tipo_norma, page } = request.all();
+  //   //console.log(id_escola);
+  //   try {
+
+  //     if (!id_escala && !id_eixo && !id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .fetch();
+
+  //       return normas;
+  //     }
+
+  //     if (id_escala && !id_eixo && !id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.id_escala", id_escala)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (!id_escala && id_eixo && !id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("e.id_eixo", id_eixo)
+  //         .fetch();
+
+  //       return normas;
+
+  //     }
+  //     if (!id_escala && !id_eixo && id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .fetch();
+
+  //       return normas;
+
+  //     }
+  //     if (!id_escala && !id_eixo && !id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.titulo", "ilike", "%" + titulo + "%")
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (id_escala && id_eixo && !id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.id_escala", id_escala)
+  //         .where("e.id_eixo", id_eixo)
+  //         .fetch();
+
+  //       return normas;
+
+  //     }
+  //     if (id_escala && !id_eixo && id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.id_escala", id_escala)
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .fetch();
+
+  //       return normas;
+
+  //     }
+  //     if (id_escala && !id_eixo && !id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.titulo", "ilike", "%" + titulo + "%")
+  //         .where("es.id_escala", id_escala)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (!id_escala && id_eixo && id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("e.id_eixo", id_eixo)
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .fetch();
+
+  //       return normas;
+
+  //     }
+  //     if (!id_escala && id_eixo && !id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.titulo", "ilike", "%" + titulo + "%")
+  //         .where("e.id_eixo", id_eixo)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (!id_escala && !id_eixo && id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("n.titulo", "ilike", "%" + titulo + "%")
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (id_escala && id_eixo && id_tipo_norma && !titulo) {
+  //       const normas = await Normas.query()
+  //         .select(
+  //           "n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma"
+  //         )
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("es.id_escala", id_escala)
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .where("e.id_eixo", id_eixo)
+  //         .fetch();
+
+  //       return normas;
+
+  //     }
+  //     if (!id_escala && id_eixo && id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("p.titulo", "ilike", "%" + titulo + "%")
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .where("e.id_eixo", id_eixo)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (id_escala && !id_eixo && id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("p.titulo", "ilike", "%" + titulo + "%")
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .where("es.id_escala", id_escala)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (id_escala && id_eixo && !id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("p.titulo", "ilike", "%" + titulo + "%")
+  //         .where("e.id_eixo", id_eixo)
+  //         .where("es.id_escala", id_escala)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+  //     if (id_escala && id_eixo && id_tipo_norma && titulo) {
+  //       const normas = await Normas.query()
+  //         .select("n.titulo",
+  //           "es.nome as escala",
+  //           "e.nome as eixo",
+  //           "n.id_norma",
+  //           "n.id_imagem",
+  //           "n.id_arquivo",
+  //           "tn.nome as tipo_norma")
+  //         .from("tedplan.normas as n")
+  //         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //         .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //         .innerJoin(
+  //           "tedplan.tipo_norma as tn",
+  //           "n.id_tipo_norma",
+  //           "tn.id_tipo_norma"
+  //         )
+  //         .orderBy("n.id_norma", "desc")
+  //         .where("p.titulo", "ilike", "%" + titulo + "%")
+  //         .where("e.id_eixo", id_eixo)
+  //         .where("tn.id_tipo_norma", id_tipo_norma)
+  //         .where("es.id_escala", id_escala)
+  //         .fetch();
+
+  //       return normas;
+  //     }
+
+  //     const normas = await Normas.query()
+  //       .select("n.titulo",
+  //         "es.nome as escala",
+  //         "e.nome as eixo",
+  //         "n.id_norma",
+  //         "n.id_imagem",
+  //         "n.id_arquivo",
+  //         "tn.nome as tipo_norma")
+  //       .from("tedplan.normas as n")
+  //       .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
+  //       .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
+  //       .innerJoin(
+  //         "tedplan.tipo_norma as tn",
+  //         "n.id_tipo_norma",
+  //         "tn.id_tipo_norma"
+  //       )
+  //       .where(where)
+  //       .fetch();
+
+  //     return normas;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return error;
+  //   }
+  // }
   async buscaPorFiltro({ request, response }) {
-    const { titulo, id_eixo, id_escala, id_tipo_norma } = request.all();
-    //console.log(id_escola);
+    const { titulo, id_eixo, id_escala, id_tipo_norma, page } = request.all();
+
     try {
-
-      if (!id_escala && !id_eixo && !id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
+      let query = Normas.query()
         .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .fetch();
-
-      return normas;
-      }
-      
-      if (id_escala && !id_eixo && !id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .where("n.id_escala", id_escala)
-        .fetch();
-
-      return normas;
-      }
-      if (!id_escala && id_eixo && !id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .where("e.id_eixo", id_eixo)
-        .fetch();
-
-      return normas;
-        
-      }
-      if (!id_escala && !id_eixo && id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .where("tn.id_tipo_norma", id_tipo_norma)
-        .fetch();
-
-      return normas;
-        
-      }
-      if (!id_escala && !id_eixo && !id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
+          "n.titulo",
           "es.nome as escala",
           "e.nome as eixo",
           "n.id_norma",
           "n.id_imagem",
           "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("n.titulo", "ilike", "%" + titulo + "%")
-          .fetch();
-
-        return normas;
-      }
-      if (id_escala && id_eixo && !id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
+          "tn.nome as tipo_norma"
         )
         .from("tedplan.normas as n")
         .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
@@ -217,293 +530,30 @@ class NormaController {
           "n.id_tipo_norma",
           "tn.id_tipo_norma"
         )
-        .orderBy("n.id_norma", "desc")
-        .where("n.id_escala", id_escala)
-        .where("e.id_eixo", id_eixo )
-        .fetch();
+        .orderBy("n.id_norma", "desc");
+
+      // Aplicar filtros condicionalmente
+      if (id_escala) {
+        query = query.where("n.id_escala", id_escala);
+      }
+      if (id_eixo) {
+        query = query.where("e.id_eixo", id_eixo);
+      }
+      if (id_tipo_norma) {
+        query = query.where("tn.id_tipo_norma", id_tipo_norma);
+      }
+      if (titulo) {
+        query = query.where("n.titulo", "ilike", `%${titulo}%`);
+      }
+
+      // Executar a query com paginação
+      const normas = await query.paginate(page, 5); // Assumindo 10 itens por página
 
       return normas;
-       
-      }
-      if (id_escala && !id_eixo && id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .where("n.id_escala", id_escala)
-        .where("tn.id_tipo_norma", id_tipo_norma )
-        .fetch();
 
-      return normas;
-        
-      }
-      if (id_escala && !id_eixo && !id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("n.titulo", "ilike", "%" + titulo + "%")
-          .where("es.id_escala", id_escala)
-          .fetch();
-
-        return normas;
-      }
-      if (!id_escala && id_eixo && id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .where("e.id_eixo", id_eixo)
-        .where("tn.id_tipo_norma", id_tipo_norma )
-        .fetch();
-
-      return normas;
-       
-      }
-      if (!id_escala && id_eixo && !id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("n.titulo", "ilike", "%" + titulo + "%")
-          .where("e.id_eixo", id_eixo)
-          .fetch();
-
-        return normas;
-      }
-      if (!id_escala && !id_eixo && id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("n.titulo", "ilike", "%" + titulo + "%")
-          .where("tn.id_tipo_norma", id_tipo_norma)
-          .fetch();
-
-        return normas;
-      }
-      if (id_escala && id_eixo && id_tipo_norma && !titulo) {
-        const normas = await Normas.query()
-        .select(
-        "n.titulo",
-        "es.nome as escala",
-        "e.nome as eixo",
-        "n.id_norma",
-        "n.id_imagem",
-        "n.id_arquivo",
-        "tn.nome as tipo_norma"
-        )
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .orderBy("n.id_norma", "desc")
-        .where("es.id_escala", id_escala)
-        .where("tn.id_tipo_norma", id_tipo_norma )
-        .where("e.id_eixo", id_eixo)
-        .fetch();
-
-      return normas;
-        
-      }
-      if (!id_escala && id_eixo && id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("tn.id_tipo_norma", id_tipo_norma)
-          .where("e.id_eixo", id_eixo)
-          .fetch();
-
-        return normas;
-      }
-      if (id_escala && !id_eixo && id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("tn.id_tipo_norma", id_tipo_norma)
-          .where("es.id_escala", id_escala)
-          .fetch();
-
-        return normas;
-      }
-      if (id_escala && id_eixo && !id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("e.id_eixo", id_eixo)
-          .where("es.id_escala", id_escala)
-          .fetch();
-
-        return normas;
-      }
-      if (id_escala && id_eixo && id_tipo_norma && titulo) {
-        const normas = await Normas.query()
-            .select("n.titulo",
-            "es.nome as escala",
-            "e.nome as eixo",
-            "n.id_norma",
-            "n.id_imagem",
-            "n.id_arquivo",
-            "tn.nome as tipo_norma")
-          .from("tedplan.normas as n")
-          .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-          .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-          .innerJoin(
-            "tedplan.tipo_norma as tn",
-            "n.id_tipo_norma",
-            "tn.id_tipo_norma"
-          )
-          .orderBy("n.id_norma", "desc")
-          .where("p.titulo", "ilike", "%" + titulo + "%")
-          .where("e.id_eixo", id_eixo)
-          .where("tn.id_tipo_norma", id_tipo_norma)
-          .where("es.id_escala", id_escala)
-          .fetch();
-
-        return normas;
-      }
-
-      const normas = await Normas.query()
-          .select("n.titulo",
-          "es.nome as escala",
-          "e.nome as eixo",
-          "n.id_norma",
-          "n.id_imagem",
-          "n.id_arquivo",
-          "tn.nome as tipo_norma")
-        .from("tedplan.normas as n")
-        .innerJoin("tedplan.escala as es", "n.id_escala", "es.id_escala")
-        .innerJoin("tedplan.eixos as e", "n.id_eixo", "e.id_eixo")
-        .innerJoin(
-          "tedplan.tipo_norma as tn",
-          "n.id_tipo_norma",
-          "tn.id_tipo_norma"
-        )
-        .where(where)
-        .fetch();
-
-      return normas;
     } catch (error) {
       console.log(error);
-      return error;
+      return response.status(500).json({ error: "Erro interno do servidor" });
     }
   }
 
@@ -578,7 +628,7 @@ class NormaController {
         .fetch();
 
       return post;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async update({ request, response }) {

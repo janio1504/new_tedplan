@@ -123,7 +123,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
   async function getDadosGerais(ano: any) {
-    const id_municipio = municipio[0].id_municipio
+    const id_municipio = usuario.id_municipio
 
     const resCad = await api
       .post("get-geral-por-ano", { id_municipio: id_municipio, ano: ano })
@@ -141,7 +141,7 @@ export default function Geral({ municipio }: MunicipioProps) {
   }
 
   async function getConcessionarias() {
-    const id_municipio = municipio[0].id_municipio
+    const id_municipio = usuario.id_municipio
     const ano = anoSelected
     const resCad = await api
       .post("get-concessionarias", { id_municipio: id_municipio, ano: ano })
@@ -161,7 +161,7 @@ export default function Geral({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {
 
     data.id_geral_da_ae_dh = dadosGeral?.id_geral_da_ae_dh
-    data.id_municipio = municipio[0].id_municipio
+    data.id_municipio = usuario.id_municipio
     data.ano = anoSelected
     console.log(data);
 
@@ -219,7 +219,7 @@ export default function Geral({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={''}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
@@ -339,7 +339,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td>
                         <InputP>
                           <select {...register('GE019')}>
-                            <option > {dadosGeral?.ge019} </option>
+                            <option value=""> {dadosGeral?.ge019 ? dadosGeral?.ge019 : 'Opções'} </option>
                             <option value="Sede Municipal"> Sede Municipal  </option>
                             <option value="Localidades"> Localidades  </option>
                             <option value="Ambos"> Ambos</option>
@@ -357,7 +357,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                         <InputP>
 
                           <select {...register('GE020')}>
-                            <option > {dadosGeral?.ge020} </option>
+                            <option value="" > {dadosGeral?.ge020 ? dadosGeral?.ge020 : 'Opções'} </option>
                             <option value="Sede Municipal"> Sede Municipal  </option>
                             <option value="Localidades"> Localidades  </option>
                             <option value="Ambos"> Ambos</option>
@@ -637,10 +637,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <tr>
                       <td><InputSNIS>GE012</InputSNIS></td>
                       <td>Existe Comitê de Bacia ou Sob-bacia Hidrográfica organizada?</td>
-                      <td><InputP><select {...register('GE012')}
-                        defaultValue={dadosGeral?.ge012}
-                        onChange={handleOnChange} >
-                        <option></option>
+                      <td><InputP><select {...register('GE012')} >
+                        <option value="">{dadosGeral?.ge012 ? dadosGeral?.ge012 : 'Opções'}</option>
                         <option value="Sim">Sim</option>
                         <option value="Não">Não</option>
                       </select></InputP></td>
@@ -714,11 +712,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <tr>
                       <td><InputSNIS>IE001</InputSNIS></td>
                       <td>Existe Plano Diretor de Drenagem e Manejo das Água Pluviais Urbanas? </td>
-                      <td><InputP><select {...register('IE001')}
-                        defaultValue={dadosGeral?.ie001}
-                        onChange={handleOnChange}
-                      >
-                        <option value=""></option>
+                      <td><InputP><select {...register('IE001')}>
+                        <option value="">{dadosGeral?.ie001 ? dadosGeral?.ie001 : 'Opções'}</option>
                         <option value="1">Sim</option>
                         <option value="0">Não</option>
                       </select></InputP></td>
@@ -958,7 +953,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                             type="checkbox" />
                             <span>Quantidade chuva por frequência diária</span></CheckBox>
                           <CheckBox><input {...register('RI004_3')}
-                            defaultChecked={dadosGeral?.ri004_1 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri004_3 == "true" ? true : false}
                             type="checkbox" />
                             <span>Quantidade chuva por frequência hora..</span></CheckBox>
                         </DivChekbox>
