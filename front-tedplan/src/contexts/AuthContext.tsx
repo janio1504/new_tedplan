@@ -45,97 +45,94 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  // async function signIn({ login, senha, id_sistema }: SignInData) {
+  //   const data = await signInRequest({
+  //     login,
+  //     senha,
+  //     id_sistema,
+  //   }).then(
+  //     (response) => {
+  //       if (response.token && response.id_usuario) {
+  //         setCookie(undefined, "tedplan.token", response.token, {
+  //           maxAge: 60 * 60 * 1, // 1 hora
+  //         });
+
+  //         setCookie(undefined, "tedplan.id_usuario", response.id_usuario, {
+  //           maxAge: 60 * 60 * 1, // 1 hora
+  //         });
+
+  //         api.defaults.headers["Authorization"] = `Bearer ${response.token}`;
+
+  //         recoverUserInformation(response.id_usuario).then((value) => {
+  //           setUser(value[0]);
+  //         });
+
+  //         //Router.push('/listarPublicacoes')
+  //       }
+  //     },
+  //     [0]
+  //   );
+
   async function signIn({ login, senha, id_sistema }: SignInData) {
     const data = await signInRequest({
       login,
       senha,
       id_sistema,
-    }).then(
-      (response) => {
+    })
+      .then((response) => {
         if (response.token && response.id_usuario) {
-          setCookie(undefined, "tedplan.token", response.token, {
-            maxAge: 60 * 60 * 1, // 1 hora
-          });
+          setCookie(undefined, "tedplan.token", response.token);
 
-          setCookie(undefined, "tedplan.id_usuario", response.id_usuario, {
-            maxAge: 60 * 60 * 1, // 1 hora
-          });
+          setCookie(undefined, "tedplan.id_usuario", response.id_usuario);
 
           api.defaults.headers["Authorization"] = `Bearer ${response.token}`;
 
           recoverUserInformation(response.id_usuario).then((value) => {
             setUser(value[0]);
           });
-
-          //Router.push('/listarPublicacoes')
         }
-      },
-      [0]
-    );
-
-    async function signIn({ login, senha, id_sistema }: SignInData) {
-      const data = await signInRequest({
-        login,
-        senha,
-        id_sistema,
+        return response;
       })
-        .then((response) => {
-          if (response.token && response.id_usuario) {
-            setCookie(undefined, "tedplan.token", response.token);
-
-            setCookie(undefined, "tedplan.id_usuario", response.id_usuario);
-
-            api.defaults.headers["Authorization"] = `Bearer ${response.token}`;
-
-            recoverUserInformation(response.id_usuario).then((value) => {
-              setUser(value[0]);
-            });
-          }
-          return response;
-        })
-        .catch((error) => {
-          return error;
-        });
-
-      const resUsuarioLogado = await api.get("getUsuario", {
-        params: { id_usuario: data.id_usuario },
-      });
-      const usuarioLogado = await resUsuarioLogado.data;
-
-      usuarioLogado.map((user) => {
-        if (user.id_tipo_usuario === 1) {
-          Router.push("/listarUsuarios");
-        }
-        if (user.id_tipo_usuario === 2) {
-          Router.push("/indicadores/home_indicadores");
-        }
+      .catch((error) => {
+        return error;
       });
 
-      usuarioLogado.map((user) => {
-        if (user.id_tipo_usuario === 1) {
-          Router.push("/listarUsuarios");
-        }
-        if (user.id_tipo_usuario === 2) {
-          Router.push("/indicadores/home_indicadores");
-        }
-      });
+    const resUsuarioLogado = await api.get("getUsuario", {
+      params: { id_usuario: data.id_usuario },
+    });
+    const usuarioLogado = await resUsuarioLogado.data;
 
-      return usuarioLogado;
-    }
+    usuarioLogado.map((user) => {
+      if (user.id_tipo_usuario === 1) {
+        Router.push("/listarUsuarios");
+      }
+      if (user.id_tipo_usuario === 2) {
+        Router.push("/indicadores/home_indicadores");
+      }
+    });
 
-    async function signOut() {
-      destroyCookie(undefined, "tedplan.token", {});
-      destroyCookie(undefined, "tedplan.id_usuario", {});
+    usuarioLogado.map((user) => {
+      if (user.id_tipo_usuario === 1) {
+        Router.push("/listarUsuarios");
+      }
+      if (user.id_tipo_usuario === 2) {
+        Router.push("/indicadores/home_indicadores");
+      }
+    });
 
-      Router.push("/");
-    }
-
-    return (
-      <AuthContext.Provider
-        value={{ usuario, isAuthenticated, signIn, signOut }}
-      >
-        {children}
-      </AuthContext.Provider>
-    );
+    return usuarioLogado;
   }
+
+  async function signOut() {
+    destroyCookie(undefined, "tedplan.token", {});
+    destroyCookie(undefined, "tedplan.id_usuario", {});
+
+    Router.push("/");
+  }
+
+  return (
+    <AuthContext.Provider value={{ usuario, isAuthenticated, signIn, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }

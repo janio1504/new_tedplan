@@ -15,14 +15,17 @@ import {
   TextoLista,
   Pagination,
   LimparFiltro,
+  PaginationContainer,
+  PaginationButton,
+  PageInfo,
 } from "../styles/views";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast, ToastContainer } from "react-nextjs-toast";
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
-import  Router  from "next/router";
+import Router from "next/router";
 
 type IPublicacao = {
   id_publicacao: string;
@@ -79,131 +82,170 @@ export default function ViewPublicacoes({
   const [idMunicipio, setIdMunicipio] = useState(null);
   const [idTipo, setIdTipo] = useState(null);
   const [titulo, setTitulo] = useState(null);
+
+  console.log("Publicacoes recebidas:", publicacoes);
+
   useEffect(() => {
-   
     if (publicacoes) {
-      const page = 1      
-      pagination(publicacoes)
+      const page = 1;
+      pagination(publicacoes);
       getPublicacoes(publicacoes, page);
     }
   }, [publicacoes]);
 
   async function handlebuscaFiltrada(data) {
-    setIdEixo(data.id_eixo)
-    setIdMunicipio(data.id_municipio)
-    setTitulo(data.titulo)
-    setIdTipo(data.id_tipo_publicacao)
+    setIdEixo(data.id_eixo);
+    setIdMunicipio(data.id_municipio);
+    setTitulo(data.titulo);
+    setIdTipo(data.id_tipo_publicacao);
     const apiClient = getAPIClient();
 
     const resBusca = await apiClient.get("/getPorFiltroPublicacoes", {
-      params: { titulo: data.titulo, id_eixo: data.id_eixo, 
-        id_tipo_publicacao: data.id_tipo_publicacao, id_municipio: data.id_municipio, page: data.page },
+      params: {
+        titulo: data.titulo,
+        id_eixo: data.id_eixo,
+        id_tipo_publicacao: data.id_tipo_publicacao,
+        id_municipio: data.id_municipio,
+        page: data.page,
+      },
     });
-    
+
     const publicacoes = resBusca.data;
-        
-    if (publicacoes.length == 0){
-      toast.notify('Nenhum resultado encontrado para a busca!',{
+
+    if (publicacoes.length == 0) {
+      toast.notify("Nenhum resultado encontrado para a busca!", {
         title: "Atenção",
         duration: 7,
         type: "error",
-      })
-      return
-    }    
-    
-    getPublicacoes(publicacoes)
-    pagination(publicacoes)      
-  
+      });
+      return;
+    }
+
+    getPublicacoes(publicacoes);
+    pagination(publicacoes);
   }
 
-  async function pagination(publicacoes){
-   
+  async function pagination(publicacoes) {
     const pages = {
+      paginaAtual: publicacoes.page,
+
       ultimaPagina: publicacoes.lastPage,
-      anterior: publicacoes.page > 1 ? publicacoes.page - 1 : 1,
-      proximo: publicacoes.page < publicacoes.lastPage ? publicacoes.page + 1 : publicacoes.lastPage,
-      primeiraPagina: 1
-    }
-    
+
+      anterior: Math.max(publicacoes.page - 1, 1),
+
+      proximo: Math.min(publicacoes.page + 1, publicacoes.lastPage),
+
+      primeiraPagina: 1,
+
+      totalItens: publicacoes.total || 0,
+    };
+
     setPaginacao(pages);
-    
   }
 
-  async function handleLimparFiltro(){
+  async function handleLimparFiltro() {
     reset({
-      id_municipio: '',
-      id_eixo: '',
-      id_tipo_publicacao: '',
-      titulo: ''
-    })
-    setIdEixo('')
-    setIdMunicipio('')
-    setIdTipo('')
-    setTitulo('')
+      id_municipio: "",
+      id_eixo: "",
+      id_tipo_publicacao: "",
+      titulo: "",
+    });
+    setIdEixo("");
+    setIdMunicipio("");
+    setIdTipo("");
+    setTitulo("");
     Router.push("/publicacoes");
-    getPublicacoes(publicacoes)
-    
+    getPublicacoes(publicacoes);
   }
 
-  async function handlegetPubPaginate(page?) {
+  async function handlegetPubPaginate(page?: number) {
     const apiClient = getAPIClient();
-    
-    const resBusca = await apiClient.get("/getPorFiltroPublicacoes", {
-      params: { titulo: titulo ? titulo : '', id_eixo: idEixo ? idEixo : '', 
-      id_tipo_publicacao: idTipo ? idTipo : '', id_municipio: idMunicipio ? idMunicipio : '',
-      page: page ? page : 1 },
-    });
-    
-    const publicacoes = resBusca.data;
 
-    if (publicacoes.length == 0){
-      toast.notify('Nenhum resultado encontrado para a busca!',{
-        title: "Atenção",
+    try {
+      const resBusca = await apiClient.get("/getPorFiltroPublicacoes", {
+        params: {
+          titulo: titulo || "",
+          id_eixo: idEixo || "",
+          id_tipo_publicacao: idTipo || "",
+          id_municipio: idMunicipio || "",
+          page: page || 1,
+        },
+      });
+
+      const publicacoes = resBusca.data;
+
+      if (publicacoes.data.length === 0) {
+        toast.notify("Nenhum resultado encontrado para a busca!", {
+          title: "Atenção",
+          duration: 7,
+          type: "error",
+        });
+        return;
+      }
+
+      getPublicacoes(publicacoes);
+      pagination(publicacoes);
+    } catch (error) {
+      toast.notify("Erro ao buscar publicações", {
+        title: "Erro",
         duration: 7,
         type: "error",
-      })
-      return
+      });
+      console.error(error);
     }
-    
-    
-    getPublicacoes(publicacoes)
-    pagination(publicacoes)
-    
   }
 
   async function getPublicacoes(publicacoes?: any, page?) {
     const apiClient = getAPIClient();
-    
+
     if (publicacoes.data) {
       const pub = await Promise.all(
-        publicacoes.data.map(async (p: { id_imagem: any; id_arquivo: any; }) => {
-          const imagem = await apiClient({
-            method: "GET",
-            url: "getImagem",
-            params: { id: p.id_imagem },
-            responseType: "blob",
-          }).then((response) => {
-            return URL.createObjectURL(response.data);
-          });
+        publicacoes.data.map(async (p: { id_imagem: any; id_arquivo: any }) => {
+          let imagem = null;
+          let arquivo = null;
 
-          const arquivo = await apiClient({
-            method: "GET",
-            url: "getFile",
-            params: { id: p.id_arquivo },
-            responseType: "blob",
-          }).then((response) => {
-            return URL.createObjectURL(response.data);
-          });
+          try {
+            if (p.id_imagem) {
+              const imagemResponse = await apiClient({
+                method: "GET",
+                url: "getImagem",
+                params: { id: p.id_imagem },
+                responseType: "blob",
+              });
+              imagem = URL.createObjectURL(imagemResponse.data);
+            }
+          } catch (error) {
+            console.warn(
+              `Imagem não encontrada para publicação ${p.id_publicacao}`
+            );
+          }
+
+          try {
+            if (p.id_arquivo) {
+              const arquivoResponse = await apiClient({
+                method: "GET",
+                url: "getFile",
+                params: { id: p.id_arquivo },
+                responseType: "blob",
+              });
+              arquivo = URL.createObjectURL(arquivoResponse.data);
+            }
+          } catch (error) {
+            console.warn(
+              `Arquivo não encontrado para publicação ${p.id_publicacao}`
+            );
+          }
+
           const publicacao = {
             ...p,
             imagem: imagem,
             arquivo: arquivo,
           };
-          
+
           return publicacao;
         })
       );
-            
+
       setPublicacoesList(pub);
     }
   }
@@ -264,10 +306,12 @@ export default function ViewPublicacoes({
               ></input>
             </DivInput>
             <DivInput>
-              <SubmitButton>Filtrar</SubmitButton>              
+              <SubmitButton>Filtrar</SubmitButton>
             </DivInput>
             <DivInput>
-              <LimparFiltro onClick={()=>handleLimparFiltro()}>Limpar filtro</LimparFiltro>
+              <LimparFiltro onClick={() => handleLimparFiltro()}>
+                Limpar filtro
+              </LimparFiltro>
             </DivInput>
           </Form>
 
@@ -291,16 +335,46 @@ export default function ViewPublicacoes({
               </TextoLista>
             </Lista>
           ))}
-           <Pagination>
-          <button onClick={()=>handlegetPubPaginate(paginacao.primeiraPagina)}>Primeiro</button>
-          <button onClick={()=>handlegetPubPaginate(paginacao.anterior)}>Anterior</button>
-          <button onClick={()=>handlegetPubPaginate(paginacao.proximo)}>Proximo</button>
-          <button onClick={()=>handlegetPubPaginate(paginacao.ultimaPagina)}>Ultimo</button>
-        </Pagination>
+          {paginacao && (
+            <PaginationContainer>
+              <PaginationButton
+                onClick={() => handlegetPubPaginate(paginacao.primeiraPagina)}
+                disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
+              >
+                Primeiro
+              </PaginationButton>
+
+              <PaginationButton
+                onClick={() => handlegetPubPaginate(paginacao.anterior)}
+                disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
+              >
+                Anterior
+              </PaginationButton>
+
+              <PageInfo>
+                Página {paginacao.paginaAtual} de {paginacao.ultimaPagina}
+              </PageInfo>
+
+              <PaginationButton
+                onClick={() => handlegetPubPaginate(paginacao.proximo)}
+                disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
+              >
+                Próximo
+              </PaginationButton>
+
+              <PaginationButton
+                onClick={() => handlegetPubPaginate(paginacao.ultimaPagina)}
+                disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
+              >
+                Último
+              </PaginationButton>
+            </PaginationContainer>
+          )}
         </DivFormConteudo>
-       
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
+      <Footer>
+        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+      </Footer>
     </Container>
   );
 }
@@ -322,8 +396,6 @@ export const getServerSideProps: GetServerSideProps<PublicacaoProps> = async (
   const resPublicacoes = await apiClient.get("/getPublicacoes");
   const publicacoes = await resPublicacoes.data;
 
-  
-  
   return {
     props: {
       municipios,

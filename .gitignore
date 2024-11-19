@@ -1,1 +1,4 @@
 db/
+docker-compose.yml
+app/.dockerignore
+app/.pgpass

@@ -212,7 +212,7 @@ export const DivCenter = styled.div`
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 50px;
-  text-align: left; 
+  text-align: left;
   padding: 10px;
   display: flex;
   flex-direction: row;
@@ -261,7 +261,7 @@ export const Lista = styled.div`
   float: left;
   margin-top: 20px;
   display: flex;
-  border-top: solid 3px #2dd9d0; 
+  border-top: solid 3px #2dd9d0;
   text-align: left;
   justify-content: left;
   align-items: left;
@@ -272,7 +272,7 @@ export const HeaderLista = styled.div`
   float: left;
   display: flex;
   border-top: solid 3px #2dd9d0;
-  margin-top: 20px;  
+  margin-top: 20px;
   text-align: left;
   justify-content: left;
   align-items: left;
@@ -289,81 +289,72 @@ export const FooterLista = styled.div`
   align-items: left;
 `;
 
-export const ColunaLista = styled.div`
-  
-`;
+export const ColunaLista = styled.div``;
 
 export const ColTitulo = styled.div`
   width: 450px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
-  
 `;
 export const Collink = styled.div`
   width: 200px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
-  
 `;
 export const ColEixo = styled.div`
   width: 150px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
-  
 `;
 export const ColTipo = styled.div`
   width: 100px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
-  
 `;
 export const ColStatus = styled.div`
   width: 100px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
-  
 `;
 export const ColData = styled.div`
   width: 100px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
-  
 `;
 export const ColAcoes = styled.div`
   width: 40px;
   float: left;
   flex-direction: column;
   display: flex;
-  padding: 10px 0;  
+  padding: 10px 0;
   margin: 10px;
   size: 14px;
   align-items: center;
-  
 `;
 export const ColAcoesButton = styled.button`
-   background: none;
-    border: none;
-    padding: 0 10px;
-    float: left; 
-    cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0 10px;
+  float: left;
+  cursor: pointer;
 `;
 
 export const ImagemLista = styled.div`
@@ -484,7 +475,7 @@ export const DivInput = styled.div`
   margin-right: 10px;
 `;
 export const SubmitButton = styled.button`
- padding: 10px 15px;
+  padding: 10px 15px;
   margin-top: 38px;
   color: #fff;
   border: 0px;
@@ -503,7 +494,7 @@ export const SubmitButton = styled.button`
 `;
 
 export const LimparFiltro = styled.div`
- padding: 10px 15px;
+  padding: 10px 15px;
   margin-top: 38px;
   color: #fff;
   border: 0px;
@@ -567,7 +558,7 @@ export const ContainerModal = styled.div`
 `;
 
 export const Modal = styled.div`
-   width: 520px;
+  width: 520px;
   min-height: 200px;
   background-color: #fff;
   border: 1px solid #bebebe;
@@ -600,12 +591,10 @@ export const ImagensGaleria = styled.div`
     border-radius: 3px;
     margin-top: 5px;
     cursor: pointer;
-    
   }
 `;
 
 export const CloseModalButton = styled.button`
-  
   cursor: pointer;
   padding: 10px 15px;
   margin: 10px;
@@ -724,7 +713,6 @@ export const FormModal = styled.form`
   }
 `;
 
-
 export const ConfirmButton = styled.button`
   cursor: pointer;
   padding: 10px 15px;
@@ -766,9 +754,52 @@ export const Pagination = styled.div`
   justify-content: center;
   margin-top: 50px;
   button {
-  border: none;
-  margin: 5px;
-  cursor: pointer;
+    border: none;
+    margin: 5px;
+    cursor: pointer;
   }
 `;
 
+export const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  gap: 5px;
+`;
+
+export const PaginationButton = styled.button`
+  background-color: #2271b3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+
+  &:hover {
+    background-color: #1a5f8f;
+    transform: scale(1.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    background-color: #a0a0a0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+`;
+
+export const PageInfo = styled.span`
+  color: #2271b3;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 0 15px;
+`;
