@@ -236,6 +236,17 @@ export const DivCenter = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+export const BodyDashboard = styled.div`  
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: left;
+  display: flex;
+  flex-direction: row;
+`;
 export const DivInstrucoes = styled.div`
   justify-content: left;
   padding: 10px;
@@ -300,7 +311,7 @@ export const Form = styled.form`
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
-    width: 500px;
+    width: 432px;
     background: #fff;
   }
   option {

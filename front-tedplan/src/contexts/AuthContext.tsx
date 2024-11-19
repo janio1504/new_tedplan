@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { recoverUserInformation, signInRequest } from '../services/auth'
 import { setCookie, parseCookies, destroyCookie,  } from 'nookies'
 import  Router from 'next/router'
@@ -12,11 +12,13 @@ type SignInData = {
 }
 
 type Usuario = {
+    permissao_usuario: string;
     id_usuario: BigInteger;
     login: string;
     nome: string;
     ultimo_login: string;
     id_sistema: number;
+    id_permissao: number;
     id_municipio: string;
 }
 
@@ -25,31 +27,36 @@ type AuthContextType = {
     usuario: Usuario;
     signIn: (data: SignInData) => Promise<void>
     signOut: () => Promise<void>;
+    setMunicipioUser: (id: bigint) => void
 }
 
 export const AuthContext = createContext({} as AuthContextType)
 
 export function AuthProvider({ children }){
 
-    const [ usuario, setUser ] = useState<Usuario | null>(null)
+    const [ usuario, setUser ] = useState(() => {
+        if (typeof window !== 'undefined') {
+        const savedUsuario = localStorage.getItem('usuario');
+        return savedUsuario !== null ? JSON.parse(savedUsuario) : 0;
+        }
+        
+      })
     
     const isAuthenticated = !!usuario;
     
-    useEffect(() => {      
-        
+    useEffect(() => {
         const { 'tedplan.token': token }  = parseCookies()
 
         const { 'tedplan.id_usuario': id_usuario}  = parseCookies()
         
-        if(token && id_usuario){
-            
-           recoverUserInformation(id_usuario).then(response => {   
+        if(!usuario && token && id_usuario){
+           
+           recoverUserInformation(id_usuario).then(response => {
                setUser(response[0])
            })        
         }
-    }, [0])
+    }, [usuario])
 
-    
     
     
     async function signIn({ login, senha, id_sistema }: SignInData) {
@@ -84,12 +91,14 @@ export function AuthProvider({ children }){
         const usuarioLogado = await resUsuarioLogado.data
         
         usuarioLogado.map((user)=>{
-            if(user.id_tipo_usuario === 1){
-                Router.push('/listarUsuarios')                
-            }
-            if(user.id_tipo_usuario === 2){                
-                Router.push('/indicadores/home_indicadores')                
-            }
+                      
+            if(user.id_permissao === 3 && user.id_sistema === 2){
+                Router.push('/indicadores/home_indicadores')  
+            }else{
+                Router.push('/dashboard')
+            }              
+                              
+           
             
         })
 
@@ -100,13 +109,19 @@ export function AuthProvider({ children }){
     async function signOut(){
         destroyCookie(undefined, 'tedplan.token', {})
         destroyCookie(undefined, 'tedplan.id_usuario', {})  
-        
+        localStorage.removeItem("usuario");
         Router.push('/')
         
     }
 
+    function setMunicipioUser(id){        
+        usuario.id_municipio = id
+        localStorage.setItem('usuario', JSON.stringify(usuario));
+        setUser(usuario)
+    }
+
     return (
-        <AuthContext.Provider value= {{ usuario , isAuthenticated, signIn, signOut }}>
+        <AuthContext.Provider value= {{ usuario , isAuthenticated, signIn, signOut, setMunicipioUser }}>
             {children}
         </AuthContext.Provider>
     )

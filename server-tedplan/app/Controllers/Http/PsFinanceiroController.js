@@ -40,6 +40,8 @@ class PsFinanceiroController {
   }
 
   async getDadosFinanceirosPorAno({ request }) {
+    console.log(request.all());
+    
     const { id_municipio, ano } = request.all();
     return await PsFinanceiro.query()
       .select('*', 'fn_aes.fn003 as aes_fn003',
@@ -58,6 +60,7 @@ class PsFinanceiroController {
       'fn_aes.fn023 as aes_fn023',
       'fn_aes.fn024 as aes_fn024',
       'fn_dap.fn016 as dap_fn016',
+      'fn_dap.fn004 as dap_fn004',
       'fn_rs.fn999 as residuos_fn999',
       'fn_dap.fn999 as drenagem_fn999')
       .from("tedplan.fn_residuos_solidos as fn_rs")
@@ -73,13 +76,15 @@ class PsFinanceiroController {
       )
       .where("fn_rs.id_municipio", id_municipio)
       .where("fn_rs.ano", ano)
+      .where("fn_dap.ano", ano)
+      .where("fn_aes.ano", ano)
       .fetch();
   }
   async store({ request }) {
     try {
-      const data = new Date();
+      
       const dados = request.all();
-      const ano = dados.ano ? dados.ano : data.getFullYear();
+      const ano = dados.ano
 
       if (dados.id_fn_residuos_solidos) {
         const rs = await PsFinanceiro.query()

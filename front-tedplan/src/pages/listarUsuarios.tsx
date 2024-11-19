@@ -6,7 +6,7 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast, ToastContainer } from "react-nextjs-toast";
 import {
   Container,
   NewButton,
@@ -31,15 +31,14 @@ import {
 import { useForm } from "react-hook-form";
 import { InputP } from "../styles/financeiro";
 
-
 interface IUsuario {
   id_usuario: string;
   nome: string;
   login: string;
   id_municipio: string;
   ativo: boolean;
-  tipo_usuario: string;
-  id_tipo_usuario: string;
+  permissao_usuario: string;
+  id_permissao: string;
   id_imagem: string;
   id_sistema: string;
   senha: string;
@@ -73,28 +72,20 @@ export default function Postagens({
     formState: { errors },
   } = useForm();
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isModalUpdateVisible, setModalUpdateVisible] = useState(false);
   const [usuarioModal, setUsuarioModal] = useState(null);
   const [isModalConfirm, setModalConfirm] = useState(false);
-  const [imagem, setImagem] = useState<String | ArrayBuffer>(null);
-
-
-  const [contentForEditor, setContentForEditor] = useState(null);
-  const [content, setContent] = useState("");
+  const [permissoes, setPermissoes] = useState<any>(null);
+  const [visibleMunicipiosSistemas, setVisibleMunicipiosSistemas] =
+    useState(false);
   const editor = useRef();
-  const firstRender = useRef(true);
-  const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
+  const [municipios, setMunicipios] = useState<any>(null);
 
-  const getSunEditorInstance = (sunEditor) => {
-    editor.current = sunEditor;
-  };
-
-  function handleOnChange(content) {
-    setContent(content);
-  }
-
-  useEffect(() => {}, []);
-
+ 
+  useEffect(() => {
+    getPermissoes();
+    getMunicipios();
+  }, []);
+  
   async function handleShowModal(usuario: IUsuario) {
     setUsuarioModal(usuario);
     setModalVisible(true);
@@ -114,18 +105,33 @@ export default function Postagens({
     setModalConfirm(false);
   }
 
+  async function getPermissoes() {
+    const permissoes = await api.get("/get-permissoes").then((response) => {
+      return response.data;
+    });
+    setPermissoes(permissoes);
+  }
+
+  async function getMunicipios() {
+    
+    const resMunicipio = await api
+      .get("/getMunicipios")
+      .then((response) => {
+        return response.data;
+      });
+    setMunicipios(resMunicipio);
+  }
+
   async function handleRemoverUsuario(id_usuario: IUsuario) {
     const resDelete = await api
       .delete("removerUsuario", { params: { id_usuario: id_usuario } })
-      .then((response) => {
-    
-      })
+      .then((response) => {})
       .catch((error) => {
-        toast.notify('Não foi possivel remover o usuário!',{
+        toast.notify("Não foi possivel remover o usuário!", {
           title: "Aconteceu o seguinte erro",
           duration: 7,
           type: "error",
-        })    
+        });
       });
 
     setModalConfirm(false);
@@ -137,30 +143,28 @@ export default function Postagens({
   }
 
   async function handleUpdateUsuario(data: IUsuario) {
-    console.log(data);
     
     const usuario = await api
       .post("updatePermissoes", {
         id_usuario: data.id_usuario,
         id_sistema: data.id_sistema,
+        id_municipio: data.id_municipio,
         ativo: data.ativo,
-        id_tipo_usuario: data.id_tipo_usuario,
+        id_permissao: data.id_permissao,
         senha: data.senha,
       })
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!',{
+        toast.notify("Dados gravados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
           type: "success",
-        })     
-        setTimeout(()=>{
-          setModalVisible(false)},
-          2000
-        ) 
+        });
+        setTimeout(() => {
+          setModalVisible(false);
+        }, 2000);
       })
       .catch((error) => {
         console.log(error);
-        
       });
   }
 
@@ -173,9 +177,14 @@ export default function Postagens({
 
   const { usuario } = useContext(AuthContext);
 
+  function onChange(e) { 
+    e.target.value == 2 || e.target.value == 3
+      ? setVisibleMunicipiosSistemas(true)
+      : setVisibleMunicipiosSistemas(false);
+  }
+
   return (
     <Container>
-      
       <MenuSuperior usuarios={[]}></MenuSuperior>
 
       <DivCenter>
@@ -184,7 +193,7 @@ export default function Postagens({
           <thead>
             <tr>
               <th>Login</th>
-              <th>Tipo Usuário</th>
+              <th>Permissão Usuário</th>
               <th>Ativo</th>
               <th>Ações</th>
             </tr>
@@ -194,7 +203,7 @@ export default function Postagens({
               <tbody key={usuario.id_usuario}>
                 <tr>
                   <td>{usuario.login}</td>
-                  <td>{usuario.tipo_usuario}</td>
+                  <td>{usuario.permissao_usuario}</td>
                   <td>{usuario.ativo ? "Sim" : "Não"}</td>
                   <td>
                     <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
@@ -233,72 +242,107 @@ export default function Postagens({
                     {isModalVisible && (
                       <ContainerModal>
                         <Modal>
-                          
-                         
                           <FormModal
                             onSubmit={handleSubmit(handleUpdateUsuario)}
                           >
-                            
                             <TextoModal>
-                                  <CloseModalButton onClick={handleCloseModal}>
-                                    Fechar
-                                  </CloseModalButton>
-                                  <SubmitButton type="submit">Gravar</SubmitButton>
-                            
-                            <ConteudoModal>
-                              <input
-                                type="hidden"
-                                {...register("id_usuario")}
-                                value={usuarioModal.id_usuario}
-                              />
-                              <p>Nome: {usuarioModal.nome}</p>
-                              <p>Login: {usuarioModal.login}</p>
-                              <label>Status Usuário</label>
-                              <select {...register("ativo")} name="ativo">
-                                <option value="">
-                                  {usuarioModal.ativo ? "Ativo" : "Inativo"}
-                                </option>
-                                <option
-                                  value={usuarioModal.ativo ? "false" : "true"}
+                              <CloseModalButton onClick={handleCloseModal}>
+                                Fechar
+                              </CloseModalButton>
+                              <SubmitButton type="submit">Gravar</SubmitButton>
+
+                              <ConteudoModal>
+                                <input
+                                  type="hidden"
+                                  {...register("id_usuario")}
+                                  value={usuarioModal.id_usuario}
+                                />
+                                <p>Nome: {usuarioModal.nome}</p>
+                                <p>Login: {usuarioModal.login}</p>
+                                <label>Status Usuário</label>
+                                <select {...register("ativo")} name="ativo">
+                                  <option value="">
+                                    {usuarioModal.ativo ? "Ativo" : "Inativo"}
+                                  </option>
+                                  <option
+                                    value={
+                                      usuarioModal.ativo ? "false" : "true"
+                                    }
+                                  >
+                                    {usuarioModal.ativo ? "Inativar" : "Ativar"}
+                                  </option>
+                                </select>
+                               
+                                <label>Permissões</label>
+                                <select
+                                  {...register("id_permissao")}
+                                  name="id_permissao"
+                                  onChange={(e) => onChange(e)}
                                 >
-                                  {usuarioModal.ativo ? "Inativar" : "Ativar"}
-                                </option>
-                              </select>
-                              <label>Tipo Usuário</label>
-                              <select
-                                {...register("id_tipo_usuario")}
-                                name="id_tipo_usuario"
-                              >
-                                <option value="">
-                                  {usuarioModal.tipo_usuario}
-                                </option>
-                                {tipoUsuario.map((tipo) => (
-                                  <option
-                                    key={tipo.id_tipo_usuario}
-                                    value={tipo.id_tipo_usuario}
-                                  >
-                                    {tipo.nome}
+                                  <option value="">
+                                    Selecione uma permissão
                                   </option>
-                                ))}
-                              </select>
-                              <label>Sistema</label>
-                              <select
-                                {...register("id_sistema")}
-                                name="id_sistema"
-                              >
-                                <option value="">Selecione um sistema</option>
-                                {sistemas.map((sistema) => (
-                                  <option
-                                    key={sistema.id_sistema}
-                                    value={sistema.id_sistema}
-                                  >
-                                    {sistema.nome}
-                                  </option>
-                                ))}
-                              </select>
-                              <label>Senha</label>
-                              <InputP><input {...register("senha")} type="password"></input></InputP>
-                            </ConteudoModal>
+                                  {permissoes?.map((permissao, key) => (
+                                    <option
+                                      key={key}
+                                      value={permissao.id_permissao}
+                                    >
+                                      {permissao.nome}
+                                    </option>
+                                  ))}
+                                </select>
+                                {visibleMunicipiosSistemas && (
+                                  <>
+                                    <label>Sistemas</label>
+                                    <select
+                                      {...register("id_sistema", {
+                                        required: true,
+                                      })}
+                                      name="id_sistema"
+                                    >
+                                      aria-invalid=
+                                      {errors.value ? "true" : "false"}
+                                      <option value="">
+                                        Selecione um Sistema
+                                      </option>
+                                      <option value="1">Sou Tedplan</option>
+                                      <option value="2">Sou Municipio</option>
+                                    </select>
+                                    {errors.id_sistema &&
+                                      errors.id_sistema.type && (
+                                        <span>
+                                          Selecionar um Sistema é obrigatório!
+                                        </span>
+                                      )}
+                                    <label>Municipios</label>
+                                    <select
+                                      {...register("id_municipio")}
+                                      name="id_municipio"
+                                    >
+                                      aria-invalid=
+                                      {errors.value ? "true" : "false"}
+                                      <option value="">
+                                        Selecione um Municipio
+                                      </option>
+                                      {municipios?.map((municipio, key) => (
+                                        <option
+                                          key={key}
+                                          value={municipio.id_municipio}
+                                        >
+                                          {municipio.nome}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </>
+                                )}
+                                <label>Senha</label>
+                                <InputP>
+                                  <input
+                                    {...register("senha")}
+                                    type="password"
+                                  ></input>
+                                </InputP>
+                              </ConteudoModal>
                             </TextoModal>
                           </FormModal>
                         </Modal>
@@ -311,7 +355,10 @@ export default function Postagens({
           })}
         </ListPost>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados <ToastContainer align={"center"} position={"button"}  /></Footer>
+      <Footer>
+        &copy; Todos os direitos reservados{" "}
+        <ToastContainer align={"center"} position={"button"} />
+      </Footer>
     </Container>
   );
 }

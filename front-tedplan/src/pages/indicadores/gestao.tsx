@@ -120,7 +120,7 @@ export default function GestaoIndicadores({
 }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
   const [dadosMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
-  const [isGestao, setGestao] = useState<IGestao | any>(gestao);
+  const [dadosGestao, setGestao] = useState<IGestao | any>(gestao);
   const [representantes, setRepresentantes] = useState(null);
   const {
     register,
@@ -131,65 +131,55 @@ export default function GestaoIndicadores({
 
   const [showModal, setShowModal] = useState(false);
   const [ listParticipacoes, setListParticipacoes]= useState(null)
-  const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
   const [ listPoliticas, setPoliticas] = useState(null)
   const [ listPlanos, setPlanos] = useState(null)
   const editor = useRef(null);
   let txtArea = useRef();
   
-  const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
-  const [nomeMunicipio, setNomeMunicipio] = useState("");
-
-  const getSunEditorInstance = (sunEditor) => {
-    editor.current = sunEditor;
-  };
-
   useEffect(() => {
-    municipio.map((value) => {
-      setMunicipio(value);
-      setNomeMunicipio(value.municipio_nome)
-    });
+    
     getPoliticas()
     getPlanos()
     getParticipacoes()
     getRepresentantes()
-    setGestao(gestao[0]);
+    getGestao();
   }, [municipio, gestao]);
 
-  const setOptions = {
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
+  async function getGestao(){
+    const resGestao = await api.get("/getGestao", {
+      params: { id_municipio: usuario.id_municipio },
+    });
+    
+    setGestao(resGestao.data[0]);
+  }
 
   async function handleCadastro(data) {
     const formData = new FormData();
 
-    formData.append("id_municipio", dadosMunicipio.id_municipio);
+    formData.append("id_municipio", usuario.id_municipio);
     formData.append(
       "id_gestao_associada",
-      isGestao?.id_gestao_associada ? isGestao?.id_gestao_associada : ""
+      dadosGestao?.id_gestao_associada ? dadosGestao?.id_gestao_associada : ""
     );
     formData.append(
       "id_saneamento_rural",
-      isGestao?.id_saneamento_rural ? isGestao?.id_saneamento_rural : ""
+      dadosGestao?.id_saneamento_rural ? dadosGestao?.id_saneamento_rural : ""
     );
     formData.append(
       "id_comunidades_tradicionais",
-      isGestao?.id_comunidades_tradicionais
-        ? isGestao?.id_comunidades_tradicionais
+      dadosGestao?.id_comunidades_tradicionais
+        ? dadosGestao?.id_comunidades_tradicionais
         : ""
     );
 
     formData.append(
       "nome_associacao",
-      data.nome_associacao ? data.nome_associacao : isGestao?.ga_nome
+      data.nome_associacao ? data.nome_associacao : dadosGestao?.ga_nome
     );
     formData.append(
       "norma_associacao",
-      data.norma_associacao ? data.norma_associacao : isGestao?.ga_norma
+      data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
     );
     formData.append("pcs_ano", data.pcs_ano);
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
@@ -202,17 +192,17 @@ export default function GestaoIndicadores({
     formData.append("politica_titulo", data.politica_titulo);
     formData.append(
       "sr_descricao",
-      data.sr_descricao ? data.sr_descricao : isGestao?.sr_descricao
+      data.sr_descricao ? data.sr_descricao : dadosGestao?.sr_descricao
     );
     formData.append(
       "ct_nomes_comunidades",
       data.ct_nomes_comunidades
         ? data.ct_nomes_comunidades
-        : isGestao?.nomes_comunidades_beneficiadas
+        : dadosGestao?.nomes_comunidades_beneficiadas
     );
     formData.append(
       "ct_descricao",
-      data.ct_descricao ? data.ct_descricao : isGestao?.ct_descricao
+      data.ct_descricao ? data.ct_descricao : dadosGestao?.ct_descricao
     );
 
     const apiClient = getAPIClient();
@@ -400,7 +390,7 @@ export default function GestaoIndicadores({
   async function getPoliticas(){
     
     const resPoliticas = await api.get("getPoliticas", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const politicas = await resPoliticas.data;
     if(politicas){
@@ -425,7 +415,7 @@ export default function GestaoIndicadores({
 
   async function getPlanos(){
     const resPlanos = await api.get("getPlanos", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const planos = await resPlanos.data;
     if(planos){
@@ -450,13 +440,13 @@ export default function GestaoIndicadores({
 
   async function getParticipacoes(){
     const resParticipacao = await api.get("getParticipacaoControleSocial", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const participacoes = await resParticipacao.data;
     if(participacoes){
       const resParticipacoes = await Promise.all(
         participacoes.map(async (p)=>{
-            const file = await api.get('getFile',{params: {id: p.id_arquivo}, responseType: "blob"})
+            const file = await api.get('/getFile',{params: {id: p.id_arquivo}, responseType: "blob"})
             .then((response) => {
               return URL.createObjectURL(response.data);
             }).catch((error)=>{
@@ -475,7 +465,7 @@ export default function GestaoIndicadores({
 
   async function getRepresentantes(){
     const resRepresentantes = await api.get("getRepresentantesServicos", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const representantes = await resRepresentantes.data;
         
@@ -487,7 +477,7 @@ export default function GestaoIndicadores({
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={''}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
@@ -500,7 +490,7 @@ export default function GestaoIndicadores({
                   <label>Nome da associação</label>
                   <input
                     {...register("nome_associacao")}
-                    defaultValue={isGestao?.ga_nome}
+                    defaultValue={dadosGestao?.ga_nome}
                     onChange={handleOnChange}
                     type="text"
                   ></input>
@@ -513,7 +503,7 @@ export default function GestaoIndicadores({
               </label>
               <input
                 {...register("norma_associacao")}
-                defaultValue={isGestao?.ga_norma}
+                defaultValue={dadosGestao?.ga_norma}
                 onChange={handleOnChange}
                 type="text"
               ></input>
@@ -576,7 +566,7 @@ export default function GestaoIndicadores({
                     <label>Titulo</label>
                     <input
                       {...register("politica_titulo")}
-                      defaultValue={isGestao?.politica_titulo}
+                      defaultValue={dadosGestao?.politica_titulo}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -587,7 +577,7 @@ export default function GestaoIndicadores({
                       <label>Ano</label>
                       <input
                         {...register("politica_ano")}
-                        defaultValue={isGestao?.politica_ano}
+                        defaultValue={dadosGestao?.politica_ano}
                         onChange={handleOnChange}
                         type="text"
                       ></input>
@@ -776,7 +766,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("sr_descricao")}
-                  defaultValue={isGestao?.sr_descricao ? isGestao?.sr_descricao : ''}
+                  defaultValue={dadosGestao?.sr_descricao ? dadosGestao?.sr_descricao : ''}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -791,7 +781,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_nomes_comunidades")}
-                  defaultValue={isGestao?.nomes_comunidades_beneficiadas ? isGestao?.nomes_comunidades_beneficiadas : ''}
+                  defaultValue={dadosGestao?.nomes_comunidades_beneficiadas ? dadosGestao?.nomes_comunidades_beneficiadas : ''}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -801,7 +791,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_descricao")}
-                  defaultValue={isGestao?.ct_descricao ? isGestao?.ct_descricao : ''}
+                  defaultValue={dadosGestao?.ct_descricao ? dadosGestao?.ct_descricao : ''}
                   onChange={handleOnChange}
                 ></textarea>
               </TextArea>
@@ -830,7 +820,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_nome_representante")}
-                      defaultValue={isGestao?.ga_nome_representante}
+                      defaultValue={dadosGestao?.ga_nome_representante}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -841,7 +831,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_cargo")}
-                      defaultValue={isGestao?.ga_cargo}
+                      defaultValue={dadosGestao?.ga_cargo}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -852,7 +842,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_telefone")}
-                      defaultValue={isGestao?.ga_telefone}
+                      defaultValue={dadosGestao?.ga_telefone}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -863,7 +853,7 @@ export default function GestaoIndicadores({
                     </label>
                     <input
                       {...register("ga_email")}
-                      defaultValue={isGestao?.ga_email}
+                      defaultValue={dadosGestao?.ga_email}
                       onChange={handleOnChange}
                       type="text"
                     ></input>
@@ -878,48 +868,9 @@ export default function GestaoIndicadores({
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
-
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
-
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
 
   
 
   
 
-  const resGestao = await apiClient.get("getGestao", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const gestao = await resGestao.data;
 
-  
-
-  
-
-  return {
-    props: {
-      municipio,
-      gestao,    
-    },
-  };
-};

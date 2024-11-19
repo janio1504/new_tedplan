@@ -168,7 +168,7 @@ class MunicipioController {
           "dd.id_municipio"
         )
         .fetch();
-
+        
       return municipio;
     } catch (error) {
       console.log(error);
