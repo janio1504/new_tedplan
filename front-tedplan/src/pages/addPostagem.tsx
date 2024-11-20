@@ -14,13 +14,7 @@ import {
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
-//import suneditor from "suneditor";
-import dynamic from "next/dynamic";
-import "suneditor/dist/css/suneditor.min.css";
-//import SunEditor from "suneditor/src/lib/core";
-const SunEditor = dynamic(() => import("suneditor-react"), {
-  ssr: false,
-});
+
 
 
 interface IPost {

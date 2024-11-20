@@ -43,6 +43,8 @@
     "slate": "^0.71.0",
     "slate-react": "^0.71.0",
     "styled-components": "^5.3.3",
+    "suneditor": "^2.47.0",
+    "suneditor-react": "^3.6.1",
     "swr": "^1.1.0"
   },
   "devDependencies": {

@@ -215,9 +215,9 @@ export default function ViewPublicacoes({
               imagem = URL.createObjectURL(imagemResponse.data);
             }
           } catch (error) {
-            console.warn(
-              `Imagem não encontrada para publicação ${p.id_publicacao}`
-            );
+            // console.warn(
+            //   `Imagem não encontrada para publicação ${p.id_publicacao}`
+            // );
           }
 
           try {
@@ -231,9 +231,9 @@ export default function ViewPublicacoes({
               arquivo = URL.createObjectURL(arquivoResponse.data);
             }
           } catch (error) {
-            console.warn(
-              `Arquivo não encontrado para publicação ${p.id_publicacao}`
-            );
+            // console.warn(
+            //   `Arquivo não encontrado para publicação ${p.id_publicacao}`
+            // );
           }
 
           const publicacao = {
