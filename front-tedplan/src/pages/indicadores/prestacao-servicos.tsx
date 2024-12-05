@@ -22,7 +22,7 @@ import {
   Ps3ImageDireita,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
-import MenuIndicadores from "../../components/MenuIndicadores";
+import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 import Router from "next/router";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -129,6 +129,8 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
+      <div style={{marginTop:"150px"}}>
+      </div>
       <ContainerPs>
         <Ps1>
           <PsImage>

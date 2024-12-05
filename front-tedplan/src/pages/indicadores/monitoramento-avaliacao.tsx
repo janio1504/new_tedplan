@@ -9,7 +9,7 @@ import {
 } from "../../styles/indicadores";
 import Image from "next/image";
 import HeadIndicadores from "../../components/headIndicadores";
-import MenuIndicadores from "../../components/MenuIndicadores";
+import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 import Router from "next/router";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -291,6 +291,9 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
+      <div style={{marginTop:"50px"}}>
+
+      </div>
       <DivCenter>
         <DivForm>
           <DivTituloForm>Relatórios Atuais</DivTituloForm>
