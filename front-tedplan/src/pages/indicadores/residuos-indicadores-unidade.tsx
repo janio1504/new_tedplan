@@ -5,6 +5,7 @@ import { toast, ToastContainer } from 'react-nextjs-toast'
 import {
   Container,
   DivCenter,
+  DivFormConteudoCadastro,
   DivForm,
   DivTituloForm,
   DivInput,
@@ -32,10 +33,15 @@ import {
   DivFormResiduo,
   DivBorder,
   LabelCenter,
-} from "../../styles/financeiro";
+  DivFormConteudoModal,
+  TabelaCadastro,
+  ConteudoModalResiduoSolido,
+  InputPP,
+  
+} from "../../styles/residuos-solidos";
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
-import MenuIndicadores from "../../components/MenuIndicadores";
+import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
@@ -48,6 +54,7 @@ import Excluir from "../../img/excluir.png"
 import {
   Tabela,
   ContainerModal,
+  FormCadastro,
   Modal,
   CloseModalButton,
   ConteudoModal,
@@ -61,12 +68,22 @@ import {
   IconeColeta,
   BotaoResiduos,
   Actions,
-} from "../../styles/indicadores";
+  DivTituloUnidadesCadastradas,
+  ModalStepperContainer,
+  ModalStepperWrapper,
+  ModalStepButton,
+  ModalStepLabel,
+  ModalStepContent,
+  ModalStepperNavigation,
+  ModalStepperButton,
+  
+
+  
+} from "../../styles/residuo-solidos-in";
 import api from "../../services/api";
 import { BotaoEditar } from "../../styles/dashboard";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Footer } from "../../styles";
-
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -95,7 +112,8 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [visibleCadastro, setVisibleCadastro] = useState(true);
   const [visibleResiduosRecebidos, setVisibleResiduosRecebidos] = useState(false);
   const [up080, setUp080] = useState(null);
-  
+  const [currentStep, setCurrentStep] = useState(0);
+
   useEffect(() => {
     getResiduosRecebidos()
     getUnidadesProcessamento()
@@ -160,7 +178,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   
-  function handleOpenResiduosRecebidos(){
+  function  handleOpenResiduosRecebidos(){
     setVisibleResiduosRecebidos(true)
   }
   function handleCloseResiduosRecebidos(){
@@ -269,6 +287,14 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     Router.push("/indicadores/residuos-indicadores-coleta");
   }
 
+  const handleNextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, 3));
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -289,22 +315,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 </IconeColeta>
             </DivBotao>
             </DivCenter>
-            <DivFormConteudo>
-              <DivTitulo>
-                <DivTituloConteudo>
-                  Unidades Cadastradas
-                </DivTituloConteudo>
-              </DivTitulo>
+            {visibleCadastro &&
 
-              {visibleCadastro && <DivFormConteudo>
-              <DivTitulo>
-                <DivTituloConteudo>
-                  Cadastro de Unidade
-                </DivTituloConteudo>
-              </DivTitulo>
+              
 
-
-              <Form onSubmit={handleSubmit(handleCadastro)}>
+              <FormCadastro onSubmit={handleSubmit(handleCadastro)}>
               
               <table>
                 <thead>
@@ -339,12 +354,12 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>   
 
               <SubmitButtonModal type="submit">ADICIONAR UNIDADE</SubmitButtonModal>          
-              </Form>
-            </DivFormConteudo>}
-
-
-              <Tabela>
-                <table cellSpacing={0}>
+              </FormCadastro>
+            }
+            <DivTituloUnidadesCadastradas>
+            </DivTituloUnidadesCadastradas>
+            <Tabela >
+                <table cellSpacing={0} >
                   <thead>
                     <tr>
                       <th>Município</th>
@@ -377,1218 +392,1262 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 </table>
                
               </Tabela>
-            </DivFormConteudo>
           </DivFormResiduo>      
         
       </DivCenter>
       
       {visibleUnidade && (
         <ContainerModal>
-         
-            <ModalFormUnidade>
-                  <DivFormResiduo>
-                    <DivTituloFormResiduo>Edição de cadastro de Concessionária</DivTituloFormResiduo> 
-                    <Form onSubmit={handleSubmit(handleCadastro)}>
-                      <CloseModalButton
-                          onClick={() => {
-                            handleCloseUnidade();
-                          }}
-                        >
-                          Fechar
-                        </CloseModalButton> 
-                       
-            <DivFormConteudo>
-              <DivTitulo>
-                <DivTituloConteudo>
-                Dados cadastrais
-                </DivTituloConteudo>
-              </DivTitulo>
-              <table>
-                <thead>
-                  <tr>
-
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
-                    <th>Ano {new Date().getFullYear()}</th>
-
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>UP079</td>
-                    <td>
-                      <InputGG>
-                        Município onde se localiza a unidade
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputM>
-                        <input {...register("UP079")}
-                        defaultValue={dadosUnidade?.up079}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputM>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP003</td>
-                    <td>
-                      <InputGG>
-                        Tipo de unidade
-                      </InputGG>
-                    </td>
-
-                    <td>
-                      <InputM>
-                        <select {...register("UP003")}
-                        defaultValue={dadosUnidade?.up003}
-                        onChange={handleOnChange}>
-                          <option>Lixão</option>
-                          <option>Queima em forno de qualquer tipo</option>
-                          <option>Unidade de manejo de galhadas e podas </option>
-                          <option>Unidade de transbordo </option>
-                          <option>Área de reciclagem de RCC (unidade de reciclagem de entulho) </option>
-                          <option>Aterro de resíduos da construção civil (inertes)</option>
-                          <option>Área de transbordo e triagem de RCC e volumosos (ATT)</option>
-                          <option>Aterro controlado </option>
-                          <option>Aterro sanitário </option>
-                          <option>Vala específica de RSS</option>
-                          <option>Unidade de triagem (galpão ou usina)</option>
-                          <option>Unidade de compostagem (pátio ou usina) </option>
-                          <option>Unidade de tratamento por incineração</option>
-                          <option>Unidade de tratamento por microondas ou autoclave </option>
-                          <option>Outra</option>
-                        </select>
-                      </InputM>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP001</td>
-                    <td>
-                      <InputGG>
-                        Nome da unidade
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputM>
-                        <input {...register("UP001")}
-                        defaultValue={dadosUnidade?.up001}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputM>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP065</td>
-                    <td>
-                      <InputGG>
-                        Propriétario
-                      </InputGG>
-                    </td>
-
-                    <td>
-                      <InputM>
-                        <input {...register("UP065")}
-                        defaultValue={dadosUnidade?.up065}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputM>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP087</td>
-                    <td>
-                      <InputGG>
-                        Localização
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputM>
-                        <input {...register("UP087")}
-                        defaultValue={dadosUnidade?.up087}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputM>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP051</td>
-                    <td>
-                      <InputGG>
-                        A unidade de processamento esteve em operação no ano de referência?
-                      </InputGG>
-                    </td>
-
-                    <td>
-                      <InputP>
-                        <select {...register("UP051")}
-                        defaultValue={dadosUnidade?.up051}
-                        onChange={handleOnChange}>
-                          <option></option>
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP002</td>
-                    <td>
-                      <InputGG>
-                        Ano de início da operação
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP002")}
-                        defaultValue={dadosUnidade?.up002}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP066</td>
-                    <td>
-                      <InputGG>
-                        Ano de cadastro da unidade
-                      </InputGG>
-                    </td>
-
-                    <td>
-                      <InputP>
-                        <input {...register("UP066")}
-                        defaultValue={dadosUnidade?.up066}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP004</td>
-                    <td>
-                      <InputGG>
-                        Operador da unidade
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputM>
-                        <select {...register("UP004")}
-                        defaultValue={dadosUnidade?.up004}
-                        onChange={handleOnChange}
-                        >
-                          <option></option>
-                          <option>Prefeitura</option>
-                          <option>Empresa privada</option>
-                          <option>Associação de catadores</option>
-                          <option>Consórcio intermunicipal</option>
-                          <option>Outro</option>
-                        </select>
-                      </InputM>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP084</td>
-                    <td>
-                      <InputGG>
-                        A unidade (no caso de vala de RSS) está situada na mesma área de outra unidade?
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP084")}
-                        defaultValue={dadosUnidade?.up084}
-                        onChange={handleOnChange}>
-                          <option></option>
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP050</td>
-                    <td>
-                      <InputGG>
-                        Tipo de licença ambiental emitida pelo orgão de controle ambiental
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP050")}
-                         defaultValue={dadosUnidade?.up050}
-                         onChange={handleOnChange}
-                        >
-                          <option></option>
-                          <option>Operação</option>
-                          <option>Instalação</option>
-                          <option>Prévia</option>
-                          <option>Não existe</option>
-                          <option>Outro tipo.</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP012</td>
-                    <td>
-                      <InputGG>
-                        Recebeu resíduos de outros municípios
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP012")}
-                        defaultValue={dadosUnidade?.up012}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-
-
-                  <tr>
-                    <td>UP085</td>
-                    <td>
-                      <InputG>
-                        Nome do titular da licença de operação (Prefeitura ou Empresa)
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputG>
-                        <input {...register("UP085")}
-                        defaultValue={dadosUnidade?.up085}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputG>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP086</td>
-                    <td>
-                      <InputGG>
-                        CNPJ do titular de Licença de Operação
-                      </InputGG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP086")}
-                        defaultValue={dadosUnidade?.up086}
-                        onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-
-                </tbody>
-              </table>
-            </DivFormConteudo>
-
-            <DivFormConteudo>
-              <DivTitulo>
-                <DivTituloConteudo>
-                  Serviços de coleta seletiva
-                </DivTituloConteudo>
-              </DivTitulo>
-              <table>
-                <thead>
-                  <tr>
-
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
-                    <th>Ano {new Date().getFullYear()}</th>
-
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>UP027</td>
-                    <td>
-                      <InputXL>Existe cercamento da área?</InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP027")}
-                        defaultValue={dadosUnidade?.up027}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP028</td>
-                    <td>
-                      <InputXL>
-                        Existe instaloções administrativas ou de apoio aos trabalhadores?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP028")}
-                      defaultValue={dadosUnidade?.up028}
-                      onChange={handleOnChange}
-                      >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP029</td>
-                    <td>
-                      <InputXL>
-                        Existe impermeabilização da base do aterro(com argila ou manta)?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP029")}
-                       defaultValue={dadosUnidade?.up029}
-                       onChange={handleOnChange}
-                      >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP030</td>
-                    <td>
-                      <InputXL>
-                        Qual a frequência do recolhimento de resíduos?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP030")}
-                        defaultValue={dadosUnidade?.up030}
-                        onChange={handleOnChange}
-                        >
-                          <option></option>
-                          <option>Não e realizado</option>
-                          <option>Diária</option>
-                          <option>Semanal</option>
-                          <option>Quinzenal</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP031</td>
-                    <td>
-                      <InputXL>
-                        Existe drenagem de gases?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP031")}
-                        defaultValue={dadosUnidade?.up031}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP052</td>
-                    <td>
-                      <InputXL>
-                        Existe algum tipo de reaproveitamento de gases drenados?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP052")}
-                      defaultValue={dadosUnidade?.up052}
-                      onChange={handleOnChange}
-                      >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP032</td>
-                    <td>
-                      <InputXL>
-                        Existe sistema de drenagem do liquído percola(chorume)?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP032")}
-                      defaultValue={dadosUnidade?.up032}
-                      onChange={handleOnChange}
-                      >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP033</td>
-                    <td>
-                      <InputXL>
-                        Existe unidade de tratamento do líquido percolado na área da unidade?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP033")}
-                      defaultValue={dadosUnidade?.up033}
-                      onChange={handleOnChange}
-                      >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>                     
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP053</td>
-                    <td>
-                      <InputXL>
-                        Existe unidade de tratamento do líquido percolado localizado fora da área da unidade?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <select {...register("UP053")}
-                      defaultValue={dadosUnidade?.up053}
-                      onChange={handleOnChange}
-                      >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>                      
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP054</td>
-                    <td>
-                      <InputXL>
-                        Existe sistema de drenagem de águas pluviais?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP054")}
-                        defaultValue={dadosUnidade?.up054}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>                      
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP034</td>
-                    <td>
-                      <InputXL>
-                        Existe recirculação do líquido percolado (chorume)?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP034")}
-                        defaultValue={dadosUnidade?.up034}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP035</td>
-                    <td>
-                      <InputXL>
-                        Há vigilância diurna e norturna na unidade?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP035")}
-                        defaultValue={dadosUnidade?.up035}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP036</td>
-                    <td>
-                      <InputXL>
-                        Há algum tipo de monitoramento ambiental da instalação?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP036")}
-                        defaultValue={dadosUnidade?.up036}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP037</td>
-                    <td>
-                      <InputXL>
-                        É feita queima de resíduos a céu aberto?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP037")}
-                        defaultValue={dadosUnidade?.up037}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP038</td>
-                    <td>
-                      <InputXL>
-                        Há presença de animais(exceto aves) na área(porcos, cavalos, vacas...)?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP038")}
-                        defaultValue={dadosUnidade?.up038}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td>UP081</td>
-                    <td>
-                      <InputXL>
-                        Existem catadores de materiais recicláveis?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP081")}
-                        defaultValue={dadosUnidade?.up081}
-                        onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-
-
-
-                  <tr>
-                    <td>UP082</td>
-                    <td>
-                      <InputXL>
-                      Quantidade de catadores até 14 anos?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <input {...register("UP082")}
-                       defaultValue={dadosUnidade?.up082}
-                       onChange={handleOnChange}
-                       type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>Catadores</td>
-                  </tr>
+          <ModalFormUnidade>
+            <CloseModalButton 
+              type="button"
+              onClick={handleCloseUnidade}
+              aria-label="Fechar modal"
+            >
+              <span></span>
+            </CloseModalButton>
+            
+            <Form onSubmit={handleSubmit(handleCadastro)}>
+              <ModalStepperContainer>
+                <ModalStepperWrapper>
+                  <div>
+                    <ModalStepButton active={currentStep === 0} completed={currentStep > 0}>
+                      1
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 0}>
+                    </ModalStepLabel>
+                  </div>
                   
-                  <tr>
-                    <td>UP083</td>
-                    <td>
-                      <InputXL>
-                      Quantidade de catadores maiores de 14 anos?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <input {...register("UP083")}
-                       defaultValue={dadosUnidade?.up083}
-                       onChange={handleOnChange}
-                      type="text"></input> 
-                      </InputP>
-                    </td>
-                    <td>Catadores</td>
-                  </tr>
+                  <div>
+                    <ModalStepButton active={currentStep === 1} completed={currentStep > 1}>
+                      2
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 1}>
+                      
+                    </ModalStepLabel>
+                  </div>
 
-                  <tr>
-                    <td>UP039</td>
-                    <td>
-                      <InputXL>
-                        há domicílios de catadores na areá da unidade?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                        <select {...register("UP039")}
-                         defaultValue={dadosUnidade?.up039}
-                         onChange={handleOnChange}
-                        >
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select> 
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>UP040</td>
-                    <td>
-                      <InputXL>
-                        Quantidade de domicílios de catadores na área?
-                      </InputXL>
-                    </td>
-                    <td>
-                      <InputP>
-                      <input {...register("UP040")}
-                       defaultValue={dadosUnidade?.up040}
-                       onChange={handleOnChange}
-                      type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>Domicílios</td>
-                  </tr>
+                  <div>
+                    <ModalStepButton active={currentStep === 2} completed={currentStep > 2}>
+                      3
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 2}>
+                      
+                    </ModalStepLabel>
+                  </div>
 
-                </tbody>
-              </table>           
+                  <div>
+                    <ModalStepButton active={currentStep === 3} completed={currentStep > 3}>
+                      4
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 3}>
+                    </ModalStepLabel>
+                  </div>
+                </ModalStepperWrapper>
 
-            </DivFormConteudo>
+                <ModalStepContent active={currentStep === 0}>
+                  <ConteudoModalResiduoSolido>
+                    <DivTitulo>
+                      <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>
+                    </DivTitulo>
+                    <table>
+                      <thead>
+                        <tr>
 
-            <DivFormConteudo>
-              <DivTitulo>
-                <DivTituloConteudo>Quantidade de veículos e Equipamentos Utilizados Rotineiramente</DivTituloConteudo>
-              </DivTitulo>
-              <table>
-                <thead>
-                  <tr>
-                    <th>
-                      <span>Tipo de equipamentos</span>
-                    </th>
-                    <th></th>
-                    <th>
-                      <InputP>
-                        <span>Forma adotada</span>
-                      </InputP>
-                    </th>
-                    <th></th>
-                  </tr>
-                  <tr>
-                    <th></th>
-                    <th>
-                      <LabelCenter>
-                        <InputP>Da prefeitura ou SLU</InputP>
-                      </LabelCenter>
-                    </th>
-                    <th>
-                    
-                    </th>
-                    <th>
-                      <LabelCenter>
-                        <InputP>De empresas contratadas</InputP>
-                      </LabelCenter>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP015</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-             
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP020</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Trato de esteiras
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP015")}
-                         defaultValue={dadosUnidade?.up015}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-         
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP020")}
-                         defaultValue={dadosUnidade?.up020}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP016</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                     
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP021</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Retro-escavadeira
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP016")}
-                         defaultValue={dadosUnidade?.up016}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-                   
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP021")}
-                         defaultValue={dadosUnidade?.up021}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP017</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP022</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Pá carregadeira
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP017")}
-                         defaultValue={dadosUnidade?.up017}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-                 
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP022")}
-                         defaultValue={dadosUnidade?.up022}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP018</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-              
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP023</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                      Caminhão basculante
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP018")}
-                         defaultValue={dadosUnidade?.up018}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-                
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP023")}
-                         defaultValue={dadosUnidade?.up023}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP071</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                 
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP075</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Caminhão-pipa
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP071")}
-                         defaultValue={dadosUnidade?.up071}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-          
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP075")}
-                         defaultValue={dadosUnidade?.up075}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <th>Ano {new Date().getFullYear()}</th>
 
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP068</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                 
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP072</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Escavadeira hidráulica
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP068")}
-                         defaultValue={dadosUnidade?.up068}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-          
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP072")}
-                         defaultValue={dadosUnidade?.up072}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>UP079</td>
+                          <td>
+                            <InputG>
+                              Município onde se localiza a unidade
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <input {...register("UP079")}
+                              defaultValue={dadosUnidade?.up079}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP003</td>
+                          <td>
+                            <InputG>
+                              Tipo de unidade
+                            </InputG>
+                          </td>
 
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP069</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                 
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP073</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Trator com rolo compactador
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP069")}
-                         defaultValue={dadosUnidade?.up069}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-          
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP073")}
-                         defaultValue={dadosUnidade?.up073}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
+                          <td>
+                            <InputG>
+                              <select {...register("UP003")}
+                              defaultValue={dadosUnidade?.up003}
+                              onChange={handleOnChange}>
+                                <option>Lixão</option>
+                                <option>Queima em forno de qualquer tipo</option>
+                                <option>Unidade de manejo de galhadas e podas </option>
+                                <option>Unidade de transbordo </option>
+                                <option>Área de reciclagem de RCC (unidade de reciclagem de entulho) </option>
+                                <option>Aterro de resíduos da construção civil (inertes)</option>
+                                <option>Área de transbordo e triagem de RCC e volumosos (ATT)</option>
+                                <option>Aterro controlado </option>
+                                <option>Aterro sanitário </option>
+                                <option>Vala específica de RSS</option>
+                                <option>Unidade de triagem (galpão ou usina)</option>
+                                <option>Unidade de compostagem (pátio ou usina) </option>
+                                <option>Unidade de tratamento por incineração</option>
+                                <option>Unidade de tratamento por microondas ou autoclave </option>
+                                <option>Outra</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP001</td>
+                          <td>
+                            <InputG>
+                              Nome da unidade
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <input {...register("UP001")}
+                              defaultValue={dadosUnidade?.up001}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP065</td>
+                          <td>
+                            <InputG>
+                              Propriétario
+                            </InputG>
+                          </td>
 
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP070</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                 
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP074</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                      Trator de pneus com rolo compactador
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP070")}
-                         defaultValue={dadosUnidade?.up070}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-          
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP074")}
-                         defaultValue={dadosUnidade?.up074}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
+                          <td>
+                            <InputG>
+                              <input {...register("UP065")}
+                              defaultValue={dadosUnidade?.up065}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP087</td>
+                          <td>
+                            <InputG>
+                              Localização
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <input {...register("UP087")}
+                              defaultValue={dadosUnidade?.up087}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP051</td>
+                          <td>
+                            <InputG>
+                              A unidade de processamento esteve em operação no ano de referência?
+                            </InputG>
+                          </td>
 
-                  <tr>
-                    <td></td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP019</InputP>
-                      </LabelCenter>
-                    </td>
-                    <td>
-                 
-                    </td>
-                    <td>
-                      <LabelCenter>
-                        <InputP>UP024</InputP>
-                      </LabelCenter>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputG>
-                        Outros
-                      </InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP019")}
-                         defaultValue={dadosUnidade?.up019}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                    <td>
-          
-                    </td>
-                    <td>
-                      <InputP>
-                        <input {...register("UP024")}
-                         defaultValue={dadosUnidade?.up024}
-                         onChange={handleOnChange}
-                        type="text"></input>
-                      </InputP>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-             
+                          <td>
+                            <InputG>
+                              <select {...register("UP051")}
+                              defaultValue={dadosUnidade?.up051}
+                              onChange={handleOnChange}>
+                                <option></option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP002</td>
+                          <td>
+                            <InputG>
+                              Ano de início da operação
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <input {...register("UP002")}
+                              defaultValue={dadosUnidade?.up002}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP066</td>
+                          <td>
+                            <InputG>
+                              Ano de cadastro da unidade
+                            </InputG>
+                          </td>
+
+                          <td>
+                            <InputG>
+                              <input {...register("UP066")}
+                              defaultValue={dadosUnidade?.up066}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP004</td>
+                          <td>
+                            <InputG>
+                              Operador da unidade
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <select {...register("UP004")}
+                              defaultValue={dadosUnidade?.up004}
+                              onChange={handleOnChange}
+                              >
+                                <option></option>
+                                <option>Prefeitura</option>
+                                <option>Empresa privada</option>
+                                <option>Associação de catadores</option>
+                                <option>Consórcio intermunicipal</option>
+                                <option>Outro</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP084</td>
+                          <td>
+                            <InputG>
+                              A unidade (no caso de vala de RSS) está situada na mesma área de outra unidade?
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                            <select {...register("UP084")}
+                              defaultValue={dadosUnidade?.up084}
+                              onChange={handleOnChange}>
+                                <option></option>
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP050</td>
+                          <td>
+                            <InputG>
+                              Tipo de licença ambiental emitida pelo orgão de controle ambiental
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <select {...register("UP050")}
+                               defaultValue={dadosUnidade?.up050}
+                               onChange={handleOnChange}
+                              >
+                                <option></option>
+                                <option>Operação</option>
+                                <option>Instalação</option>
+                                <option>Prévia</option>
+                                <option>Não existe</option>
+                                <option>Outro tipo.</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP012</td>
+                          <td>
+                            <InputG>
+                              Recebeu resíduos de outros municípios
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <select {...register("UP012")}
+                              defaultValue={dadosUnidade?.up012}
+                              onChange={handleOnChange}
+                              >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+
+
+                        <tr>
+                          <td>UP085</td>
+                          <td>
+                            <InputG>
+                              Nome do titular da licença de operação (Prefeitura ou Empresa)
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <input {...register("UP085")}
+                              defaultValue={dadosUnidade?.up085}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP086</td>
+                          <td>
+                            <InputG>
+                              CNPJ do titular de Licença de Operação
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputG>
+                              <input {...register("UP086")}
+                              defaultValue={dadosUnidade?.up086}
+                              onChange={handleOnChange}
+                              type="text"></input>
+                            </InputG>
+                          </td>
+                        </tr>
+
+                      </tbody>
+                    </table>
+                  </ConteudoModalResiduoSolido>
+                </ModalStepContent>
+
+                <ModalStepContent active={currentStep === 1}>
+                  <DivFormConteudoModal>
+                    <DivTitulo>
+                      <DivTituloConteudo>Serviços de coleta seletiva</DivTituloConteudo>
+                    </DivTitulo>
+                    <table>
+                      <thead>
+                        <tr>
+
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <th>Ano {new Date().getFullYear()}</th>
+
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>UP027</td>
+                          <td>
+                            <InputG>Existe cercamento da área?</InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <select {...register("UP027")}
+                              defaultValue={dadosUnidade?.up027}
+                              onChange={handleOnChange}
+                              >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP028</td>
+                          <td>
+                            <InputXL>
+                              Existe instaloções administrativas ou de apoio aos trabalhadores?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP028")}
+                            defaultValue={dadosUnidade?.up028}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP029</td>
+                          <td>
+                            <InputXL>
+                              Existe impermeabilização da base do aterro(com argila ou manta)?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP029")}
+                             defaultValue={dadosUnidade?.up029}
+                             onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP030</td>
+                          <td>
+                            <InputXL>
+                              Qual a frequência do recolhimento de resíduos?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputG>
+                              <select {...register("UP030")}
+                              defaultValue={dadosUnidade?.up030}
+                              onChange={handleOnChange}
+                              >
+                                <option></option>
+                                <option>Não e realizado</option>
+                                <option>Diária</option>
+                                <option>Semanal</option>
+                                <option>Quinzenal</option>
+                              </select>
+                            </InputG>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP031</td>
+                          <td>
+                            <InputXL>
+                              Existe drenagem de gases?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                              <select {...register("UP031")}
+                              defaultValue={dadosUnidade?.up031}
+                              onChange={handleOnChange}
+                              >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP052</td>
+                          <td>
+                            <InputXL>
+                              Existe algum tipo de reaproveitamento de gases drenados?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP052")}
+                            defaultValue={dadosUnidade?.up052}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP032</td>
+                          <td>
+                            <InputXL>
+                              Existe sistema de drenagem do liquído percola(chorume)?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP032")}
+                            defaultValue={dadosUnidade?.up032}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP033</td>
+                          <td>
+                            <InputXL>
+                              Existe unidade de tratamento do líquido percolado na área da unidade?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP033")}
+                            defaultValue={dadosUnidade?.up033}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>                     
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP053</td>
+                          <td>
+                            <InputXL>
+                              Existe unidade de tratamento do líquido percolado localizado fora da área da unidade?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP053")}
+                            defaultValue={dadosUnidade?.up053}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>                      
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP054</td>
+                          <td>
+                            <InputXL>
+                              Existe sistema de drenagem de águas pluviais?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP054")}
+                            defaultValue={dadosUnidade?.up054}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select>                      
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP034</td>
+                          <td>
+                            <InputXL>
+                              Existe recirculação do líquido percolado (chorume)?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP034")}
+                            defaultValue={dadosUnidade?.up034}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP035</td>
+                          <td>
+                            <InputXL>
+                              Há vigilância diurna e norturna na unidade?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP035")}
+                            defaultValue={dadosUnidade?.up035}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP036</td>
+                          <td>
+                            <InputXL>
+                              Há algum tipo de monitoramento ambiental da instalação?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP036")}
+                            defaultValue={dadosUnidade?.up036}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP037</td>
+                          <td>
+                            <InputXL>
+                              É feita queima de resíduos a céu aberto?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP037")}
+                            defaultValue={dadosUnidade?.up037}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP038</td>
+                          <td>
+                            <InputXL>
+                              Há presença de animais(exceto aves) na área(porcos, cavalos, vacas...)?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP038")}
+                            defaultValue={dadosUnidade?.up038}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td>UP081</td>
+                          <td>
+                            <InputXL>
+                              Existem catadores de materiais recicláveis?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP081")}
+                            defaultValue={dadosUnidade?.up081}
+                            onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+
+
+
+                        <tr>
+                          <td>UP082</td>
+                          <td>
+                            <InputXL>
+                            Quantidade de catadores até 14 anos?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputG>
+                            <input {...register("UP082")}
+                             defaultValue={dadosUnidade?.up082}
+                             onChange={handleOnChange}
+                             type="text"></input>
+                            </InputG>
+                          </td>
+                          <td >Catadores</td>
+                        </tr>
                         
-            </DivFormConteudo>
-            <DivFormConteudo>
-            <DivTitulo>
-                <DivTituloConteudo>Quantidade de resíduos recebidos (toneladas)</DivTituloConteudo>
-              </DivTitulo>
-              <DivBotaoAdicionar>
-                        <span
-                        onClick={() => {
-                          handleOpenResiduosRecebidos();
-                        }}
-                        >
-                        Adicionar
-                       </span>
-              </DivBotaoAdicionar>
-              <Tabela>
-                <table cellSpacing={0}>
-                  <thead>
-                  <tr>
-                      <th>Município</th>
-                      <th>RDO + RPU</th>
-                      <th>RSS</th>
-                      <th>RIN</th>
-                      <th>RCC</th>
-                      <th>RPO</th>
-                      <th>Outros</th>
-                      <th>Total</th>
-                    </tr>    
-                    <tr>
-                      <th>UP025</th>
-                      <th>UP007</th>
-                      <th>UP008</th>
-                      <th>UP009</th>
-                      <th>UP010</th>
-                      <th>UP067</th>
-                      <th>UP011</th>
-                      <th>UP080</th>
-                    </tr>                 
-                  </thead>
-                  <tbody>
-                        {residuosRecebidos?.map((rr, key)=>(
-                          <>
-                                <tr key={key}>
-                                  <td>{rr.up025}</td>
-                                  <td>{rr.up007}</td>
-                                  <td>{rr.up008}</td>
-                                  <td>{rr.up009}</td>
-                                  <td>{rr.up010}</td>
-                                  <td>{rr.up067}</td>
-                                  <td>{rr.up011}</td>
-                                  <td>{rr.up080}</td>
-                                </tr>
-                          </>
-                        ))}
-                  </tbody>
-                </table>
-              </Tabela>      
-           
-            </DivFormConteudo>
+                        <tr>
+                          <td>UP083</td>
+                          <td>
+                            <InputXL>
+                            Quantidade de catadores maiores de 14 anos?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputPP>
+                            <input {...register("UP083")}
+                             defaultValue={dadosUnidade?.up083}
+                             onChange={handleOnChange}
+                            type="text"></input> 
+                            </InputPP>
+                          </td>
+                          <td>Catadores</td>
+                        </tr>
 
-            <SubmitButton type="submit">Gravar</SubmitButton>
-          </Form>
+                        <tr>
+                          <td>UP039</td>
+                          <td>
+                            <InputXL>
+                              há domicílios de catadores na areá da unidade?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <select {...register("UP039")}
+                             defaultValue={dadosUnidade?.up039}
+                             onChange={handleOnChange}
+                            >
+                                <option value="Sim">Sim</option>
+                                <option value="Não">Não</option>
+                              </select> 
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>UP040</td>
+                          <td>
+                            <InputXL>
+                              Quantidade de domicílios de catadores na área?
+                            </InputXL>
+                          </td>
+                          <td>
+                            <InputP>
+                            <input {...register("UP040")}
+                             defaultValue={dadosUnidade?.up040}
+                             onChange={handleOnChange}
+                            type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>Domicílios</td>
+                        </tr>
 
-                </DivFormResiduo>              
-            </ModalFormUnidade>
-          
-        </ContainerModal>
-        
+                      </tbody>
+                    </table>           
+
+                  </DivFormConteudoModal>
+                </ModalStepContent>
+
+                <ModalStepContent active={currentStep === 2}>
+                  <DivFormConteudoModal>
+                    <DivTitulo>
+                      <DivTituloConteudo>Quantidade de veículos e Equipamentos</DivTituloConteudo>
+                    </DivTitulo>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>
+                            <span>Tipo de equipamentos</span>
+                          </th>
+                          <th></th>
+                          <th>
+                            <InputP>
+                              <span>Forma adotada</span>
+                            </InputP>
+                          </th>
+                          <th></th>
+                        </tr>
+                        <tr>
+                          <th></th>
+                          <th>
+                            <LabelCenter>
+                              <InputP>Da prefeitura ou SLU</InputP>
+                            </LabelCenter>
+                          </th>
+                          <th>
+                        
+                          </th>
+                          <th>
+                            <LabelCenter>
+                              <InputP>De empresas contratadas</InputP>
+                            </LabelCenter>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP015</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP020</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Trato de esteiras
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP015")}
+                               defaultValue={dadosUnidade?.up015}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP020")}
+                               defaultValue={dadosUnidade?.up020}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP016</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                           
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP021</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Retro-escavadeira
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP016")}
+                               defaultValue={dadosUnidade?.up016}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP021")}
+                               defaultValue={dadosUnidade?.up021}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP017</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                      
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP022</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Pá carregadeira
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP017")}
+                               defaultValue={dadosUnidade?.up017}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP022")}
+                               defaultValue={dadosUnidade?.up022}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP018</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                      
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP023</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                            Caminhão basculante
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP018")}
+                               defaultValue={dadosUnidade?.up018}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                      
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP023")}
+                               defaultValue={dadosUnidade?.up023}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP071</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP075</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Caminhão-pipa
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP071")}
+                               defaultValue={dadosUnidade?.up071}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                        
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP075")}
+                               defaultValue={dadosUnidade?.up075}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP068</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP072</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Escavadeira hidráulica
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP068")}
+                               defaultValue={dadosUnidade?.up068}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                        
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP072")}
+                               defaultValue={dadosUnidade?.up072}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP069</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP073</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Trator com rolo compactador
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP069")}
+                               defaultValue={dadosUnidade?.up069}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                        
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP073")}
+                               defaultValue={dadosUnidade?.up073}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP070</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP074</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                            Trator de pneus com rolo compactador
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP070")}
+                               defaultValue={dadosUnidade?.up070}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                        
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP074")}
+                               defaultValue={dadosUnidade?.up074}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+
+                        <tr>
+                          <td></td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP019</InputP>
+                            </LabelCenter>
+                          </td>
+                          <td>
+                       
+                          </td>
+                          <td>
+                            <LabelCenter>
+                              <InputP>UP024</InputP>
+                            </LabelCenter>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputG>
+                              Outros
+                            </InputG>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP019")}
+                               defaultValue={dadosUnidade?.up019}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                          <td>
+                        
+                          </td>
+                          <td>
+                            <InputP>
+                              <input {...register("UP024")}
+                               defaultValue={dadosUnidade?.up024}
+                               onChange={handleOnChange}
+                              type="text"></input>
+                            </InputP>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                   
+                              
+                  </DivFormConteudoModal>
+                </ModalStepContent>
+
+                <ModalStepContent active={currentStep === 3}>
+                  <DivFormConteudoModal>
+                    <DivTitulo>
+                      <DivTituloConteudo>Quantidade de resíduos recebidos</DivTituloConteudo>
+                    </DivTitulo>
+                    <DivBotaoAdicionar>
+                              <span
+                              onClick={() => {
+                                handleOpenResiduosRecebidos();
+                              }}
+                              >
+                              Adicionar
+                             </span>
+                    </DivBotaoAdicionar>
+                    <Tabela>
+                      <table cellSpacing={0}>
+                        <thead>
+                        <tr>
+                            <th >Município</th>
+                            <th>RDO + RPU</th>
+                            <th>RSS</th>
+                            <th>RIN</th>
+                            <th>RCC</th>
+                            <th>RPO</th>
+                            <th>Outros</th>
+                            <th>Total</th>
+                          </tr>    
+                              
+                        </thead>
+                        <tbody>
+                              {residuosRecebidos?.map((rr, key)=>(
+                                <>
+                                      <tr key={key}>
+                                        <td style={{color: "#FFFFF"}}>{rr.up025}</td>
+                                        <td>{rr.up007}</td>
+                                        <td>{rr.up008}</td>
+                                        <td>{rr.up009}</td>
+                                        <td>{rr.up010}</td>
+                                        <td>{rr.up067}</td>
+                                        <td>{rr.up011}</td>
+                                        <td>{rr.up080}</td>
+                                      </tr>
+                                </>
+                              ))}
+                        </tbody>
+                      </table>
+                    </Tabela>      
+                  </DivFormConteudoModal>
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+
+                </ModalStepContent>
+
+                <ModalStepperNavigation>
+                  <ModalStepperButton 
+                    secondary
+                    onClick={handlePrevStep}
+                    disabled={currentStep === 0}
+                  >
+                    Voltar
+                  </ModalStepperButton>
+
+                  {currentStep === 3 ? (
+                    <h1></h1>
+                  ) : (
+                    <ModalStepperButton onClick={handleNextStep}>
+                      Proximo
+                    </ModalStepperButton>
+                  )}
+                </ModalStepperNavigation>
+              </ModalStepperContainer>
+
+            </Form>
+          </ModalFormUnidade>
+        </ContainerModal>  
       )}
-      
-{visibleResiduosRecebidos && (
+
+      {visibleResiduosRecebidos && (
         <ContainerModal>
           <Modal>
             <FormModal onSubmit={handleSubmit(handleCreateResiduosRecebidos)}>
@@ -1597,15 +1656,17 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   onClick={() => {
                     handleCloseResiduosRecebidos();
                   }}
+                  type="button"
+                  
+
                 >
-                  Fechar
-                </CloseModalButton>
-                <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
-                <DivFormConteudo>
+                  <span></span>
+            </CloseModalButton>
+                <DivFormConteudoModal>
                 <table>
                   <thead>
                     <tr>
-                      <th><label>Municipio</label></th>
+                      <th ><label>Municipio</label></th>
                       <th><label>RDO + RPU</label></th>
                       <th><label>RSS</label></th>
                       <th><label>RIN</label> </th>
@@ -1673,8 +1734,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
-                </DivFormConteudo>
+                </DivFormConteudoModal>
+                <SubmitButton type="submit">Gravar</SubmitButton>
+
               </ConteudoModal>
+
             </FormModal>
             
           </Modal>

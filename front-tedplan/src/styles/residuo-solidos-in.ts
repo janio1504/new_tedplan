@@ -888,8 +888,14 @@ export const ContainerModal = styled.div`
   overflow-y: auto;
   padding: 20px;
   z-index: 1000;
+  color: #FFFF;
   animation: ${fadeIn} 0.3s ease;
 `;
+
+
+
+
+
 
 export const Modal = styled.div`
   position: relative;

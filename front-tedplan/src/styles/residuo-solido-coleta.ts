@@ -135,7 +135,6 @@ export const DivCenter = styled.div`
   min-width: 1280px;
   width: 100%;
   height: 100%;
-  background: #fff;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 50px;
@@ -210,8 +209,11 @@ export const MunicipioDireita = styled.div`
   font-weight: bold;
 `;
 
+
+
+
 export const DivConteudo = styled.div`
-  max-width: 65%;
+   max-width: 65%;
   width: 100%;
   height: 100%;
   background: #fff;
@@ -253,30 +255,43 @@ export const DivFormEixo = styled.div`
   margin-left: 5px;
 `;
 
-export const DivFormConteudo= styled.div`
- float: left;
+export const DivFormConteudo = styled.div`
+  float: left;
   width: 97%;
-  max-width: 1320;
-  min-width: 1090px;
+  max-width: 1320px;
+  min-width: 320px;
   padding: 10px 10px 10px 15px;
-  border: solid #3D6CA6 2px;
+  
   border-radius: 10px;
   margin-top: 30px;
   color: #667778;
-  table{
+  overflow-x: auto;
+
+  table {
     float: left;
     margin-bottom: 20px;
+    min-width: 100%;
+    
+    @media (max-width: 1090px) {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
   }
-  th{
+
+  th {
     text-align: left;
     padding: 0 10px 0 0px;
-    span{
+    min-width: 120px;
+
+    span {
       text-align: center;
       color: blue;
     }
-    p{
+
+    p {
       padding: 10px;
-      background:  #2dd9d0;
+      background: #2dd9d0;
       color: #008080;
       font-weight: bolder;
       border-radius: 5px;
@@ -284,9 +299,10 @@ export const DivFormConteudo= styled.div`
       width: auto;
       width: 70px;
     }
-    button{
+
+    button {
       border: none;
-      background:  #2dd9d0;
+      background: #2dd9d0;
       color: #008080;
       padding: 10px;
       text-align: center;
@@ -295,21 +311,27 @@ export const DivFormConteudo= styled.div`
       cursor: pointer;
     }
   }
-  td{
-  
-    
-    
-    
+
+  td {
+    min-width: 120px;
+    padding: 5px;
   }
-  select{
+
+  select {
     font-size: 14px;
-    option{
-    font-size: 16px;
+    width: 100%;
+    
+    option {
+      font-size: 16px;
+    }
   }
+
+  @media (max-width: 1090px) {
+    min-width: unset;
+    width: 95%;
   }
- 
-  
 `;
+
 export const DivForm = styled.div`
   float: left;
   width: 97%;
@@ -321,16 +343,80 @@ export const DivForm = styled.div`
   color: #667778;
 `;
 
+export const DivFormRe = styled.div`
+
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
+  input {
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 10px;
+    color: #666;
+    float: left;
+  }
+ 
+
+  textarea {
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 10px;
+    min-width: 500px;
+    height: 200px;
+  }
+  label {
+    color: #666;
+    margin: 10px 0 0 15px;
+  }
+
+  select {
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 10px;
+    background: #fff;
+  }
+  option {
+    border: 1px solid #2dd9d0;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin: 10px;
+    width: 500px;
+    background: #fff;
+  }
+  span {
+    color: #666;
+    //font-weight: bold;
+  }
+`
+
 export const DivFormResiduo = styled.div`
-  float: left;
-  width: 97%;
-  min-width: 1280px;
-  padding: 10px 12px 10px 10px;
-  border: solid #1bb6d3 2px;
-  border-radius: 5px;
-  margin-top: 20px;
-  margin-bottom: 0px;
-  color: #667778;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+  padding: 24px;
+  margin-bottom: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    margin-bottom: 16px;
+    gap: 16px;
+  }
 `;
 
 export const DivSeparadora = styled.div`
@@ -340,10 +426,10 @@ export const DivSeparadora = styled.div`
 
 export const DivTituloFormResiduo = styled.div`
   width: auto;
-  padding: 10px;
+  padding: 15px;
   margin: -11px -13px 0 -11px;
-  background-color: #42895B;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-radius: 7px;
   font-weight: bolder;
   color: #fff;
 `;
@@ -368,40 +454,17 @@ export const DivTituloFormDrenagem = styled.div`
   color: #fff;
 `;
 
-export const DivTituloEixo = styled.div`
-  //width: 300px;
-  float: right;
-  padding: 10px 40px;
-  margin: -30px 10px 0 -11px;
-  background-color: #3A8191;
-  border-radius: 25px;
-  font-weight: bolder;
-  text-align: center;
-  color: #fff;
-`;
 
-export const DivTituloEixoDrenagem = styled.div`
-  //width: 300px;
-  float: right;
-  padding: 10px 40px;
-  margin: -30px 10px 0 -11px;
-  background-color: #0F4C81;
-  border-radius: 25px;
-  font-weight: bolder;
-  text-align: center;
-  color: #fff;
-`;
 
 export const DivTituloConteudo = styled.div`
  
- float: left;
-  padding: 10px 40px;
-  margin: -30px 10px 0 0px;
-  background-color: #3D6CA6;
-  border-radius: 25px;
-  font-weight: bolder;
-  text-align: center;
-  color: #fff;
+ display: block;
+    font-size: 1.25rem;
+    color: #212121;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #2196F3;
+    font-weight: 500;
 `;
 export const DivTitulo = styled.div`
   min-width: 60%;
@@ -475,6 +538,7 @@ export const InputP = styled.div`
   flex-direction: column;
   display: flex;
   width: 140px;
+  
   p {
   margin-left: 20px;
   padding: 10px;
@@ -482,8 +546,46 @@ export const InputP = styled.div`
   }
   input{
     text-align: right;
+    border: 2px solid #e2e8f0;
+    border-color: 2px solid #cbd5e0;
+
+    &:hover {
+      border-color: #cbd5e0;
+      background-color: #f7fafc;
+    }
+
+    &:focus {
+      border-color: #0085bd;
+      box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+      outline: none;
+    }
   }
+ 
 `;
+
+// width: 100%;
+//     height: 38px;
+//     padding: 8px 12px;
+//     border: 1.5px solid #e2e8f0;
+//     border-radius: 8px;
+//     font-size: 14px;
+//     color: #2d3748;
+//     background-color: white;
+//     transition: all 0.2s ease-in-out;
+//     box-sizing: border-box;
+//     margin-top: 8px;
+    
+//     &:hover {
+//       border-color: #cbd5e0;
+//       background-color: #f7fafc;
+//     }
+
+//     &:focus {
+//       border-color: #0085bd;
+//       box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+//       outline: none;
+//     }
+
 
 export const InputM = styled.div`
   float: left;
@@ -580,10 +682,11 @@ export const DivEixo = styled.div`
   font-weight: bold;
 `;
 
+
+
 export const Form = styled.form`
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -591,17 +694,16 @@ export const Form = styled.form`
     float: left;
   }
   input:focus-within {
-    border-color: 2px solid #008080;
+    border-color: 2px solid #fff;
   }
 
   textarea {
-    border: 1px solid #eee;
+    border: 1px solid #000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     min-width: 500px;
     height: 200px;
-    border: 2px solid #2dd9d0;
   }
   label {
     color: #666;
@@ -609,7 +711,6 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -719,7 +820,6 @@ export const ConteudoModal = styled.div`
   text-align: left;
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -734,7 +834,6 @@ export const ConteudoModal = styled.div`
   }
 
   select {
-    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -791,3 +890,68 @@ export const CloseModalButton = styled.button`
   }
 `;
 
+
+
+export const FormContent = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+export const FormSection = styled.div`
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  h3 {
+    color: #1a202c;
+    font-size: 18px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+`;
+
+export const FormGroup = styled.div`
+  margin-bottom: 16px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #1a202c;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+    }
+
+    &:disabled {
+      background: #f8fafc;
+      cursor: not-allowed;
+    }
+  }
+
+  .error {
+    color: #e53e3e;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+`;

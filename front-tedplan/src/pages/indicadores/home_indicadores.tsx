@@ -14,7 +14,7 @@ import {
   MenuMunicipioItem,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
-import MenuIndicadores from "../../components/MenuIndicadores";
+import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 import Router from "next/router";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../../contexts/AuthContext";

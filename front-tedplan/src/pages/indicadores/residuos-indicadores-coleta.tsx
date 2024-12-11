@@ -11,9 +11,6 @@ import {
   InputG,
   SubmitButton,
   DivEixo,
-  MenuMunicipio,
-  Municipio,
-  MenuMunicipioItem,
   DivTitulo,
   DivFormConteudo,
   DivTituloConteudo,
@@ -23,13 +20,15 @@ import {
   InputXL,
   DivTituloFormResiduo,
   DivFormResiduo,
+  DivFormRe,
   DivBorder,
   LabelCenter,
-} from "../../styles/financeiro";
+  
+} from "../../styles/residuo-solido-coleta";
 import HeadIndicadores from "../../components/headIndicadores";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
-import MenuIndicadores from "../../components/MenuIndicadores";
+import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
@@ -51,7 +50,9 @@ import {
   TabelaModal,
   BotaoResiduos,
   Actions,
-} from "../../styles/indicadores";
+  ModalStepButton, ModalStepContent, ModalStepperContainer, ModalStepperNavigation,
+  ModalStepLabel, ModalStepperWrapper, ModalStepperButton
+} from "../../styles/residuo-solido-coleta-in";
 import Image from "next/image";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
@@ -74,7 +75,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     reset,
     formState: { errors },
   } = useForm();
-
+  const [activeStep, setActiveStep] = useState(0);
   const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
   const [modalCO020, setModalCO020] = useState(false);
@@ -87,12 +88,26 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   const [dadosResiduos, setDadosResiduos] = useState(null);
   const editor = useRef();
   const firstRender = useRef(true);
+  const [currentStep, setCurrentStep] = useState(0);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
+
+  const handleNextStep = () => {
+    setCurrentStep((prev) => Math.min(prev + 1, 11));
+  };
+
+  const handlePrevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+
 
   const getSunEditorInstance = (sunEditor) => {
     editor.current = sunEditor;
   };
 
+
+
+  
   useEffect(() => {    
     getRsc()  
     getUnidadesRsc()
@@ -403,6 +418,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
    
     
         <Form onSubmit={handleSubmit(handleCadastro)}>
+        <ModalStepperContainer>
         
           <DivFormResiduo>
             <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo>
@@ -416,7 +432,110 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
             </IconeColeta>
         </DivBotao>
         </DivCenter>
+        <ModalStepperWrapper>
+                  <div>
+                    <ModalStepButton active={currentStep === 0} completed={currentStep > 0}>
+                      1
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 0}>
+                    </ModalStepLabel>
+                  </div>
+                  
+                  <div>
+                    <ModalStepButton active={currentStep === 1} completed={currentStep > 1}>
+                      2
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 1}>
+                      
+                    </ModalStepLabel>
+                  </div>
 
+                  <div>
+                    <ModalStepButton active={currentStep === 2} completed={currentStep > 2}>
+                      3
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 2}>
+                      
+                    </ModalStepLabel>
+                  </div>
+
+                  <div>
+                    <ModalStepButton active={currentStep === 3} completed={currentStep > 3}>
+                      4
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 3}>
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 4} completed={currentStep > 4}>
+                      5
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 4}>
+                      
+                    </ModalStepLabel>
+                  </div>
+
+                  <div>
+                    <ModalStepButton active={currentStep === 5} completed={currentStep > 5}>
+                      6
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 5}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 6} completed={currentStep > 6}>
+                      7
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 6}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 7} completed={currentStep > 7}>
+                      8
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 7}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 8} completed={currentStep > 8}>
+                      9
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 8}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 9} completed={currentStep > 9}>
+                      10
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 9}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 10} completed={currentStep > 10}>
+                      11
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 10}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                  <div>
+                    <ModalStepButton active={currentStep === 11} completed={currentStep > 11}>
+                      12
+                    </ModalStepButton>
+                    <ModalStepLabel active={currentStep === 11}>
+                      
+                    </ModalStepLabel>
+                  </div>
+                 
+
+
+                </ModalStepperWrapper>
+        <ModalStepContent active={currentStep === 0} >
             <DivFormConteudo>
           
               <DivTitulo>
@@ -682,7 +801,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 <p>.</p>
               </InputSNIS>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 1} >
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
@@ -927,7 +1048,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 />
               </InputGG>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 2}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
@@ -1253,7 +1376,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </tbody>
               </table>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 3}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
@@ -1365,7 +1490,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </table>
               </Tabela>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 4}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
@@ -1431,18 +1558,20 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     <td>CO999</td>
                     <td>Obsevações</td>
                     <th>
-                      <InputM>
+                      <div>
                         <textarea {...register("CO999")}
                         defaultValue={dadosResiduos?.co999}
                         onChange={handleOnChange}
                         ></textarea>
-                      </InputM>
+                      </div>
                     </th>
                   </tr>
                 </tbody>
               </table>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 5}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>
@@ -2294,7 +2423,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
 
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 6}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Resíduos sólidos dos serviços da saúde (RSS)</DivTituloConteudo>
@@ -2705,7 +2836,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </table>
               </Tabela>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 7}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Resíduos sólidos da Construção Civil (RCC)</DivTituloConteudo>
@@ -2832,7 +2965,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 />
               </InputGG>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 8}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Serviço de Varrição</DivTituloConteudo>
@@ -2898,7 +3033,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               </table>
             
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 9}>
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Serviços de capina e roçada</DivTituloConteudo>
@@ -2984,7 +3121,10 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
               
             </DivFormConteudo>
+            </ModalStepContent>
 
+
+            <ModalStepContent active={currentStep === 10} >
             <DivFormConteudo>
             <DivTitulo>
                 <DivTituloConteudo>Outros serviços</DivTituloConteudo>
@@ -3862,7 +4002,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </tbody>
               </table>
             </DivFormConteudo>
+            </ModalStepContent>
 
+            <ModalStepContent active={currentStep === 11} >
             <DivFormConteudo>
               <DivTitulo>
                 <DivTituloConteudo>Catadores</DivTituloConteudo>
@@ -4009,11 +4151,35 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 </table>
               </Tabela>
             </DivFormConteudo>          
+            </ModalStepContent>
 
+            
 
           </DivFormResiduo>
+          
 
-          <SubmitButton type="submit">Gravar</SubmitButton>
+         
+           <ModalStepperNavigation>
+                  <ModalStepperButton 
+                    secondary
+                    onClick={handlePrevStep}
+                    disabled={currentStep === 0}
+                  >
+                    Voltar
+                  </ModalStepperButton>
+
+                  {currentStep === 11 ? (
+                    <h1></h1>
+                  ) : (
+                    <ModalStepperButton onClick={handleNextStep}>
+                      Proximo
+                    </ModalStepperButton>
+                    
+                  )}
+                <SubmitButton type="submit">Gravar</SubmitButton>
+                </ModalStepperNavigation>
+                
+          </ModalStepperContainer>
         </Form>
       </DivCenter>
 
@@ -4027,7 +4193,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     handleCloseModalCO020();
                   }}
                 >
-                  Fechar
+                  <span></span>
                 </CloseModalButton>
                 <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
                 <table>
@@ -4081,7 +4247,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     handleCloseModalRS031();
                   }}
                 >
-                  Fechar
+                  <span></span>
                 </CloseModalButton>
                 <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
                 <table>
@@ -4134,7 +4300,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     handleCloseAssCatadores();
                   }}
                 >
-                  Fechar
+                  <span></span>
                 </CloseModalButton>
                 <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
                 <TabelaModal>
