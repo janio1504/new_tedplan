@@ -6,7 +6,7 @@ export const Container = styled.div`
   height: 100%;
   max-width: 100%;
   background-color: #f3f4f6;
-
+  
   max-height: 100%;
   padding: 0;
   margin: 0;
@@ -56,11 +56,12 @@ export const IconeColeta = styled.div`
     object-fit: contain;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
+    
   }
 
   @media (max-width: 1200px) {
     width: 160px;
-
+    
     img {
       width: 90px;
       height: 90px;
@@ -71,7 +72,7 @@ export const IconeColeta = styled.div`
     width: 140px;
     padding: 12px;
     margin: 8px;
-
+    
     img {
       width: 80px;
       height: 80px;
@@ -175,7 +176,7 @@ export const DivCenter = styled.div`
   max-width: 75%;
   width: 100%;
   height: 100%;
-
+  
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -183,6 +184,13 @@ export const DivCenter = styled.div`
   padding: 0px;
   display: flex;
 `;
+
+
+
+
+
+ 
+
 
 export const MenuMunicipio = styled.div`
   justify-content: center;
@@ -238,120 +246,122 @@ export const MunicipioDireita = styled.div`
   font-weight: bold;
 `;
 export const ContainerPs = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 50px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    margin: 50px 0; 
 `;
 export const Ps1 = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 0 0px 0;
-  width: 30px;
-  height: 100px;
-  background-color: #2dd9d0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    margin: 0 0 0px 0;    
+    width: 30px;
+    height: 100px;
+    background-color: #2dd9d0;
+    
 `;
 export const Ps2 = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 0 0 0px 0;
-  width: 800px;
-  height: 300px;
-  border: solid 30px #2dd9d0;
-  border-radius: 20px;
-  img {
-    margin-top: -30px;
-    width: 80px;
-  }
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    margin: 0 0 0px 0;    
+    width: 800px;
+    height: 300px;
+    border: solid 30px #2dd9d0;
+    border-radius: 20px;
+    img{
+      margin-top: -30px;
+      width: 80px;
+    }
 `;
 
 export const Ps3 = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 0 -30px 0;
-  width: 400px;
-  height: 150px;
-  border: solid 30px #2dd9d0;
-  border-radius: 20px;
-  img {
-    margin-top: -30px;
-    width: 80px;
-  }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;  
+    margin: 0 0 -30px 0;    
+    width: 400px;
+    height: 150px;
+    border: solid 30px #2dd9d0;
+    border-radius: 20px;
+    img{
+      margin-top: -30px;
+      width: 80px;
+    }
 `;
 export const Ps4 = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  margin: 0 0 0px 0;
-  width: 600px;
-  height: 150px;
-  border: solid 30px #2dd9d0;
-  border-radius: 20px;
-  img {
-    margin-top: -30px;
-    width: 80px;
-  }
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;  
+    margin: 0 0 0px 0;    
+    width: 600px;
+    height: 150px;
+    border: solid 30px #2dd9d0;
+    border-radius: 20px;
+    img{
+      margin-top: -30px;
+      width: 80px;
+    }
 `;
 export const Ps5 = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: -5px 0 0px 0;
-  width: 30px;
-  height: 180px;
-  background-color: #2dd9d0;
-  img {
-    margin-top: -30px;
-    width: 80px;
-  }
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    margin: -5px 0 0px 0;    
+    width: 30px;
+    height: 180px;
+    background-color: #2dd9d0;
+    img{
+      margin-top: -30px;
+      width: 80px;
+    }
 `;
 export const PsImage = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: -150px 0 0px 0;
-  width: 100px;
-  cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;  
+    margin: -150px 0 0px 0;    
+    width: 100px;
+    cursor: pointer;
 `;
 export const PsImageEsquerda = styled.div`
-  float: left;
-  margin: -110px 0 0px -830px;
-  width: 100px;
-  left: -30px;
-  cursor: pointer;
+    float: left;
+    margin: -110px 0 0px -830px;    
+    width: 100px;
+    left: -30px;
+    cursor: pointer;    
 `;
 export const Ps3ImageDireita = styled.div`
-  float: right;
-  margin: -140px -60px 0px 0;
-  width: 100px;
-  left: -30px;
-  cursor: pointer;
+    float: right;
+    margin: -140px -60px 0px 0;    
+    width: 100px;
+    left: -30px;  
+    cursor: pointer;  
 `;
 export const Ps3ImageEsquerda = styled.div`
-  float: left;
-  margin: -140px 0 0px -60px;
-  width: 100px;
-  right: -30px;
-  cursor: pointer;
+    float: left;
+    margin: -140px 0 0px -60px;    
+    width: 100px;
+    right: -30px; 
+    cursor: pointer;   
 `;
 export const PsImageDireita = styled.div`
-  float: right;
-  margin: -110px -830px 0px 0;
-  width: 100px;
-  left: -30px;
-  cursor: pointer;
+    float: right;
+    margin: -110px -830px 0px 0;    
+    width: 100px;
+    left: -30px; 
+    cursor: pointer;   
 `;
 export const DivConteudo = styled.div`
+
   max-width: 65%;
   width: 100%;
   height: 100%;
@@ -391,29 +401,29 @@ export const DivColRelatorios = styled.div`
 export const TituloRelatorios = styled.div`
   font-size: 24px;
   font-weight: bolder;
-  color: #70b8c2;
+  color: #70B8C2;
   text-align: center;
-  p {
+  p{
     font-size: 18px;
   }
 `;
 export const BaixarRelatorio = styled.div`
-  width: 200px;
-  text-align: center;
-  margin-top: 10px;
-  background-color: #3d6ca6;
-  font-size: 22px;
-  color: #fff;
-  border-radius: 5px;
-  padding: 5px 20px;
-  cursor: pointer;
+width: 200px;
+text-align: center;
+margin-top: 10px;
+background-color: #3D6CA6;
+font-size: 22px;
+color: #fff;
+border-radius: 5px;
+padding: 5px 20px;
+cursor: pointer;
 `;
 
 export const BotaoResiduos = styled.div`
   width: 150px;
   text-align: center;
   margin-top: 10px;
-  background-color: #42895b;
+  background-color: #42895B;
   font-size: 16px;
   color: #fff;
   border-radius: 8px;
@@ -427,18 +437,20 @@ export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
-
+  
   text-align: left;
   padding: 10px 8px 10px 10px;
   border: solid #008080 2px;
   border-radius: 5px;
   margin-top: 50px;
   color: #fff;
-  table {
+  table{
     display: flex;
     justify-content: left;
   }
 `;
+
+
 
 export const DivTituloForm = styled.div`
   width: 100%;
@@ -450,22 +462,23 @@ export const DivTituloForm = styled.div`
   font-weight: bolder;
 `;
 
+
 export const Tabela = styled.div`
+
   width: 100%;
   margin-bottom: 30px;
   overflow: hidden;
   border-radius: 12px;
   background: #fff;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   table {
     width: 100%;
-
+    
     border-collapse: separate;
     border-spacing: 0;
     min-width: 600px;
-
+    
     th {
       background: #0085bd;
       color: #fff;
@@ -478,11 +491,11 @@ export const Tabela = styled.div`
       position: sticky;
       top: 0;
       z-index: 10;
-
+      
       &:first-child {
         padding-left: 24px;
       }
-
+      
       &:last-child {
         padding-right: 24px;
       }
@@ -500,36 +513,36 @@ export const Tabela = styled.div`
         padding-left: 24px;
         font-weight: 500;
       }
-
+      
       &:last-child {
         padding-right: 24px;
       }
 
       &.status {
         font-weight: 500;
-
+        
         &.active {
           color: #059669;
         }
-
+        
         &.inactive {
           color: #dc2626;
         }
-
+        
         &.pending {
           color: #d97706;
         }
       }
 
       &.numeric {
-        font-family: "IBM Plex Mono", monospace;
+        font-family: 'IBM Plex Mono', monospace;
         text-align: right;
       }
     }
 
     tr {
       transition: all 0.2s ease;
-
+      
       &:hover td {
         background: #f8fafc;
       }
@@ -543,19 +556,19 @@ export const Tabela = styled.div`
   .table-container {
     overflow-x: auto;
     margin: 0 -1px;
-
+    
     &::-webkit-scrollbar {
       height: 8px;
     }
-
+    
     &::-webkit-scrollbar-track {
       background: #f1f5f9;
     }
-
+    
     &::-webkit-scrollbar-thumb {
       background: #cbd5e0;
       border-radius: 4px;
-
+      
       &:hover {
         background: #94a3b8;
       }
@@ -568,8 +581,7 @@ export const Actions = styled.div`
   gap: 8px;
   align-items: center;
 
-  button,
-  a {
+  button, a {
     padding: 8px 12px;
     border-radius: 6px;
     border: none;
@@ -580,7 +592,7 @@ export const Actions = styled.div`
     display: inline-flex;
     align-items: center;
     gap: 8px;
-
+    
     &:focus {
       outline: none;
       box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
@@ -595,12 +607,12 @@ export const Actions = styled.div`
   .edit {
     background: #008080;
     color: white;
-
+    
     &:hover {
       background: #006666;
       transform: translateY(-1px);
     }
-
+    
     &:active {
       transform: translateY(0);
     }
@@ -610,13 +622,13 @@ export const Actions = styled.div`
     background: #fff;
     color: #dc2626;
     border: 1px solid #dc2626;
-
+    
     &:hover {
       background: #dc2626;
       color: #fff;
       transform: translateY(-1px);
     }
-
+    
     &:active {
       transform: translateY(0);
     }
@@ -626,13 +638,13 @@ export const Actions = styled.div`
     background: #fff;
     color: #3182ce;
     border: 1px solid #3182ce;
-
+    
     &:hover {
       background: #3182ce;
       color: #fff;
       transform: translateY(-1px);
     }
-
+    
     &:active {
       transform: translateY(0);
     }
@@ -641,8 +653,7 @@ export const Actions = styled.div`
   @media (max-width: 768px) {
     gap: 6px;
 
-    button,
-    a {
+    button, a {
       padding: 6px 10px;
       font-size: 13px;
 
@@ -654,22 +665,22 @@ export const Actions = styled.div`
   }
 `;
 
-export const DivBotaoAdicionar = styled.div`
-  width: 100%;
-  float: left;
-  margin-bottom: 10px;
-
-  span {
-    padding: 10px;
-    background: #2dd9d0;
-    color: #008080;
-    font-weight: bolder;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 70px;
-    float: right;
-    margin-right: 30px;
-  }
+export const DivBotaoAdicionar= styled.div`
+   width: 100%;
+   float: left;
+   margin-bottom: 10px;
+  
+   span{
+      padding: 10px;
+      background:  #2dd9d0;
+      color: #008080;
+      font-weight: bolder;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 70px;
+      float: right;
+      margin-right: 30px;
+    }
 `;
 
 export const SubmitButton = styled.button`
@@ -718,6 +729,7 @@ export const DivInput = styled.div`
 `;
 
 export const InputP = styled.div`
+  
   flex-direction: column;
   display: flex;
   width: 150px;
@@ -729,6 +741,7 @@ export const InputP = styled.div`
 `;
 
 export const InputM = styled.div`
+  
   flex-direction: column;
   display: flex;
   width: 350px;
@@ -739,6 +752,7 @@ export const InputM = styled.div`
 `;
 
 export const InputG = styled.div`
+  
   flex-direction: column;
   display: flex;
   width: 500px;
@@ -748,7 +762,7 @@ export const InputG = styled.div`
   }
 `;
 
-export const DivEixo = styled.div`
+export const DivEixo = styled.div`  
   flex-direction: row;
   margin: 10px;
   display: flex;
@@ -778,7 +792,7 @@ export const Form = styled.form`
     color: #666;
     float: left;
   }
-
+  
   input:focus-within {
     border-color: 2px solid #008080;
   }
@@ -818,12 +832,13 @@ export const Form = styled.form`
 `;
 
 export const DivBotao = styled.div`
-  float: left;
+ float: left;
   flex-direction: row;
-  display: flex;
+  display:flex;
   align-items: center;
   justify-content: center;
 `;
+
 
 const fadeIn = keyframes`
   from {
@@ -850,12 +865,12 @@ export const DivTituloUnidadesCadastradas = styled.div`
   color: #212121;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 2px solid #2196f3;
+  border-bottom: 2px solid #2196F3;
   font-weight: 500;
   width: 100%;
-
+  
   &::after {
-    content: "Unidades Cadastradas";
+    content: 'Unidades Cadastradas';
     display: block;
   }
 `;
@@ -873,8 +888,14 @@ export const ContainerModal = styled.div`
   overflow-y: auto;
   padding: 20px;
   z-index: 1000;
+  color: #FFFF;
   animation: ${fadeIn} 0.3s ease;
 `;
+
+
+
+
+
 
 export const Modal = styled.div`
   position: relative;
@@ -908,7 +929,7 @@ export const ModalForm = styled(Modal)`
   &::-webkit-scrollbar-thumb {
     background: #cbd5e0;
     border-radius: 4px;
-
+    
     &:hover {
       background: #a0aec0;
     }
@@ -917,13 +938,13 @@ export const ModalForm = styled(Modal)`
 
 export const ModalFormUnidade = styled(ModalForm)`
   padding: 0;
-
+  
   .modal-header {
-    background: #1caecc;
+    background: #1CAECC;
     padding: 24px 32px;
     border-radius: 16px 16px 0 0;
     position: relative;
-
+    
     h2 {
       color: white;
       margin: 0;
@@ -936,6 +957,7 @@ export const ModalFormUnidade = styled(ModalForm)`
   }
 `;
 
+
 export const ConteudoModal = styled.div`
   width: 100%;
   color: #4a5568;
@@ -944,10 +966,8 @@ export const ConteudoModal = styled.div`
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-  input,
-  select,
-  textarea {
+  
+  input, select, textarea {
     width: 100%;
     padding: 12px 16px;
     margin: 8px 0;
@@ -958,7 +978,7 @@ export const ConteudoModal = styled.div`
     background: #fff;
 
     &:focus {
-      border-color: #1caecc;
+      border-color: #1CAECC;
       box-shadow: 0 0 0 3px rgba(28, 174, 204, 0.1);
       outline: none;
     }
@@ -997,9 +1017,8 @@ export const TabelaModal = styled.div`
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-
-    th,
-    td {
+    
+    th, td {
       padding: 12px 16px;
       text-align: left;
       border-bottom: 1px solid #e2e8f0;
@@ -1021,13 +1040,13 @@ export const TabelaModal = styled.div`
   }
 
   @media (max-width: 768px) {
-    th,
-    td {
+    th, td {
       padding: 10px;
       font-size: 14px;
     }
   }
 `;
+
 
 export const CloseModalButton = styled.button`
   position: absolute;
@@ -1063,10 +1082,10 @@ export const CloseModalButton = styled.button`
     position: relative;
     width: 16px;
     height: 16px;
-
+    
     &::before,
     &::after {
-      content: "";
+      content: '';
       position: absolute;
       width: 16px;
       height: 2px;
@@ -1138,13 +1157,12 @@ export const BotaoMenu = styled.div`
     align-items: center;
     border-radius: 3px;
   }
-  //
-`;
+// `;
 export const BotaoMenuActive = styled.div`
   min-width: 300px;
   min-height: 20px;
   border-radius: 10px;
-  background: #193454;
+  background:  #193454;
   cursor: pointer;
   color: #fff;
   margin: 20px;
@@ -1166,22 +1184,28 @@ export const BotaoMenuActive = styled.div`
   }
 `;
 
+
+
+
+
+
 //Novo CSS para o DIV MENU INDICADORES
+
 
 export const DivMenuCadastro = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: #1caecc;
+  background: #1CAECC;
   padding: 10px 0;
-
+  
   width: 100%;
   margin: 0;
 `;
 
 export const DivBotaoMenuCadastro = styled.div`
   display: flex;
-
+  
   align-items: center;
   margin: 0 10px;
 `;
@@ -1189,7 +1213,7 @@ export const DivBotaoMenuCadastro = styled.div`
 export const NumeroMenuCadastro = styled.div`
   border-radius: 50%;
   padding: 5px;
-
+  
   background: #fff;
   color: #0085bd;
   font-weight: bold;
@@ -1218,17 +1242,20 @@ export const BotaoMenuCadastro = styled.div`
   &:hover {
     background: #193454;
   }
+  
 `;
 
 export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
-  color: #fff;
+   color: #fff;
 `;
+
 
 // Novo CSS SIDE BAR
 // export const Container = styled.div`
 //   display: flex;
 //   width: 100%;
 // `;
+
 
 export const Sidebar = styled.div`
   width: 250px;
@@ -1268,14 +1295,14 @@ export const SidebarItem = styled.div<{ active?: boolean }>`
   padding: 0.75rem 1rem;
   margin-bottom: 0.25rem;
   font-size: 1rem;
-  background-color: ${(props) => (props.active ? "#0085bd" : "transparent")};
-  color: ${(props) => (props.active ? "white" : "#333")};
+  background-color: ${props => props.active ? '#0085bd' : 'transparent'};
+  color: ${props => props.active ? 'white' : '#333'};
   border-radius: 4px;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
 
   &:hover {
-    background-color: ${(props) => (props.active ? "#0073a3" : "#e0e0e0")};
+    background-color: ${props => props.active ? '#0073a3' : '#e0e0e0'};
     border-left-color: #0085bd;
   }
 
@@ -1304,49 +1331,51 @@ export const SidebarSection = styled.div`
   }
 `;
 
-// export const DivFormCadastro = styled.div<{ active?: boolean }>`
-//   display: ${props => props.active ? 'block' : 'none'};
-//   flex-direction: column;
-//   justify-content: space-between;
-//   min-height: 300px
-//   text-align: left;
-//   padding: 10px 8px 10px 10px;
-//   border: solid #008080 2px;
-//   border-radius: 15px;
-//   margin-top: 50px;
-//   color: #fff;
-//   position: relative;
-//   padding-bottom: 70px;
-//   table{
 
-//     display: flex;
-//     justify-content: left;
-//   }
-//     label {
-//       font-size: 20px;
-//     }
 
-//     input, select, textarea {
-//       font-size: 20px;
-//     }
-// `;
+  // export const DivFormCadastro = styled.div<{ active?: boolean }>`
+  //   display: ${props => props.active ? 'block' : 'none'};
+  //   flex-direction: column;
+  //   justify-content: space-between;
+  //   min-height: 300px
+  //   text-align: left;
+  //   padding: 10px 8px 10px 10px;
+  //   border: solid #008080 2px;
+  //   border-radius: 15px;
+  //   margin-top: 50px;
+  //   color: #fff;
+  //   position: relative; 
+  //   padding-bottom: 70px;
+  //   table{
+    
+  //     display: flex;
+  //     justify-content: left;
+  //   }
+  //     label {
+  //       font-size: 20px;
+  //     }
 
-export const FormCadastro = styled.form`
+  //     input, select, textarea {
+  //       font-size: 20px;
+  //     }
+  // `;
+
+  export const FormCadastro = styled.form`
   background: white;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   margin-bottom: 2rem;
   animation: fadeIn 0.5s ease forwards;
 
   &::before {
-    content: "Cadastro de Unidades";
+    content: 'Cadastro de Unidades';
     display: block;
     font-size: 1.25rem;
     color: #212121;
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #2196f3;
+    border-bottom: 2px solid #2196F3;
     font-weight: 500;
   }
 
@@ -1371,7 +1400,7 @@ export const FormCadastro = styled.form`
   th {
     padding: 1rem;
     text-align: left;
-
+    
     label {
       font-size: 0.9rem;
       font-weight: 500;
@@ -1395,7 +1424,7 @@ export const FormCadastro = styled.form`
       background: #f8f9fa;
 
       &:focus {
-        border-color: #2196f3;
+        border-color: #2196F3;
         box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         outline: none;
         background: white;
@@ -1414,7 +1443,7 @@ export const FormCadastro = styled.form`
 
   ${InputM}, ${InputG} {
     margin: 0;
-
+    
     span {
       color: #f44336;
       font-size: 0.75rem;
@@ -1425,7 +1454,7 @@ export const FormCadastro = styled.form`
   }
 
   ${SubmitButtonModal} {
-    background: #2196f3;
+    background: #2196F3;
     color: white;
     border: none;
     padding: 1rem 2rem;
@@ -1442,20 +1471,20 @@ export const FormCadastro = styled.form`
     letter-spacing: 0.5px;
 
     &:hover {
-      background: #1976d2;
+      background: #1976D2;
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     &:active {
       transform: translateY(0);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
   }
 
   @media (max-width: 768px) {
     padding: 1.5rem;
-
+    
     &::before {
       font-size: 1.1rem;
     }
@@ -1472,19 +1501,16 @@ export const FormCadastro = styled.form`
   }
 `;
 
-//     input, select, textarea {
-//       font-size: 20px;
-//     }
-// `;
 
 export const SubmitButtonContainer = styled.div`
   position: absolute;
-
+  
   bottom: 0;
   right: 0;
   padding: 10px;
   width: 100%;
 `;
+
 
 export const DivTextArea = styled.div`
   float: left;
@@ -1492,7 +1518,7 @@ export const DivTextArea = styled.div`
   display: flex;
 `;
 
-export const TextArea = styled.div`
+export const TextArea = styled.div`  
   flex-direction: column;
   display: flex;
   width: 600px;
@@ -1501,8 +1527,9 @@ export const TextArea = styled.div`
   border-radius: 5px;
 `;
 
+
 export const DivFormCadastro = styled.div<{ active?: boolean }>`
-  display: ${(props) => (props.active ? "block" : "none")};
+  display: ${props => props.active ? 'block' : 'none'};
   background-color: white;
   padding: 0 1.9rem 1.9rem;
   border-radius: 7.6px;
@@ -1571,51 +1598,51 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   }
 
   input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
-    line-height: 1.5;
-    transition: all 0.3s ease;
-    color: #333;
-    background-color: #fff;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+input[type="email"],
+input[type="tel"],
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  line-height: 1.5;
+  transition: all 0.3s ease;
+  color: #333;
+  background-color: #fff;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 
-    &:focus {
-      outline: none;
-      border-color: #008080;
-      box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
-    }
-
-    &:hover {
-      border-color: #999;
-    }
-
-    &::placeholder {
-      color: #999;
-      opacity: 1;
-    }
-
-    &:disabled {
-      background-color: #f5f5f5;
-      cursor: not-allowed;
-    }
+  &:focus {
+    outline: none;
+    border-color: #008080;
+    box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
   }
 
-  select {
-    padding-right: 2rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 12px;
+  &:hover {
+    border-color: #999;
   }
+
+  &::placeholder {
+    color: #999;
+    opacity: 1;
+  }
+
+  &:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+  }
+}
+
+select {
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px;
+}
   .required::after {
     content: "*";
     color: red;
@@ -1650,6 +1677,7 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   }
 `;
 
+
 export const StepperContainer = styled.div`
   width: 100%;
   margin-bottom: 30px;
@@ -1662,7 +1690,7 @@ export const StepperWrapper = styled.div`
   position: relative;
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     background: #ddd;
     height: 2px;
@@ -1678,15 +1706,20 @@ export const StepButton = styled.div<{ active?: boolean; completed?: boolean }>`
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background-color: ${(props) =>
-    props.completed ? "#008080" : props.active ? "#2dd9d0" : "#fff"};
-  border: 2px solid
-    ${(props) =>
-      props.completed ? "#008080" : props.active ? "#2dd9d0" : "#ddd"};
+  background-color: ${props => 
+    props.completed ? '#008080' : 
+    props.active ? '#2dd9d0' : 
+    '#fff'};
+  border: 2px solid ${props => 
+    props.completed ? '#008080' : 
+    props.active ? '#2dd9d0' : 
+    '#ddd'};
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${(props) => (props.completed || props.active ? "#fff" : "#666")};
+  color: ${props => 
+    props.completed || props.active ? '#fff' : 
+    '#666'};
   font-weight: bold;
   position: relative;
   z-index: 2;
@@ -1694,20 +1727,22 @@ export const StepButton = styled.div<{ active?: boolean; completed?: boolean }>`
   transition: all 0.3s ease;
 `;
 
+
+
 export const StepLabel = styled.div<{ active?: boolean }>`
   position: absolute;
   top: 60px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  color: ${(props) => (props.active ? "#008080" : "#666")};
+  color: ${props => props.active ? '#008080' : '#666'};
   font-size: 14px;
-  font-weight: ${(props) => (props.active ? "bold" : "normal")};
+  font-weight: ${props => props.active ? 'bold' : 'normal'};
   width: 90px;
 `;
 
 export const StepContent = styled.div<{ active?: boolean }>`
-  display: ${(props) => (props.active ? "block" : "none")};
+  display: ${props => props.active ? 'block' : 'none'};
   margin-top: 20px;
 `;
 
@@ -1723,14 +1758,14 @@ export const StepperButton = styled.button<{ secondary?: boolean }>`
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  background-color: ${(props) => (props.secondary ? "#666" : "#008080")};
+  background-color: ${props => props.secondary ? '#666' : '#008080'};
   color: white;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${(props) => (props.secondary ? "#555" : "#006666")};
+    background-color: ${props => props.secondary ? '#555' : '#006666'};
   }
 
   &:disabled {
@@ -1738,6 +1773,7 @@ export const StepperButton = styled.button<{ secondary?: boolean }>`
     cursor: not-allowed;
   }
 `;
+
 
 export const ModalStepperWrapper = styled.div`
   display: flex;
@@ -1748,7 +1784,7 @@ export const ModalStepperWrapper = styled.div`
   margin: 0 auto;
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     background: #e2e8f0;
     height: 2px;
@@ -1760,30 +1796,32 @@ export const ModalStepperWrapper = styled.div`
   }
 `;
 
-export const ModalStepButton = styled.div<{
-  active?: boolean;
-  completed?: boolean;
-}>`
+export const ModalStepButton = styled.div<{ active?: boolean; completed?: boolean }>`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: ${(props) =>
-    props.completed ? "#1CAECC" : props.active ? "#2dd9d0" : "#fff"};
-  border: 2px solid
-    ${(props) =>
-      props.completed ? "#1CAECC" : props.active ? "#2dd9d0" : "#e2e8f0"};
+  background-color: ${props => 
+    props.completed ? '#1CAECC' : 
+    props.active ? '#2dd9d0' : 
+    '#fff'};
+  border: 2px solid ${props => 
+    props.completed ? '#1CAECC' : 
+    props.active ? '#2dd9d0' : 
+    '#e2e8f0'};
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${(props) => (props.completed || props.active ? "#fff" : "#4a5568")};
+  color: ${props => 
+    props.completed || props.active ? '#fff' : 
+    '#4a5568'};
   font-weight: 600;
   font-size: 16px;
   position: relative;
   z-index: 2;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: ${(props) =>
-    props.active ? "0 0 0 4px rgba(45, 217, 208, 0.2)" : "none"};
+  box-shadow: ${props =>
+    props.active ? '0 0 0 4px rgba(45, 217, 208, 0.2)' : 'none'};
 `;
 
 export const ModalStepLabel = styled.div<{ active?: boolean }>`
@@ -1792,9 +1830,9 @@ export const ModalStepLabel = styled.div<{ active?: boolean }>`
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  color: ${(props) => (props.active ? "#1CAECC" : "#4a5568")};
+  color: ${props => props.active ? '#1CAECC' : '#4a5568'};
   font-size: 14px;
-  font-weight: ${(props) => (props.active ? "600" : "500")};
+  font-weight: ${props => props.active ? '600' : '500'};
   width: 120px;
   white-space: nowrap;
   transition: all 0.3s ease;
@@ -1831,20 +1869,20 @@ export const ModalStepperButton = styled.button<{ secondary?: boolean }>`
   min-width: 120px;
   border: none;
   border-radius: 8px;
-  background-color: ${(props) => (props.secondary ? "#fff" : "#1CAECC")};
-  color: ${(props) => (props.secondary ? "#4a5568" : "#fff")};
+  background-color: ${props => props.secondary ? '#fff' : '#1CAECC'};
+  color: ${props => props.secondary ? '#4a5568' : '#fff'};
   cursor: pointer;
   font-weight: 600;
   font-size: 14px;
   transition: all 0.2s ease;
-  border: ${(props) => (props.secondary ? "1px solid #e2e8f0" : "none")};
+  border: ${props => props.secondary ? '1px solid #e2e8f0' : 'none'};
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 
   &:hover {
-    background-color: ${(props) => (props.secondary ? "#f8fafc" : "#0085bd")};
+    background-color: ${props => props.secondary ? '#f8fafc' : '#0085bd'};
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
@@ -1874,7 +1912,7 @@ export const ModalStepperContainer = styled.div`
 `;
 
 export const ModalStepContent = styled.div<{ active?: boolean }>`
-  display: ${(props) => (props.active ? "block" : "none")};
+  display: ${props => props.active ? 'block' : 'none'};
   padding: 32px;
   animation: fadeIn 0.3s ease;
 

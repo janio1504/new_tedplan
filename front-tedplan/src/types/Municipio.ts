@@ -1,29 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import {
-  Container,
-  DivMenu,
-  DivBotao,
-  BotaoMenu,
-  DivCenter,
-  DivConteudo,
-  DivColRelatorios,
-  MenuMunicipio,
-  MunicipioDireita,
-  Municipio,
-  StatusMunicipio,
-  MenuMunicipioItem,
-} from "../../styles/indicadores";
-import HeadIndicadores from "../../components/headIndicadores";
-import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
-import Router from "next/router";
-import { parseCookies } from "nookies";
-import { AuthContext } from "../../contexts/AuthContext";
-import api from "../../services/api";
-import { GetServerSideProps } from "next";
-import { getAPIClient } from "../../services/axios";
-import MenuHorizontal from "../../components/MenuHorizontal";
-
-interface IMunicipio {
+export type Municipio = {
   id_municipio: string;
   municipio_codigo_ibge: string;
   municipio_nome: string;
@@ -35,7 +10,7 @@ interface IMunicipio {
   municipio_bairro: string;
   municipio_telefone: string;
   municipio_email: string;
-  municipio_nome_prefeito: string;
+  municipio_prefeito: string;
   //titular dos serviços municipais de saneamento
   id_titular_servicos_ms: string;
   ts_setor_responsavel: string;
@@ -132,53 +107,4 @@ interface IMunicipio {
   dd_populacao_rural: string;
   dd_populacao_total: string;
   dd_total_moradias: string;
-}
-
-interface MunicipioProps {
-  municipio: IMunicipio[];
-}
-
-export default function HomeIndicadores() {
-  const { usuario, signOut } = useContext(AuthContext)
-  const [ nomeMunicipio, setNomeMunicipio] = useState<IMunicipio | undefined>()
-  useEffect(()=>{
-   getMunicipio()
-  },[usuario])
-  
-  console.log(usuario);
-  
-   async function getMunicipio(){
-    const res = await api.get("getMunicipio", {params: {id_municipio: usuario?.id_municipio}});
-    const municipio = await res.data;
-    if(res[0]){
-      setNomeMunicipio(municipio[0].municipio_nome)
-    }
-    
-   }
-     
-  return (
-    <Container>
-      <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={nomeMunicipio}></MenuHorizontal>
-      <StatusMunicipio>
-        Relatório SIMISAB correspondente ao ano {new Date().getFullYear()} - Estado PENDENTE
-      </StatusMunicipio>
-      <MenuIndicadores></MenuIndicadores>
-      <DivConteudo>
-        <DivColRelatorios>
-    
-        </DivColRelatorios>
-        <DivColRelatorios>
-          
-        </DivColRelatorios>
-        <DivColRelatorios>
-          
-        </DivColRelatorios>
-      </DivConteudo>
-    </Container>
-  );
-}
-
-
-
-
+};

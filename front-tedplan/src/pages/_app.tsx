@@ -1,16 +1,18 @@
-import { AuthProvider } from '../contexts/AuthContext'
-import GlobalStyle from '../styles/GlobalStyle'
+import { AuthProvider } from "../contexts/AuthContext";
+import { MunicipioProvider } from "../contexts/MunicipioContext";
+import { Municipio } from "../styles/financeiro";
+import GlobalStyle from "../styles/GlobalStyle";
 import NextNProgress from "nextjs-progressbar";
 function MyApp({ Component, pageProps }) {
   return (
-   
     <AuthProvider>
-       <GlobalStyle />
-       <NextNProgress />
-        <Component {...pageProps} />    
+      <MunicipioProvider>
+        <GlobalStyle />
+        <NextNProgress />
+        <Component {...pageProps} />
+      </MunicipioProvider>
     </AuthProvider>
-
-  )
+  );
 }
 
-export default MyApp
+export default MyApp;

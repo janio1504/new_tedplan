@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
@@ -30,129 +30,15 @@ import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
 
 import "suneditor/dist/css/suneditor.min.css";
-import { AuthContext } from "../../contexts/AuthContext";
-import { useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext";
 import { toast, ToastContainer } from "react-nextjs-toast";
-import { parseCookies } from "nookies";
 import Router from "next/router";
-import { GetServerSideProps } from "next";
-import { getAPIClient } from "../../services/axios";
 import MenuHorizontal from "../../components/MenuHorizontal";
-import api from "../../services/api";
-
-interface IMunicipio {
-  id_municipio: string;
-  municipio_codigo_ibge: string;
-  municipio_nome: string;
-  municipio_cnpj: string;
-  municipio_nome_prefeitura: string;
-  municipio_cep: string;
-  municipio_endereco: string;
-  municipio_numero: string;
-  municipio_bairro: string;
-  municipio_telefone: string;
-  municipio_email: string;
-  municipio_nome_prefeito: string;
-  //titular dos serviços municipais de saneamento
-  id_titular_servicos_ms: string;
-  ts_setor_responsavel: string;
-  ts_telefone_comercial: string;
-  ts_responsavel: string;
-  ts_cargo: string;
-  ts_telefone: string;
-  ts_email: string;
-
-  //prestador do serviço de seneamento basico
-  //abastecimento de agua
-  id_ps_abastecimento_agua: string;
-  aa_abrangencia: string;
-  aa_natureza_juridica: string;
-  aa_cnpj: string;
-  aa_telefone: string;
-  aa_cep: string;
-  aa_endereco: string;
-  aa_numero: string;
-  aa_bairro: string;
-  aa_responsavel: string;
-  aa_cargo: string;
-  aa_email: string;
-  aa_secretaria_setor_responsavel: string;
-
-  //esgotamento sanitario
-  id_ps_esgotamento_sanitario: string;
-  es_secretaria_setor_responsavel: string;
-  es_abrangencia: string;
-  es_natureza_juridica: string;
-  es_cnpj: string;
-  es_telefone: string;
-  es_cep: string;
-  es_endereco: string;
-  es_numero: string;
-  es_bairro: string;
-  es_responsavel: string;
-  es_cargo: string;
-  es_email: string;
-  //drenagem e àguas pluvias
-  id_ps_drenagem_aguas_pluviais: string;
-  da_secretaria_setor_responsavel: string;
-  da_abrangencia: string;
-  da_natureza_juridica: string;
-  da_cnpj: string;
-  da_telefone: string;
-  da_cep: string;
-  da_endereco: string;
-  da_numero: string;
-  da_bairro: string;
-  da_responsavel: string;
-  da_cargo: string;
-  da_email: string;
-  //Resíduos Sólidos
-  id_ps_residuo_solido: string;
-  rs_secretaria_setor_responsavel: string;
-  rs_abrangencia: string;
-  rs_natureza_juridica: string;
-  rs_cnpj: string;
-  rs_telefone: string;
-  rs_cep: string;
-  rs_endereco: string;
-  rs_numero: string;
-  rs_bairro: string;
-  rs_responsavel: string;
-  rs_cargo: string;
-  rs_email: string;
-
-  //Regulador e Fiscalizador dos Serviços de Saneamento
-  id_regulador_fiscalizador_ss: string;
-  rf_setor_responsavel: string;
-  rf_telefone_comercial: string;
-  rf_responsavel: string;
-  rf_cargo: string;
-  rf_telefone: string;
-  rf_email: string;
-  rf_descricao: string;
-
-  //Controle Social dos Serços Municipais de Saneamento
-  id_controle_social_sms: string;
-  setor_responsavel_cs_sms: string;
-  telefone_cs_sms: string;
-  email_cs_sms: string;
-
-  //Responsável pelo SIMISAB
-  id_responsavel_simisab: string;
-  simisab_responsavel: string;
-  simisab_telefone: string;
-  simisab_email: string;
-
-  //Dados demográficos
-  id_dados_demograficos: string;
-  dd_populacao_urbana: string;
-  dd_populacao_rural: string;
-  dd_populacao_total: string;
-  dd_total_moradias: string;
-}
+import { Municipio } from "../../types";
+import { useMunicipio } from "../../contexts/MunicipioContext";
 
 interface MunicipioProps {
-  municipio: IMunicipio[];
+  municipio: Municipio;
 }
 
 export default function Cadastro({ municipio }: MunicipioProps) {
@@ -160,19 +46,51 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm();
   const [activeForm, setActiveForm] = useState("dadosMunicipio");
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, signOut } = useAuth();
   const [content, setContent] = useState("");
-  const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>("");
+  const { dadosMunicipio, loadMunicipio, loading, updateMunicipio } =
+    useMunicipio();
   const [activeStep, setActiveStep] = useState(0);
+
+  console.log("dados municipio", dadosMunicipio);
+
   const steps = [
     "Abastecimento de Água",
     "Esgotamento Sanitário",
     "Drenagem e Águas Pluviais",
     "Resíduos Sólidos",
   ];
+
+  useEffect(() => {
+    if (usuario) {
+      loadMunicipio();
+    }
+  }, [usuario]);
+  useEffect(() => {
+    if (dadosMunicipio) {
+      Object.entries(dadosMunicipio).forEach(([key, value]) => {
+        setValue(key, value);
+      });
+    }
+  }, [dadosMunicipio, setValue]);
+  // useEffect(() => {
+  //   const carregarDados = async () => {
+  //     await loadMunicipio();
+  //   };
+  //   carregarDados();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (dadosMunicipio) {
+  //     Object.keys(dadosMunicipio).forEach((key) => {
+  //       setValue(key, dadosMunicipio[key]);
+  //     });
+  //   }
+  // }, [dadosMunicipio, setValue]);
 
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);
@@ -186,437 +104,25 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     setActiveStep(step);
   };
 
-  //const [nomeMunicipio, setMunicipio] = useState("");
-
-  useEffect(() => {
-    if (usuario) {
-      getMunicipio();
-    }
-  }, [usuario]);
-
-  async function getMunicipio() {
-    if (usuario) {
-      const resMunicipio = await api.get("getMunicipio", {
-        params: { id_municipio: usuario.id_municipio },
+  async function handleCadastro(data: any) {
+    try {
+      await updateMunicipio({
+        ...data,
+        id_municipio: usuario?.id_municipio,
       });
-      const res = resMunicipio.data.map((mun: IMunicipio) => {
-        return mun;
+      toast.notify("Dados gravados com sucesso!", {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
       });
-      setDadosMunicipio(resMunicipio.data[0]);
-    }
-  }
-
-  async function handleCadastro(data) {
-    data.id_municipio = data.id_municipio
-      ? data.id_municipio
-      : dadosMunicipio.id_municipio;
-
-    {
-      data.municipio_codigo_ibge
-        ? ""
-        : (data.municipio_codigo_ibge = dadosMunicipio.municipio_codigo_ibge);
-    }
-    {
-      data.municipio_nome
-        ? ""
-        : (data.municipio_nome = dadosMunicipio.municipio_nome);
-    }
-    {
-      data.municipio_cnpj
-        ? ""
-        : (data.municipio_cnpj = dadosMunicipio.municipio_cnpj);
-    }
-    {
-      data.municipio_cep
-        ? ""
-        : (data.municipio_cep = dadosMunicipio.municipio_cep);
-    }
-    {
-      data.municipio_endereco
-        ? ""
-        : (data.municipio_endereco = dadosMunicipio.municipio_endereco);
-    }
-    {
-      data.municipio_numero
-        ? ""
-        : (data.municipio_numero = dadosMunicipio.municipio_numero);
-    }
-    {
-      data.municipio_bairro
-        ? ""
-        : (data.municipio_bairro = dadosMunicipio.municipio_bairro);
-    }
-    {
-      data.municipio_telefone
-        ? ""
-        : (data.municipio_telefone = dadosMunicipio.municipio_telefone);
-    }
-    {
-      data.municipio_email
-        ? ""
-        : (data.municipio_email = dadosMunicipio.municipio_email);
-    }
-    {
-      data.municipio_prefeito
-        ? ""
-        : (data.municipio_prefeito = dadosMunicipio.municipio_prefeito);
-    }
-    {
-      data.municipio_nome_prefeitura
-        ? ""
-        : (data.municipio_nome_prefeitura =
-            dadosMunicipio.municipio_nome_prefeitura);
-    }
-
-    {
-      data.id_titular_servicos_ms
-        ? ""
-        : (data.id_titular_servicos_ms = dadosMunicipio.id_titular_servicos_ms);
-    }
-    {
-      data.ts_setor_responsavel
-        ? ""
-        : (data.ts_setor_responsavel = dadosMunicipio.ts_setor_responsavel);
-    }
-    {
-      data.ts_telefone_comercial
-        ? ""
-        : (data.ts_telefone_comercial = dadosMunicipio.ts_telefone_comercial);
-    }
-    {
-      data.ts_responsavel
-        ? ""
-        : (data.ts_responsavel = dadosMunicipio.ts_responsavel);
-    }
-    {
-      data.ts_cargo ? "" : (data.ts_cargo = dadosMunicipio.ts_cargo);
-    }
-    {
-      data.ts_telefone ? "" : (data.ts_telefone = dadosMunicipio.ts_telefone);
-    }
-    {
-      data.ts_email ? "" : (data.ts_email = dadosMunicipio.ts_email);
-    }
-
-    {
-      data.id_ps_abastecimento_agua
-        ? ""
-        : (data.id_ps_abastecimento_agua =
-            dadosMunicipio.id_ps_abastecimento_agua);
-    }
-    {
-      data.aa_abrangencia
-        ? ""
-        : (data.aa_abrangencia = dadosMunicipio.aa_abrangencia);
-    }
-    {
-      data.aa_natureza_juridica
-        ? ""
-        : (data.aa_natureza_juridica = dadosMunicipio.aa_natureza_juridica);
-    }
-    {
-      data.aa_cnpj ? "" : (data.aa_cnpj = dadosMunicipio.aa_cnpj);
-    }
-    {
-      data.aa_telefone ? "" : (data.aa_telefone = dadosMunicipio.aa_telefone);
-    }
-    {
-      data.aa_cep ? "" : (data.aa_cep = dadosMunicipio.aa_cep);
-    }
-    {
-      data.aa_endereco ? "" : (data.aa_endereco = dadosMunicipio.aa_endereco);
-    }
-    {
-      data.aa_numero ? "" : (data.aa_numero = dadosMunicipio.aa_numero);
-    }
-    {
-      data.aa_bairro ? "" : (data.aa_bairro = dadosMunicipio.aa_bairro);
-    }
-    {
-      data.aa_responsavel
-        ? ""
-        : (data.aa_responsavel = dadosMunicipio.aa_responsavel);
-    }
-    {
-      data.aa_cargo ? "" : (data.aa_cargo = dadosMunicipio.aa_cargo);
-    }
-    {
-      data.aa_email ? "" : (data.aa_email = dadosMunicipio.aa_email);
-    }
-    {
-      data.aa_secretaria_setor_responsavel
-        ? ""
-        : (data.aa_secretaria_setor_responsavel =
-            dadosMunicipio.aa_secretaria_setor_responsavel);
-    }
-
-    {
-      data.id_ps_esgotamento_sanitario
-        ? ""
-        : (data.id_ps_esgotamento_sanitario =
-            dadosMunicipio.id_ps_esgotamento_sanitario);
-    }
-    {
-      data.es_secretaria_setor_responsavel
-        ? ""
-        : (data.es_secretaria_setor_responsavel =
-            dadosMunicipio.es_secretaria_setor_responsavel);
-    }
-    {
-      data.es_abrangencia
-        ? ""
-        : (data.es_abrangencia = dadosMunicipio.es_abrangencia);
-    }
-    {
-      data.es_natureza_juridica
-        ? ""
-        : (data.es_natureza_juridica = dadosMunicipio.es_natureza_juridica);
-    }
-    {
-      data.es_cnpj ? "" : (data.es_cnpj = dadosMunicipio.es_cnpj);
-    }
-    {
-      data.es_telefone ? "" : (data.es_telefone = dadosMunicipio.es_telefone);
-    }
-    {
-      data.es_cep ? "" : (data.es_cep = dadosMunicipio.es_cep);
-    }
-    {
-      data.es_endereco ? "" : (data.es_endereco = dadosMunicipio.es_endereco);
-    }
-    {
-      data.es_numero ? "" : (data.es_numero = dadosMunicipio.es_numero);
-    }
-    {
-      data.es_bairro ? "" : (data.es_bairro = dadosMunicipio.es_bairro);
-    }
-    {
-      data.es_responsavel
-        ? ""
-        : (data.es_responsavel = dadosMunicipio.es_responsavel);
-    }
-    {
-      data.es_cargo ? "" : (data.es_cargo = dadosMunicipio.es_cargo);
-    }
-    {
-      data.es_email ? "" : (data.es_email = dadosMunicipio.es_email);
-    }
-
-    {
-      data.id_ps_drenagem_aguas_pluviais
-        ? ""
-        : (data.id_ps_drenagem_aguas_pluviais =
-            dadosMunicipio.id_ps_drenagem_aguas_pluviais);
-    }
-    {
-      data.da_secretaria_setor_responsavel
-        ? ""
-        : (data.da_secretaria_setor_responsavel =
-            dadosMunicipio.da_secretaria_setor_responsavel);
-    }
-    {
-      data.da_abrangencia
-        ? ""
-        : (data.da_abrangencia = dadosMunicipio.da_abrangencia);
-    }
-    {
-      data.da_natureza_juridica
-        ? ""
-        : (data.da_natureza_juridica = dadosMunicipio.da_natureza_juridica);
-    }
-    {
-      data.da_cnpj ? "" : (data.da_cnpj = dadosMunicipio.da_cnpj);
-    }
-    {
-      data.da_telefone ? "" : (data.da_telefone = dadosMunicipio.da_telefone);
-    }
-    {
-      data.da_cep ? "" : (data.da_cep = dadosMunicipio.da_cep);
-    }
-    {
-      data.da_endereco ? "" : (data.da_endereco = dadosMunicipio.da_endereco);
-    }
-    {
-      data.da_numero ? "" : (data.da_numero = dadosMunicipio.da_numero);
-    }
-    {
-      data.da_bairro ? "" : (data.da_bairro = dadosMunicipio.da_bairro);
-    }
-    {
-      data.da_responsavel
-        ? ""
-        : (data.da_responsavel = dadosMunicipio.da_responsavel);
-    }
-    {
-      data.da_cargo ? "" : (data.da_cargo = dadosMunicipio.da_cargo);
-    }
-    {
-      data.da_email ? "" : (data.da_email = dadosMunicipio.da_email);
-    }
-
-    {
-      data.id_ps_residuo_solido
-        ? ""
-        : (data.id_ps_residuo_solido = dadosMunicipio.id_ps_residuo_solido);
-    }
-    {
-      data.rs_secretaria_setor_responsavel
-        ? ""
-        : (data.rs_secretaria_setor_responsavel =
-            dadosMunicipio.rs_secretaria_setor_responsavel);
-    }
-    {
-      data.rs_abrangencia
-        ? ""
-        : (data.rs_abrangencia = dadosMunicipio.rs_abrangencia);
-    }
-    {
-      data.rs_natureza_juridica
-        ? ""
-        : (data.rs_natureza_juridica = dadosMunicipio.rs_natureza_juridica);
-    }
-    {
-      data.rs_cnpj ? "" : (data.rs_cnpj = dadosMunicipio.rs_cnpj);
-    }
-    {
-      data.rs_telefone ? "" : (data.rs_telefone = dadosMunicipio.rs_telefone);
-    }
-    {
-      data.rs_cep ? "" : (data.rs_cep = dadosMunicipio.rs_cep);
-    }
-    {
-      data.rs_endereco ? "" : (data.rs_endereco = dadosMunicipio.rs_endereco);
-    }
-    {
-      data.rs_numero ? "" : (data.rs_numero = dadosMunicipio.rs_numero);
-    }
-    {
-      data.rs_bairro ? "" : (data.rs_bairro = dadosMunicipio.rs_bairro);
-    }
-    {
-      data.rs_responsavel
-        ? ""
-        : (data.rs_responsavel = dadosMunicipio.rs_responsavel);
-    }
-    {
-      data.rs_cargo ? "" : (data.rs_cargo = dadosMunicipio.rs_cargo);
-    }
-    {
-      data.rs_email ? "" : (data.rs_email = dadosMunicipio.rs_email);
-    }
-
-    {
-      data.id_regulador_fiscalizador_ss
-        ? ""
-        : (data.id_regulador_fiscalizador_ss =
-            dadosMunicipio.id_regulador_fiscalizador_ss);
-    }
-    {
-      data.rf_setor_responsavel
-        ? ""
-        : (data.rf_setor_responsavel = dadosMunicipio.rf_setor_responsavel);
-    }
-    {
-      data.rf_telefone_comercial
-        ? ""
-        : (data.rf_telefone_comercial = dadosMunicipio.rf_telefone_comercial);
-    }
-    {
-      data.rf_responsavel
-        ? ""
-        : (data.rf_responsavel = dadosMunicipio.rf_responsavel);
-    }
-    {
-      data.rf_cargo ? "" : (data.rf_cargo = dadosMunicipio.rf_cargo);
-    }
-    {
-      data.rf_telefone ? "" : (data.rf_telefone = dadosMunicipio.rf_telefone);
-    }
-    {
-      data.rf_email ? "" : (data.rf_email = dadosMunicipio.rf_email);
-    }
-    {
-      data.rf_descricao
-        ? ""
-        : (data.rf_descricao = dadosMunicipio.rf_descricao);
-    }
-
-    {
-      data.id_controle_social_sms
-        ? ""
-        : (data.id_controle_social_sms = dadosMunicipio.id_controle_social_sms);
-    }
-    {
-      data.cs_setor_responsavel
-        ? ""
-        : (data.cs_setor_responsavel = dadosMunicipio.cs_setor_responsavel);
-    }
-    {
-      data.cs_telefone ? "" : (data.cs_telefone = dadosMunicipio.cs_telefone);
-    }
-    {
-      data.cs_email ? "" : (data.cs_email = dadosMunicipio.cs_email);
-    }
-
-    {
-      data.id_responsavel_simisab
-        ? ""
-        : (data.id_responsavel_simisab = dadosMunicipio.id_responsavel_simisab);
-    }
-    {
-      data.simisab_responsavel
-        ? ""
-        : (data.simisab_responsavel = dadosMunicipio.simisab_responsavel);
-    }
-    {
-      data.simisab_telefone
-        ? ""
-        : (data.simisab_telefone = dadosMunicipio.simisab_telefone);
-    }
-    {
-      data.simisab_email
-        ? ""
-        : (data.simisab_email = dadosMunicipio.simisab_email);
-    }
-
-    {
-      data.id_dados_demograficos
-        ? ""
-        : (data.id_dados_demograficos = dadosMunicipio.id_dados_demograficos);
-    }
-    {
-      data.dd_populacao_urbana
-        ? ""
-        : (data.dd_populacao_urbana = dadosMunicipio.dd_populacao_urbana);
-    }
-    {
-      data.dd_populacao_rural
-        ? ""
-        : (data.dd_populacao_rural = dadosMunicipio.dd_populacao_rural);
-    }
-    {
-      data.dd_populacao_total
-        ? ""
-        : (data.dd_populacao_total = dadosMunicipio.dd_populacao_total);
-    }
-    {
-      data.dd_total_moradias
-        ? ""
-        : (data.dd_total_moradias = dadosMunicipio.dd_total_moradias);
-    }
-
-    const res = await api
-      .post("addMunicipio", data)
-      .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    } catch (error) {
+      console.log(error);
+      toast.notify("Erro ao gravar dados", {
+        title: "Erro",
+        duration: 7,
+        type: "error",
       });
+    }
   }
 
   function handleOnChange(content) {
@@ -699,8 +205,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
               <input
                 {...register("id_municipio")}
-                defaultValue={usuario?.id_municipio}
-                onChange={handleOnChange}
+                // defaultValue={usuario?.id_municipio}
+                // onChange={handleOnChange}
                 type="hidden"
               ></input>
               <table>
@@ -712,8 +218,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>Código do IBGE</label>
                         <input
                           {...register("municipio_codigo_ibge")}
-                          defaultValue={dadosMunicipio.municipio_codigo_ibge}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_codigo_ibge}
+                          // onChange={handleOnChange}
                           type="text"
                         ></input>
                       </InputP>
@@ -723,8 +229,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>Municipio</label>
                         <input
                           {...register("municipio_nome")}
-                          defaultValue={dadosMunicipio.municipio_nome}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_nome}
+                          // onChange={handleOnChange}
                           type="text"
                         ></input>
                       </InputM>
@@ -734,8 +240,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>CNPJ ( Somente numeros )</label>
                         <input
                           {...register("municipio_cnpj")}
-                          defaultValue={dadosMunicipio.municipio_cnpj}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_cnpj}
+                          // onChange={handleOnChange}
                           placeholder={"Somente numeros"}
                           type="text"
                         ></input>
@@ -757,10 +263,10 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           {...register("municipio_nome_prefeitura", {
                             required: false,
                           })}
-                          defaultValue={
-                            dadosMunicipio.municipio_nome_prefeitura
-                          }
-                          onChange={handleOnChange}
+                          // defaultValue={
+                          //   dadosMunicipio?.municipio_nome_prefeitura
+                          // }
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_nome_prefeitura &&
@@ -777,8 +283,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <input
                           aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_cep", { required: false })}
-                          defaultValue={dadosMunicipio.municipio_cep}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_cep}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_cep && errors.municipio_cep.type && (
@@ -802,8 +308,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           {...register("municipio_endereco", {
                             required: false,
                           })}
-                          defaultValue={dadosMunicipio.municipio_endereco}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_endereco}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_endereco &&
@@ -820,8 +326,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <input
                           aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_numero", { required: false })}
-                          defaultValue={dadosMunicipio.municipio_numero}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_numero}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_numero &&
@@ -838,8 +344,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <input
                           aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_bairro", { required: false })}
-                          defaultValue={dadosMunicipio.municipio_bairro}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_bairro}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_bairro &&
@@ -864,8 +370,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           {...register("municipio_telefone", {
                             required: false,
                           })}
-                          defaultValue={dadosMunicipio.municipio_telefone}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_telefone}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_telefone &&
@@ -882,8 +388,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <input
                           aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_email", { required: false })}
-                          defaultValue={dadosMunicipio.municipio_email}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_email}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_email &&
@@ -902,8 +408,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           {...register("municipio_prefeito", {
                             required: false,
                           })}
-                          defaultValue={dadosMunicipio.municipio_prefeito}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.municipio_prefeito}
+                          // onChange={handleOnChange}
                           type="text"
                         />
                         {errors.municipio_prefeito &&
@@ -925,8 +431,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </DivTituloForm>
               <input
                 {...register("id_titular_servicos_ms")}
-                defaultValue={dadosMunicipio?.id_titular_servicos_ms}
-                onChange={handleOnChange}
+                // defaultValue={dadosMunicipio?.id_titular_servicos_ms}
+                // onChange={handleOnChange}
                 type="hidden"
               />
               <table>
@@ -939,8 +445,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("ts_setor_responsavel")}
-                          defaultValue={dadosMunicipio?.ts_setor_reponsavel}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.ts_setor_responsavel}
+                          // onChange={handleOnChange}
                           type="text"
                         ></input>
                       </InputG>
@@ -952,8 +458,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("ts_telefone_comercial")}
-                          defaultValue={dadosMunicipio?.ts_telefone_comercial}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.ts_telefone_comercial}
+                          // onChange={handleOnChange}
                           type="text"
                         ></input>
                       </InputP>
@@ -972,8 +478,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("ts_responsavel")}
-                          defaultValue={dadosMunicipio?.ts_responsavel}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.ts_responsavel}
+                          // onChange={handleOnChange}
                           type="text"
                         ></input>
                       </InputG>
@@ -985,8 +491,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("ts_cargo")}
-                          defaultValue={dadosMunicipio?.ts_cargo}
-                          onChange={handleOnChange}
+                          // defaultValue={dadosMunicipio?.ts_cargo}
+                          // onChange={handleOnChange}
                           type="text"
                         ></input>
                       </InputM>
@@ -998,7 +504,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("ts_telefone")}
-                          defaultValue={dadosMunicipio?.ts_telefone}
+                          // defaultValue={dadosMunicipio?.ts_telefone}
                           onChange={handleOnChange}
                           type="text"
                         />
@@ -1018,7 +524,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("ts_email")}
-                          defaultValue={dadosMunicipio?.ts_email}
+                          // defaultValue={dadosMunicipio?.ts_email}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -1061,7 +567,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </DivEixo>
                     <input
                       {...register("id_ps_abastecimento_agua")}
-                      defaultValue={dadosMunicipio?.id_ps_abastecimento_agua}
+                      // defaultValue={dadosMunicipio?.id_ps_abastecimento_agua}
                       onChange={handleOnChange}
                       type="hidden"
                     />
@@ -1075,9 +581,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_secretaria_setor_responsavel")}
-                                defaultValue={
-                                  dadosMunicipio?.aa_secretaria_setor_responsavel
-                                }
+                                // defaultValue={
+                                //   dadosMunicipio?.aa_secretaria_setor_responsavel
+                                // }
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1090,7 +596,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_abrangencia")}
-                                defaultValue={dadosMunicipio?.aa_abrangencia}
+                                // defaultValue={dadosMunicipio?.aa_abrangencia}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1139,7 +645,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_cnpj")}
-                                defaultValue={dadosMunicipio?.aa_cnpj}
+                                // defaultValue={dadosMunicipio?.aa_cnpj}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1152,7 +658,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_telefone")}
-                                defaultValue={dadosMunicipio?.aa_telefone}
+                                // defaultValue={dadosMunicipio?.aa_telefone}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1172,7 +678,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_cep")}
-                                defaultValue={dadosMunicipio?.aa_cep}
+                                // defaultValue={dadosMunicipio?.aa_cep}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1185,7 +691,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_endereco")}
-                                defaultValue={dadosMunicipio?.aa_endereco}
+                                // defaultValue={dadosMunicipio?.aa_endereco}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1198,7 +704,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_numero")}
-                                defaultValue={dadosMunicipio?.aa_numero}
+                                // defaultValue={dadosMunicipio?.aa_numero}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1211,7 +717,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_bairro")}
-                                defaultValue={dadosMunicipio?.aa_bairro}
+                                // defaultValue={dadosMunicipio?.aa_bairro}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1231,7 +737,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_responsavel")}
-                                defaultValue={dadosMunicipio?.aa_responsavel}
+                                // defaultValue={dadosMunicipio?.aa_responsavel}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1244,7 +750,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_cargo")}
-                                defaultValue={dadosMunicipio?.aa_cargo}
+                                // defaultValue={dadosMunicipio?.aa_cargo}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1257,7 +763,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("aa_email")}
-                                defaultValue={dadosMunicipio?.aa_email}
+                                // defaultValue={dadosMunicipio?.aa_email}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1274,7 +780,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </DivEixo>
                     <input
                       {...register("id_ps_esgotamento_sanitario")}
-                      defaultValue={dadosMunicipio?.id_ps_esgotamento_sanitario}
+                      // defaultValue={dadosMunicipio?.id_ps_esgotamento_sanitario}
                       onChange={handleOnChange}
                       type="hidden"
                     />
@@ -1287,11 +793,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Secretaria ou Setor Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("es_secretaria_setor_responsavel")}
-                                defaultValue={
-                                  dadosMunicipio?.es_secretaria_setor_responsavel
-                                }
-                                onChange={handleOnChange}
+                                // {...register("es_secretaria_setor_responsavel")}
+                                // defaultValue={
+                                //   dadosMunicipio?.es_secretaria_setor_responsavel
+                                // }
+                                // onChange={handleOnChange}
                                 type="text"
                               ></input>
                             </InputG>
@@ -1303,7 +809,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_abrangencia")}
-                                defaultValue={dadosMunicipio?.es_abrangencia}
+                                // defaultValue={dadosMunicipio?.es_abrangencia}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1352,7 +858,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_cnpj")}
-                                defaultValue={dadosMunicipio?.es_cnpj}
+                                // defaultValue={dadosMunicipio?.es_cnpj}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1365,7 +871,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_telefone")}
-                                defaultValue={dadosMunicipio?.es_telefone}
+                                // defaultValue={dadosMunicipio?.es_telefone}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1385,7 +891,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_cep")}
-                                defaultValue={dadosMunicipio?.es_cep}
+                                // defaultValue={dadosMunicipio?.es_cep}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1398,7 +904,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_endereco")}
-                                defaultValue={dadosMunicipio?.es_endereco}
+                                // defaultValue={dadosMunicipio?.es_endereco}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1411,7 +917,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_numero")}
-                                defaultValue={dadosMunicipio?.es_numero}
+                                // defaultValue={dadosMunicipio?.es_numero}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1424,7 +930,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_bairro")}
-                                defaultValue={dadosMunicipio?.es_bairro}
+                                // defaultValue={dadosMunicipio?.es_bairro}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1444,7 +950,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_responsavel")}
-                                defaultValue={dadosMunicipio?.es_responsavel}
+                                // defaultValue={dadosMunicipio?.es_responsavel}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1457,7 +963,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_cargo")}
-                                defaultValue={dadosMunicipio?.es_cargo}
+                                // defaultValue={dadosMunicipio?.es_cargo}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1470,7 +976,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("es_email")}
-                                defaultValue={dadosMunicipio?.es_email}
+                                // defaultValue={dadosMunicipio?.es_email}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1487,10 +993,10 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </DivEixo>
                     <input
                       {...register("id_ps_drenagem_aguas_pluviais")}
-                      defaultValue={
-                        dadosMunicipio?.id_ps_drenagem_aguas_pluviais
-                      }
-                      onChange={handleOnChange}
+                      // defaultValue={
+                      //   dadosMunicipio?.id_ps_drenagem_aguas_pluviais
+                      // }
+                      // onChange={handleOnChange}
                       type="hidden"
                     />
                     <table>
@@ -1503,10 +1009,10 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_secretaria_setor_responsavel")}
-                                defaultValue={
-                                  dadosMunicipio?.da_secretaria_setor_responsavel
-                                }
-                                onChange={handleOnChange}
+                                // defaultValue={
+                                //   dadosMunicipio?.da_secretaria_setor_responsavel
+                                // }
+                                // onChange={handleOnChange}
                                 type="text"
                               ></input>
                             </InputG>
@@ -1518,7 +1024,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_abrangencia")}
-                                defaultValue={dadosMunicipio?.da_abrangencia}
+                                // defaultValue={dadosMunicipio?.da_abrangencia}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1569,7 +1075,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_cnpj")}
-                                defaultValue={dadosMunicipio?.da_cnpj}
+                                // defaultValue={dadosMunicipio?.da_cnpj}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1582,7 +1088,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_telefone")}
-                                defaultValue={dadosMunicipio?.da_telefone}
+                                // defaultValue={dadosMunicipio?.da_telefone}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1602,7 +1108,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_cep")}
-                                defaultValue={dadosMunicipio?.da_cep}
+                                // defaultValue={dadosMunicipio?.da_cep}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1615,7 +1121,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_endereco")}
-                                defaultValue={dadosMunicipio?.da_endereco}
+                                // defaultValue={dadosMunicipio?.da_endereco}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1628,7 +1134,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_numero")}
-                                defaultValue={dadosMunicipio?.da_numero}
+                                // defaultValue={dadosMunicipio?.da_numero}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1641,7 +1147,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_bairro")}
-                                defaultValue={dadosMunicipio?.da_bairro}
+                                // defaultValue={dadosMunicipio?.da_bairro}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1661,7 +1167,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_responsavel")}
-                                defaultValue={dadosMunicipio?.da_responsavel}
+                                // defaultValue={dadosMunicipio?.da_responsavel}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1674,7 +1180,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_cargo")}
-                                defaultValue={dadosMunicipio?.da_cargo}
+                                // defaultValue={dadosMunicipio?.da_cargo}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1687,7 +1193,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("da_email")}
-                                defaultValue={dadosMunicipio?.da_email}
+                                // defaultValue={dadosMunicipio?.da_email}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1712,9 +1218,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_secretaria_setor_responsavel")}
-                                defaultValue={
-                                  dadosMunicipio?.rs_secretaria_setor_responsavel
-                                }
+                                // defaultValue={
+                                //   dadosMunicipio?.rs_secretaria_setor_responsavel
+                                // }
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1727,8 +1233,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_abrangencia")}
-                                defaultValue={dadosMunicipio?.rs_abrangencia}
-                                onChange={handleOnChange}
+                                // defaultValue={dadosMunicipio?.rs_abrangencia}
+                                // onChange={handleOnChange}
                                 type="text"
                               ></input>
                             </InputP>
@@ -1738,8 +1244,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </table>
                     <input
                       {...register("id_ps_residuo_solido")}
-                      defaultValue={dadosMunicipio?.id_ps_residuo_solido}
-                      onChange={handleOnChange}
+                      // defaultValue={dadosMunicipio?.id_ps_residuo_solido}
+                      // onChange={handleOnChange}
                       type="hidden"
                     />
 
@@ -1783,8 +1289,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_cnpj")}
-                                defaultValue={dadosMunicipio?.rs_cnpj}
-                                onChange={handleOnChange}
+                                // defaultValue={dadosMunicipio?.rs_cnpj}
+                                // onChange={handleOnChange}
                                 type="text"
                               ></input>
                             </InputM>
@@ -1796,7 +1302,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_telefone")}
-                                defaultValue={dadosMunicipio?.rs_telefone}
+                                // defaultValue={dadosMunicipio?.rs_telefone}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1815,7 +1321,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_cep")}
-                                defaultValue={dadosMunicipio?.rs_cep}
+                                // defaultValue={dadosMunicipio?.rs_cep}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1828,7 +1334,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_endereco")}
-                                defaultValue={dadosMunicipio?.rs_endereco}
+                                // defaultValue={dadosMunicipio?.rs_endereco}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1841,7 +1347,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_numero")}
-                                defaultValue={dadosMunicipio?.rs_numero}
+                                // defaultValue={dadosMunicipio?.rs_numero}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1854,7 +1360,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_bairro")}
-                                defaultValue={dadosMunicipio?.rs_bairro}
+                                // defaultValue={dadosMunicipio?.rs_bairro}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1873,7 +1379,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_responsavel")}
-                                defaultValue={dadosMunicipio?.rs_responsavel}
+                                // defaultValue={dadosMunicipio?.rs_responsavel}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1886,7 +1392,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_cargo")}
-                                defaultValue={dadosMunicipio?.rs_cargo}
+                                // defaultValue={dadosMunicipio?.rs_cargo}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1899,7 +1405,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               </label>
                               <input
                                 {...register("rs_email")}
-                                defaultValue={dadosMunicipio?.rs_email}
+                                // defaultValue={dadosMunicipio?.rs_email}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -1938,7 +1444,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </DivTituloForm>
               <input
                 {...register("id_regulador_fiscalizador_ss")}
-                defaultValue={dadosMunicipio?.id_regulador_fiscalizador_ss}
+                // defaultValue={dadosMunicipio?.id_regulador_fiscalizador_ss}
                 onChange={handleOnChange}
                 type="hidden"
               />
@@ -1952,7 +1458,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("rf_setor_responsavel")}
-                          defaultValue={dadosMunicipio?.rf_setor_responsavel}
+                          // defaultValue={dadosMunicipio?.rf_setor_responsavel}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -1965,7 +1471,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("rf_telefone_comercial")}
-                          defaultValue={dadosMunicipio?.rf_telefone_comercial}
+                          // defaultValue={dadosMunicipio?.rf_telefone_comercial}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -1985,7 +1491,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("rf_responsavel")}
-                          defaultValue={dadosMunicipio?.rf_responsavel}
+                          // defaultValue={dadosMunicipio?.rf_responsavel}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -1998,7 +1504,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("rf_cargo")}
-                          defaultValue={dadosMunicipio?.rf_cargo}
+                          // defaultValue={dadosMunicipio?.rf_cargo}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -2011,7 +1517,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("rf_telefone")}
-                          defaultValue={dadosMunicipio?.rf_telefone}
+                          // defaultValue={dadosMunicipio?.rf_telefone}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -2031,7 +1537,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <input
                           {...register("rf_email")}
-                          defaultValue={dadosMunicipio?.rf_email}
+                          // defaultValue={dadosMunicipio?.rf_email}
                           onChange={handleOnChange}
                           type="text"
                         ></input>
@@ -2053,7 +1559,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <TextArea>
                           <textarea
                             {...register("rf_descricao")}
-                            defaultValue={dadosMunicipio?.rf_descricao}
+                            // defaultValue={dadosMunicipio?.rf_descricao}
                             onChange={handleOnChange}
                             name="rf_descricao"
                           />
@@ -2074,7 +1580,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </DivTituloForm>
               <input
                 {...register("id_controle_social_sms")}
-                defaultValue={dadosMunicipio?.id_controle_social_sms}
+                // defaultValue={dadosMunicipio?.id_controle_social_sms}
                 onChange={handleOnChange}
                 type="hidden"
               />
@@ -2084,7 +1590,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("cs_setor_responsavel")}
-                  defaultValue={dadosMunicipio?.cs_setor_responsavel}
+                  // defaultValue={dadosMunicipio?.cs_setor_responsavel}
                   onChange={handleOnChange}
                   type="text"
                 ></input>
@@ -2095,7 +1601,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("cs_telefone")}
-                  defaultValue={dadosMunicipio?.cs_telefone}
+                  // defaultValue={dadosMunicipio?.cs_telefone}
                   onChange={handleOnChange}
                   type="text"
                 ></input>
@@ -2106,7 +1612,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("cs_email")}
-                  defaultValue={dadosMunicipio?.cs_email}
+                  // defaultValue={dadosMunicipio?.cs_email}
                   onChange={handleOnChange}
                   type="text"
                 ></input>
@@ -2119,7 +1625,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <DivTituloForm>Responsável pelo SIMISAB</DivTituloForm>
               <input
                 {...register("id_responsavel_simisab")}
-                defaultValue={dadosMunicipio?.id_responsavel_simisab}
+                // defaultValue={dadosMunicipio?.id_responsavel_simisab}
                 onChange={handleOnChange}
                 type="hidden"
               />
@@ -2129,7 +1635,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("simisab_responsavel")}
-                  defaultValue={dadosMunicipio?.simisab_responsavel}
+                  // defaultValue={dadosMunicipio?.simisab_responsavel}
                   onChange={handleOnChange}
                   type="text"
                 ></input>
@@ -2140,7 +1646,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("simisab_telefone")}
-                  defaultValue={dadosMunicipio?.simisab_telefone}
+                  // defaultValue={dadosMunicipio?.simisab_telefone}
                   onChange={handleOnChange}
                   type="text"
                 ></input>
@@ -2151,7 +1657,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("simisab_email")}
-                  defaultValue={dadosMunicipio?.simisab_email}
+                  // defaultValue={dadosMunicipio?.simisab_email}
                   onChange={handleOnChange}
                   type="text"
                 ></input>
@@ -2165,7 +1671,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <DivTituloForm>Dados demográficos</DivTituloForm>
               <input
                 {...register("id_dados_demograficos")}
-                defaultValue={dadosMunicipio?.id_dados_demograficos}
+                // defaultValue={dadosMunicipio?.id_dados_demograficos}
                 onChange={handleOnChange}
                 type="hidden"
                 name="id_dados_demograficos"
@@ -2176,7 +1682,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("dd_populacao_urbana")}
-                  defaultValue={dadosMunicipio?.dd_populacao_urbana}
+                  // defaultValue={dadosMunicipio?.dd_populacao_urbana}
                   onChange={handleOnChange}
                   type="text"
                   name="dd_populacao_urbana"
@@ -2188,7 +1694,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("dd_populacao_rural")}
-                  defaultValue={dadosMunicipio?.dd_populacao_rural}
+                  // defaultValue={dadosMunicipio?.dd_populacao_rural}
                   onChange={handleOnChange}
                   type="text"
                   name="dd_populacao_rural"
@@ -2200,7 +1706,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("dd_populacao_total")}
-                  defaultValue={dadosMunicipio?.dd_populacao_total}
+                  // defaultValue={dadosMunicipio?.dd_populacao_total}
                   onChange={handleOnChange}
                   type="text"
                   name="dd_populacao_total"
@@ -2212,7 +1718,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
                 <input
                   {...register("dd_total_moradias")}
-                  defaultValue={dadosMunicipio?.dd_total_moradias}
+                  // defaultValue={dadosMunicipio?.dd_total_moradias}
                   onChange={handleOnChange}
                   type="text"
                   name="dd_total_moradias"
