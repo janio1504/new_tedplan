@@ -18,10 +18,10 @@ interface ResiduosContextData {
   unidadesRss: any[];
   unidadesRsc: any[];
   cooperativas: any[];
-  loadDadosResiduos: () => Promise<void>;
-  loadDadosUnidadesRss: () => Promise<void>;
-  loadDadosUnidadesRsc: () => Promise<void>;
-  loadDadosCooperativasCatadores: () => Promise<void>;
+  loadDadosResiduos: (ano) => Promise<void>;
+  loadDadosUnidadesRss: (ano) => Promise<void>;
+  loadDadosUnidadesRsc: (ano) => Promise<void>;
+  loadDadosCooperativasCatadores: (ano) => Promise<void>;
   loading: boolean;
   removeUnidadeRss: (id: string) => Promise<any>;
   removeUnidadeRsc: (id: string) => Promise<any>;
@@ -49,13 +49,13 @@ export const ResiduosProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const { usuario } = useAuth();
 
-  const loadDadosResiduos = async () => {
+  const loadDadosResiduos = async (ano) => {
     if (usuario) {
       try {
         setLoading(true);
         const data = await getPsResiduosColeta(
           usuario?.id_municipio,
-          new Date().getFullYear()
+          ano
         );
         setDadosResiduos(data);
       } catch (error) {
@@ -66,7 +66,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
     }
   };
 
-  const loadDadosUnidadesRss = async () => {
+  const loadDadosUnidadesRss = async (ano) => {
     if (usuario) {
       try {
         setLoading(true);
@@ -88,7 +88,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
       const response = await removerUnidadeRss(id);
 
       if (response.success) {
-        await loadDadosUnidadesRss();
+        //await loadDadosUnidadesRss();
       }
       return response;
     } catch (error) {
@@ -104,7 +104,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
 
       const response = await createUnidadeRss(data);
       if (response.success) {
-        await loadDadosUnidadesRss();
+        //await loadDadosUnidadesRss();
       }
       return response;
     } catch (error) {
@@ -163,7 +163,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
   };
 
   // =============================================================================
-  const loadDadosCooperativasCatadores = async () => {
+  const loadDadosCooperativasCatadores = async (ano) => {
     if (usuario) {
       try {
         setLoading(true);
@@ -183,11 +183,11 @@ export const ResiduosProvider: React.FC = ({ children }) => {
   const createDataCoopCat = async (data: any) => {
     try {
       data.id_municipio = usuario?.id_municipio;
-      data.ano = new Date().getFullYear();
+      //data.ano = new Date().getFullYear();
 
       const response = await createCoopCat(data);
       if (response.success) {
-        await loadDadosCooperativasCatadores();
+        await loadDadosCooperativasCatadores(data.ano);
       }
       return response;
     } catch (error) {
@@ -204,7 +204,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
       const response = await removerCoopCat(id);
 
       if (response.success) {
-        await loadDadosCooperativasCatadores();
+        //await loadDadosCooperativasCatadores();
       }
       return response;
     } catch (error) {

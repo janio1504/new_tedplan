@@ -88,7 +88,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   const [modalCO020, setModalCO020] = useState(false);
   const [modalRS031, setModalRS031] = useState(false);
   const [modalAssCatadores, setModalAssCatadores] = useState(false);
-
+  const [anoSelected, setAnoSelected] = useState(null);
   const editor = useRef();
   const firstRender = useRef(true);
   const [currentStep, setCurrentStep] = useState(0);
@@ -127,10 +127,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   useEffect(() => {
     if (usuario) {
       loadMunicipio();
-      loadDadosResiduos();
-      loadDadosUnidadesRss();
-      loadDadosUnidadesRsc();
-      loadDadosCooperativasCatadores();
     }
   }, [usuario]);
 
@@ -449,7 +445,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
           duration: 7,
           type: "success",
         });
-        loadDadosResiduos();
+        loadDadosResiduos(anoSelected);
         return response;
       })
       .catch((error) => {
@@ -564,6 +560,16 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
   function unidadeProcessamento() {
     Router.push("/indicadores/residuos-indicadores-unidade");
+  }
+
+  function seletcAno(ano: any) {
+    setAnoSelected(ano);
+
+      
+      loadDadosResiduos(ano);
+      loadDadosUnidadesRss(ano);
+      loadDadosUnidadesRsc(ano);
+      loadDadosCooperativasCatadores(ano);
   }
 
   return (
@@ -714,7 +720,27 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepLabel active={currentStep === 11}></ModalStepLabel>
                 </div>
               </ModalStepperWrapper>
-              <ModalStepContent active={currentStep === 0}>
+              <DivFormConteudo>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Selecione um ano para visualização dos dados.
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <InputP>
+                    <label>Selecione o ano desejado:</label>
+                    <select
+                      name="ano"
+                      id="ano"
+                      onChange={(e) => seletcAno(e.target.value)}
+                    >
+                      <option>Selecionar</option>
+                      <option value="2022">2022</option>
+                      <option value="2023">2023</option>
+                      <option value="2024">2024</option>
+                    </select>
+                  </InputP>
+                </DivFormConteudo>
+              <ModalStepContent active={currentStep === 0}>                
                 <DivFormConteudo>
                   <DivTitulo>
                     <DivTituloConteudo>
