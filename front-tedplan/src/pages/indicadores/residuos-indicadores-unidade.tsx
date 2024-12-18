@@ -312,13 +312,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={municipio[0]?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <DivFormResiduo>
           <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo>
           <DivCenter>
             <DivBotao>
+            <IconeColeta>
+                {" "}
+                <Image src={unidade_escuro} alt="Simisab" />
+                <BotaoResiduos>Processamento</BotaoResiduos>
+              </IconeColeta>
               <IconeColeta>
                 {" "}
                 <Image
@@ -330,11 +335,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   Coleta
                 </BotaoResiduos>
               </IconeColeta>
-              <IconeColeta>
-                {" "}
-                <Image src={unidade_escuro} alt="Simisab" />
-                <BotaoResiduos>Processamento</BotaoResiduos>
-              </IconeColeta>
+              
             </DivBotao>
           </DivCenter>
           {visibleCadastro && (

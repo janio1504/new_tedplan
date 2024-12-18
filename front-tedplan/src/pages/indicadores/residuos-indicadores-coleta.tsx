@@ -588,12 +588,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
               <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo>
               <DivCenter>
                 <DivBotao>
-                  <IconeColeta>
-                    {" "}
-                    <Image src={coleta_escuro} alt="Simisab" />
-                    <BotaoResiduos>Coleta</BotaoResiduos>
-                  </IconeColeta>
-                  <IconeColeta>
+                <IconeColeta>
                     {" "}
                     <Image
                       onClick={() => unidadeProcessamento()}
@@ -604,6 +599,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       Processamento
                     </BotaoResiduos>
                   </IconeColeta>
+                  <IconeColeta>
+                    {" "}
+                    <Image src={coleta_escuro} alt="Simisab" />
+                    <BotaoResiduos>Coleta</BotaoResiduos>
+                  </IconeColeta>
+                 
                 </DivBotao>
               </DivCenter>
               <ModalStepperWrapper>
