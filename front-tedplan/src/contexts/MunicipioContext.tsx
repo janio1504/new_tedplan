@@ -1,11 +1,7 @@
 // contexts/MunicipioContext.tsx
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { Municipio } from "../types";
-import {
-  getMunicipio,
-  updateMunicipio,
-  updateMunicipioService,
-} from "../services/municipio";
+import { getMunicipio, updateMunicipio } from "../services/municipio";
 import { useAuth } from "./AuthContext";
 
 interface MunicipioContextData {
