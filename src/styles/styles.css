@@ -1,0 +1,27 @@
+
+  
+  .suggestion-list {
+    box-shadow: 0 2px 12px 0 rgba(41, 45, 55, 0.16);
+    position: absolute;
+    background: #fefeff;
+    width: 280px;
+    margin: 0.5rem 0;
+    padding: 12px 0 4px;
+    border-radius: 4px;
+    list-style-type: none;
+  }
+  
+  .suggestion-item {
+    /* width: 280px; */
+    height: 38px;
+    padding: 8px 20px;
+  }
+  
+  .suggestion-item:hover {
+    background: #eef3f9;
+  }
+  
+  .active {
+    background: #eef3f9;
+  }
+  
