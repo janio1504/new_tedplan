@@ -513,9 +513,10 @@ export const InputG = styled.div`
   flex-direction: column;
   display: flex;
   width: 500px;
+
   p {
   margin-left: 20px;
-  padding: 21.5px 0;
+  padding: 21.4px 0;
   }
 `;
 export const InputGG = styled.div`
