@@ -81,8 +81,11 @@ Route.post("list-cooperativas-catadores", "PsResiduosColetaController.getCoopera
 Route.delete("delete-cooperativa-catadores", "PsResiduosColetaController.destroyCAC");
 
 Route.post("create-unidade-processamento", "PsResiduosUnidadeController.createUnidadeProcessamento");
+Route.post("create-dados-unidade-processamento", "PsResiduosUnidadeController.createDadosUnidadeProcessamento");
 Route.post("list-unidades-processamento", "PsResiduosUnidadeController.getUnidadesProcessamento");
+Route.post("list-unidades-processamento-por-tipo", "PsResiduosUnidadeController.getUnidadesProcessamento");
 Route.post("get-unidade-processamento", "PsResiduosUnidadeController.getUnidadeProcessamento");
+Route.post("get-dados-unidade-processamento", "PsResiduosUnidadeController.getDadosUnidadeProcessamento");
 Route.delete("detete-unidade-processamento/:id", "PsResiduosUnidadeController.destroy");
 
 Route.post("create-geral", "GeralController.store");
