@@ -2,6 +2,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-nextjs-toast";
+import { anosSelect } from "../../util/util";
 import {
   Container,
   DivCenter,
@@ -80,6 +81,7 @@ import api from "../../services/api";
 import { BotaoEditar } from "../../styles/dashboard";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Footer } from "../../styles";
+import { getMunicipio } from "../../services/municipio";
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -96,29 +98,32 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const {
     register,
     handleSubmit,
+    setValue,
     reset,
     formState: { errors },
   } = useForm();
 
   const [residuosRecebidos, setResiduosRecebidos] = useState(null);
+  const [municipios, setMunicipios] = useState<IMunicipio | any>(null);
   const [content, setContent] = useState("");
   const [dadosUnidade, setDadosUnidade] = useState(null);
   const [unidades, setUnidades] = useState(null);
+  const [unidadeProcessamento, setUnidadeProcessamento] = useState(null);
   const [visibleUnidade, setVisibleUnidade] = useState(false);
   const [visibleCadastro, setVisibleCadastro] = useState(true);
   const [visibleResiduosRecebidos, setVisibleResiduosRecebidos] =
     useState(false);
-  const [up080, setUp080] = useState(null);
+  const [anoSelected, setAnoSelected] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
+  const [disabledProximo, setDisabledProximo] = useState(false);
 
   useEffect(() => {
     getResiduosRecebidos();
     getUnidadesProcessamento();
+    getMunicipios();
   }, []);
 
   function handleOnChange(content) {
-    console.log(content.target.value);
-
     setContent(content.target.value);
   }
   function handleCloseUnidade() {
@@ -140,12 +145,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       });
   }
 
+  async function getMunicipios() {
+    await api.get("getMunicipios").then((response) => {
+      setMunicipios(response.data);
+    });
+  }
+
   async function handleCreateResiduosRecebidos(data) {
     data.id_residuos_unidade_processamento =
       dadosUnidade?.id_residuos_unidade_processamento;
     data.id_quant_residuos_recebidos =
       residuosRecebidos?.id_quant_residuos_recebidos;
-    data.ano = new Date().getFullYear();
+    data.ano = anoSelected;
     data.id_municipio = municipio[0]?.id_municipio;
 
     data.UP080 =
@@ -194,7 +205,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     setVisibleResiduosRecebidos(false);
   }
 
-  async function handleCadastro(data) {
+  async function handleCadastroDadosUP(data) { 
+     
+    if(anoSelected === null || anoSelected === 'Selecionar') {
+      toast.notify("Selecione um ano!", {
+        title: "Erro",
+        duration: 7,
+        type: "error",
+      })
+      return
+    }
     data.UP079a ? (data.UP079 = data.UP079a) : data.UP079;
     data.UP051a ? (data.UP051 = data.UP051a) : data.UP051;
     data.UP001a ? (data.UP001 = data.UP001a) : data.UP001;
@@ -202,7 +222,46 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     data.id_residuos_unidade_processamento =
       dadosUnidade?.id_residuos_unidade_processamento;
     data.id_municipio = municipio[0].id_municipio;
-    data.ano = new Date().getFullYear();
+    data.ano = anoSelected;
+    const resCad = await api
+      .post("create-dados-unidade-processamento", data)
+      .then((response) => {
+        toast.notify("Dados gravados com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getUnidadesProcessamento();
+      })
+      .catch((error) => {
+        toast.notify("Aconteceu o seguinte erro: ", {
+          title: "Erro",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
+
+  async function handleCadastroUnidadeProcessamento(data) {
+    const dataAtual = new Date();
+    const dia = String(dataAtual.getDate()).padStart(2, "0"); // Dia com 2 dígitos
+    const mes = String(dataAtual.getMonth() + 1).padStart(2, "0"); // Mês com 2 dígitos (Janeiro = 0)
+    const ano = dataAtual.getFullYear(); // Ano completo
+
+    const dataFormatada = `${dia}/${mes}/${ano}`;
+    data.data_cadastro = dataFormatada;
+
+    data.id_municipio = municipio[0].id_municipio;
+
+    if (!municipio[0].id_municipio) {
+      toast.notify("Não existe id_municipio, entre novamente no sistema!", {
+        title: "Erro",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
     const resCad = await api
       .post("create-unidade-processamento", data)
       .then((response) => {
@@ -214,7 +273,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         getUnidadesProcessamento();
       })
       .catch((error) => {
-        toast.notify("Aconteceu o seguinte erro: ", {
+        toast.notify("Aconteceu o seguinte erro: " + error, {
           title: "Erro",
           duration: 7,
           type: "error",
@@ -240,20 +299,35 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   async function getUnidadeProcessamento(id) {
+    
     const res = await api
       .post("get-unidade-processamento", {
-        id_residuos_unidade_processamento: id,
+        id_unidade_processamento: id,
       })
       .then((response) => {
         return response.data;
       })
       .catch((error) => {
         console.log(error);
-      });
-    reset();
-    setDadosUnidade(res[0]);
+      }); 
     setVisibleUnidade(true);
-    getUnidadesProcessamento();
+    setUnidadeProcessamento(res[0]);
+  }
+
+  async function getDadosUnidadeProcessamento({id, ano}) {        
+    const res = await api
+      .post("get-dados-unidade-processamento", {
+        id_unidade_processamento: id,
+        ano: ano,
+        id_municipio: municipio[0]?.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });      
+    setDadosUnidade(res[0]);    
     setVisibleCadastro(false);
   }
 
@@ -308,6 +382,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
+  function seletcAno(ano) {
+    if(ano !== ""){
+      const id = unidadeProcessamento.id_unidade_processamento
+      setDisabledProximo(true)
+      setAnoSelected(ano);
+      getDadosUnidadeProcessamento({id, ano});
+    }else{
+      setDisabledProximo(false)
+    }
+    
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -319,7 +405,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
           <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo>
           <DivCenter>
             <DivBotao>
-            <IconeColeta>
+              <IconeColeta>
                 {" "}
                 <Image src={unidade_escuro} alt="Simisab" />
                 <BotaoResiduos>Processamento</BotaoResiduos>
@@ -335,54 +421,178 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   Coleta
                 </BotaoResiduos>
               </IconeColeta>
-              
             </DivBotao>
           </DivCenter>
           {visibleCadastro && (
-            <FormCadastro onSubmit={handleSubmit(handleCadastro)}>
+            <FormCadastro
+              onSubmit={handleSubmit(handleCadastroUnidadeProcessamento)}
+            >
               <table>
-                <thead>
-                  <tr>
-                    <th>
-                      <label>Município</label>
-                    </th>
-                    <th>
-                      <label>Unidade</label>
-                    </th>
-                    <th>
-                      <label>Observações</label>
-                    </th>
-                  </tr>
-                </thead>
                 <tbody>
                   <tr>
                     <td>
-                      <InputM>
-                        <input
-                          aria-invalid={errors.value ? "true" : "false"}
-                          {...register("UP079a", { required: true })}
-                        />
-                        {errors.UP079a && errors.UP079a.type && (
-                          <span>O campo é obrigatório!</span>
-                        )}
-                      </InputM>
+                      <label style={{ marginLeft: "10px" }}>Município</label>
                     </td>
                     <td>
+                      <label style={{ marginLeft: "10px" }}>
+                        Nome da Unidade
+                      </label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
                       <InputM>
+                        <select
+                          aria-invalid={errors.value ? "true" : "false"}
+                          {...register("id_municipio_unidade_processamento", {
+                            required: true,
+                          })}
+                        >
+                          <option value="">Selecione</option>
+                          {municipios?.map((municipio) => (
+                            <option
+                              value={municipio.id_municipio}
+                              key={municipio.id_municipio}
+                            >
+                              {municipio.nome}
+                            </option>
+                          ))}
+                        </select>
+
+                        {errors.id_municipio_unidade_processamento &&
+                          errors.id_municipio_unidade_processamento.type && (
+                            <span style={{ color: "red" }}>
+                              O campo é obrigatório!
+                            </span>
+                          )}
+                      </InputM>
+                    </td>
+                    <td colSpan={2}>
+                      <InputGG>
                         <input
                           aria-invalid={errors.value ? "true" : "false"}
-                          {...register("UP001a")}
+                          {...register("nome_unidade_processamento", {
+                            required: true,
+                          })}
                         ></input>
+                        {errors.nome_unidade_processamento &&
+                          errors.nome_unidade_processamento.type && (
+                            <span style={{ color: "red" }}>
+                              O campo é obrigatório!
+                            </span>
+                          )}
+                      </InputGG>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <label style={{ marginLeft: "10px" }}>CNPJ</label>
+                    </td>
+                    <td>
+                      <label style={{ marginLeft: "10px" }}>Endereço</label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <InputM>
+                        <input
+                          aria-invalid={errors.value ? "true" : "false"}
+                          {...register("cnpj")}
+                        ></input>
+                        {errors.cnpj && errors.cnpj.type && (
+                          <span style={{ color: "red" }}>
+                            O campo é obrigatório!
+                          </span>
+                        )}
+                      </InputM>
+                    </td>
+                    <td colSpan={2}>
+                      <InputGG>
+                        <input
+                          aria-invalid={errors.value ? "true" : "false"}
+                          {...register("endereco", { required: true })}
+                        ></input>
+                        {errors.endereco && errors.endereco.type && (
+                          <span style={{ color: "red" }}>
+                            O campo é obrigatório!
+                          </span>
+                        )}
+                      </InputGG>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>
+                      <label style={{ marginLeft: "10px" }}>
+                        Tipo de Unidade
+                      </label>
+                    </td>
+                    <td>
+                      <label style={{ marginLeft: "10px" }}>
+                        Ano inicio operação
+                      </label>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <InputM>
+                        <select
+                          {...register("tipo_unidade")}
+                          onChange={handleOnChange}
+                        >
+                          <option value="">Selecione</option>
+                          <option>Lixão</option>
+                          <option>Queima em forno de qualquer tipo</option>
+                          <option>
+                            Unidade de manejo de galhadas e podas{" "}
+                          </option>
+                          <option>Unidade de transbordo </option>
+                          <option>
+                            Área de reciclagem de RCC (unidade de reciclagem de
+                            entulho){" "}
+                          </option>
+                          <option>
+                            Aterro de resíduos da construção civil (inertes)
+                          </option>
+                          <option>
+                            Área de transbordo e triagem de RCC e volumosos
+                            (ATT)
+                          </option>
+                          <option>Aterro controlado </option>
+                          <option>Aterro sanitário </option>
+                          <option>Vala específica de RSS</option>
+                          <option>Unidade de triagem (galpão ou usina)</option>
+                          <option>
+                            Unidade de compostagem (pátio ou usina){" "}
+                          </option>
+                          <option>Unidade de tratamento por incineração</option>
+                          <option>
+                            Unidade de tratamento por microondas ou autoclave{" "}
+                          </option>
+                          <option>Outra</option>
+                        </select>
+
                         {errors.UP079a && errors.UP079a.type && (
                           <span>O campo é obrigatório!</span>
                         )}
                       </InputM>
                     </td>
                     <td>
-                      <InputG>
-                        <input {...register("UP051a")}></input>
-                      </InputG>
+                      <InputP>
+                        <input
+                          aria-invalid={errors.value ? "true" : "false"}
+                          {...register("ano_inicio_operacao")}
+                        ></input>
+                        {errors.ano_inicio_operacao &&
+                          errors.ano_inicio_operacao.type && (
+                            <span style={{ color: "red" }}>
+                              O campo é obrigatório!
+                            </span>
+                          )}
+                      </InputP>
                     </td>
+                    <td></td>
                   </tr>
                 </tbody>
               </table>
@@ -398,8 +608,8 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               <thead>
                 <tr>
                   <th>Município</th>
-                  <th>Unidade</th>
-                  <th>Esteve em operção no ano de referencia?</th>
+                  <th>Nome da Unidade</th>
+                  <th>CNPJ</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -407,16 +617,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 {unidades?.map((unidade, index) => (
                   <>
                     <tr key={index}>
-                      <td>{unidade.up079}</td>
-                      <td>{unidade.up001}</td>
-                      <td>{unidade.up051}</td>
-                      <td>
+                      <td>{unidade.nome}</td>
+                      <td>{unidade.nome_unidade_processamento}</td>
+                      <td>{unidade.cnpj}</td>
+                      <td style={{ textAlign: "center", width: "100px" }}>
                         <Actions>
                           <Image
                             title="Editar"
                             onClick={() => {
                               getUnidadeProcessamento(
-                                unidade.id_residuos_unidade_processamento
+                                unidade.id_unidade_processamento
                               );
                             }}
                             width={30}
@@ -426,9 +636,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           />
                           <Image
                             onClick={() =>
-                              handleDelete(
-                                unidade.id_residuos_unidade_processamento
-                              )
+                              handleDelete(unidade.id_unidade_processamento)
                             }
                             title="Excluir"
                             width={30}
@@ -458,7 +666,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               <span></span>
             </CloseModalButton>
 
-            <Form onSubmit={handleSubmit(handleCadastro)}>
+            <Form onSubmit={handleSubmit(handleCadastroDadosUP)}>
               <ModalStepperContainer>
                 <ModalStepperWrapper>
                   <div>
@@ -505,14 +713,33 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 <ModalStepContent active={currentStep === 0}>
                   <ConteudoModalResiduoSolido>
                     <DivTitulo>
-                      <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>
+                      <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>                     
                     </DivTitulo>
+                       <div style={{ marginTop: "10px", marginBottom: "10px", padding: "10px", borderTop: "1px solid #ccc", borderBottom: "1px solid #ccc"}}>
+                        <label style={{ fontWeight: "bold" }}>Selecione um ano para visualização dos dados:</label>
+                        <InputM>
+                          
+                          <select
+                            name="ano"
+                            id="ano"
+                            onChange={(e) => seletcAno(e.target.value)}
+                          >
+                            <option value={""}>Selecionar</option>                           
+                              <option value="2025">2025</option>
+                              <option value="2024">2024</option>
+                              <option value="2023">2023</option>
+                              <option value="2022">2022</option>
+                              <option value="2021">2021</option>
+                              <option value="2020">2020</option>                           
+                          </select>
+                        </InputM>
+                      </div>
                     <table>
                       <thead>
                         <tr>
                           <th>Código SNIS</th>
                           <th>Descrição</th>
-                          <th>Ano {new Date().getFullYear()}</th>
+                          <th>Ano {anoSelected}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -526,8 +753,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           <td>
                             <InputG>
                               <input
+                                disabled={true}
                                 {...register("UP079")}
-                                defaultValue={dadosUnidade?.up079}
+                                defaultValue={unidadeProcessamento?.municipio_unidade_processamento}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -542,49 +770,13 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
                           <td>
                             <InputG>
-                              <select
+                              <input
+                                disabled={true}
                                 {...register("UP003")}
-                                defaultValue={dadosUnidade?.up003}
+                                defaultValue={unidadeProcessamento?.tipo_unidade}
                                 onChange={handleOnChange}
-                              >
-                                <option>Lixão</option>
-                                <option>
-                                  Queima em forno de qualquer tipo
-                                </option>
-                                <option>
-                                  Unidade de manejo de galhadas e podas{" "}
-                                </option>
-                                <option>Unidade de transbordo </option>
-                                <option>
-                                  Área de reciclagem de RCC (unidade de
-                                  reciclagem de entulho){" "}
-                                </option>
-                                <option>
-                                  Aterro de resíduos da construção civil
-                                  (inertes)
-                                </option>
-                                <option>
-                                  Área de transbordo e triagem de RCC e
-                                  volumosos (ATT)
-                                </option>
-                                <option>Aterro controlado </option>
-                                <option>Aterro sanitário </option>
-                                <option>Vala específica de RSS</option>
-                                <option>
-                                  Unidade de triagem (galpão ou usina)
-                                </option>
-                                <option>
-                                  Unidade de compostagem (pátio ou usina){" "}
-                                </option>
-                                <option>
-                                  Unidade de tratamento por incineração
-                                </option>
-                                <option>
-                                  Unidade de tratamento por microondas ou
-                                  autoclave{" "}
-                                </option>
-                                <option>Outra</option>
-                              </select>
+                              >                               
+                              </input>
                             </InputG>
                           </td>
                         </tr>
@@ -596,8 +788,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           <td>
                             <InputG>
                               <input
+                                disabled={true}
                                 {...register("UP001")}
-                                defaultValue={dadosUnidade?.up001}
+                                defaultValue={unidadeProcessamento?.nome_unidade_processamento}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -629,8 +822,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           <td>
                             <InputG>
                               <input
+                                disabled={true}
                                 {...register("UP087")}
-                                defaultValue={dadosUnidade?.up087}
+                                defaultValue={unidadeProcessamento?.endereco}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -670,7 +864,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                             <InputG>
                               <input
                                 {...register("UP002")}
-                                defaultValue={dadosUnidade?.up002}
+                                defaultValue={unidadeProcessamento?.ano_inicio_operacao}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -704,10 +898,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                             <InputG>
                               <select
                                 {...register("UP004")}
-                                defaultValue={dadosUnidade?.up004}
                                 onChange={handleOnChange}
                               >
-                                <option></option>
+                                <option value={""}>{dadosUnidade?.up004 ? dadosUnidade?.up004 : "Selecione uma opção"}</option>
                                 <option>Prefeitura</option>
                                 <option>Empresa privada</option>
                                 <option>Associação de catadores</option>
@@ -730,9 +923,8 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               <select
                                 {...register("UP084")}
                                 defaultValue={dadosUnidade?.up084}
-                                onChange={handleOnChange}
                               >
-                                <option></option>
+                                <option value={""}>{dadosUnidade?.up084 ? dadosUnidade?.up084 : "Selecione uma opção"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -815,8 +1007,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           <td>
                             <InputG>
                               <input
+                                disabled={true}
                                 {...register("UP086")}
-                                defaultValue={dadosUnidade?.up086}
+                                defaultValue={unidadeProcessamento?.cnpj}
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -840,7 +1033,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         <tr>
                           <th>Código SNIS</th>
                           <th>Descrição</th>
-                          <th>Ano {new Date().getFullYear()}</th>
+                          <th>Ano {anoSelected}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1733,7 +1926,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   {currentStep === 3 ? (
                     <h1></h1>
                   ) : (
-                    <ModalStepperButton onClick={handleNextStep}>
+                   disabledProximo && <ModalStepperButton onClick={handleNextStep}>
                       Proximo
                     </ModalStepperButton>
                   )}
@@ -1746,6 +1939,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
       {visibleResiduosRecebidos && (
         <ContainerModal>
+          <ToastContainer></ToastContainer>
           <Modal>
             <FormModal onSubmit={handleSubmit(handleCreateResiduosRecebidos)}>
               <ConteudoModal>
@@ -1885,11 +2079,13 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   </table>
                 </DivFormConteudoModal>
                 <SubmitButton type="submit">Gravar</SubmitButton>
+                
               </ConteudoModal>
             </FormModal>
           </Modal>
         </ContainerModal>
       )}
+      
     </Container>
   );
 }

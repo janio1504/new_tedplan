@@ -1398,7 +1398,7 @@ export const SidebarSection = styled.div`
   }
 
   th {
-    padding: 1rem;
+    //padding: 1rem;
     text-align: left;
     
     label {
@@ -1406,12 +1406,13 @@ export const SidebarSection = styled.div`
       font-weight: 500;
       color: #212121;
       display: block;
+      margin-left: 0.8rem;
       margin-bottom: 0.5rem;
     }
   }
 
   td {
-    padding: 0.5rem 1rem;
+    //padding: 0.5rem 1rem;
     vertical-align: top;
 
     input {
