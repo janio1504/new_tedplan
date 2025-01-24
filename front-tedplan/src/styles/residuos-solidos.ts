@@ -807,6 +807,24 @@ export const InputP = styled.div`
 export const InputM = styled.div`
   width: 250px;
   margin: 8px;
+
+  select {
+    width: 100%;
+    height: 45px;
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2d3748;
+    background-color: white;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+    
+    &:hover {
+      border-color: #cbd5e0;
+      background-color: #f7fafc;
+    }
+  }
 `;
 
 export const InputG = styled.div`

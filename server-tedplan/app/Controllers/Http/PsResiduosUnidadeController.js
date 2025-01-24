@@ -5,19 +5,71 @@ class PsResiduosUnidadeController {
   async getUnidadesProcessamento({ request }){
     const dados = request.all()
     const dadosRuc = await PsFinanceiro.query()
+        .from('tedplan.unidades_processamento_residuo_solido')
+        .where('id_municipio', dados.id_municipio)
+        .fetch()       
+
+        const unidades = await Promise.all(dadosRuc.toJSON().map(async (value) => {
+          const res = await PsFinanceiro.query()
+          .from('tedplan.municipios')
+          .where('id_municipio', value.id_municipio_unidade_processamento)
+          .fetch()
+
+          return {
+            ...value,
+            nome: res.toJSON()[0].nome
+          }
+        }))
+      return unidades
+  }
+
+  async getUnidadesProcessamentoPorTipo({ request }){
+    const dados = request.all()
+    const dadosRuc = await PsFinanceiro.query()
+        .from('tedplan.unidades_processamento_residuo_solido')
+        .where('id_municipio', dados.id_municipio)
+        .where('tipo_unidade', dados.tipo_unidade.trim())
+        .fetch()       
+
+        const unidades = await Promise.all(dadosRuc.toJSON().map(async (value) => {
+          const res = await PsFinanceiro.query()
+          .from('tedplan.municipios')
+          .where('id_municipio', value.id_municipio_unidade_processamento)
+          .fetch()
+
+          return {
+            ...value,
+            nome: res.toJSON()[0].nome
+          }
+        }))
+      return unidades
+  }
+
+  async getDadosUnidadeProcessamento({ request }){
+    const dados = request.all()    
+    try {
+      const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
         .where('id_municipio', dados.id_municipio)
+        .where('id_unidade_processamento', dados.id_unidade_processamento)
         .where('ano', dados.ano)
         .fetch()
 
       return dadosRuc
+      
+    } catch (error) {
+      console.log(error);
+      
+    }
   }
 
   async getUnidadeProcessamento({ request }){
     const dados = request.all()
     const dadosRuc = await PsFinanceiro.query()
-        .from('tedplan.residuos_unidade_processamento')
-        .where('id_residuos_unidade_processamento', dados.id_residuos_unidade_processamento)
+        .select('upr.*', 'ms.nome as municipio_unidade_processamento')
+        .from('tedplan.unidades_processamento_residuo_solido as upr')
+        .innerJoin('tedplan.municipios as ms', 'upr.id_municipio_unidade_processamento', 'ms.id_municipio')
+        .where('id_unidade_processamento', dados.id_unidade_processamento)
         .fetch()
 
       return dadosRuc
@@ -26,8 +78,8 @@ class PsResiduosUnidadeController {
   async destroy({ params }){
     try {
       await PsFinanceiro.query()
-      .table('tedplan.residuos_unidade_processamento')
-      .where('id_residuos_unidade_processamento', params.id)
+      .table('tedplan.unidades_processamento_residuo_solido')
+      .where('id_unidade_processamento', params.id)
       .delete()
     } catch (error) {
       console.log(error);
@@ -35,6 +87,51 @@ class PsResiduosUnidadeController {
   }
 
   async createUnidadeProcessamento({ request }){
+    const dados = request.all()
+    try {
+      if(!dados.id_unidade_processamento){
+        const res = await PsFinanceiro.query()
+        .from('tedplan.unidades_processamento_residuo_solido')
+        .insert({    
+          id_municipio: dados.id_municipio, 
+          id_municipio_unidade_processamento: dados.id_municipio_unidade_processamento,    
+          nome_unidade_processamento: dados.nome_unidade_processamento,
+          cnpj: dados.cnpj,
+          endereco: dados.endereco,
+          tipo_unidade: dados.tipo_unidade,
+          ano_inicio_operacao: dados.ano_inicio_operacao,
+          data_cadastro: dados.data_cadastro,
+          })
+      }else{
+        const dadosRuc = await PsFinanceiro.query()
+        .from('tedplan.unidades_processamento_residuo_solido')
+        .where('id_unidade_processamento', dados.id_unidade_processamento)
+        .fetch()
+        const ruc = dadosRuc.toJSON()[0]
+
+        const res = await PsFinanceiro.query()
+        .from('tedplan.residuos_unidade_processamento')
+        .where('id_unidade_processamento', dados.id_unidade_processamento)
+        .update({
+          id_municipio:  dados.id_municipio ? dados.id_municipio : ruc.id_municipio, 
+          id_municipio_unidade_processamento: dados.id_municipio_unidade_processamento ? dados.id_municipio_unidade_processamento : ruc.id_municipio_unidade_processamento,    
+          nome_unidade_processamento: dados.nome_unidade_processamento ? dados.nome_unidade_processamento : ruc.nome_unidade_processamento,
+          cnpj: dados.cnpj ? dados.cnpj : ruc.cnpj,
+          endereco: dados.endereco ? dados.endereco : ruc.endereco,
+          tipo_unidade: dados.tipo_unidade ? dados.tipo_unidade : ruc.tipo_unidade,
+          data_cadastro: dados.data_cadastro ? dados.data_cadastro : ruc.data_cadastro,
+         
+          })
+      }
+
+    } catch (error) {
+      console.log(error);
+      return error
+    }
+
+  }
+
+  async createDadosUnidadeProcessamento({ request }){
     const dados = request.all()
     try {
       if(!dados.id_residuos_unidade_processamento){
