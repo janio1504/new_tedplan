@@ -40,7 +40,7 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
-
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -138,7 +138,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>

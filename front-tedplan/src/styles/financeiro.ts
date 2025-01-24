@@ -277,7 +277,7 @@ export const DivFormConteudo= styled.div`
     p{
       padding: 10px;
       background:  #2dd9d0;
-      color: #008080;
+      color: #008080; 
       font-weight: bolder;
       border-radius: 5px;
       cursor: pointer;
@@ -396,12 +396,12 @@ export const DivTituloConteudo = styled.div`
  
  float: left;
   padding: 10px 40px;
+  width: 100%;
   margin: -30px 10px 0 0px;
-  background-color: #3D6CA6;
-  border-radius: 25px;
+  border-bottom: 2px solid #0085bd;
   font-weight: bolder;
   text-align: center;
-  color: #fff;
+  color: #4a5568;
 `;
 export const DivTitulo = styled.div`
   min-width: 60%;
@@ -474,6 +474,7 @@ export const InputP = styled.div`
   float: left;
   flex-direction: column;
   display: flex;
+  
   width: 140px;
   p {
   margin-left: 20px;
@@ -488,6 +489,7 @@ export const InputP = styled.div`
 export const InputM = styled.div`
   float: left;
   flex-direction: column;
+
   display: flex;
   width: 350px;
   p {
@@ -563,7 +565,7 @@ export const TextArea = styled.div`
   flex-direction: column;
   display: flex;
   width: 990px;
-  border: #2dd9d0 solid 2px;
+  border: #000000 solid 2px;
   margin: 10px;
   border-radius: 5px;
 `;
@@ -574,7 +576,7 @@ export const DivEixo = styled.div`
   margin: 10px;
   display: flex;
   width: 95%;
-  border-bottom: #2dd9d0 solid 2px;
+  border-bottom: #000000 solid 2px;
   padding: 5px;
   color: #666;
   font-weight: bold;
@@ -583,7 +585,7 @@ export const DivEixo = styled.div`
 export const Form = styled.form`
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #000000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -591,7 +593,7 @@ export const Form = styled.form`
     float: left;
   }
   input:focus-within {
-    border-color: 2px solid #008080;
+    border-color: 2px solid #000000;
   }
 
   textarea {
@@ -601,7 +603,7 @@ export const Form = styled.form`
     margin: 10px;
     min-width: 500px;
     height: 200px;
-    border: 2px solid #2dd9d0;
+    border: 2px solid #000000;
   }
   label {
     color: #666;
@@ -609,14 +611,14 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #000000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #2dd9d0;
+    border: 1px solid #000000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;

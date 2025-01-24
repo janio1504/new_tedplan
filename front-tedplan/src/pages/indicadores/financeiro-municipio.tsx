@@ -16,7 +16,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -24,6 +23,7 @@ import {
   InputXL,
   InputAno,
 } from "../../styles/financeiro";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
@@ -36,8 +36,12 @@ import { AuthContext } from "../../contexts/AuthContext";
 import CurrencyInput from "react-currency-masked-input";
 import { parseCookies } from "nookies";
 import api from "../../services/api";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { log } from "console";
+import { MainContent } from "../../styles/indicadores";
+import { SidebarItem, Sidebar } from "../../styles/residuo-solido-coleta-in";
+import { LineSideBar } from "../../styles/drenagem-indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -66,6 +70,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   );
   const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
   const [anoSelected, setAnoSelected] = useState(null);
+  const [activeForm, setActiveForm] = useState("receitas1");
 
   useEffect(() => {
     getDadosMunicipio();
@@ -598,13 +603,125 @@ export default function Financeiro({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
-      <DivCenter>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <LineSideBar>Água e Esgoto Sanitário</LineSideBar>
+        <SidebarItem
+          active={activeForm === "receitas1"}
+          onClick={() => setActiveForm("receitas1")}
+        >
+          Receitas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "arrecadacao"}
+          onClick={() => setActiveForm("arrecadacao")}
+        >
+          Arrecadação e crédito a receber
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "despesas1"}
+          onClick={() => setActiveForm("despesas1")}
+        >
+          Despesas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "investimentos"}
+          onClick={() => setActiveForm("investimentos")}
+        >
+          Investimentos realizados pelo prestador de serviços
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "investimentosMunicipio"}
+          onClick={() => setActiveForm("investimentosMunicipio")}
+        >
+          Investimentos realizados pelo município
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "investimentosEstado"}
+          onClick={() => setActiveForm("investimentosEstado")}
+        >
+          Investimentos realizados pelo estado
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações, esclarecimentos e sugestões
+        </SidebarItem>
+        <LineSideBar>Drenagem e Águas Pluviais</LineSideBar>
+        <SidebarItem
+          active={activeForm === "cobranca"}
+          onClick={() => setActiveForm("cobranca")}
+        >
+          Cobrança
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "receitas"}
+          onClick={() => setActiveForm("receitas")}
+        >
+          Receitas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "despesas"}
+          onClick={() => setActiveForm("despesas")}
+        >
+          Despesas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "investimentoDesembolsos"}
+          onClick={() => setActiveForm("investimentoDesembolsos")}
+        >
+          Investimento e desembolsos
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes2"}
+          onClick={() => setActiveForm("observacoes2")}
+        >
+          Observações, esclarecimentos e sugestões
+        </SidebarItem>
+        <LineSideBar>Resíduos Sólidos</LineSideBar>
+        <SidebarItem
+          active={activeForm === "cobranca2"}
+          onClick={() => setActiveForm("cobranca2")}
+        >
+          Cobrança
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "despesas2"}
+          onClick={() => setActiveForm("despesas2")}
+        >
+          Despesas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "receitas2"}
+          onClick={() => setActiveForm("receitas2")}
+        >
+          Receitas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "investimentoUniao"}
+          onClick={() => setActiveForm("investimentoUniao")}
+        >
+          Investimento da União
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes3"}
+          onClick={() => setActiveForm("observacoes3")}
+        >
+          Observações, esclarecimentos e sugestões
+        </SidebarItem>
+      </Sidebar>
+      <MainContent>
+        <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>
             <DivTituloForm>Informações Financeiras</DivTituloForm>
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "receitas1" || activeForm === "arrecadacao" || activeForm === "despesas1" || activeForm === "investimentos" || activeForm === "investimentosMunicipio" || activeForm === "investimentosEstado" || activeForm === "observacoes"
+              || activeForm === "cobranca" || activeForm === "receitas" || activeForm === "despesas" || activeForm === "investimentoDesembolsos" || activeForm === "observacoes2"
+              || activeForm === "cobranca2" || activeForm === "despesas2" || activeForm === "receitas2" || activeForm === "investimentoUniao" || activeForm === "observacoes3"
+              
+              }>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
@@ -621,10 +738,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </select>
               </DivFormConteudo>
             </DivFormEixo>
-            <DivFormEixo>
-              <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
 
-              <DivFormConteudo>
+              {/* Água e Esgoto Sanitário */}
+              <DivFormConteudo active={activeForm === "receitas1"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Receitas</DivTituloConteudo>
                 </DivTitulo>
@@ -718,7 +836,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "arrecadacao"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>
                     Arrecadação e crédito a receber
@@ -762,7 +882,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "despesas1"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Despesas</DivTituloConteudo>
                 </DivTitulo>
@@ -954,7 +1076,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "investimentos"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Investimentos realizados pelo prestador de serviços
@@ -1072,7 +1195,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "investimentosMunicipio"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Investimentos realizados pelo município
@@ -1184,7 +1308,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "investimentosEstado"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Investimentos realizados pelo estado
@@ -1295,7 +1420,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "observacoes"}>
+              <DivTituloEixo >Água e Esgoto Sanitário</DivTituloEixo>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Observações, esclarecimentos ou sugestões
@@ -1341,11 +1467,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   ></textarea>
                 </InputGG>
               </DivFormConteudo>
-            </DivFormEixo>
 
-            <DivFormEixo>
+              {/* Drenagem e Águas Pluviais */}
+              <DivFormConteudo active={activeForm === "cobranca"}>
               <DivTituloEixo>Drenagem e Águas Pluviais</DivTituloEixo>
-              <DivFormConteudo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Cobrança</DivTituloConteudo>
                 </DivTitulo>
@@ -1449,7 +1575,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputGG>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "receitas"}>
+              <DivTituloEixo>Drenagem e Águas Pluviais</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Receitas</DivTituloConteudo>
                 </DivTitulo>
@@ -1555,7 +1683,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputP>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "despesas"}>
+              <DivTituloEixo>Drenagem e Águas Pluviais</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Despesas</DivTituloConteudo>
                 </DivTitulo>
@@ -1625,7 +1755,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputP>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "investimentoDesembolsos"}>
+              <DivTituloEixo>Drenagem e Águas Pluviais</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>
                     Investimentos e desembolsos
@@ -1795,7 +1927,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "observacoes2"}>
+              <DivTituloEixo>Drenagem e Águas Pluviais</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>
                     Observações, esclarecimentos ou sugestões
@@ -1824,12 +1958,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   />
                 </InputGG>
               </DivFormConteudo>
-            </DivFormEixo>
 
-            <DivFormEixo>
+              {/* Resíduos Sólidos */}
+
+              <DivFormConteudo active={activeForm === "cobranca2"}>
               <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>
 
-              <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Cobrança</DivTituloConteudo>
                 </DivTitulo>
@@ -1926,7 +2060,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <p>.</p>
                 </InputP>
               </DivFormConteudo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "despesas2"}>
+              <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Despesas</DivTituloConteudo>
                 </DivTitulo>
@@ -2120,7 +2256,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "receitas2"}>
+              <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Receitas</DivTituloConteudo>
                 </DivTitulo>
@@ -2168,7 +2306,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </InputP>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "investimentoUniao"}>
+              <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>Investimentos da União</DivTituloConteudo>
                 </DivTitulo>
@@ -2252,7 +2392,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "observacoes3"}>
+              <DivTituloEixo>Resíduos Sólidos</DivTituloEixo>
+
                 <DivTitulo>
                   <DivTituloConteudo>
                     Observações, esclarecimentos ou sugestões
@@ -2286,12 +2428,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
 
                 <table></table>
               </DivFormConteudo>
-            </DivFormEixo>
           </DivForm>
 
           {anoSelected && <SubmitButton type="submit">Gravar</SubmitButton>}
         </Form>
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }

@@ -22,7 +22,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -40,8 +39,14 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { log } from "console";
+import { 
+  Sidebar, 
+  SidebarItem } from "../../styles/residuo-solidos-in";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
+import { MainContent } from "../../styles/indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -62,7 +67,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     reset,
     formState: { errors },
   } = useForm();
-
+  const [activeForm, setActiveForm] = useState("ViasUrbanas");
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [content, setContent] = useState("");
   
@@ -145,15 +150,44 @@ export default function Drenagem({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
-            <DivTituloFormDrenagem>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <SidebarItem
+          active={activeForm === "ViasUrbanas"}
+          onClick={() => setActiveForm("ViasUrbanas")}
+        >
+          Vias Urbanas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "CursosAguas"}
+          onClick={() => setActiveForm("CursosAguas")}
+        >
+          Cursos d'água - áreas urbanas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observaçoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações, esclarecimentos e sugestões
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "eventosHidrologicos"}
+          onClick={() => setActiveForm("eventosHidrologicos")}
+        >
+          Eventos hidrológicos
+        </SidebarItem>
+        
+      </Sidebar>
+      <MainContent>
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <DivForm>
+              <DivTituloFormDrenagem>
               Drenagem e Águas Pluviais
             </DivTituloFormDrenagem>
 
-            <DivFormConteudo>
+            
+            <DivFormConteudo active={activeForm === "ViasUrbanas"}>
               <DivTitulo>
                 <DivTituloConteudo>Vias urbanas</DivTituloConteudo>
               </DivTitulo>
@@ -305,7 +339,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputSNIS>
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "CursosAguas"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Cursos d’água - áreas urbanas
@@ -440,7 +474,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputSNIS>
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "observacoes"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Observações, esclarecimentos ou sugestões
@@ -467,7 +501,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputGG>
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "eventosHidrologicos"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Eventos hidrológicos impactantes
@@ -638,6 +672,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }

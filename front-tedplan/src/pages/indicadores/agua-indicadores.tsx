@@ -15,7 +15,6 @@ import {
   Municipio,
   MenuMunicipioItem,
   DivTitulo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   InputSNIS,
@@ -31,6 +30,12 @@ import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { toast, ToastContainer } from 'react-nextjs-toast'
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
+import { 
+  Sidebar, 
+  SidebarItem } from "../../styles/residuo-solidos-in";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
+import { MainContent } from "../../styles/indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -55,6 +60,7 @@ export default function Agua() {
 
   const [dadosAgua, setDadosAgua] = useState(null);
   const [content, setContent] = useState(null);
+  const [activeForm, setActiveForm] = useState("ligacoes");
 
   useEffect(() => {
     getMunicipio()
@@ -124,13 +130,46 @@ export default function Agua() {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <SidebarItem
+          active={activeForm === "ligacoes"}
+          onClick={() => setActiveForm("ligacoes")}
+        >
+          Ligações e economias
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "volumes"}
+          onClick={() => setActiveForm("volumes")}
+        >
+          Volumes
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "extencao"}
+          onClick={() => setActiveForm("extencao")}
+        >
+          Extenção da rede
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "consumo"}
+          onClick={() => setActiveForm("consumo")}
+        >
+          Consumo de energia elétrica
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações, esclarecimentos ou sugestões
+        </SidebarItem>
+      </Sidebar>
+      <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm style={{ borderColor: "#12B2D5" }}>
             <DivTituloForm>Água</DivTituloForm>
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "ligacoes" || activeForm === "volumes" || activeForm === "extencao" || activeForm === "consumo" || activeForm === "observacoes"}>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
@@ -141,10 +180,10 @@ export default function Agua() {
                   <option value="2023">2023</option>
                   <option value="2024">2024</option>
                 </select>
-              </DivFormConteudo>
+              </DivFormConteudo >
             </DivFormEixo>
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "ligacoes"}>
                 <DivTitulo>
                   <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
                 </DivTitulo>
@@ -214,7 +253,7 @@ export default function Agua() {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "volumes"}>
                 <DivTitulo>
                   <DivTituloConteudo>Volumes</DivTituloConteudo>
                 </DivTitulo>
@@ -336,7 +375,7 @@ export default function Agua() {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "extencao"}>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Extenção da rede
@@ -366,7 +405,7 @@ export default function Agua() {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "consumo"}>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Consumo de energia elétrica
@@ -398,7 +437,7 @@ export default function Agua() {
 
 
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "observacoes"}>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Observações, esclarecimentos ou sugestões
@@ -448,6 +487,7 @@ export default function Agua() {
         </Form>
 
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }

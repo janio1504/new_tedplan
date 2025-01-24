@@ -427,11 +427,11 @@ export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
-
+  background-color: #fff;
   text-align: left;
   padding: 10px 8px 10px 10px;
-  border: solid #008080 2px;
   border-radius: 5px;
+  font-size: 17px;
   margin-top: 50px;
   color: #fff;
   table {
@@ -445,8 +445,10 @@ export const DivTituloForm = styled.div`
   padding: 10px;
   color: #fff;
   margin: -11px -10px 0 -11px;
-  background-color: #008080;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+
   font-weight: bolder;
 `;
 
@@ -713,6 +715,7 @@ export const SubmitButtonModal = styled.button`
 
 export const DivInput = styled.div`
   float: left;
+  
   flex-direction: column;
   display: flex;
 `;
