@@ -678,8 +678,8 @@ export const SubmitButton = styled.button`
   padding: 10px 15px;
   margin: 30px 10px 8px 10px;
   color: #fff;
-  border: 0px;
-  background: #008080;
+  border: 2px solid #0085bd;
+  background: #0085bd;
   border-radius: 3px;
   flex-direction: row;
   cursor: pointer;
@@ -774,8 +774,8 @@ export const Form = styled.form`
   background-color: #f3f4f6;
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
-    border-radius: 5px;
+    border: 1px solid #4B4B4B;
+  border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     color: #666;
@@ -800,7 +800,7 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    border: 1px solid #4B4B4B;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;

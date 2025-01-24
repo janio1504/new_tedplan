@@ -2,14 +2,11 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
-  Container,
-  DivCenter,
   DivForm,
   DivTituloForm,
   Form,
   InputP,
   InputM,
-  SubmitButton,
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
@@ -23,6 +20,25 @@ import {
   InputXL,
   InputAno,
 } from "../../styles/financeiro";
+
+import {
+  Container,
+  DivCenter,
+  InputG,
+  SubmitButton,
+  TextArea,
+  DivTextArea,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
@@ -748,9 +764,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 </DivTitulo>
 
                 <InputSNIS>
-                  <label>
+                  <th>
                     <b>Código SNIS</b>
-                  </label>
+                  </th>
                   <p>FN002</p>
                   <p>FN003</p>
                   <p>FN007</p>

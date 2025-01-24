@@ -4,18 +4,15 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivCenter,
   DivForm,
-  DivTituloForm,
+
   DivInput,
   Form,
   InputP,
   InputM,
-  InputG,
-  SubmitButton,
+
   DivEixo,
-  TextArea,
-  DivTextArea,
+
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
@@ -29,6 +26,26 @@ import {
   InputSNIS,
   InputXL,
 } from "../../styles/financeiro";
+
+import {
+  DivCenter,
+  DivFormCadastro,
+  DivTituloForm,
+  InputG,
+  SubmitButton,
+  TextArea,
+  DivTextArea,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";

@@ -2,15 +2,8 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-  Container,
-  DivCenter,
-  DivForm,
-  DivTituloForm,
-  Form,
   InputP,
   InputM,
-  InputG,
-  SubmitButton,
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
@@ -20,6 +13,31 @@ import {
   InputSNIS,
   DivFormEixo,
 } from "../../styles/financeiro";
+
+import {
+  Container,
+  DivCenter,
+  DivForm,
+  DivFormCadastro,
+  DivTituloForm,
+  Form,
+  InputG,
+  SubmitButton,
+  DivEixo,
+  TextArea,
+  DivTextArea,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";

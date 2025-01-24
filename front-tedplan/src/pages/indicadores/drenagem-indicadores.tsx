@@ -4,9 +4,7 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivCenter,
   DivForm,
-  DivTituloForm,
   DivInput,
   Form,
   InputP,
@@ -29,6 +27,22 @@ import {
   InputXL,
   DivTituloFormDrenagem,
 } from "../../styles/financeiro";
+
+import {
+  DivCenter,
+  DivFormCadastro,
+  DivTituloForm,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";
@@ -192,7 +206,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <DivTituloConteudo>Vias urbanas</DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label><b>Código SNIS</b></label>
+                <th><b>Código SNIS</b></th>
                 <p>IE017</p>
                 <p>IE018</p>
                 <p>IE019</p>
@@ -208,7 +222,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>IE029</p>
               </InputSNIS>
               <InputXL>
-                <label><b>Descrição</b></label>
+                <th><b>Descrição</b></th>
                 <p>Extensão total das vias públicas urbanas</p>
                 <p>Extensão total das vias públicas urbanas implantadas</p>
                 <p>

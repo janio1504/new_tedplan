@@ -4,15 +4,12 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivCenter,
   DivForm,
-  DivTituloForm,
   DivInput,
   Form,
   InputP,
   InputM,
   InputG,
-  SubmitButton,
   DivEixo,
   TextArea,
   DivTextArea,
@@ -32,6 +29,22 @@ import {
   DivBorder,
   LabelCenter,
 } from "../../styles/financeiro";
+
+import {
+  DivCenter,
+  DivFormCadastro,
+  DivTituloForm,
+  SubmitButton,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";

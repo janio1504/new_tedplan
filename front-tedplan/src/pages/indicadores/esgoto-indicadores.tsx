@@ -250,11 +250,13 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                     onChange={handleOnChange}
                     type="text"></input>
                   </InputP>
-
+                  <InputSNIS>
+                    <label>.</label>
                     <p>ligação</p>
                     <p>ligação</p>
                     <p>economia</p>
                     <p>economia</p>
+                  </InputSNIS>
                 </div>
               </DivFormConteudo>
               
