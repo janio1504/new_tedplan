@@ -245,8 +245,7 @@ export const DivFormEixo = styled.div`
   width: 97%;
   min-width: 1000px;
   padding: 10px 8px 10px 15px;
-  border: solid #3A8191 2px;
-  border-radius: 10px;
+  
   margin-top: 30px;
   color: #667778;
 
@@ -259,8 +258,7 @@ export const DivFormConteudo= styled.div`
   max-width: 1320;
   min-width: 1090px;
   padding: 10px 10px 10px 15px;
-  border: solid #3D6CA6 2px;
-  border-radius: 10px;
+ 
   margin-top: 30px;
   color: #667778;
   table{
@@ -277,7 +275,7 @@ export const DivFormConteudo= styled.div`
     p{
       padding: 10px;
       background:  #2dd9d0;
-      color: #008080;
+      color: #008080; 
       font-weight: bolder;
       border-radius: 5px;
       cursor: pointer;
@@ -315,10 +313,10 @@ export const DivForm = styled.div`
   width: 97%;
   min-width: 1280px;
   padding: 10px 12px 10px 10px;
-  border: solid #1BB6D3 2px;
+  
   border-radius: 5px;
   margin-top: 20px;
-  color: #667778;
+  background-color: #ffff;
 `;
 
 export const DivFormResiduo = styled.div`
@@ -326,11 +324,12 @@ export const DivFormResiduo = styled.div`
   width: 97%;
   min-width: 1280px;
   padding: 10px 12px 10px 10px;
-  border: solid #1bb6d3 2px;
+  
   border-radius: 5px;
   margin-top: 20px;
   margin-bottom: 0px;
   color: #667778;
+  background-color: #ffff;
 `;
 
 export const DivSeparadora = styled.div`
@@ -342,28 +341,33 @@ export const DivTituloFormResiduo = styled.div`
   width: auto;
   padding: 10px;
   margin: -11px -13px 0 -11px;
-  background-color: #42895B;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
   font-weight: bolder;
   color: #fff;
 `;
 
 export const DivTituloForm = styled.div`
   width: auto;
-  padding: 10px;
+  padding: 16px;
+  font-size: 16px;
   margin: -11px -13px 0 -11px;
-  background-color: #008080;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
   font-weight: bolder;
   color: #fff;
 `;
 
 export const DivTituloFormDrenagem = styled.div`
   width: auto;
-  padding: 10px;
+  padding: 15px;
   margin: -11px -13px 0 -11px;
-  background-color: #3D6CA6;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  font-size: 16px;
+  border-top-right-radius: 6px;
   font-weight: bolder;
   color: #fff;
 `;
@@ -393,19 +397,21 @@ export const DivTituloEixoDrenagem = styled.div`
 `;
 
 export const DivTituloConteudo = styled.div`
- 
- float: left;
+  float: left;
   padding: 10px 40px;
+  width: auto;
+  max-width: 100%;
   margin: -30px 10px 0 0px;
-  background-color: #3D6CA6;
-  border-radius: 25px;
+  border: 2px solid #0085bd;
+  border-radius: 5px;
   font-weight: bolder;
   text-align: center;
-  color: #fff;
+  color: #4a5568;
 `;
+
 export const DivTitulo = styled.div`
   min-width: 60%;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 `;
 
 export const SubmitButton = styled.button`
@@ -440,13 +446,14 @@ export const InputSNIS = styled.div`
   float: left;
   flex-direction: column;
   display: flex;
-  width: 100px;
   p {
-  margin-left: 20px;
-  padding: 10px;
-  padding: 21.5px 0;
+    margin-left: 20px;
+    padding: 10px;
+    padding: 18.5px 0;
   }
 `;
+
+
 export const DivChekbox = styled.div`
   float: left;
   flex-direction: column;
@@ -474,13 +481,13 @@ export const InputP = styled.div`
   float: left;
   flex-direction: column;
   display: flex;
-  width: 140px;
+  width: 150px;
   p {
-  margin-left: 20px;
-  padding: 10px;
-  padding: 21.5px 0;
+    margin-left: 20px;
+    padding: 10px;
+    padding: 21.5px 0;
   }
-  input{
+  input {
     text-align: right;
   }
 `;
@@ -488,6 +495,7 @@ export const InputP = styled.div`
 export const InputM = styled.div`
   float: left;
   flex-direction: column;
+
   display: flex;
   width: 350px;
   p {
@@ -517,7 +525,7 @@ export const InputGG = styled.div`
   width: 650px;
   p {
   margin-left: 20px;
-  padding: 21.5px 0;
+  padding: 18.5px 0;
   }
   text-align: left;
 `;
@@ -563,7 +571,7 @@ export const TextArea = styled.div`
   flex-direction: column;
   display: flex;
   width: 990px;
-  border: #2dd9d0 solid 2px;
+  border: #000000 solid 2px;
   margin: 10px;
   border-radius: 5px;
 `;
@@ -574,7 +582,7 @@ export const DivEixo = styled.div`
   margin: 10px;
   display: flex;
   width: 95%;
-  border-bottom: #2dd9d0 solid 2px;
+  border-bottom: #000000 solid 2px;
   padding: 5px;
   color: #666;
   font-weight: bold;
@@ -583,7 +591,7 @@ export const DivEixo = styled.div`
 export const Form = styled.form`
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #000000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -591,7 +599,7 @@ export const Form = styled.form`
     float: left;
   }
   input:focus-within {
-    border-color: 2px solid #008080;
+    border-color: 2px solid #000000;
   }
 
   textarea {
@@ -601,7 +609,7 @@ export const Form = styled.form`
     margin: 10px;
     min-width: 500px;
     height: 200px;
-    border: 2px solid #2dd9d0;
+    border: 2px solid #000000;
   }
   label {
     color: #666;
@@ -609,14 +617,14 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #000000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #2dd9d0;
+    border: 1px solid #000000;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -789,5 +797,16 @@ export const CloseModalButton = styled.button`
   svg {
     margin-right: 8px;
   }
+`;
+
+export const TableContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+export const TableColumn = styled.div`
+  flex: 1;
+  padding: 10px;
 `;
 

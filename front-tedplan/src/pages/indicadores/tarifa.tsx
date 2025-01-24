@@ -4,15 +4,12 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivCenter,
   DivForm,
-  DivTituloForm,
   DivInput,
   Form,
   InputP,
   InputM,
   InputG,
-  SubmitButton,
   DivEixo,
   TextArea,
   DivTextArea,
@@ -22,7 +19,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -33,6 +29,22 @@ import {
   DivBorder,
   LabelCenter,
 } from "../../styles/financeiro";
+
+import {
+  DivCenter,
+  DivFormCadastro,
+  DivTituloForm,
+  SubmitButton,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";
@@ -43,6 +55,11 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import CurrencyInput from "react-currency-masked-input";
+import { MainContent } from "../../styles/indicadores";
+import { 
+  Sidebar, 
+  SidebarItem } from "../../styles/residuo-solidos-in";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import {
   Tabela,
   ContainerModal,
@@ -53,6 +70,7 @@ import {
   SubmitButtonModal,
   DivBotaoAdicionar,
 } from "../../styles/indicadores";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import api from "../../services/api";
 
 interface IMunicipio {
@@ -76,7 +94,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   } = useForm();
   const [dadosTarifa, setDadosTarifa] = useState(null);
   const [content, setContent] = useState("");
-  
+  const [activeForm, setActiveForm] = useState("tarifa");
   
   useEffect(() => {
     getDadosTarifa()
@@ -166,7 +184,28 @@ export default function Tarifa({ municipio }: MunicipioProps) {
           </ul>
         </MenuMunicipioItem>
       </MenuMunicipio>
-      <MenuIndicadores></MenuIndicadores>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <SidebarItem
+          active={activeForm === "tarifa"}
+          onClick={() => setActiveForm("tarifa")}
+        >
+          Tarifa
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "tarifasocial"}
+          onClick={() => setActiveForm("tarifasocial")}
+        >
+          Tarifa Social
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações
+        </SidebarItem>
+      </Sidebar>
+      <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivFormResiduo>
@@ -174,7 +213,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
             <DivFormEixo>
               <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
             
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "tarifa"}>
               <DivTitulo>
                 <DivTituloConteudo>Tarifa minima</DivTituloConteudo>
               </DivTitulo>
@@ -300,7 +339,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "tarifasocial"}>
               <DivTitulo>
                 <DivTituloConteudo>Tarifa Social</DivTituloConteudo>
               </DivTitulo>
@@ -579,7 +618,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
             </DivFormConteudo> 
 
           
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "observacoes"}>
               <DivTitulo>
                 <DivTituloConteudo>Observações</DivTituloConteudo>
               </DivTitulo>
@@ -604,7 +643,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
-
+      </MainContent>
      
     </Container>
   );

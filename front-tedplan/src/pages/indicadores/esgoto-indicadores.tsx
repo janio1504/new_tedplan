@@ -3,32 +3,45 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
-  Container,
-  DivCenter,
-  DivForm,
-  DivTituloForm,
   DivInput,
-  Form,
-  InputP,
-  InputM,
-  InputG,
-  SubmitButton,
-  DivEixo,
-  TextArea,
-  DivTextArea,
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
+  InputP,
+  InputM,
   DivSeparadora,
   InputSNIS,
   InputXL,
 } from "../../styles/financeiro";
+
+import {
+  Container,
+  DivCenter,
+  DivForm,
+  DivFormCadastro,
+  DivTituloForm,
+  Form,
+  InputG,
+  SubmitButton,
+  DivEixo,
+  TextArea,
+  DivTextArea,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";
@@ -40,6 +53,12 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
+import { 
+  Sidebar, 
+  SidebarItem } from "../../styles/residuo-solidos-in";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
+import { MainContent } from "../../styles/indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -65,7 +84,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   
   const [content, setContent] = useState("");
   const [dadosEsgoto, setDadosEsgoto] = useState(null);
-  
+  const [activeForm, setActiveForm] = useState("ligacoes");
  
 
   useEffect(() => {
@@ -137,78 +156,111 @@ export default function Esgoto({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <SidebarItem
+          active={activeForm === "ligacoes"}
+          onClick={() => setActiveForm("ligacoes")}
+        >
+          Ligações e economias
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "volumes"}
+          onClick={() => setActiveForm("volumes")}
+        >
+          Volumes
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "extencao"}
+          onClick={() => setActiveForm("extencao")}
+        >
+          Extenção da rede
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "consumo"}
+          onClick={() => setActiveForm("consumo")}
+        >
+          Consumo de energia elétrica
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações, esclarecimentos ou sugestões
+        </SidebarItem>
+      </Sidebar>
+      <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>            
-            <DivTituloForm style={{borderColor: "#235460"}}>Esgoto</DivTituloForm> 
+            <DivTituloForm style={{borderColor: "#0085bd"}}>Esgoto</DivTituloForm> 
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "ligacoes" || activeForm === "volumes" || activeForm === "extencao" || activeForm === "consumo" || activeForm === "observacoes"}>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
                 <label>Selecione o ano desejado:</label>
                 <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
-                  <option >Selecionar</option>
-                  <option value="2022">2022</option>
-                  <option value="2023">2023</option>
-                  <option value="2024">2024</option>
+                  <option style={{color: "#000000"}} >Selecionar</option>
+                  <option style={{color: "#000000"}} value="2022">2022</option>
+                  <option style={{color: "#000000"}} value="2023">2023</option>
+                  <option style={{color: "#000000"}} value="2024">2024</option>
                 </select>
               </DivFormConteudo>         
              
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "ligacoes"}>
 
                 <DivTitulo>
                   <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
                 </DivTitulo>
-                <InputSNIS>
-                  <label><b>Código SNIS</b></label>
-                  <p>ES009</p>
-                  <p>ES002</p>
-                  <p>ES003</p>
-                  <p>ES008</p>
-                 
-                </InputSNIS>
-                <InputGG>
-                  <label><b>Descrição</b></label>
-                  <p>Quantidade de ligações totais de esgoto</p>
-                  <p>Quantidade de ligações ativas de esgoto</p>
-                  <p>Quantidade de economias ativas de esgoto</p>
-                  <p>Quantidade de economias residenciais ativas de esgoto</p>
-                </InputGG>
-           
-                <InputP>
-
-                  <label>Ano: {anoSelected}</label>
-
-                  <input {...register("ES009")}
-                  defaultValue={dadosEsgoto?.es009}
-                  onChange={handleOnChange}
-                  type="text"></input>
-                  <input {...register("ES002")}
-                  defaultValue={dadosEsgoto?.es002}
-                  onChange={handleOnChange}
-                  type="text"></input>
-                  <input {...register("ES003")}
-                  defaultValue={dadosEsgoto?.es003}
-                  onChange={handleOnChange}
-                  type="text"></input>
-                  <input {...register("ES008")}
-                  defaultValue={dadosEsgoto?.es008}
-                  onChange={handleOnChange}
-                  type="text"></input>
-                </InputP>
-                <InputSNIS>
-                  <label>.</label>
-                  <p>ligação</p>
-                  <p>ligação</p>                  
-                  <p>economia</p>
-                  <p>economia</p>
                 
-                </InputSNIS>
+                <div className="input-row">
+                  <InputSNIS>
+                    <label>Código SNIS</label>
+                    <p>ES009</p>
+                    <p>ES002</p>
+                    <p>ES003</p>
+                    <p>ES008</p>
+                  </InputSNIS>
+                  
+                  <InputGG>
+                    <label>Descrição</label>
+                    <p>Quantidade de ligações totais de esgoto</p>
+                    <p>Quantidade de ligações ativas de esgoto</p>
+                    <p>Quantidade de economias ativas de esgoto</p>
+                    <p>Quantidade de economias residenciais ativas de esgoto</p>
+                  </InputGG>
+
+                  <InputP>
+                    <label>Ano: {anoSelected}</label>
+                    <input {...register("ES009")}
+                    defaultValue={dadosEsgoto?.ES009}
+                    onChange={handleOnChange}
+                    type="text"></input>
+                    <input {...register("ES002")}
+                    defaultValue={dadosEsgoto?.ES002}
+                    onChange={handleOnChange}
+                    type="text"></input>
+                    <input {...register("ES003")}
+                    defaultValue={dadosEsgoto?.ES003}
+                    onChange={handleOnChange}
+                    type="text"></input>
+                    <input {...register("ES008")}
+                    defaultValue={dadosEsgoto?.ES008}
+                    onChange={handleOnChange}
+                    type="text"></input>
+                  </InputP>
+                  <InputSNIS>
+                    <label>.</label>
+                    <p>ligação</p>
+                    <p>ligação</p>
+                    <p>economia</p>
+                    <p>economia</p>
+                  </InputSNIS>
+                </div>
               </DivFormConteudo>
               
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "volumes"}>
                 <DivTitulo>
                   <DivTituloConteudo>Volumes</DivTituloConteudo>
                 </DivTitulo>
@@ -236,23 +288,23 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES005")}
-                  defaultValue={dadosEsgoto?.es005}
+                  defaultValue={dadosEsgoto?.ES005}
                   onChange={handleOnChange}
                   type="text"></input>
                   <input {...register("ES006")}
-                  defaultValue={dadosEsgoto?.es006}
+                  defaultValue={dadosEsgoto?.ES006}
                   onChange={handleOnChange}
                   type="text"></input>
                   <input {...register("ES007")}
-                  defaultValue={dadosEsgoto?.es007}
+                  defaultValue={dadosEsgoto?.ES007}
                   onChange={handleOnChange}
                   type="text"></input>
                   <input {...register("ES012")}
-                  defaultValue={dadosEsgoto?.es012}
+                  defaultValue={dadosEsgoto?.ES012}
                   onChange={handleOnChange}
                   type="text"></input>
                   <input {...register("ES015")}
-                  defaultValue={dadosEsgoto?.es015}
+                  defaultValue={dadosEsgoto?.ES015}
                   onChange={handleOnChange}
                   type="text"></input>
                
@@ -270,7 +322,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "extencao"}>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Extenção da rede
@@ -289,7 +341,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES004")}
-                  defaultValue={dadosEsgoto?.es004}
+                  defaultValue={dadosEsgoto?.ES004}
                   onChange={handleOnChange}
                   type="text"></input>
                 </InputP>
@@ -299,7 +351,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </InputSNIS>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "consumo"}>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Consumo de energia elétrica
@@ -319,7 +371,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <label>Ano: {anoSelected}</label>
 
                   <input {...register("ES028")}
-                  defaultValue={dadosEsgoto?.es028}
+                  defaultValue={dadosEsgoto?.ES028}
                   onChange={handleOnChange}
                   type="text"></input>
                 </InputP>
@@ -331,7 +383,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
              
 
-             <DivFormConteudo>
+             <DivFormConteudo active={activeForm === "observacoes"}>
                 <DivTitulo>
                   <DivTituloConteudo>
                     Observações, esclarecimentos ou sugestões
@@ -363,11 +415,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <label>Ano: {anoSelected}</label>
 
                   <textarea {...register("ES098")}
-                  defaultValue={dadosEsgoto?.es098}
+                  defaultValue={dadosEsgoto?.ES098}
                   onChange={handleOnChange}
                   />
                   <textarea {...register("ES099")}
-                  defaultValue={dadosEsgoto?.es099}
+                  defaultValue={dadosEsgoto?.ES099}
                   onChange={handleOnChange}
                   ></textarea>
                 </InputG>
@@ -379,6 +431,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }
@@ -415,4 +468,5 @@ export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
     },
   };
 };
+
 

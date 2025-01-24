@@ -4,18 +4,15 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivCenter,
   DivForm,
-  DivTituloForm,
+
   DivInput,
   Form,
   InputP,
   InputM,
-  InputG,
-  SubmitButton,
+
   DivEixo,
-  TextArea,
-  DivTextArea,
+
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
@@ -29,6 +26,26 @@ import {
   InputSNIS,
   InputXL,
 } from "../../styles/financeiro";
+
+import {
+  DivCenter,
+  DivFormCadastro,
+  DivTituloForm,
+  InputG,
+  SubmitButton,
+  TextArea,
+  DivTextArea,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";
@@ -40,7 +57,7 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
-
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -138,7 +155,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>
