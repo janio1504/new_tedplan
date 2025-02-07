@@ -23,22 +23,13 @@ import {
   Container,
   NewButton,
   ListPost,
-  FormModal,
-  ConfirmButton,
-  CancelButton,
+ 
   Footer,
   DivCenter,
   BotaoVisualizar,
   BotaoEditar,
   BotaoRemover,
-  ContainerModal,
-  Modal,
-  CloseModalButton,
-  ConteudoModal,
-  TituloModal,
-  ImagemModal,
-  ConfirmModal,
-  SubmitButton,
+
   ModalGaleria,
   ImagemGaleria,
   ImagensGaleria,
@@ -46,6 +37,24 @@ import {
   ModalImgAmpliada,
   ImagenAmpliada,
 } from "../styles/dashboard";
+
+
+
+
+import {
+  ContainerModal,
+  Modal,
+  CloseModalButton,
+  ConteudoModal,
+  ImagemModal,
+  SubmitButton,
+  TituloModal,
+  ConfirmModal,
+  CancelButton,
+  ConfirmButton,
+  FormModal,
+} from "../styles/dashboard-original";
+
 import { useForm } from "react-hook-form";
 import image from "next/image";
 import { Form } from "../styles/indicadores";

@@ -6,12 +6,20 @@ import { toast, ToastContainer } from 'react-nextjs-toast';
 
 import {
   Container,
-     Form, SubmitButton,
+     Form,
      Footer, DivCenter, DivInstrucoes,
   } from '../styles/dashboard';
+
+
+  import {
+  SubmitButton,
+       
+    } from '../styles/dashboard-original';
+
 import { getAPIClient } from '../services/axios';
 import { useForm } from 'react-hook-form';
 import MenuSuperior from '../components/head';
+
 
 interface IPublicacao {
   id_posts: string;

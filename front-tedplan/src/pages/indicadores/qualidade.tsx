@@ -251,7 +251,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     <td><InputP><input {...register('QD002')}
                     defaultValue={dadosQualidade?.qd002}
                     onChange={handleOnChange}
-                    type="text"></input></InputP></td>
+                    type="text" ></input></InputP></td>
                     <td>Paralisações</td>
                   </tr>
                   <tr>
