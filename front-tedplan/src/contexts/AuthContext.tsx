@@ -53,6 +53,10 @@ export function AuthProvider({ children }) {
         setUser(response[0]);
       });
     }
+
+    if(!token){
+      Router.push('/')
+    }
   }, [usuario]);
 
   async function signIn({ login, senha, id_sistema }: SignInData) {
@@ -78,6 +82,12 @@ export function AuthProvider({ children }) {
       .catch((error) => {
         return error;
       });
+
+      const { "tedplan.token": token } = parseCookies();
+
+      if (!token) {
+        Router.push("/login_indicadores");
+      }
 
     const resUsuarioLogado = await api.get("getUsuario", {
       params: { id_usuario: data.id_usuario },

@@ -281,7 +281,7 @@ export const DivFormConteudo = styled.div`
 
   th {
     text-align: left;
-    padding: 0 10px 0 0px;
+    padding: 0 10px 5px 0px;
     min-width: 120px;
 
     span {
@@ -314,7 +314,7 @@ export const DivFormConteudo = styled.div`
 
   td {
     min-width: 120px;
-    padding: 5px;
+    padding: 0px;
   }
 
   select {
@@ -592,6 +592,7 @@ export const InputM = styled.div`
   flex-direction: column;
   display: flex;
   width: 350px;
+  font-size: 16px;
   p {
   margin-left: 20px;
   padding: 22px 0;
@@ -607,6 +608,7 @@ export const InputG = styled.div`
   flex-direction: column;
   display: flex;
   width: 500px;
+  font-size: 16px;
   p {
   margin-left: 20px;
   padding: 21.5px 0;
@@ -617,6 +619,7 @@ export const InputGG = styled.div`
   flex-direction: column;
   display: flex;
   width: 650px;
+  font-size: 16px;
   p {
   margin-left: 20px;
   padding: 21.5px 0;

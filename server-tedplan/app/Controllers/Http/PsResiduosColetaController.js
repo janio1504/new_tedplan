@@ -11,9 +11,12 @@ class PsResiduosColetaController {
     const { ano, id_municipio} = request.all()
     try {
       const res = await PsFinanceiro.query()
-      .from('tedplan.unidades_residuos_solidos')
-      .where('id_municipio', id_municipio)
-      .where('ano', ano)
+      .from('tedplan.unidades_residuos_solidos_rsc as rsc')
+      .select('m.nome as nome_municipio','up.nome_unidade_processamento','up.tipo_unidade','up.up004 as operador_unidade','up.cnpj','rsc.quant_residuos_exportados','rsc.ano','rsc.id_unidade_residuo_solido')
+      .innerJoin('tedplan.municipios as m', 'rsc.id_municipio', 'm.id_municipio')
+      .innerJoin('tedplan.unidades_processamento_residuo_solido as up', 'rsc.id_unidade_processamento', 'up.id_unidade_processamento')
+      .where('rsc.id_municipio', id_municipio)
+      .where('rsc.ano', ano)
       .fetch()
       return res
     } catch (error) {
@@ -25,7 +28,7 @@ class PsResiduosColetaController {
     try {
       const { id } = request.all()
       const res = await PsFinanceiro.query()
-      .from('tedplan.unidades_residuos_solidos')
+      .from('tedplan.unidades_residuos_solidos_rsc')
       .where('id_unidade_residuo_solido', id)
       .delete()
     } catch (error) {
@@ -46,17 +49,14 @@ class PsResiduosColetaController {
   }
 
   async createUnidadeRsc({request}){
-    const { municipio, nome_unidade, operador_unidade,
-    cnpj_unidade, quant_residuos_exportados, ano, id_municipio }
+    const { id_unidade_processamento, codigo, quant_residuos_exportados, ano, id_municipio }
     = request.all()
     try {
       await PsFinanceiro.query()
-      .from('tedplan.unidades_residuos_solidos')
+      .from('tedplan.unidades_residuos_solidos_rsc')
       .insert({
-        municipio: municipio,
-        nome_unidade: nome_unidade,
-        operador_unidade: operador_unidade,
-        cnpj_unidade: cnpj_unidade,
+        id_unidade_processamento: id_unidade_processamento,
+        codigo: codigo,
         quant_residuos_exportados: quant_residuos_exportados,
         ano: ano,
         id_municipio: id_municipio,
@@ -70,9 +70,12 @@ class PsResiduosColetaController {
     const { ano, id_municipio} = request.all()
     try {
       const res = await PsFinanceiro.query()
-      .from('tedplan.unidades_residuos_solidos_rss')
-      .where('id_municipio', id_municipio)
-      .where('ano', ano)
+      .from('tedplan.unidades_residuos_solidos_rss as rss')
+      .select('m.nome as nome_municipio','up.nome_unidade_processamento','up.tipo_unidade','up.up004 as operador_unidade','up.cnpj','rss.quant_residuos_exportados','rss.ano','rss.id_unidade_residuo_solido_rss')
+      .innerJoin('tedplan.municipios as m', 'rss.id_municipio', 'm.id_municipio')
+      .innerJoin('tedplan.unidades_processamento_residuo_solido as up', 'rss.id_unidade_processamento', 'up.id_unidade_processamento')
+      .where('rss.id_municipio', id_municipio)
+      .where('rss.ano', ano)
       .fetch()
       return res
     } catch (error) {
@@ -81,17 +84,16 @@ class PsResiduosColetaController {
   }
   // Criar unidades de RSS
   async createUnidadeRss({request}){
-    const { municipio, nome_unidade, operador_unidade,
-    cnpj_unidade, quant_residuos_exportados, ano, id_municipio }
+    const { id_unidade_processamento, codigo, quant_residuos_exportados, ano, id_municipio }
     = request.all()
+    console.log(request.all());
+    
     try {
       await PsFinanceiro.query()
       .from('tedplan.unidades_residuos_solidos_rss')
       .insert({
-        municipio: municipio,
-        nome_unidade: nome_unidade,
-        operador_unidade: operador_unidade,
-        cnpj_unidade: cnpj_unidade,
+        id_unidade_processamento: id_unidade_processamento,
+        codigo: codigo,
         quant_residuos_exportados: quant_residuos_exportados,
         ano: ano,
         id_municipio: id_municipio,
@@ -115,10 +117,10 @@ class PsResiduosColetaController {
 
   async store({ response, request }){
     const dados = request.all()
-
+    
     try {
       if(!dados.id_residuos_solidos_coleta){
-
+       
         await PsFinanceiro.query()
         .from('tedplan.residuos_solidos_coleta')
         .insert({
@@ -382,7 +384,7 @@ class PsResiduosColetaController {
           co055: dados.CO055 ? dados.CO055: rsc.co055,
           co056: dados.CO056 ? dados.CO056: rsc.co056,
           co057: dados.CO057 ? dados.CO057: rsc.co057,
-          co057: dados.CO058 ? dados.CO058: rsc.co057,
+          co058: dados.CO058 ? dados.CO058: rsc.co058,
           co059: dados.CO059 ? dados.CO059: rsc.co059,
           co063: dados.CO063 ? dados.CO063: rsc.co063,
           co064: dados.CO064 ? dados.CO064: rsc.co064,
@@ -462,7 +464,7 @@ class PsResiduosColetaController {
           cs034: dados.CS034 ? dados.CS034: rsc.cs034,
           cs035: dados.CS035 ? dados.CS035: rsc.cs035,
           cs036: dados.CS036 ? dados.CS036: rsc.cs036,
-          cs036: dados.CS038 ? dados.CS038: rsc.cs036,
+          cs038: dados.CS038 ? dados.CS038: rsc.cs038,
           cs042: dados.CS042 ? dados.CS042: rsc.cs042,
           cs043: dados.CS043 ? dados.CS043: rsc.cs043,
           cs044: dados.CS044 ? dados.CS044: rsc.cs044,

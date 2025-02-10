@@ -99,8 +99,8 @@ class PsResiduosUnidadeController {
           cnpj: dados.cnpj,
           endereco: dados.endereco,
           tipo_unidade: dados.tipo_unidade,
-          ano_inicio_operacao: dados.ano_inicio_operacao,
-          data_cadastro: dados.data_cadastro,
+          up002: dados.UP002,
+          up066: dados.UP066,
           })
       }else{
         const dadosRuc = await PsFinanceiro.query()
@@ -119,8 +119,16 @@ class PsResiduosUnidadeController {
           cnpj: dados.cnpj ? dados.cnpj : ruc.cnpj,
           endereco: dados.endereco ? dados.endereco : ruc.endereco,
           tipo_unidade: dados.tipo_unidade ? dados.tipo_unidade : ruc.tipo_unidade,
-          data_cadastro: dados.data_cadastro ? dados.data_cadastro : ruc.data_cadastro,
-         
+          up065: dados.UP065 ? dados.UP065 : ruc.up065,
+          up051: dados.UP051 ? dados.UP051 : ruc.up051,
+          up002: dados.UP002 ? dados.UP002 : ruc.up002,
+          up066: dados.UP066 ? dados.UP066 : ruc.up066,
+          up004: dados.UP004 ? dados.UP004 : ruc.up004,
+          up084: dados.UP084 ? dados.UP084 : ruc.up084,
+          up050: dados.UP050 ? dados.UP050 : ruc.up050,
+          up012: dados.UP012 ? dados.UP012 : ruc.up012,
+          up085: dados.UP085 ? dados.UP085 : ruc.up085,
+
           })
       }
 
@@ -208,10 +216,7 @@ class PsResiduosUnidadeController {
         .where('id_residuos_unidade_processamento', dados.id_residuos_unidade_processamento)
         .update({
           up001: dados.UP001 ? dados.UP001 : ruc.up001,
-          up002: dados.UP002 ? dados.UP002 : ruc.up002,
           up003: dados.UP003 ? dados.UP003 : ruc.up003,
-          up004: dados.UP004 ? dados.UP004 : ruc.up004,
-          up012: dados.UP012 ? dados.UP012 : ruc.up012,
           up015: dados.UP015 ? dados.UP015 : ruc.up015,
           up016: dados.UP016 ? dados.UP016 : ruc.up016,
           up017: dados.UP017 ? dados.UP017 : ruc.up017,
@@ -236,13 +241,9 @@ class PsResiduosUnidadeController {
           up038: dados.UP038 ? dados.UP038 : ruc.up038,
           up039: dados.UP039 ? dados.UP039 : ruc.up039,
           up040: dados.UP040 ? dados.UP040 : ruc.up040,
-          up050: dados.UP050 ? dados.UP050 : ruc.up050,
-          up051: dados.UP051 ? dados.UP051 : ruc.up051,
           up052: dados.UP052 ? dados.UP052 : ruc.up052,
           up053: dados.UP053 ? dados.UP053 : ruc.up053,
           up054: dados.UP054 ? dados.UP054 : ruc.up054,
-          up065: dados.UP065 ? dados.UP065 : ruc.up065,
-          up066: dados.UP066 ? dados.UP066 : ruc.up066,
           up068: dados.UP068 ? dados.UP068 : ruc.up068,
           up069: dados.UP069 ? dados.UP069 : ruc.up069,
           up070: dados.UP070 ? dados.UP070 : ruc.up070,
@@ -255,14 +256,41 @@ class PsResiduosUnidadeController {
           up081: dados.UP081 ? dados.UP081 : ruc.up081,
           up082: dados.UP082 ? dados.UP082 : ruc.up082,
           up083: dados.UP083 ? dados.UP083 : ruc.up083,
-          up084: dados.UP084 ? dados.UP084 : ruc.up084,
-          up085: dados.UP085 ? dados.UP085 : ruc.up085,
           up086: dados.UP086 ? dados.UP086 : ruc.up086,
           up087: dados.UP087 ? dados.UP087 : ruc.up087,
           municipio_unidade: dados.municipio_unidade ? dados.municipio_unidade : ruc.municipio_unidade,
           nome_unidade: dados.nome_unidade ? dados.nome_unidade : ruc.nome_unidade,
           observacoes_unidade: dados.observacoes_unidade ? dados.observacoes_unidade : ruc.observacoes_unidade,
           })
+          console.log(dados);          
+
+          const dadosUprs = await PsFinanceiro.query()
+          .from('tedplan.unidades_processamento_residuo_solido')
+          .where('id_unidade_processamento', dados.id_unidade_processamento)
+          .fetch()
+          const uprs = dadosUprs.toJSON()[0]
+          
+          const resUprs = await PsFinanceiro.query()
+          .from('tedplan.unidades_processamento_residuo_solido')
+          .where('id_unidade_processamento', dados.id_unidade_processamento)
+          .update({
+            id_municipio:  dados.id_municipio ? dados.id_municipio : uprs.id_municipio, 
+            id_municipio_unidade_processamento: dados.id_municipio_unidade_processamento ? dados.id_municipio_unidade_processamento : uprs.id_municipio_unidade_processamento,    
+            nome_unidade_processamento: dados.nome_unidade_processamento ? dados.nome_unidade_processamento : uprs.nome_unidade_processamento,
+            cnpj: dados.cnpj ? dados.cnpj : uprs.cnpj,
+            endereco: dados.endereco ? dados.endereco : uprs.endereco,
+            tipo_unidade: dados.tipo_unidade ? dados.tipo_unidade : uprs.tipo_unidade,
+            up065: dados.UP065 ? dados.UP065 : uprs.up065,
+            up051: dados.UP051 ? dados.UP051 : uprs.up051,
+            up002: dados.UP002 ? dados.UP002 : uprs.up002,
+            up066: dados.UP066 ? dados.UP066 : uprs.up066,
+            up004: dados.UP004 ? dados.UP004 : uprs.up004,
+            up084: dados.UP084 ? dados.UP084 : uprs.up084,
+            up050: dados.UP050 ? dados.UP050 : uprs.up050,
+            up012: dados.UP012 ? dados.UP012 : uprs.up012,
+            up085: dados.UP085 ? dados.UP085 : uprs.up085,
+  
+            })
       }
 
     } catch (error) {

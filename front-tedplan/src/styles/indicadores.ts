@@ -323,6 +323,21 @@ export const PsImage = styled.div`
   width: 100px;
   cursor: pointer;
 `;
+
+export const TitlePsOnMouse = styled.div`
+  display: block;
+  position: absolute;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: 1;
+  margin: -140px auto 0 auto;
+  border-radius: 5px;
+  color: #053d68;
+  font-size: 16px;
+  text-align: left;
+`;
+
 export const PsImageEsquerda = styled.div`
   float: left;
   margin: -110px 0 0px -830px;

@@ -3,7 +3,7 @@ import { Form } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-nextjs-toast";
 import { useResiduos } from "../contexts/ResiduosContext";
-import { InputP } from "../styles/financeiro";
+import { InputGG, InputP, InputSNIS } from "../styles/financeiro";
 import api from "../services/api";
 import { Actions, Tabela } from "../styles/residuo-solido-coleta-in";
 import Image from "next/image";
@@ -16,17 +16,17 @@ export default function RssExportado(id_municipio: any) {
     reset,
     formState: { errors },
   } = useForm();
-  const { dadosResiduos, createDataUnidadeRss, unidadesRss, removeUnidadeRss } = useResiduos();
+  const { dadosResiduos, createDataUnidadeRss, unidadesRss, removeUnidadeRss } =
+    useResiduos();
   const [rsExportado, setRsExportado] = useState(true);
   const [unidadesProcessamento, setUnidadesProcessamento] = useState(null);
   const [unidadeP, setUnidadeP] = useState(null);
   const [municipioUnidade, setMunicipioUnidade] = useState(null);
   const [municipios, setMunicipios] = useState(null);
- 
-  async function handleCadastroUnidadeRss(data) {
-    
-    alert(id_municipio)
 
+  async function handleCadastroUnidadeRss(data) {
+    alert(id_municipio);
+    return;
     try {
       const result = await createDataUnidadeRss(data);
 
@@ -77,23 +77,23 @@ export default function RssExportado(id_municipio: any) {
     setUnidadeP(up[0]);
   }
 
-   const handleRemoveUnidadeRss = async (id: string) => {
-      const result = await removeUnidadeRss(id);
-  
-      if (result.success) {
-        toast.notify(result.message, {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-      } else {
-        toast.notify(result.message, {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
-      }
-    };
+  const handleRemoveUnidadeRss = async (id: string) => {
+    const result = await removeUnidadeRss(id);
+
+    if (result.success) {
+      toast.notify(result.message, {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      });
+    } else {
+      toast.notify(result.message, {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+    }
+  };
 
   function rsExportadoChange(e) {
     e.target.value == "Sim" ? setRsExportado(false) : setRsExportado(true);
@@ -101,7 +101,38 @@ export default function RssExportado(id_municipio: any) {
 
   return (
     <>
-      <form onSubmit={handleCadastroUnidadeRss}>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <InputSNIS>RS030</InputSNIS>
+            </td>
+            <td>
+              <InputGG>
+                O município envia RSS coletados para outro município ?
+              </InputGG>
+            </td>
+            <td>
+              <InputP>
+                <select
+                  defaultValue={dadosResiduos?.rs030}
+                  onChange={rsExportadoChange}
+                >
+                  <option value="Selecionar">Selecionar</option>
+                  <option value="Sim">Sim</option>
+                  <option value="Não">Não</option>
+                </select>
+              </InputP>
+            </td>
+          </tr>
+          <tr>
+            <td>RS031</td>
+            <td>Município(s) para onde são remitidos os RSS </td>
+            <th></th>
+          </tr>
+        </tbody>
+      </table>
+      <form onSubmit={handleSubmit(handleCadastroUnidadeRss)}>
         <table>
           <tr>
             <td>Município</td>

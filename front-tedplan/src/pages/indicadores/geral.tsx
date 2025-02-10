@@ -40,10 +40,10 @@ import {
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
-import { getAPIClient } from "../../services/axios";
+import Image from "next/image";
 import MenuIndicadores from "../../components/MenuIndicadores";
-import { parseCookies } from "nookies";
-import { GetServerSideProps } from "next";
+import Editar from "../../img/editar.png";
+import Excluir from "../../img/excluir.png";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import CurrencyInput from "react-currency-masked-input";
@@ -60,6 +60,7 @@ import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { Actions } from "../../styles/residuo-solido-coleta-in";
 
 interface IMunicipio {
   id_municipio: string;
@@ -94,24 +95,19 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
   useEffect(() => {
-    //getDadosGerais()
-    getConcessionarias()
+   
   }, []);
 
-  const setOptions = {
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
-
-
+  
   function handleCloseModalAddConcesionaria() {
     setModalAddConssionaria(false);
   }
   function handleModalAddConcesionaria() {
+    setDadosConcessionaria(null)
     setModalAddConssionaria(true);
   }
+
+ 
   function handleOnChange(content) {
     setContent(content);
   }
@@ -140,9 +136,8 @@ export default function Geral({ municipio }: MunicipioProps) {
       });
   }
 
-  async function getConcessionarias() {
+  async function getConcessionarias(ano) {
     const id_municipio = usuario.id_municipio
-    const ano = anoSelected
     const resCad = await api
       .post("get-concessionarias", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
@@ -158,12 +153,54 @@ export default function Geral({ municipio }: MunicipioProps) {
       });
   }
 
+  async function getConcessionaria(id) {
+    
+    const resCad = await api
+      .get("get-concessionaria/"+id)
+      .then((response) => {
+        const res = response.data                
+        setDadosConcessionaria(res[0])
+      })
+      .catch((error) => {
+        toast.notify('Aconteceu o seguinte erro: ', {
+          title: "Erro",
+          duration: 7,
+          type: "error",
+        })
+        console.log(error);
+      });
+  }
+  
+  async function handleModalEditConcesionaria(id) {
+    getConcessionaria(id)
+    setModalAddConssionaria(true);
+  }
   async function handleCadastro(data) {
 
     data.id_geral_da_ae_dh = dadosGeral?.id_geral_da_ae_dh
     data.id_municipio = usuario.id_municipio
     data.ano = anoSelected
-    console.log(data);
+
+    data.OP001_1 = data.OP001_1 ? data.OP001_1 : dadosGeral?.op001_1
+    data.OP001_2 = data.OP001_2 ? data.OP001_2 : dadosGeral?.op001_2
+    data.OP001_3 = data.OP001_3 ? data.OP001_3 : dadosGeral?.op001_3
+
+    data.RI001_1 = data.RI001_1 ? data.RI001_1 : dadosGeral?.ri001_1
+    data.RI001_2 = data.RI001_2 ? data.RI001_2 : dadosGeral?.ri001_2
+    data.RI001_3 = data.RI001_3 ? data.RI001_3 : dadosGeral?.ri001_3
+
+    data.RI002_1 = data.RI002_1 ? data.RI002_1 : dadosGeral?.ri002_1
+    data.RI002_2 = data.RI002_2 ? data.RI002_2 : dadosGeral?.ri002_2
+    data.RI002_3 = data.RI002_3 ? data.RI002_3 : dadosGeral?.ri002_3
+
+    data.RI003_1 = data.RI003_1 ? data.RI003_1 : dadosGeral?.ri003_1
+    data.RI003_2 = data.RI003_2 ? data.RI003_2 : dadosGeral?.ri003_2
+    data.RI003_3 = data.RI003_3 ? data.RI003_3 : dadosGeral?.ri003_3
+
+    data.RI004_1 = data.RI004_1 ? data.RI004_1 : dadosGeral?.ri004_1
+    data.RI004_2 = data.RI004_2 ? data.RI004_2 : dadosGeral?.ri004_2
+    data.RI004_3 = data.RI004_3 ? data.RI004_3 : dadosGeral?.ri004_3
+
 
     const resCad = await api
       .post("create-geral", data)
@@ -186,7 +223,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
   async function handleCadastroConcessionaria(data) {
 
-    data.id_municipio = municipio[0].id_municipio
+    data.id_municipio = usuario.id_municipio
     data.ano = anoSelected
     const resCad = await api
       .post("create-concessionaria", data)
@@ -196,6 +233,7 @@ export default function Geral({ municipio }: MunicipioProps) {
           duration: 7,
           type: "success",
         })
+        getConcessionarias(anoSelected)
       })
       .catch((error) => {
         toast.notify('Aconteceu o seguinte erro: ', {
@@ -209,10 +247,12 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
   function seletcAno(ano: any) {
-
+    setDadosGeral(null);
     setAnoSelected(ano)
-
+    getConcessionarias(ano)
     getDadosGerais(ano)
+    getConcessionarias(ano)
+    
   }
 
   return (
@@ -233,9 +273,14 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <label>Selecione o ano desejado:</label>
                 <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
                   <option >Selecionar</option>
-                  <option value="2022">2022</option>
-                  <option value="2023">2023</option>
+                  <option value="2025">2025</option>
                   <option value="2024">2024</option>
+                  <option value="2023">2023</option>
+                  <option value="2022">2022</option>
+                  <option value="2021">2021</option>
+                  <option value="2020">2020</option>
+                  <option value="2019">2019</option>                  
+                  
                 </select>
               </DivFormConteudo>
             </DivFormEixo>
@@ -806,15 +851,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                           <CheckBox>
                             <input {...register("OP001_1")}
                               type="checkbox"
-                              defaultChecked={dadosGeral?.op001_1 == "true" ? true : false}
+                              defaultChecked={dadosGeral?.op001_1}
                             />
                             <span>Não houve intervenção ou manutenção</span></CheckBox>
                           <CheckBox><input {...register("OP001_2")}
-                            defaultChecked={dadosGeral?.op001_2 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.op001_2}
                             type="checkbox" />
                             <span>Manutenção ou recuperação de sarjetas</span></CheckBox>
                           <CheckBox><input {...register("OP001_3")}
-                            defaultChecked={dadosGeral?.op001_3 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.op001_3}
                             type="checkbox" />
                             <span>Manutenção ou recuperação estrutural</span></CheckBox>
                         </DivChekbox>
@@ -855,16 +900,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI001_1')}
-                            defaultChecked={dadosGeral?.ri001_1 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri001_1}
                             type="checkbox"
                             name="RI001_1" />
                             <span>Não há instituições relacionadas com à gestão de riscos ou respostas a desastres</span></CheckBox>
                           <CheckBox><input {...register('RI001_2')}
-                            defaultChecked={dadosGeral?.ri001_2 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri001_2}
                             type="checkbox" />
                             <span>Unidades de corpos de bombeiros</span></CheckBox>
                           <CheckBox><input {...register('RI001_3')}
-                            defaultChecked={dadosGeral?.ri001_3 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri001_3}
                             type="checkbox" />
                             <span>Coordenação Municipal de Defesa Civil (COMDEC)</span></CheckBox>
                         </DivChekbox>
@@ -886,15 +931,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI002_1')}
-                            defaultChecked={dadosGeral?.ri002_1 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri002_1}
                             type="checkbox" />
                             <span>Nenhuma intervenção ou situação</span></CheckBox>
                           <CheckBox><input {...register('RI002_2')}
-                            defaultChecked={dadosGeral?.ri002_3 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri002_3}
                             type="checkbox" />
                             <span>Barragens</span></CheckBox>
                           <CheckBox><input {...register('RI002_3')}
-                            defaultChecked={dadosGeral?.ri002_3 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri002_3}
                             type="checkbox" />
                             <span>Retificações de cursos de água naturais</span></CheckBox>
                         </DivChekbox>
@@ -916,15 +961,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI003_1')}
-                            defaultChecked={dadosGeral?.ri003_1 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri003_1}
                             type="checkbox" />
                             <span>Nenhum instrumento</span></CheckBox>
                           <CheckBox><input {...register('RI003_2')}
-                            defaultChecked={dadosGeral?.ri003_2 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri003_2}
                             type="checkbox" />
                             <span>Pluviômetro</span></CheckBox>
                           <CheckBox><input {...register('RI003_3')}
-                            defaultChecked={dadosGeral?.ri003_3 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri003_3}
                             type="checkbox" />
                             <span>Pluviógrafo</span></CheckBox>
                         </DivChekbox>
@@ -945,15 +990,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI004_1')}
-                            defaultChecked={dadosGeral?.ri004_1 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri004_1}
                             type="checkbox" />
                             <span>Quantidade chuva por registro auto..</span></CheckBox>
                           <CheckBox><input {...register('RI004_2')}
-                            defaultChecked={dadosGeral?.ri004_2 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri004_2}
                             type="checkbox" />
                             <span>Quantidade chuva por frequência diária</span></CheckBox>
                           <CheckBox><input {...register('RI004_3')}
-                            defaultChecked={dadosGeral?.ri004_3 == "true" ? true : false}
+                            defaultChecked={dadosGeral?.ri004_3}
                             type="checkbox" />
                             <span>Quantidade chuva por frequência hora..</span></CheckBox>
                         </DivChekbox>
@@ -1196,7 +1241,30 @@ export default function Geral({ municipio }: MunicipioProps) {
                             <td>{conc.ano_inicio}</td>
                             <td>{conc.duracao}</td>
                             <td>{conc.vigente}</td>
-                            <td></td>
+                            <td>
+                            <Actions>
+                                  <span>
+                                    <Image style={{ cursor: 'pointer' }}
+                                      onClick={() => handleModalEditConcesionaria(conc.id_concessionaria)}
+                                      title="Editar"
+                                      width={30}
+                                      height={30}
+                                      src={Editar}
+                                      alt=""
+                                    />
+                                  </span>
+                                  <span>
+                                    <Image style={{ cursor: 'pointer' }}
+                                      onClick={() =>('')}
+                                      title="Excluir"
+                                      width={30}
+                                      height={30}
+                                      src={Excluir}
+                                      alt=""
+                                    />
+                                  </span>
+                                </Actions>
+                            </td>
                           </tr>
                         ))
                       }
@@ -1397,12 +1465,15 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody> 
+                        <input type="hidden" {...register('id_concessionaria')} defaultValue={dadosConcessionaria?.id_concessionaria}></input>
                         <tr>
 
                           <td><InputGG>CNPJ da Concessionária</InputGG></td>
-                          <td><InputP><input {...register('cnpj')}
+                          <td><InputP><input 
+                            {...register('cnpj')}
                             defaultValue={dadosConcessionaria?.cnpj}
+                            type="text"
                             onChange={handleOnChange}
                           ></input></InputP></td>
                         </tr>
@@ -1434,7 +1505,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                             defaultValue={dadosConcessionaria?.vigente}
                             onChange={handleOnChange}
                           >
-                            <option value=""></option>
+                            <option >Opções</option>
                             <option value="1">Sim</option>
                             <option value="0">Não</option>
                           </select></InputP></td>
@@ -1444,67 +1515,67 @@ export default function Geral({ municipio }: MunicipioProps) {
                           <td>
                             <DivChekbox>
                               <CheckBox><input {...register('capina_e_rocada')}
-                                defaultValue={dadosConcessionaria?.capina_rocada}
+                                defaultChecked={dadosConcessionaria?.capina_e_rocada}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Capina e roçada</span></CheckBox>
                               <CheckBox><input {...register('coleta_res_construcao_civil')}
-                                defaultValue={dadosConcessionaria?.coleta_construcao_civil}
+                                defaultChecked={dadosConcessionaria?.coleta_res_construcao_civil}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. contrucão civil</span></CheckBox>
                               <CheckBox><input {...register('coteta_res_domiciliar')}
-                                defaultValue={dadosConcessionaria?.coteta_domiciliares}
+                                defaultChecked={dadosConcessionaria?.coteta_res_domiciliar}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. Domiciliar</span></CheckBox>
                               <CheckBox><input {...register('coleta_res_servicos_saude')}
-                                defaultValue={dadosConcessionaria?.coleta_servicos_saude}
+                                defaultChecked={dadosConcessionaria?.coleta_res_servicos_saude}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. dos Serviços da Saúde</span></CheckBox>
                               <CheckBox><input {...register('coleta_res_publico')}
-                                defaultValue={dadosConcessionaria?.coleta_publicos}
+                                defaultChecked={dadosConcessionaria?.coleta_res_publico}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. Público</span></CheckBox>
                               <CheckBox><input {...register('operacao_aterro_sanitario')}
-                                defaultValue={dadosConcessionaria?.operacao_aterro_sanitario}
+                                defaultChecked={dadosConcessionaria?.operacao_aterro_sanitario}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de aterro sanitário</span></CheckBox>
                               <CheckBox><input {...register('operacao_incinerador')}
-                                defaultValue={dadosConcessionaria?.operacao_incinerador}
+                                defaultChecked={dadosConcessionaria?.operacao_incinerador}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de incinerador</span></CheckBox>
                               <CheckBox><input {...register('operacao_outras_unidades_processamento')}
-                                defaultValue={dadosConcessionaria?.operacao_outras_unidades_proc}
+                                defaultChecked={dadosConcessionaria?.operacao_outras_unidades_processamento}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de outras unidades de processamento</span></CheckBox>
                               <CheckBox><input {...register('operacao_unidade_compostagem')}
-                                defaultValue={dadosConcessionaria?.operacao_compostagem}
+                                defaultChecked={dadosConcessionaria?.operacao_unidade_compostagem}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de unidade de compostagem</span></CheckBox>
                               <CheckBox><input {...register('operacao_triagem')}
-                                defaultValue={dadosConcessionaria?.operacao_triagem}
+                                defaultChecked={dadosConcessionaria?.operacao_triagem}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de triagem</span></CheckBox>
                               <CheckBox><input {...register('outros')}
-                                defaultValue={dadosConcessionaria?.outros}
+                                defaultChecked={dadosConcessionaria?.outros}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Outros</span></CheckBox>
                               <CheckBox><input {...register('tipo_desconhecido')}
-                                defaultValue={dadosConcessionaria?.tipo_desconhecido}
+                                defaultChecked={dadosConcessionaria?.tipo_desconhecido}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Tipo desconhecido</span></CheckBox>
                               <CheckBox><input {...register('varricao_logradouros_publicos')}
-                                defaultValue={dadosConcessionaria?.varricao_logradouros_publicos}
+                                defaultChecked={dadosConcessionaria?.varricao_logradouros_publicos}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Varrição de logradouros públicos</span></CheckBox>
@@ -1516,7 +1587,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                           <td><InputP><select {...register('unidade_relacionada')}
                             defaultValue={dadosConcessionaria?.unidade_relacionada}
                             onChange={handleOnChange}>
-                            <option value=""></option>
+                            <option >Opcões</option>
                             <option value="1">Sim</option>
                             <option value="0">Não</option>
                           </select></InputP></td>
@@ -1536,37 +1607,37 @@ export default function Geral({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
+// export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
+//   ctx
+// ) => {
+//   const apiClient = getAPIClient(ctx);
+//   const { ["tedplan.token"]: token } = parseCookies(ctx);
+//   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
 
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
+//   if (!token) {
+//     return {
+//       redirect: {
+//         destination: "/login_indicadores",
+//         permanent: false,
+//       },
+//     };
 
-  }
+//   }
 
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
+//   const resUsuario = await apiClient.get("getUsuario", {
+//     params: { id_usuario: id_usuario },
+//   });
+//   const usuario = await resUsuario.data;
 
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
+//   const res = await apiClient.get("getMunicipio", {
+//     params: { id_municipio: usuario[0].id_municipio },
+//   });
+//   const municipio = await res.data;
 
-  return {
-    props: {
-      municipio,
-    },
-  };
-};
+//   return {
+//     props: {
+//       municipio,
+//     },
+//   };
+// };
 

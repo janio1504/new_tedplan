@@ -20,6 +20,7 @@ import {
   PsImageDireita,
   Ps3ImageEsquerda,
   Ps3ImageDireita,
+  TitlePsOnMouse,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -39,6 +40,7 @@ import Qualidade from "../../img/qualidade.png"
 import Balanco from "../../img/balanco.png"
 import Tarifas from "../../img/tarifas.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { set } from "react-hook-form";
 
 interface IMunicipio {
   id_municipio: string;
@@ -62,11 +64,12 @@ interface MunicipioProps {
 
 
 export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, signOut, isAuthenticated } = useContext(AuthContext);
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
   
   useEffect(() => {
-    getMunicipio()    
+    getMunicipio()  
+  
   }, [municipio]);
 
   async function getMunicipio(){
@@ -124,6 +127,15 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
     Router.push("/indicadores/Manuais");
   }
 
+  const [title, setTitle] = useState("");
+  const [show, setShow] = useState(false);
+
+  const titleOnMouse = (e) => {
+    setTitle(e.target.alt);
+    setShow(true);    
+  };
+  
+
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
@@ -134,47 +146,74 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <ContainerPs>
         <Ps1>
           <PsImage>
-          <Image src={Geral} onClick={handleGeral} alt="Geral" />
+          <Image src={Geral} onClick={handleGeral} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Geral" />
+          {title === 'Geral' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)}
           </PsImage>
         </Ps1>
         <Ps2>
          
           <Ps5>
           <PsImage>
-          <Image src={Financeiro} onClick={handleFinaceiro} alt="Financeiro" />
+          <Image src={Financeiro} onClick={handleFinaceiro} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)}  alt="Financeiro" />
+          {title === 'Financeiro' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)}
           </PsImage>
           </Ps5>
           <PsImageEsquerda>
-            <Image src={Agua} onClick={handleAgua} alt="Agua" />
+            <Image src={Agua} onClick={handleAgua} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Água" />
+            {title === 'Água' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)}
           </PsImageEsquerda>
           <PsImageDireita>
-          <Image src={Residuos} onClick={handleResiduosColeta} alt="Residuos" />            
+          <Image src={Residuos} onClick={handleResiduosColeta} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Residuos" />
+          {title === 'Residuos' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)}            
           </PsImageDireita>
           <Ps3>  
             <Ps3ImageEsquerda>
-            <Image src={Esgoto} onClick={handleEsgoto} alt="Esgoto" />              
+            <Image src={Esgoto} onClick={handleEsgoto} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Esgoto" />
+            {title === 'Esgoto' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)}               
             </Ps3ImageEsquerda>
             <Ps3ImageDireita>
-            <Image src={Drenagem} onClick={handleDrenagem} alt="Drenagem" />
+            <Image src={Drenagem} onClick={handleDrenagem} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Drenagem" />
+            {title === 'Drenagem' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)} 
             </Ps3ImageDireita>    
           </Ps3>          
         </Ps2>
         <Ps1></Ps1>
         <Ps4>
         <Ps3ImageEsquerda>
-              <Image src={Qualidade} onClick={handleQualidade} alt="Qualidade" />
+              <Image src={Qualidade} onClick={handleQualidade} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Qualidade" />
+              {title === 'Qualidade' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)} 
             </Ps3ImageEsquerda>
             <Ps3ImageDireita>
-              <Image src={Balanco} onClick={handleBalanco} alt="Balanco" />
+              <Image src={Balanco} onClick={handleBalanco} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Balanco" />
+              {title === 'Balanco' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)} 
             </Ps3ImageDireita>
         </Ps4>
         <Ps1>
           <PsImage>
-            <Image src={Tarifas} onClick={handleTarifa} alt="Tarifas" />
+            <Image src={Tarifas} onClick={handleTarifa} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Tarifas" />
+            {title === 'Tarifas' && show && (<TitlePsOnMouse>
+          {title}
+          </TitlePsOnMouse>)} 
             </PsImage>
           </Ps1>
       </ContainerPs>
-     
+  
     </Container>
   );
 }

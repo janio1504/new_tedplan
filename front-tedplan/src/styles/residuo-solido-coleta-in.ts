@@ -534,6 +534,7 @@ export const Actions = styled.div`
   display: flex;
   gap: 8px;
   align-items: center;
+  justify-content: center;
 
   button,
   a {
@@ -886,7 +887,7 @@ export const ConteudoModal = styled.div`
 
     th {
       color: #2d3748;
-      padding: 12px 20px; // Aumenta padding horizontal
+      padding: 0px 20px; // Aumenta padding horizontal
       text-align: left;
       font-weight: 600;
       font-size: 14px;
