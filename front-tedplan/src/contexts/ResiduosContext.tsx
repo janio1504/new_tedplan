@@ -18,10 +18,10 @@ interface ResiduosContextData {
   unidadesRss: any[];
   unidadesRsc: any[];
   cooperativas: any[];
-  loadDadosResiduos: (ano) => Promise<void>;
-  loadDadosUnidadesRss: (ano) => Promise<void>;
-  loadDadosUnidadesRsc: (ano) => Promise<void>;
-  loadDadosCooperativasCatadores: (ano) => Promise<void>;
+  loadDadosResiduos: ({ano, id}) => Promise<void>;
+  loadDadosUnidadesRss: ({ano, id}) => Promise<void>;
+  loadDadosUnidadesRsc: ({ano, id}) => Promise<void>;
+  loadDadosCooperativasCatadores: ({ano, id}) => Promise<void>;
   loading: boolean;
   removeUnidadeRss: (id: string) => Promise<any>;
   removeUnidadeRsc: (id: string) => Promise<any>;
@@ -49,12 +49,12 @@ export const ResiduosProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const { usuario } = useAuth();
 
-  const loadDadosResiduos = async (ano) => {
+  const loadDadosResiduos = async ({ano, id}) => {
     if (usuario) {
       try {
         setLoading(true);
         const data = await getPsResiduosColeta(
-          usuario?.id_municipio,
+          id,
           ano
         );
         setDadosResiduos(data);
@@ -66,14 +66,15 @@ export const ResiduosProvider: React.FC = ({ children }) => {
     }
   };
 
-  const loadDadosUnidadesRss = async (ano) => {
+  const loadDadosUnidadesRss = async ({ano, id}) => {
     if (usuario) {
       try {
         setLoading(true);
         const data = await getUnidadesRss(
-          usuario?.id_municipio,
-          new Date().getFullYear()
+          id,
+          ano
         );
+
         setUnidadesRss(data);
       } catch (error) {
         console.error("Erro ao carregar dados de resíduos:", error);
@@ -86,7 +87,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
   const removeUnidadeRss = async (id: string) => {
     try {
       const response = await removerUnidadeRss(id);
-
+   
       if (response.success) {
         //await loadDadosUnidadesRss();
       }
@@ -99,9 +100,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
 
   const createDataUnidadeRss = async (data: any) => {
     try {
-      data.id_municipio = usuario?.id_municipio;
-      data.ano = new Date().getFullYear();
-
+     
       const response = await createUnidadeRss(data);
       if (response.success) {
         //await loadDadosUnidadesRss();
@@ -120,7 +119,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
 
       const response = await createUnidadeRsc(data);
       if (response.success) {
-        await loadDadosUnidadesRsc();
+        //await loadDadosUnidadesRsc();
       }
       return response;
     } catch (error) {
@@ -128,13 +127,13 @@ export const ResiduosProvider: React.FC = ({ children }) => {
       return { success: false, message: "Erro inesperado ao criar unidade" };
     }
   };
-  const loadDadosUnidadesRsc = async () => {
+  const loadDadosUnidadesRsc = async ({ano, id}) => {
     if (usuario) {
       try {
         setLoading(true);
         const data = await getUnidadesRsc(
-          usuario?.id_municipio,
-          new Date().getFullYear()
+          id,
+          ano
         );
         setUnidadesRsc(data);
       } catch (error) {
@@ -150,7 +149,7 @@ export const ResiduosProvider: React.FC = ({ children }) => {
       const response = await removerUnidadeRsc(id);
 
       if (response.success) {
-        await loadDadosUnidadesRsc();
+        //await loadDadosUnidadesRsc();
       }
       return response;
     } catch (error) {
@@ -163,13 +162,13 @@ export const ResiduosProvider: React.FC = ({ children }) => {
   };
 
   // =============================================================================
-  const loadDadosCooperativasCatadores = async (ano) => {
+  const loadDadosCooperativasCatadores = async ({ano, id}) => {
     if (usuario) {
       try {
         setLoading(true);
         const data = await getCooperativasCatadores(
-          usuario?.id_municipio,
-          new Date().getFullYear()
+          id,
+          ano
         );
         setCooperativas(data);
       } catch (error) {

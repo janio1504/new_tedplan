@@ -5,6 +5,7 @@ class ConcessionariaController {
 
   async getConcessionarias({ request }){
     const dados = request.all()
+    
     try {
       const res = await Concessioraria.query()
       .from('tedplan.concessionarias')
@@ -20,7 +21,7 @@ class ConcessionariaController {
   }
 
   async getConcessionaria({ params }){
-
+    
     try {
       const res = await Concessioraria.query()
       .from('tedplan.concessionarias')
@@ -35,6 +36,8 @@ class ConcessionariaController {
 
   async store({ request }){
     const dados = request.all()
+    console.log(dados);
+    
     try {
       if(!dados.id_concessionaria){
         const res = await Concessioraria.query()
@@ -63,8 +66,8 @@ class ConcessionariaController {
         })
       }else{
         const res = await Concessioraria.query()
-        .from('tedpla.concessionarias')
-        .where('id_municipio', dados.id_municipio)
+        .from('tedplan.concessionarias')
+        .where('id_concessionaria', dados.id_concessionaria)
         .fetch()
 
         const rc = res.toJSON()[0]

@@ -4,11 +4,12 @@ const PsFinanceiro = use('App/Models/PsFinanceiro')
 class PsQuantResiduosRecebidoController {
 
   async getResiduosRecebidos({ request }){
-    const { id_municipio, ano } = request.all()
+    const { ano } = request.all()
     const res = await PsFinanceiro.query()
-    .from('tedplan.quant_residuos_recebidos')
-    .where('id_municipio', id_municipio)
-    .where('ano', ano)
+    .from('tedplan.quant_residuos_recebidos as qrr')
+    .select('m.nome as nome_municipio','qrr.*')
+    .innerJoin('tedplan.municipios as m', 'qrr.id_municipio', 'm.id_municipio')
+    .where('qrr.ano', ano)
     .fetch()
 
     return res
