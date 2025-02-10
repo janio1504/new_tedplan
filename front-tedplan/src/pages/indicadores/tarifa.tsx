@@ -117,7 +117,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {  
     
     data.id_tarifa = dadosTarifa?.id_tarifa
-    data.id_municipio = municipio[0].id_municipio
+    data.id_municipio = usuario.id_municipio
     data.ano = new Date().getFullYear()  
     const resCad = await api
       .post("create-tarifa", data)
@@ -138,7 +138,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   async function getDadosTarifa() {  
     
     
-    const id_municipio = municipio[0].id_municipio
+    const id_municipio = usuario.id_municipio
     const ano = new Date().getFullYear()  
     const res = await api
       .post("get-tarifa", {id_municipio: id_municipio, ano: ano})

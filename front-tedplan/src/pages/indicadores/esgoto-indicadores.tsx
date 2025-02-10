@@ -94,7 +94,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {  
     
     data.id_esgoto = dadosEsgoto?.id_esgoto
-    data.id_municipio = municipio[0].id_municipio
+    data.id_municipio = usuario.id_municipio
     data.ano = anoSelected  
     const resCad = await api
       .post("create-esgoto", data)
@@ -118,7 +118,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function getDadosEsgoto(ano: any) {  
-    const id_municipio = municipio[0].id_municipio
+    const id_municipio = usuario.id_municipio
      
     const res = await api
       .post("get-esgoto-por-ano", {id_municipio: id_municipio, ano: ano})
@@ -155,7 +155,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={''}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -436,37 +436,37 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
+// export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
+//   ctx
+// ) => {
+//   const apiClient = getAPIClient(ctx);
+//   const { ["tedplan.token"]: token } = parseCookies(ctx);
+//   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
  
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
+//   if (!token) {
+//     return {
+//       redirect: {
+//         destination: "/login_indicadores",
+//         permanent: false,
+//       },
+//     };
+//   }
 
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
+//   const resUsuario = await apiClient.get("getUsuario", {
+//     params: { id_usuario: id_usuario },
+//   });
+//   const usuario = await resUsuario.data;
 
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
+//   const res = await apiClient.get("getMunicipio", {
+//     params: { id_municipio: usuario[0].id_municipio },
+//   });
+//   const municipio = await res.data;
 
-  return {
-    props: {
-      municipio,
-    },
-  };
-};
+//   return {
+//     props: {
+//       municipio,
+//     },
+//   };
+// };
 
 
