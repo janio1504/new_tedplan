@@ -122,7 +122,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {  
     
     data.id_qualidade = dadosQualidade?.id_qualidade
-    data.id_municipio = municipio[0].id_municipio
+    data.id_municipio = usuario.id_municipio
     data.ano = new Date().getFullYear()  
     const resCad = await api
       .post("create-qualidade", data)
@@ -141,7 +141,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   async function getDadosQualidade() {  
-    const id_municipio = municipio[0].id_municipio
+    const id_municipio = usuario.id_municipio
     const ano = new Date().getFullYear()  
     const res = await api
       .post("get-qualidade", {id_municipio: id_municipio, ano: ano})
@@ -175,7 +175,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={''}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -648,36 +648,36 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
+// export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
+//   ctx
+// ) => {
+//   const apiClient = getAPIClient(ctx);
+//   const { ["tedplan.token"]: token } = parseCookies(ctx);
+//   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
  
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
+//   if (!token) {
+//     return {
+//       redirect: {
+//         destination: "/login_indicadores",
+//         permanent: false,
+//       },
+//     };
+//   }
 
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
+//   const resUsuario = await apiClient.get("getUsuario", {
+//     params: { id_usuario: id_usuario },
+//   });
+//   const usuario = await resUsuario.data;
 
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
+//   const res = await apiClient.get("getMunicipio", {
+//     params: { id_municipio: usuario[0].id_municipio },
+//   });
+//   const municipio = await res.data;
 
-  return {
-    props: {
-      municipio,
-    },
-  };
-};
+//   return {
+//     props: {
+//       municipio,
+//     },
+//   };
+// };
 

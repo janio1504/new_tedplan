@@ -103,8 +103,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   
   async function handleCadastro(data) {   
     data.id_drenagem_aguas_pluviais = dadosDrenagem?.id_drenagem_aguas_pluviais
-    console.log(data)
-    data.id_municipio = municipio[0].id_municipio
+   
+    data.id_municipio = usuario.id_municipio
     data.ano = new Date().getFullYear()     
     
     const resCad = await api
@@ -128,7 +128,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function getDadosDrenagem() {  
-    const id_municipio = municipio[0].id_municipio
+    const id_municipio = usuario.id_municipio
     const ano = new Date().getFullYear()  
     
     
@@ -163,7 +163,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={''}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
