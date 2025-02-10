@@ -4,9 +4,7 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivCenter,
   DivForm,
-  DivTituloForm,
   DivInput,
   Form,
   InputP,
@@ -22,7 +20,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -30,6 +27,22 @@ import {
   InputXL,
   DivTituloFormDrenagem,
 } from "../../styles/financeiro";
+
+import {
+  DivCenter,
+  DivFormCadastro,
+  DivTituloForm,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";
@@ -40,8 +53,14 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { log } from "console";
+import { 
+  Sidebar, 
+  SidebarItem } from "../../styles/residuo-solidos-in";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
+import { MainContent } from "../../styles/indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -62,7 +81,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     reset,
     formState: { errors },
   } = useForm();
-
+  const [activeForm, setActiveForm] = useState("ViasUrbanas");
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [content, setContent] = useState("");
   
@@ -145,20 +164,49 @@ export default function Drenagem({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
-            <DivTituloFormDrenagem>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <SidebarItem
+          active={activeForm === "ViasUrbanas"}
+          onClick={() => setActiveForm("ViasUrbanas")}
+        >
+          Vias Urbanas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "CursosAguas"}
+          onClick={() => setActiveForm("CursosAguas")}
+        >
+          Cursos d'água - áreas urbanas
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observaçoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações, esclarecimentos e sugestões
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "eventosHidrologicos"}
+          onClick={() => setActiveForm("eventosHidrologicos")}
+        >
+          Eventos hidrológicos
+        </SidebarItem>
+        
+      </Sidebar>
+      <MainContent>
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <DivForm>
+              <DivTituloFormDrenagem>
               Drenagem e Águas Pluviais
             </DivTituloFormDrenagem>
 
-            <DivFormConteudo>
+            
+            <DivFormConteudo active={activeForm === "ViasUrbanas"}>
               <DivTitulo>
                 <DivTituloConteudo>Vias urbanas</DivTituloConteudo>
               </DivTitulo>
               <InputSNIS>
-                <label><b>Código SNIS</b></label>
+                <th><b>Código SNIS</b></th>
                 <p>IE017</p>
                 <p>IE018</p>
                 <p>IE019</p>
@@ -174,7 +222,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 <p>IE029</p>
               </InputSNIS>
               <InputXL>
-                <label><b>Descrição</b></label>
+                <th><b>Descrição</b></th>
                 <p>Extensão total das vias públicas urbanas</p>
                 <p>Extensão total das vias públicas urbanas implantadas</p>
                 <p>
@@ -305,7 +353,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputSNIS>
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "CursosAguas"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Cursos d’água - áreas urbanas
@@ -440,7 +488,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputSNIS>
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "observacoes"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Observações, esclarecimentos ou sugestões
@@ -467,7 +515,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               </InputGG>
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "eventosHidrologicos"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Eventos hidrológicos impactantes
@@ -638,6 +686,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }

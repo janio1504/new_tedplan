@@ -6,7 +6,7 @@ export const Container = styled.div`
   height: 100%;
   max-width: 100%;
   background-color: none;
-  
+
   max-height: 100%;
   padding: 0;
   margin: 0;
@@ -56,12 +56,11 @@ export const IconeColeta = styled.div`
     object-fit: contain;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     transform-origin: center;
-    
   }
 
   @media (max-width: 1200px) {
     width: 160px;
-    
+
     img {
       width: 90px;
       height: 90px;
@@ -72,7 +71,7 @@ export const IconeColeta = styled.div`
     width: 140px;
     padding: 12px;
     margin: 8px;
-    
+
     img {
       width: 80px;
       height: 80px;
@@ -176,7 +175,7 @@ export const DivCenter = styled.div`
   max-width: 75%;
   width: 100%;
   height: 100%;
-  
+
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -184,13 +183,6 @@ export const DivCenter = styled.div`
   padding: 0px;
   display: flex;
 `;
-
-
-
-
-
- 
-
 
 export const MenuMunicipio = styled.div`
   justify-content: center;
@@ -246,22 +238,18 @@ export const MunicipioDireita = styled.div`
   font-weight: bold;
 `;
 export const ContainerPs = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;  
-    margin: 50px 0; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 50px 0;
 `;
-
-
-
-
 
 export const BotaoResiduos = styled.div`
   width: 150px;
   text-align: center;
   margin-top: 10px;
-  background-color: #42895B;
+  background-color: #42895b;
   font-size: 16px;
   color: #fff;
   border-radius: 8px;
@@ -271,24 +259,153 @@ export const BotaoResiduos = styled.div`
   box-shadow: 0 2px 4px rgba(66, 137, 91, 0.2);
 `;
 
+export const DivFormConteudo = styled.div`
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 1200px;
+  color: #333;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+`;
+
+export const DivTitulo = styled.div`
+  width: 100%;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #0085bd;
+  padding-bottom: 12px;
+`;
+
+export const DivTituloConteudo = styled.div`
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #0085bd;
+`;
+
+export const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+
+  label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 4px;
+  }
+
+  select,
+  input,
+  textarea {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    background: #fff;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: #0085bd;
+      box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+    }
+
+    &:disabled {
+      background: #f7fafc;
+      cursor: not-allowed;
+    }
+  }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+`;
+
+export const DivSeparadora = styled.div`
+  width: 100%;
+  height: 1px;
+  background: #e2e8f0;
+  margin: 24px 0;
+`;
+
+export const DivFormResiduo = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+`;
+
+export const DivFormRe = styled.div`
+  background: #f8fafc;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+`;
+
+export const DivTituloFormResiduo = styled.div`
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #0085bd;
+`;
+
+export const SelectAnoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+
+  label {
+    font-weight: 500;
+    color: #4a5568;
+  }
+
+  select {
+    padding: 8px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 14px;
+    min-width: 120px;
+    background: #fff;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: #0085bd;
+      box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+    }
+  }
+`;
+
 export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
-  
+
   text-align: left;
   padding: 10px 8px 10px 10px;
   border: solid #008080 2px;
   border-radius: 5px;
   margin-top: 50px;
   color: #fff;
-  table{
+  table {
     display: flex;
     justify-content: left;
   }
 `;
-
-
 
 export const DivTituloForm = styled.div`
   width: 100%;
@@ -300,23 +417,22 @@ export const DivTituloForm = styled.div`
   font-weight: bolder;
 `;
 
-
 export const Tabela = styled.div`
-
   width: 100%;
   margin-bottom: 30px;
   overflow: hidden;
   border-radius: 12px;
   background: #fff;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   table {
     width: 100%;
-    
+
     border-collapse: separate;
     border-spacing: 0;
     min-width: 600px;
-    
+
     th {
       background: #0085bd;
       color: #fff;
@@ -329,11 +445,11 @@ export const Tabela = styled.div`
       position: sticky;
       top: 0;
       z-index: 10;
-      
+
       &:first-child {
         padding-left: 24px;
       }
-      
+
       &:last-child {
         padding-right: 24px;
       }
@@ -351,36 +467,36 @@ export const Tabela = styled.div`
         padding-left: 24px;
         font-weight: 500;
       }
-      
+
       &:last-child {
         padding-right: 24px;
       }
 
       &.status {
         font-weight: 500;
-        
+
         &.active {
           color: #059669;
         }
-        
+
         &.inactive {
           color: #dc2626;
         }
-        
+
         &.pending {
           color: #d97706;
         }
       }
 
       &.numeric {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: "IBM Plex Mono", monospace;
         text-align: right;
       }
     }
 
     tr {
       transition: all 0.2s ease;
-      
+
       &:hover td {
         background: #f8fafc;
       }
@@ -394,19 +510,19 @@ export const Tabela = styled.div`
   .table-container {
     overflow-x: auto;
     margin: 0 -1px;
-    
+
     &::-webkit-scrollbar {
       height: 8px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f5f9;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: #cbd5e0;
       border-radius: 4px;
-      
+
       &:hover {
         background: #94a3b8;
       }
@@ -420,7 +536,8 @@ export const Actions = styled.div`
   align-items: center;
   justify-content: center;
 
-  button, a {
+  button,
+  a {
     padding: 8px 12px;
     border-radius: 6px;
     border: none;
@@ -431,7 +548,7 @@ export const Actions = styled.div`
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    
+
     &:focus {
       outline: none;
       box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
@@ -446,12 +563,12 @@ export const Actions = styled.div`
   .edit {
     background: #008080;
     color: white;
-    
+
     &:hover {
       background: #006666;
       transform: translateY(-1px);
     }
-    
+
     &:active {
       transform: translateY(0);
     }
@@ -461,13 +578,13 @@ export const Actions = styled.div`
     background: #fff;
     color: #dc2626;
     border: 1px solid #dc2626;
-    
+
     &:hover {
       background: #dc2626;
       color: #fff;
       transform: translateY(-1px);
     }
-    
+
     &:active {
       transform: translateY(0);
     }
@@ -477,13 +594,13 @@ export const Actions = styled.div`
     background: #fff;
     color: #3182ce;
     border: 1px solid #3182ce;
-    
+
     &:hover {
       background: #3182ce;
       color: #fff;
       transform: translateY(-1px);
     }
-    
+
     &:active {
       transform: translateY(0);
     }
@@ -492,7 +609,8 @@ export const Actions = styled.div`
   @media (max-width: 768px) {
     gap: 6px;
 
-    button, a {
+    button,
+    a {
       padding: 6px 10px;
       font-size: 13px;
 
@@ -504,22 +622,22 @@ export const Actions = styled.div`
   }
 `;
 
-export const DivBotaoAdicionar= styled.div`
-   width: 100%;
-   float: left;
-   margin-bottom: 10px;
-  
-   span{
-      padding: 10px;
-      background:  #2dd9d0;
-      color: #008080;
-      font-weight: bolder;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 70px;
-      float: right;
-      margin-right: 30px;
-    }
+export const DivBotaoAdicionar = styled.div`
+  width: 100%;
+  float: left;
+  margin-bottom: 10px;
+
+  span {
+    padding: 10px;
+    background: #2dd9d0;
+    color: #008080;
+    font-weight: bolder;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 70px;
+    float: right;
+    margin-right: 30px;
+  }
 `;
 
 export const SubmitButton = styled.button`
@@ -568,7 +686,6 @@ export const DivInput = styled.div`
 `;
 
 export const InputP = styled.div`
-  
   flex-direction: column;
   display: flex;
   width: 150px;
@@ -580,7 +697,6 @@ export const InputP = styled.div`
 `;
 
 export const InputM = styled.div`
-  
   flex-direction: column;
   display: flex;
   width: 350px;
@@ -591,7 +707,6 @@ export const InputM = styled.div`
 `;
 
 export const InputG = styled.div`
-  
   flex-direction: column;
   display: flex;
   width: 500px;
@@ -601,7 +716,7 @@ export const InputG = styled.div`
   }
 `;
 
-export const DivEixo = styled.div`  
+export const DivEixo = styled.div`
   flex-direction: row;
   margin: 10px;
   display: flex;
@@ -620,16 +735,13 @@ export const DivEixo = styled.div`
   }
 `;
 
-
-
 export const DivBotao = styled.div`
- float: left;
+  float: left;
   flex-direction: row;
-  display:flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 `;
-
 
 const fadeIn = keyframes`
   from {
@@ -651,7 +763,6 @@ const slideUp = keyframes`
   }
 `;
 
-
 export const ContainerModal = styled.div`
   position: fixed;
   top: 0;
@@ -665,7 +776,7 @@ export const ContainerModal = styled.div`
   overflow-y: auto;
   padding: 20px;
   z-index: 1000;
-  color: #FFFF;
+  color: #ffff;
   animation: ${fadeIn} 0.3s ease;
 `;
 
@@ -701,7 +812,7 @@ export const ModalForm = styled(Modal)`
   &::-webkit-scrollbar-thumb {
     background: #cbd5e0;
     border-radius: 4px;
-    
+
     &:hover {
       background: #a0aec0;
     }
@@ -710,13 +821,13 @@ export const ModalForm = styled(Modal)`
 
 export const ModalFormUnidade = styled(ModalForm)`
   padding: 0;
-  
+
   .modal-header {
-    background: #1CAECC;
+    background: #1caecc;
     padding: 24px 32px;
     border-radius: 16px 16px 0 0;
     position: relative;
-    
+
     h2 {
       color: white;
       margin: 0;
@@ -729,7 +840,6 @@ export const ModalFormUnidade = styled(ModalForm)`
   }
 `;
 
-
 export const ConteudoModal = styled.div`
   width: 100%;
   color: #4a5568;
@@ -739,7 +849,7 @@ export const ConteudoModal = styled.div`
   border-radius: 16px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.1);
   position: relative;
-  
+
   .modal-header {
     display: flex;
     justify-content: space-between;
@@ -786,7 +896,7 @@ export const ConteudoModal = styled.div`
 
     td {
       padding: 8px 20px; // Aumenta padding horizontal
-      
+
       input {
         width: 90%; // Reduz largura para não ficar colado
         padding: 8px 12px;
@@ -848,20 +958,20 @@ export const ConteudoModal = styled.div`
       display: block;
       overflow-x: auto;
       white-space: nowrap;
-      
+
       &::-webkit-scrollbar {
         height: 8px;
       }
-      
+
       &::-webkit-scrollbar-track {
         background: #f1f5f9;
         border-radius: 4px;
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background: #cbd5e0;
         border-radius: 4px;
-        
+
         &:hover {
           background: #94a3b8;
         }
@@ -882,15 +992,16 @@ export const TabelaModal = styled.div`
   overflow: hidden;
   border-radius: 12px;
   background: #fff;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   table {
     width: 100%;
-    
+
     border-collapse: separate;
     border-spacing: 0;
     min-width: 600px;
-    
+
     th {
       background: #0085bd;
       color: #fff;
@@ -903,11 +1014,11 @@ export const TabelaModal = styled.div`
       position: sticky;
       top: 0;
       z-index: 10;
-      
+
       &:first-child {
         padding-left: 24px;
       }
-      
+
       &:last-child {
         padding-right: 24px;
       }
@@ -925,36 +1036,36 @@ export const TabelaModal = styled.div`
         padding-left: 24px;
         font-weight: 500;
       }
-      
+
       &:last-child {
         padding-right: 24px;
       }
 
       &.status {
         font-weight: 500;
-        
+
         &.active {
           color: #059669;
         }
-        
+
         &.inactive {
           color: #dc2626;
         }
-        
+
         &.pending {
           color: #d97706;
         }
       }
 
       &.numeric {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: "IBM Plex Mono", monospace;
         text-align: right;
       }
     }
 
     tr {
       transition: all 0.2s ease;
-      
+
       &:hover td {
         background: #f8fafc;
       }
@@ -968,26 +1079,25 @@ export const TabelaModal = styled.div`
   .table-container {
     overflow-x: auto;
     margin: 0 -1px;
-    
+
     &::-webkit-scrollbar {
       height: 8px;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f5f9;
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: #cbd5e0;
       border-radius: 4px;
-      
+
       &:hover {
         background: #94a3b8;
       }
     }
   }
 `;
-
 
 export const CloseModalButton = styled.button`
   position: absolute;
@@ -1023,10 +1133,10 @@ export const CloseModalButton = styled.button`
     position: relative;
     width: 16px;
     height: 16px;
-    
+
     &::before,
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       width: 16px;
       height: 2px;
@@ -1045,23 +1155,19 @@ export const CloseModalButton = styled.button`
   }
 `;
 
-
-
-
-
 export const StepperButton = styled.button<{ secondary?: boolean }>`
   padding: 10px;
   width: 70px;
   border: none;
   border-radius: 5px;
-  background: ${props => props.secondary ? '#fff' : '#2dd9d0'};
-  color: ${props => props.secondary ? '#667778' : '#008080'};
+  background: ${(props) => (props.secondary ? "#fff" : "#2dd9d0")};
+  color: ${(props) => (props.secondary ? "#667778" : "#008080")};
   cursor: pointer;
   font-weight: bolder;
   font-size: 14px;
   text-align: center;
   margin: 0 10px;
-  border: ${props => props.secondary ? '1px solid #e2e8f0' : 'none'};
+  border: ${(props) => (props.secondary ? "1px solid #e2e8f0" : "none")};
 
   &:disabled {
     background: #e2e8f0;
@@ -1076,24 +1182,22 @@ export const StepperButton = styled.button<{ secondary?: boolean }>`
   }
 `;
 
-export const ModalStepButton = styled.div<{ active?: boolean; completed?: boolean }>`
+export const ModalStepButton = styled.div<{
+  active?: boolean;
+  completed?: boolean;
+}>`
   width: 35px;
   height: 35px;
   border-radius: 50%;
-  background-color: ${props => 
-    props.completed ? '#1CAECC' : 
-    props.active ? '#2dd9d0' : 
-    '#fff'};
-  border: 2px solid ${props => 
-    props.completed ? '#1CAECC' : 
-    props.active ? '#2dd9d0' : 
-    '#e2e8f0'};
+  background-color: ${(props) =>
+    props.completed ? "#1CAECC" : props.active ? "#2dd9d0" : "#fff"};
+  border: 2px solid
+    ${(props) =>
+      props.completed ? "#1CAECC" : props.active ? "#2dd9d0" : "#e2e8f0"};
   display: flex;
   justify-content: center;
   align-items: center;
-  color: ${props => 
-    props.completed || props.active ? '#fff' : 
-    '#4a5568'};
+  color: ${(props) => (props.completed || props.active ? "#fff" : "#4a5568")};
   font-weight: 600;
   font-size: 16px;
   margin: 0 15px;
@@ -1101,16 +1205,15 @@ export const ModalStepButton = styled.div<{ active?: boolean; completed?: boolea
   position: relative;
   z-index: 2;
   transition: all 0.3s ease;
-  box-shadow: ${props =>
-    props.active ? '0 0 0 4px rgba(45, 217, 208, 0.2)' : 'none'};
+  box-shadow: ${(props) =>
+    props.active ? "0 0 0 4px rgba(45, 217, 208, 0.2)" : "none"};
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     width: 30px;
     height: 2px;
-    background: ${props => 
-      props.completed ? '#1CAECC' : '#e2e8f0'};
+    background: ${(props) => (props.completed ? "#1CAECC" : "#e2e8f0")};
     left: -30px;
     top: 50%;
     transform: translateY(-50%);
@@ -1142,7 +1245,7 @@ export const ModalStepperWrapper = styled.div`
   margin: 0 auto;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     background: #e2e8f0;
     height: 2px;
@@ -1154,16 +1257,15 @@ export const ModalStepperWrapper = styled.div`
   }
 `;
 
-
 export const ModalStepLabel = styled.div<{ active?: boolean }>`
   position: absolute;
   bottom: -25px;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
-  color: ${props => props.active ? '#1CAECC' : '#4a5568'};
+  color: ${(props) => (props.active ? "#1CAECC" : "#4a5568")};
   font-size: 14px;
-  font-weight: ${props => props.active ? '600' : '500'};
+  font-weight: ${(props) => (props.active ? "600" : "500")};
   width: 120px;
   white-space: nowrap;
   transition: all 0.3s ease;
@@ -1177,20 +1279,40 @@ export const ModalStepLabel = styled.div<{ active?: boolean }>`
 
 export const ModalStepperNavigation = styled.div`
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 12px;
-  margin-top: 24px;
-  padding: 16px 24px;
-  border-top: 1px solid #e2e8f0;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 50px;
+  padding: 20px;
   width: 100%;
-  background: #fff;
-  /* position: sticky;
-  bottom: 0;  Com isso, a barra vai se mover, sem isso fica parada */
-  
-  @media (max-width: 768px) {
-    padding: 12px 16px;
-    gap: 8px;
+  background-color: white;
+  border-top: 1px solid #eee;
+
+  button {
+    padding: 10px 30px;
+    border: none;
+    border-radius: 4px;
+    background-color: #42895b;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-weight: bold;
+    min-width: 120px;
+
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      background-color: #357048;
+    }
+
+    &[type="submit"] {
+      background-color: #2196f3;
+      &:hover {
+        background-color: #1976d2;
+      }
+    }
   }
 `;
 
@@ -1199,21 +1321,21 @@ export const ModalStepperButton = styled.button<{ secondary?: boolean }>`
   min-width: 100px;
   border: none;
   border-radius: 6px;
-  background: ${props => props.secondary ? '#fff' : '#2dd9d0'};
-  color: ${props => props.secondary ? '#4a5568' : '#008080'};
+  background: ${(props) => (props.secondary ? "#fff" : "#2dd9d0")};
+  color: ${(props) => (props.secondary ? "#4a5568" : "#008080")};
   cursor: pointer;
   font-weight: 500;
   font-size: 14px;
   text-align: center;
   transition: all 0.2s ease;
-  border: ${props => props.secondary ? '1.5px solid #e2e8f0' : 'none'};
+  border: ${(props) => (props.secondary ? "1.5px solid #e2e8f0" : "none")};
   display: flex;
   align-items: center;
   justify-content: center;
 
   &:hover {
-    background: ${props => props.secondary ? '#f7fafc' : '#20c9c0'};
-    border-color: ${props => props.secondary ? '#cbd5e0' : 'none'};
+    background: ${(props) => (props.secondary ? "#f7fafc" : "#20c9c0")};
+    border-color: ${(props) => (props.secondary ? "#cbd5e0" : "none")};
   }
 
   &:disabled {
@@ -1238,19 +1360,20 @@ export const ModalStepperContainer = styled.div`
   margin-left: -50px;
 
   @media (min-width: 1600px) {
-    max-width: 1200px; 
+    max-width: 1200px;
     margin: 0 auto;
     padding: 24px 48px;
   }
 
   @media (min-width: 1920px) {
-    max-width: 1400px; 
+    max-width: 1400px;
   }
 `;
 
 export const ModalStepContent = styled.div<{ active?: boolean }>`
-  display: ${props => props.active ? 'block' : 'none'};
+  display: ${(props) => (props.active ? "block" : "none")};
   width: 100%;
+  margin-bottom: 60px;
 
   @media (min-width: 1600px) {
     max-width: 1200px;
@@ -1260,4 +1383,142 @@ export const ModalStepContent = styled.div<{ active?: boolean }>`
   @media (min-width: 1920px) {
     max-width: 1400px;
   }
+`;
+
+export const SidebarItem = styled.div<{ active?: boolean }>`
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  background-color: ${(props) => (props.active ? "#0085bd" : "transparent")};
+  color: ${(props) => (props.active ? "white" : "#333")};
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#0073a3" : "#e0e0e0")};
+    border-left-color: #0085bd;
+  }
+
+  &:active {
+    transform: translateX(2px);
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const SidebarTitle = styled.h2`
+  font-size: 1.25rem;
+  color: #333;
+  margin: 0.5rem 0;
+  padding: 0 0.5rem 0.5rem;
+  border-bottom: 2px solid #ffff;
+`;
+
+export const SidebarSection = styled.div`
+  margin-bottom: 2px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const Sidebar = styled.div`
+  width: 250px;
+  background-color: #f0f0f0;
+  padding: 1rem;
+  bottom: -600px;
+  position: absolute;
+  left: 0;
+  top: 246px;
+  overflow-y: auto;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+  }
+`;
+
+export const MainContent = styled.div`
+  margin-left: 270px; // Para dar espaço para a sidebar
+  padding: 20px;
+  width: calc(100% - 270px);
+`;
+
+export const StepperContainer = styled.div`
+  width: 100%;
+  margin-bottom: 30px;
+`;
+
+export const StepperWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 120px;
+  margin: 20px auto;
+  width: 50%;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    background: #ddd;
+    height: 2px;
+    width: 70%;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 15%;
+    z-index: 1;
+  }
+`;
+
+export const StepButton = styled.div<{ active?: boolean; completed?: boolean }>`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: ${(props) =>
+    props.completed ? "#008080" : props.active ? "#2dd9d0" : "#fff"};
+  border: 2px solid
+    ${(props) =>
+      props.completed ? "#008080" : props.active ? "#2dd9d0" : "#ddd"};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: ${(props) => (props.completed || props.active ? "#fff" : "#666")};
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+  cursor: pointer;
+  transition: all 0.3s ease;
+`;
+
+export const StepLabel = styled.div<{ active?: boolean }>`
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  color: ${(props) => (props.active ? "#008080" : "#666")};
+  font-size: 14px;
+  font-weight: ${(props) => (props.active ? "bold" : "normal")};
+  width: 90px;
+`;
+
+export const StepContent = styled.div<{ active?: boolean }>`
+  display: ${(props) => (props.active ? "block" : "none")};
+  margin-top: 20px;
+  margin-bottom: 60px;
 `;

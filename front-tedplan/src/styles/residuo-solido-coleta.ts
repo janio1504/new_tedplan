@@ -958,3 +958,198 @@ export const FormGroup = styled.div`
     margin-top: 4px;
   }
 `;
+
+
+
+export const DivFormConteudoAno = styled.div`
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  width: 100%;
+
+  background: #fff;
+
+  border-radius: 8px;
+
+  padding: 24px;
+
+  margin-bottom: 20px;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+`;
+
+
+
+export const DivTituloAno = styled.div`
+
+  width: 100%;
+
+  text-align: center;
+
+  margin-bottom: 24px;
+
+`;
+
+
+
+export const DivTituloConteudoAno = styled.div`
+
+  font-size: 20px;
+
+  font-weight: bold;
+
+  color: #333;
+
+  padding: 10px 0;
+
+`;
+
+
+
+export const InputPAno = styled.div`
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  width: 100%;
+
+  max-width: 500px;
+
+  margin: 0 auto;
+
+
+
+  label {
+
+    margin-bottom: 10px;
+
+    font-weight: 500;
+
+    color: #333;
+
+  }
+
+
+
+  select {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border-radius: 4px;
+
+    border: 1px solid #ddd;
+
+    background: #fff;
+
+    margin-bottom: 15px;
+
+    font-size: 16px;
+
+
+
+    &:focus {
+
+      border-color: #2684ff;
+
+      box-shadow: 0 0 0 1px #2684ff;
+
+    }
+
+  }
+
+
+
+  option {
+
+    padding: 8px;
+
+  }
+
+`;
+
+export const SelectAnoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 30px auto;
+  width: 100%;
+  max-width: 300px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  label {
+    color: #666;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background-color: white;
+    color: #4a5568;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234A5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+    text-align: center;
+    text-align-last: center;
+
+    &:hover {
+      border-color: #CBD5E0;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #1CAECC;
+      box-shadow: 0 0 0 3px rgba(28, 174, 204, 0.1);
+    }
+
+    option {
+      padding: 12px;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    &::-ms-expand {
+      display: none;
+    }
+  }
+
+  @media (max-width: 768px) {
+    width: 90%;
+    margin: 20px auto;
+    padding: 15px;
+
+    select {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+  }
+`;

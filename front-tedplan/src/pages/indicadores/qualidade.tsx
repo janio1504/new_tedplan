@@ -3,26 +3,16 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import {
-  Container,
-  DivCenter,
-  DivForm,
-  DivTituloForm,
+
   DivInput,
-  Form,
   InputP,
   InputM,
-  InputG,
-  SubmitButton,
-  DivEixo,
-  TextArea,
-  DivTextArea,
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -33,6 +23,30 @@ import {
   DivBorder,
   LabelCenter,
 } from "../../styles/financeiro";
+
+
+import {
+  Container,
+  DivCenter,
+  DivForm,
+  DivFormCadastro,
+  DivTituloForm,
+  Form,
+  InputG,
+  SubmitButton,
+  DivEixo,
+  TextArea,
+  DivTextArea,
+  StepButton,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepperButton,
+} from "../../styles/esgoto-indicadores";
+
+
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 import "suneditor/dist/css/suneditor.min.css";
@@ -41,6 +55,7 @@ import MenuIndicadores from "../../components/MenuIndicadores";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { AuthContext } from "../../contexts/AuthContext";
 import CurrencyInput from "react-currency-masked-input";
 import {
@@ -54,6 +69,12 @@ import {
   DivBotaoAdicionar,
 } from "../../styles/indicadores";
 import api from "../../services/api";
+import { DivFormConteudo } from "../../styles/drenagem-indicadores";
+
+import { MainContent } from "../../styles/indicadores";
+import { 
+  Sidebar, 
+  SidebarItem } from "../../styles/residuo-solidos-in"; 
 import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
@@ -78,7 +99,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [modalCO020, setModalCO020] = useState(null)
   const [dadosQualidade, setDadosQualidade] = useState(null);
   const [content, setContent] = useState("");
-  
+  const [activeForm, setActiveForm] = useState("agua");
 
   useEffect(() => {
     getDadosQualidade()
@@ -155,7 +176,53 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <SidebarItem
+          active={activeForm === "agua"}
+          onClick={() => setActiveForm("agua")}
+        >
+          Paralisações no sistema de distribuição de água
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "interrupcoes"}
+          onClick={() => setActiveForm("interrupcoes")}
+        >
+          Interrupções sistemáticas no sistema de distribuição de água
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "extravasamento"}
+          onClick={() => setActiveForm("extravasamento")}
+        >
+          Extravasamento de esgoto
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "tipoatendimento"}
+          onClick={() => setActiveForm("tipoatendimento")}
+        >
+          Tipo de atendimento
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "amostra"}
+          onClick={() => setActiveForm("amostra")}
+        >
+          Amostras
+        </SidebarItem>
+      
+        <SidebarItem
+          active={activeForm === "reclamacoes"}
+          onClick={() => setActiveForm("reclamacoes")}
+        >
+          Reclamações sobre a qualidade da água
+        </SidebarItem>
+        <SidebarItem
+          active={activeForm === "observacoes"}
+          onClick={() => setActiveForm("observacoes")}
+        >
+          Observações
+        </SidebarItem>
+      </Sidebar>
+      <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivFormResiduo>
@@ -163,7 +230,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
             <DivFormEixo>
               <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
             
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "agua"}>
               <DivTitulo>
                 <DivTituloConteudo>Paralisações no sistema de distribuição de água</DivTituloConteudo>
               </DivTitulo>
@@ -208,7 +275,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "interrupcoes"}>
               <DivTitulo>
                 <DivTituloConteudo>Interrupções sistemáticas no sistema de distribuição de água</DivTituloConteudo>
               </DivTitulo>
@@ -254,7 +321,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo> 
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "extravasamento"}>
               <DivTitulo>
                 <DivTituloConteudo>Extravasamento de esgoto</DivTituloConteudo>
               </DivTitulo>
@@ -291,7 +358,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo> 
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "tipoatendimento"}>
               <DivTitulo>
                 <DivTituloConteudo>Tipo de atendimento</DivTituloConteudo>
               </DivTitulo>
@@ -319,7 +386,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo> 
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "amostra"}>
               <DivTitulo>
                 <DivTituloConteudo>Amostra, na(s) saída(s) Unidade(s) de Tratamento e na rede, para determinação do cloro residual</DivTituloConteudo>
               </DivTitulo>
@@ -365,7 +432,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "amostra"}>
               <DivTitulo>
                 <DivTituloConteudo>Amostra, na(s) saída(s) Unidade(s) de Tratamento e na rede, para determinação de turbidez</DivTituloConteudo>
               </DivTitulo>
@@ -410,7 +477,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 </tbody>                
               </table>            
             </DivFormConteudo>
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "amostra"}>
               <DivTitulo>
                 <DivTituloConteudo>Amostra, na(s) saída(s) Unidade(s) de Tratamento e na rede, para determinação de coliformes fecais</DivTituloConteudo>
               </DivTitulo>
@@ -456,7 +523,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo>
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "amostra"}>
               <DivTitulo>
                 <DivTituloConteudo>Amostra, na(s) saída(s) Unidade(s) de Tratamento e na rede, para determinação de coliformes totais</DivTituloConteudo>
               </DivTitulo>
@@ -502,7 +569,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </table>            
             </DivFormConteudo> 
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "reclamacoes"}>
               <DivTitulo>
                 <DivTituloConteudo>Reclamações ou solicitações de serviços</DivTituloConteudo>
               </DivTitulo>
@@ -549,7 +616,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
             </DivFormConteudo>   
 
 
-            <DivFormConteudo>
+            <DivFormConteudo active={activeForm === "observacoes"}>
               <DivTitulo>
                 <DivTituloConteudo>Observações</DivTituloConteudo>
               </DivTitulo>
@@ -574,6 +641,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
+      </MainContent>
 
      
     </Container>

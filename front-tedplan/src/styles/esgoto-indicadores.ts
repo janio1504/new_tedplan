@@ -323,21 +323,6 @@ export const PsImage = styled.div`
   width: 100px;
   cursor: pointer;
 `;
-
-export const TitlePsOnMouse = styled.div`
-  display: block;
-  position: absolute;
-  background-color: #f9f9f9;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  padding: 12px 16px;
-  z-index: 1;
-  margin: -140px auto 0 auto;
-  border-radius: 5px;
-  color: #053d68;
-  font-size: 16px;
-  text-align: left;
-`;
-
 export const PsImageEsquerda = styled.div`
   float: left;
   margin: -110px 0 0px -830px;
@@ -442,11 +427,11 @@ export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
-
+  background-color: #fff;
   text-align: left;
   padding: 10px 8px 10px 10px;
-  border: solid #008080 2px;
   border-radius: 5px;
+  font-size: 17px;
   margin-top: 50px;
   color: #fff;
   table {
@@ -460,8 +445,10 @@ export const DivTituloForm = styled.div`
   padding: 10px;
   color: #fff;
   margin: -11px -10px 0 -11px;
-  background-color: #008080;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+
   font-weight: bolder;
 `;
 
@@ -691,8 +678,8 @@ export const SubmitButton = styled.button`
   padding: 10px 15px;
   margin: 30px 10px 8px 10px;
   color: #fff;
-  border: 0px;
-  background: #008080;
+  border: 2px solid #0085bd;
+  background: #0085bd;
   border-radius: 3px;
   flex-direction: row;
   cursor: pointer;
@@ -728,6 +715,7 @@ export const SubmitButtonModal = styled.button`
 
 export const DivInput = styled.div`
   float: left;
+  
   flex-direction: column;
   display: flex;
 `;
@@ -786,8 +774,8 @@ export const Form = styled.form`
   background-color: #f3f4f6;
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
-    border-radius: 5px;
+    border: 1px solid #4B4B4B;
+  border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     color: #666;
@@ -812,7 +800,7 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    border: 1px solid #4B4B4B;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
