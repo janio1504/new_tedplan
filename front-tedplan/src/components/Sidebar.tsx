@@ -12,32 +12,55 @@ import { AuthContext } from "../contexts/AuthContext";
 
 // Container principal do menu
 const SidebarContainer = styled.div`
-  width: 250px;
+  width: 280px;
   height: 100vh;
-  background-color: #f8f8ff;
-  padding: 20px;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  color: #696969;
-  border-right: 1px solid #ccc;
+  color: #2C3E50;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
 `;
 
 // Título do menu
 const MenuTitle = styled.h2`
-  color: #696969;
-  font-size: 24px;
-  margin-bottom: 20px;
+  color: #424242;
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e0e0e0;
 `;
 
 // Estilos para cada item do menu
 const MenuItem = styled.div`
-  font-size: 18px;
-  padding: 10px 10px;
+  font-size: 16px;
+  padding: 14px 16px;
+  margin: 4px 0;
   cursor: pointer;
-  transition: 0.3s;
-  border-radius: 4px;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #424242;
+  font-weight: 500;
+
+  svg {
+    font-size: 20px;
+    color: #2C3E50;
+  }
+
   &:hover {
-    background-color: #d3d3d3;
+    background-color: rgba(26, 35, 126, 0.08);
+    color: ##2C3E50;
+    transform: translateX(4px);
+  }
+
+  &:active {
+    background-color: rgba(26, 35, 126, 0.12);
+    transform: scale(0.98);
   }
 `;
 

@@ -2,7 +2,8 @@ import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
-import { Container, Footer, BodyDashboard, Form, SubmitButton } from "../styles/dashboard";
+import { Container, Footer, BodyDashboard, Form  } from "../styles/dashboard";
+import { SubmitButton } from "../styles/dashboard-original";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
@@ -79,13 +80,11 @@ export default function DashboardIndicadores() {
     
     height: 200px;
     display: flex;
-    flexdirection: column;
-    border: 1px solid #ccc;
+    flex-direction: column;
     padding: 10px;
     margin: 30px;
-    border-radius: 10px;
-    background-color: #f8f8ff;
   `;
+  
   return (
     <Container>
       <HeadPublico></HeadPublico>

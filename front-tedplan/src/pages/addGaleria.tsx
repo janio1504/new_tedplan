@@ -3,14 +3,19 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
 import { toast, ToastContainer } from 'react-nextjs-toast';
 
+
 import {
   Container,
-  Form,
+     Form,
+     Footer, DivCenter, DivInstrucoes,
+  } from '../styles/dashboard';
+
+
+  import {
   SubmitButton,
-  DivCenter,
-  DivInstrucoes,
-  Footer,
-} from "../styles/dashboard";
+       
+    } from '../styles/dashboard-original';
+
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";

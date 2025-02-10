@@ -18,20 +18,26 @@ import {
   BotaoVisualizar,
   BotaoEditar,
   BotaoRemover,
+  DivInput,
+  Form,
+
+} from "../styles/dashboard";
+
+
+import {
   ContainerModal,
   Modal,
   CloseModalButton,
   ConteudoModal,
   ImagemModal,
-  DivInput,
-  Form,
   SubmitButton,
   TituloModal,
   ConfirmModal,
   CancelButton,
   ConfirmButton,
   FormModal,
-} from "../styles/dashboard";
+} from "../styles/dashboard-original";
+
 import { useForm } from "react-hook-form";
 import { log } from "console";
 
