@@ -619,6 +619,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   }
 
   function seletcAno(ano: any) {
+    resetExternal()
     setAnoSelected(ano);
 
     loadDadosResiduos({ ano: ano, id: dadosMunicipio?.id_municipio });
