@@ -2319,7 +2319,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.co021 ? dadosResiduos?.co021 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.co021}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -2339,7 +2339,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.co019}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.co019 ? dadosResiduos?.co019 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.co019}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -2442,7 +2442,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.co008}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.co008 ? dadosResiduos?.co008 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.co008}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2466,7 +2466,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.co131}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.co131 ? dadosResiduos?.co131 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.co131}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2520,7 +2520,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs001}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs001 ? dadosResiduos?.cs001 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs001}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2542,7 +2542,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs053}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs053 ? dadosResiduos?.cs053 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs053}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2585,7 +2585,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs055}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs055 ? dadosResiduos?.cs055 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs055}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2607,7 +2607,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs061}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs061 ? dadosResiduos?.cs061 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs061}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2696,7 +2696,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs059}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs059 ? dadosResiduos?.cs059 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs059}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2720,7 +2720,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.cs059 ? dadosResiduos?.cs059 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs059}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2816,7 +2816,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs027}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs027 ? dadosResiduos?.cs027 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs027}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2829,7 +2829,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs031}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs031 ? dadosResiduos?.cs031 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs031}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2842,7 +2842,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs035}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs035 ? dadosResiduos?.cs035 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs035}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2881,7 +2881,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs028}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs028 ? dadosResiduos?.cs028 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs028}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2894,7 +2894,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs032}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs032 ? dadosResiduos?.cs032 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs032}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2907,7 +2907,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs036}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs036 ? dadosResiduos?.cs036 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs036}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2946,7 +2946,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs042}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs042 ? dadosResiduos?.cs042 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs042}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2959,7 +2959,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs043}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs043 ? dadosResiduos?.cs043 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs043}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -2972,7 +2972,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs044}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs044 ? dadosResiduos?.cs044 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs044}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3011,7 +3011,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs045}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs045 ? dadosResiduos?.cs045 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs045}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3024,7 +3024,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs059}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs059 ? dadosResiduos?.cs059 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs059}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3037,7 +3037,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs047}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs047 ? dadosResiduos?.cs047 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs047}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3075,7 +3075,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs030}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs030 ? dadosResiduos?.cs030 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs030}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3088,7 +3088,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs034}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs034 ? dadosResiduos?.cs034 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs034}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3101,7 +3101,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs038}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs038 ? dadosResiduos?.cs038 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cs038}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3277,7 +3277,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs051}
                               onChange={handleOnChange}
                             >
-                              <option >{dadosResiduos?.cs051 ? dadosResiduos?.cs051 : "Selecionar"}</option>
+                              <option >{dadosResiduos?.cs051}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3441,7 +3441,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs020}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs020 ? dadosResiduos?.rs020 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs020}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3482,7 +3482,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs045}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs045 ? dadosResiduos?.rs045 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs045}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3503,7 +3503,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs046}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs046 ? dadosResiduos?.rs046 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs046}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3525,7 +3525,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs003}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs003 ? dadosResiduos?.rs003 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs003}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3609,7 +3609,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs026}
                               onChange={handleOnChange}
                             >                              
-                              <option>{dadosResiduos?.rs026 ? dadosResiduos?.rs026 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs026}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3661,7 +3661,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.rs036 ? dadosResiduos?.rs036 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs036}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3685,7 +3685,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs038}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs038 ? dadosResiduos?.rs038 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs038}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3709,7 +3709,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs040}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs040 ? dadosResiduos?.rs040 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs040}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3753,7 +3753,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs042}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs042 ? dadosResiduos?.rs042 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.rs042}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3796,7 +3796,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs030}
                               onChange={rsExportadoChange}
                             >
-                              <option >{dadosResiduos?.rs030 ? dadosResiduos?.rs030 : "Selecionar"}</option>
+                              <option >{dadosResiduos?.rs030}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3900,7 +3900,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cc019}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cc019 ? dadosResiduos?.cc019 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cc019}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -3924,7 +3924,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cc010}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cc010 ? dadosResiduos?.cc010 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cc010}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -3948,7 +3948,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cc020}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cc020 ? dadosResiduos?.cc020 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cc020}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -3973,7 +3973,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cc017}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cc017 ? dadosResiduos?.cc017 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cc017}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -3999,7 +3999,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cc018}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cc018 ? dadosResiduos?.cc018 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cc018}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -4183,7 +4183,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.va016}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.va016 ? dadosResiduos?.va016 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.va016}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -4241,7 +4241,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cp001}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cp001 ? dadosResiduos?.cp001 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cp001}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -4260,7 +4260,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cp002}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cp002 ? dadosResiduos?.cp002 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cp002}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -4279,7 +4279,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cp003}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cp003 ? dadosResiduos?.cp003 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cp003}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -4298,7 +4298,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cp004}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cp004 ? dadosResiduos?.cp004 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.cp004}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
                             </select>
@@ -4398,7 +4398,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os001}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os001 ? dadosResiduos?.os001 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os001}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4411,7 +4411,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os012}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os012 ? dadosResiduos?.os012 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os012}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4424,7 +4424,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os023}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os023 ? dadosResiduos?.os023 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os023}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4462,7 +4462,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os003}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os003 ? dadosResiduos?.os003 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os003}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4475,7 +4475,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os014}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os014 ? dadosResiduos?.os014 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os014}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4488,7 +4488,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os025}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os025 ? dadosResiduos?.os025 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os025}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4525,7 +4525,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os004 ? dadosResiduos?.os004 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os004}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4538,7 +4538,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os015}
                               onChange={handleOnChange}
                             >                              
-                              <option>{dadosResiduos?.os015 ? dadosResiduos?.os015 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os015}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4551,7 +4551,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os026}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os026 ? dadosResiduos?.os026 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os026}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4587,7 +4587,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os005}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os005 ? dadosResiduos?.os005 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os005}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4600,7 +4600,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os016}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os016 ? dadosResiduos?.os016 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os016}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4613,7 +4613,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os027}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os027 ? dadosResiduos?.os027 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os027}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4649,7 +4649,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os006}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os006 ? dadosResiduos?.os006 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os006}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4662,7 +4662,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os017}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os017 ? dadosResiduos?.os017 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os017}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4675,7 +4675,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os028}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os028 ? dadosResiduos?.os028 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os028}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4712,7 +4712,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os007}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os007 ? dadosResiduos?.os007 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os007}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4725,7 +4725,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os018}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os018 ? dadosResiduos?.os018 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os018}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4738,7 +4738,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os029}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os029 ? dadosResiduos?.os029 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os029}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4778,7 +4778,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os008}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os008 ? dadosResiduos?.os008 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os008}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4791,7 +4791,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os019}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os019 ? dadosResiduos?.os019 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os019}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4804,7 +4804,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os030}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os030 ? dadosResiduos?.os030 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os030}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4844,7 +4844,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.os009 ? dadosResiduos?.os009 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os009}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4858,7 +4858,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.os020 ? dadosResiduos?.os020 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os020}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4872,7 +4872,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.os031 ? dadosResiduos?.os031 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os031}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4912,7 +4912,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.os010 ? dadosResiduos?.os010 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os010}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4926,7 +4926,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os021 ? dadosResiduos?.os021 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os021}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4939,7 +4939,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os032}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os032 ? dadosResiduos?.os032 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os032}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4979,7 +4979,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os011 ? dadosResiduos?.os011 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os011}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -4993,7 +4993,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os022 ? dadosResiduos?.os022 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os022}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5006,7 +5006,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os033}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os033 ? dadosResiduos?.os033 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os033}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5044,7 +5044,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               {" "}
-                              <option>{dadosResiduos?.os040 ? dadosResiduos?.os040 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os040}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5057,7 +5057,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os041}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os041 ? dadosResiduos?.os041 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os041}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5071,7 +5071,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                              
-                              <option>{dadosResiduos?.os042 ? dadosResiduos?.os042 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os042}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5111,7 +5111,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os043}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os043 ? dadosResiduos?.os043 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os043}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5125,7 +5125,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os044 ? dadosResiduos?.os044 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os044}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5138,7 +5138,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os045}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os045 ? dadosResiduos?.os045 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os045}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5175,11 +5175,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                           <InputP>
                             <select
                               {...registerExternal("OS047")}
-                              defaultValue={dadosResiduos?.os47}
+                              defaultValue={dadosResiduos?.os047}
                               onChange={handleOnChange}
                             >
                              
-                              <option>{dadosResiduos?.os47 ? dadosResiduos?.os47 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os047}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5193,7 +5193,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os048 ? dadosResiduos?.os048 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os048}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5206,7 +5206,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os030}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os030 ? dadosResiduos?.os030 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os030}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5247,7 +5247,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               onChange={handleOnChange}
                             >
                               
-                              <option>{dadosResiduos?.os050 ? dadosResiduos?.os050 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os050}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5260,7 +5260,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os051}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os051 ? dadosResiduos?.os051 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os051}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5273,7 +5273,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os052}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.os052 ? dadosResiduos?.os052 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.os052}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5320,7 +5320,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.ca004}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.ca004 ? dadosResiduos?.ca004 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.ca004}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5342,7 +5342,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                                onChange={handleOnChange}
                             >
                               <option >
-                              {dadosResiduos?.ca008 ? dadosResiduos?.ca008 : "Selecionar"}
+                              {dadosResiduos?.ca008}
                               </option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5433,7 +5433,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.ca005}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.ca005 ? dadosResiduos?.ca005 : "Selecionar"}</option>
+                              <option>{dadosResiduos?.ca005}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5539,7 +5539,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   Proximo
                 </ModalStepperButton>
               )}
-              {/* <SubmitButton type="submit">Gravar</SubmitButton> */}
+              {currentStep === 11 && <SubmitButton type="submit">Gravar</SubmitButton>}
             </ModalStepperNavigation>
           </ModalStepperContainer>
         </Form>

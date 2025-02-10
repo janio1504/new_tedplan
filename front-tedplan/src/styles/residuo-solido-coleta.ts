@@ -473,7 +473,7 @@ export const DivTitulo = styled.div`
 
 export const SubmitButton = styled.button`
   padding: 10px 15px;
-  margin: 30px 10px;
+  margin: 0px 10px;
   color: #fff;
   border: 0px;
   background: #008080;
