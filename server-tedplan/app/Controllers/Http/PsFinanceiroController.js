@@ -40,7 +40,6 @@ class PsFinanceiroController {
   }
 
   async getDadosFinanceirosPorAno({ request }) {
-    console.log(request.all());
     
     const { id_municipio, ano } = request.all();
     return await PsFinanceiro.query()
@@ -91,8 +90,6 @@ class PsFinanceiroController {
         .from("tedplan.fn_residuos_solidos")
         .where("id_fn_residuos_solidos", dados.id_fn_residuos_solidos)
         .fetch()
-
-        
 
         await PsFinanceiro.query()
           .from("tedplan.fn_residuos_solidos")
@@ -319,7 +316,7 @@ class PsFinanceiroController {
           .from("tedplan.fn_agua_esgoto_sanitario")
           .insert({
             fn002: dados.FN002,
-            fn003: dados.FN003,
+            fn003: dados.AES_FN003,
             fn007: dados.FN007,
             fn038: dados.FN038,
             fn001: dados.FN001,

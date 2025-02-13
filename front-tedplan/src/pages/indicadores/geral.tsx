@@ -3,11 +3,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import {
-  Container,
-  DivCenter,
-  DivForm,
-  DivTituloForm,
+import {  
   DivInput,
   Form,
   InputP,
@@ -30,7 +26,6 @@ import {
   InputSNIS,
   InputXL,
   DivTituloFormResiduo,
-  DivFormResiduo,
   DivBorder,
   LabelCenter,
   DivChekbox,
@@ -46,21 +41,24 @@ import Editar from "../../img/editar.png";
 import Excluir from "../../img/excluir.png";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
-import CurrencyInput from "react-currency-masked-input";
+import { DivFormResiduo } from "../../styles/residuos-solidos";
 import {
+  Container,
+  DivCenter,
+  DivTituloForm,
   Tabela,
-  ContainerModal,
-
+  ContainerModal,  
+  DivForm,
   CloseModalButton,
-
   TabelaModal,
   ModalForm,
-} from "../../styles/indicadores";
+} from "../../styles/esgoto-indicadores";
 import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
+import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 
 interface IMunicipio {
   id_municipio: string;
@@ -82,7 +80,7 @@ export default function Geral({ municipio }: MunicipioProps) {
     formState: { errors },
   } = useForm();
 
-  const [contentForEditor, setContentForEditor] = useState(null);
+  const [dadosMunicipio, setDadosMunicipio] = useState(null)
   const [content, setContent] = useState("");
   const [check, setCheck] = useState(false);
   const [dadosGeral, setDadosGeral] = useState(null);
@@ -95,8 +93,18 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
   useEffect(() => {
-   
+    getMunicipio()
   }, []);
+
+  async function getMunicipio() {
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        setDadosMunicipio(response.data[0]);
+      });
+  }
 
   
   function handleCloseModalAddConcesionaria() {
@@ -176,6 +184,10 @@ export default function Geral({ municipio }: MunicipioProps) {
     setModalAddConssionaria(true);
   }
   async function handleCadastro(data) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
 
     data.id_geral_da_ae_dh = dadosGeral?.id_geral_da_ae_dh
     data.id_municipio = usuario.id_municipio
@@ -258,12 +270,12 @@ export default function Geral({ municipio }: MunicipioProps) {
   return (
     <Container>
       <ToastContainer></ToastContainer>
-      <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={''}></MenuHorizontal>
-      <MenuIndicadores></MenuIndicadores>
+       <HeadIndicadores usuarios={[]}></HeadIndicadores>
+       <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
+      <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivFormResiduo>
+          <DivForm>
             <DivTituloForm>Geral</DivTituloForm>
             <DivFormEixo>
               <DivFormConteudo>
@@ -286,14 +298,12 @@ export default function Geral({ municipio }: MunicipioProps) {
             </DivFormEixo>
 
             <DivFormEixo>
-              <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
-
               <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Municípios atendidos</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -301,8 +311,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                  
+                 
                     <tr>
                       <td><InputSNIS>GE05A</InputSNIS></td>
                       <td>Quantidade de Municípios atendidos com abastecimento de água </td>
@@ -330,7 +340,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Sedes e localidades atendidas</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -338,8 +348,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+              
+                 
                     <tr>
                       <td><InputSNIS>GE008</InputSNIS></td>
                       <td>Quantidade de sedes atendidas com abastecimento de água </td>
@@ -421,7 +431,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -429,8 +439,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                                    
                     <tr>
                       <td><InputSNIS>AG026</InputSNIS></td>
                       <td>População urbana atendida com abastecimento de água</td>
@@ -476,7 +485,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>População existente</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -484,8 +493,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                                   
                     <tr>
                       <td><InputSNIS>GD06A</InputSNIS></td>
                       <td>População urbana residente no(s) município(s) com abastecimento de água</td>
@@ -531,16 +539,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
 
-                    </tr>
-                  </thead>
-                  <tbody>
+                    </tr>               
+                  
                     <tr>
                       <td><InputSNIS>FN026</InputSNIS></td>
                       <td>Quantidade de empregados próprios</td>
@@ -559,42 +566,45 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <DivTitulo>
                   <DivTituloConteudo>Observações, esclarecimentos ou sugestões</DivTituloConteudo>
                 </DivTitulo>
-
-                <InputSNIS>
-                  <p>GE099</p>
-                </InputSNIS>
-                <InputM>
-                  <p>Observações</p>
-                </InputM>
-
-                <InputGG>
-                  <textarea {...register("GE099")}
-                    defaultValue={dadosGeral?.ge099}
-                    onChange={handleOnChange}
-                  />
-                </InputGG>
+                <table>
+                  <tbody>
+                   <tr>
+                      <th>Código SNIS</th>
+                      <th>Descrição</th>
+                      <th>Ano {anoSelected}</th>
+                      <td></td>
+                    </tr>    
+                    <tr>
+                      <td>GE099</td>
+                      <td>Observações</td>
+                      <td>
+                      <textarea {...register("GE099")}
+                          defaultValue={dadosGeral?.ge099}
+                          onChange={handleOnChange}
+                        />
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+            
               </DivFormConteudo>
             </DivFormEixo>
 
             <DivFormEixo>
-
-              <DivTituloEixoDrenagem>Drenagem de Águas Pluviais</DivTituloEixoDrenagem>
-
               <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Geografia e urbanismo</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
 
-                    </tr>
-                  </thead>
-                  <tbody>
+                    </tr>                  
                     <tr>
                       <td><InputSNIS>GE001</InputSNIS></td>
                       <td>Área territorial total do município (Fonte IBGE) </td>
@@ -653,16 +663,13 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Dados hidrográficos</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
-
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
-
+                      <th></th>
                     </tr>
-                  </thead>
-                  <tbody>
                     <tr>
                       <td><InputSNIS>GE010</InputSNIS></td>
                       <td>Região Hidrográfica em que se encontra o município (Fonte:ANA)</td>
@@ -698,16 +705,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
-
+                      <th></th>
                     </tr>
-                  </thead>
-                  <tbody>
+                 
+                  
                     <tr>
                       <td><InputSNIS>AD001</InputSNIS></td>
                       <td>Quantidade de pessoal próprio alocado</td>
@@ -744,23 +751,21 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Infraestrutura</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
-
+                      <th></th>
                     </tr>
-                  </thead>
-                  <tbody>
                     <tr>
                       <td><InputSNIS>IE001</InputSNIS></td>
                       <td>Existe Plano Diretor de Drenagem e Manejo das Água Pluviais Urbanas? </td>
                       <td><InputP><select {...register('IE001')}>
-                        <option value="">{dadosGeral?.ie001 ? dadosGeral?.ie001 : 'Opções'}</option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option >{dadosGeral?.ie001}</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
 
                     </tr>
@@ -771,9 +776,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ie012}
                         onChange={handleOnChange}
                       >
-                        <option value=""></option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option ></option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
 
                     </tr>
@@ -784,9 +789,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ie013}
                         onChange={handleOnChange}
                       >
-                        <option value=""></option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option ></option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
 
                     </tr>
@@ -797,9 +802,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ie014}
                         onChange={handleOnChange}
                       >
-                        <option value=""></option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option ></option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
                     </tr>
                     <tr>
@@ -833,16 +838,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Operacional</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                  <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
-
+                      <th></th>
                     </tr>
-                  </thead>
-                  <tbody>
+                 
+                 
                     <tr>
                       <td><InputSNIS>OP001</InputSNIS></td>
                       <td>Quais da seguintes intervenções ou manutenções foram realizadas?</td>
@@ -884,7 +889,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Gestão de risco</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                  <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -892,8 +897,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                 
                     <tr>
                       <td><InputSNIS>RI001</InputSNIS></td>
                       <td>Indique quais das seguintes instituições existem</td>
@@ -1020,9 +1024,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ri005}
                         onChange={handleOnChange}
                       >
-                        <option value=""></option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option ></option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
 
                     </tr>
@@ -1033,9 +1037,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ri007}
                         onChange={handleOnChange}
                       >
-                        <option value=""></option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option ></option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
 
                     </tr>
@@ -1046,9 +1050,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ri009}
                         onChange={handleOnChange}
                       >
-                        <option value=""></option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option ></option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select></InputP></td>
 
                     </tr>
@@ -1058,7 +1062,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><select {...register('RI010')}
                         onChange={handleOnChange}
                       >
-                        <option value=""> {(dadosGeral?.ri010 == 1) ? "Integral" : "Parcial"}  </option>
+                        <option > {(dadosGeral?.ri010 == 1) ? "Integral" : "Parcial"}  </option>
                         <option value="1">Integral </option>
                         <option value="0">Parcial</option>
                       </select></InputP></td>
@@ -1117,7 +1121,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -1125,8 +1129,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                                  
                     <tr>
                       <td><InputSNIS>GE999</InputSNIS></td>
                       <td>Observações, esclarecimentos e sugestões</td>
@@ -1144,13 +1147,13 @@ export default function Geral({ municipio }: MunicipioProps) {
 
 
             <DivFormEixo>
-              <DivTituloEixo style={{ backgroundColor: "#42895B" }} >Resíduos Sólidos</DivTituloEixo>
+              
               <DivFormConteudo>
                 <DivTitulo>
                   <DivTituloConteudo>Informações gerais</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -1158,8 +1161,6 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
                     <tr>
                       <td><InputSNIS>GE201</InputSNIS></td>
                       <td>O oŕgão (Prestador) é também o prestador - direto ou indireto - de outros serviços de Saneamento?</td>
@@ -1189,16 +1190,14 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Concesionárias</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                  <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
-
+                      <th></th>
                     </tr>
-                  </thead>
-                  <tbody>
                     <tr>
                       <td><InputSNIS>GE202</InputSNIS></td>
                       <td>Há empresa com contrato de DELEGAÇÂO (conceção ou contrato de programa) para algum ou todos os serviços de limpeza urbana?</td>
@@ -1209,8 +1208,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                             onChange={handleOnChange}
                           >
                             <option value=""></option>
-                            <option value="1">Sim</option>
-                            <option value="0">Não</option>
+                            <option value="Sim">Sim</option>
+                            <option value="Não">Não</option>
                           </select>
                         </InputP>
                       </td>
@@ -1223,17 +1222,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tbody>
                 </table>
                 <Tabela>
-                  <table cellSpacing={0}>
-                    <thead>
+                  <table cellSpacing={0} >
+                  <tbody >
                       <tr>
                         <th>Concessionária</th>
                         <th>Ano de inicio</th>
                         <th>Duração(em anos)</th>
                         <th>Vigente?</th>
                         <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                      </tr>                    
+                   
                       {
                         concessionarias?.map((conc, key) => (
                           <tr key={key}>
@@ -1270,7 +1268,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       }
                     </tbody>
                   </table>
-                </Tabela>
+                  </Tabela>
               </DivFormConteudo>
 
               <DivFormConteudo>
@@ -1278,7 +1276,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>População atendida</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -1286,8 +1284,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                  
                     <tr>
                       <td><InputSNIS>CO164</InputSNIS></td>
                       <td>População total atendida no município</td>
@@ -1369,7 +1366,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Valor contratual</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
@@ -1377,8 +1374,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <th>Ano {anoSelected}</th>
 
                     </tr>
-                  </thead>
-                  <tbody>
+                  
+                  
                     <tr>
                       <td><InputSNIS>CO162</InputSNIS></td>
                       <td>Valor contratual (Preço unitario) do serviço de aterramento de RDO e RDU</td>
@@ -1407,16 +1404,14 @@ export default function Geral({ municipio }: MunicipioProps) {
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
                 <table>
-                  <thead>
+                <tbody>
                     <tr>
 
                       <th>Código SNIS</th>
                       <th>Descrição</th>
                       <th>Ano {anoSelected}</th>
 
-                    </tr>
-                  </thead>
-                  <tbody>
+                    </tr>                 
                     <tr>
                       <td><InputSNIS>GE999</InputSNIS></td>
                       <td>Observações, esclarecimentos e sugestões</td>
@@ -1433,9 +1428,9 @@ export default function Geral({ municipio }: MunicipioProps) {
             </DivFormEixo>
 
 
-          </DivFormResiduo>
+          </DivForm>
 
-          <SubmitButton type="submit">Gravar</SubmitButton>
+          {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
         </Form>
       </DivCenter>
 
@@ -1506,8 +1501,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                             onChange={handleOnChange}
                           >
                             <option >Opções</option>
-                            <option value="1">Sim</option>
-                            <option value="0">Não</option>
+                            <option value="Sim">Sim</option>
+                            <option value="Não">Não</option>
                           </select></InputP></td>
                         </tr>
                         <tr>
@@ -1588,8 +1583,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                             defaultValue={dadosConcessionaria?.unidade_relacionada}
                             onChange={handleOnChange}>
                             <option >Opcões</option>
-                            <option value="1">Sim</option>
-                            <option value="0">Não</option>
+                            <option value="Sim">Sim</option>
+                            <option value="Não">Não</option>
                           </select></InputP></td>
                         </tr>
 

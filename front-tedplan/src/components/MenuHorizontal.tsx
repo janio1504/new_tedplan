@@ -61,16 +61,7 @@ interface MunicipioProps {
 
 
 export default function MenuHorizontal({municipio}) {
-  const { usuario, signOut } = useContext(AuthContext);
-  const [dadosmunicipio, setMunicipio] = useState("");
-  
-  useEffect(() => {
- 
-    
-  }, []);
-
- 
-
+  const { signOut } = useContext(AuthContext);
   async function handleSignOut() {
     signOut();
   }

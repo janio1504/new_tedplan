@@ -122,6 +122,7 @@ export default function GestaoIndicadores({
   const [dadosMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const [dadosGestao, setGestao] = useState<IGestao | any>(gestao);
   const [representantes, setRepresentantes] = useState(null);
+  const [isClient, setIsClient] = useState(false);
   const {
     register,
     handleSubmit,
@@ -138,13 +139,26 @@ export default function GestaoIndicadores({
   let txtArea = useRef();
   
   useEffect(() => {
-    
+    setIsClient(true);
+    getMunicipio()
     getPoliticas()
     getPlanos()
     getParticipacoes()
     getRepresentantes()
     getGestao();
-  }, [municipio, gestao]);
+  }, []);
+
+  async function getMunicipio() {
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        const res = response.data;
+        setMunicipio(res[0]);
+      });
+  }
+
 
   async function getGestao(){
     const resGestao = await api.get("/getGestao", {
@@ -155,6 +169,10 @@ export default function GestaoIndicadores({
   }
 
   async function handleCadastro(data) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
     const formData = new FormData();
 
     formData.append("id_municipio", usuario.id_municipio);
@@ -262,6 +280,15 @@ export default function GestaoIndicadores({
   }
 
   async function handleAddRepresentante(data) {
+
+    if(!usuario.id_municipio){
+      toast.notify("Não existe Município, entre novamente no sistema! ", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      signOut()
+    }
     
     const id = await api
       .post("addRepresentanteServicos", {
@@ -269,7 +296,7 @@ export default function GestaoIndicadores({
         ga_email: data.ga_email,
         ga_nome_representante: data.ga_nome_representante,
         ga_telefone: data.ga_telefone,
-        id_municipio: dadosMunicipio.id_municipio,
+        id_municipio: usuario.id_municipio,
       })
       .then((response) => {
         toast.notify("Representante cadastrado com sucesso!", {
@@ -474,10 +501,10 @@ export default function GestaoIndicadores({
   }
 
   return (
-    <Container>
+    <Container>      
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={''}></MenuHorizontal>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
@@ -761,15 +788,15 @@ export default function GestaoIndicadores({
           <DivForm>
             <DivTituloForm>Saneamento Rural</DivTituloForm>
             <DivTextArea>
-              <label>Breve <b>Descrição</b></label>
-              <TextArea>
+              <label>Breve Descrição</label>
+             
                 <textarea
                   ref={txtArea}
                   {...register("sr_descricao")}
                   defaultValue={dadosGestao?.sr_descricao ? dadosGestao?.sr_descricao : ''}
                   onChange={handleOnChange}
                 ></textarea>
-              </TextArea>
+              
             </DivTextArea>
           </DivForm>
           <DivForm>
@@ -777,27 +804,27 @@ export default function GestaoIndicadores({
 
             <DivTextArea>
               <label>Nome das Comunidades Beneficiadas</label>
-              <TextArea>
+              
                 <textarea
                   ref={txtArea}
                   {...register("ct_nomes_comunidades")}
                   defaultValue={dadosGestao?.nomes_comunidades_beneficiadas ? dadosGestao?.nomes_comunidades_beneficiadas : ''}
                   onChange={handleOnChange}
                 ></textarea>
-              </TextArea>
+              
 
-              <label>Breve <b>Descrição</b></label>
-              <TextArea>
+              <label>Breve Descrição</label>
+             
                 <textarea
                   ref={txtArea}
                   {...register("ct_descricao")}
                   defaultValue={dadosGestao?.ct_descricao ? dadosGestao?.ct_descricao : ''}
                   onChange={handleOnChange}
                 ></textarea>
-              </TextArea>
+              
             </DivTextArea>
           </DivForm>
-          <SubmitButton type="submit">Gravar</SubmitButton>
+          {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
         </Form>
 
         {showModal && (
@@ -864,6 +891,7 @@ export default function GestaoIndicadores({
           </ContainerModal>
         )}
       </DivCenter>
+      
     </Container>
   );
 }

@@ -76,6 +76,7 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
     const res = await api.get("getMunicipio", {
       params: { id_municipio: usuario.id_municipio },
     }).then(response =>{
+      setMunicipio(response.data[0])
       return response.data;
     })
  
@@ -169,7 +170,7 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
           </TitlePsOnMouse>)}
           </PsImageEsquerda>
           <PsImageDireita>
-          <Image src={Residuos} onClick={handleResiduosColeta} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Residuos" />
+          <Image src={Residuos} onClick={handleResiduosUnidade} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Residuos" />
           {title === 'Residuos' && show && (<TitlePsOnMouse>
           {title}
           </TitlePsOnMouse>)}            

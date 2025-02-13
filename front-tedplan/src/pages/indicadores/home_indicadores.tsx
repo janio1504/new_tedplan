@@ -148,7 +148,7 @@ export default function HomeIndicadores() {
    async function getMunicipio(){
     const res = await api.get("getMunicipio", {params: {id_municipio: usuario?.id_municipio}});
     const municipio = await res.data;
-    if(res[0]){
+    if(municipio[0]){
       setNomeMunicipio(municipio[0].municipio_nome)
     }
     

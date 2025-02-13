@@ -117,12 +117,26 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [disabledProximo, setDisabledProximo] = useState(false);
   const [idMunicipio, setIdMunicipio] = useState(null);
+   const [dadosMunicipio, setDadosMunicipio] = useState(null)
 
   useEffect(() => {
     getResiduosRecebidos(anoSelected);
     getUnidadesProcessamento();
     getMunicipios();
+    getMunicipio()
   }, []);
+
+  async function getMunicipio() {
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        const res = response.data;
+        setDadosMunicipio(res[0]);
+      });
+  }
+
 
   function handleOnChange(content) {
     setContent(content.target.value);
@@ -201,7 +215,10 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     setVisibleResiduosRecebidos(false);
   }
 
-  async function handleCadastroDadosUP(data) { 
+  async function handleCadastroDadosUP(data) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
      data.id_unidade_processamento = Number(unidadeProcessamento.id_unidade_processamento)
     if(anoSelected === null || anoSelected === 'Selecionar') {
       toast.notify("Selecione um ano!", {
@@ -210,15 +227,17 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         type: "error",
       })
       return
-    }
+    }    
+    
     data.UP079a ? (data.UP079 = data.UP079a) : data.UP079;
     data.UP051a ? (data.UP051 = data.UP051a) : data.UP051;
     data.UP001a ? (data.UP001 = data.UP001a) : data.UP001;
 
     data.id_residuos_unidade_processamento =
       dadosUnidade?.id_residuos_unidade_processamento;
-    data.id_municipio = municipio[0].id_municipio;
+    data.id_municipio = usuario.id_municipio;
     data.ano = anoSelected;
+    
     const resCad = await api
       .post("create-dados-unidade-processamento", data)
       .then((response) => {
@@ -239,10 +258,14 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastroUnidadeProcessamento(data) {
-    
-    data.id_municipio = municipio[0].id_municipio;
 
-    if (!municipio[0].id_municipio) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
+    
+    data.id_municipio = usuario.id_municipio;
+
+    if (!usuario.id_municipio) {
       toast.notify("Não existe id_municipio, entre novamente no sistema!", {
         title: "Erro",
         duration: 7,
@@ -250,7 +273,8 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       });
       return;
     }
-
+  
+    
     const resCad = await api
       .post("create-unidade-processamento", data)
       .then((response) => {
@@ -271,16 +295,14 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   async function getUnidadesProcessamento() {
-    const ano = new Date().getFullYear();
-    const id_municipio = municipio[0]?.id_municipio;
+    const ano = anoSelected;
+    const id_municipio = usuario?.id_municipio;
     const res = await api
       .post("list-unidades-processamento", {
         ano: ano,
         id_municipio: id_municipio,
       })
-      .then((response) => {
-        console.log(response.data);
-        
+      .then((response) => {        
         return response.data;
       })
       .catch((error) => {
@@ -310,7 +332,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       .post("get-dados-unidade-processamento", {
         id_unidade_processamento: id,
         ano: ano,
-        id_municipio: municipio[0]?.id_municipio,
+        id_municipio: usuario?.id_municipio,
       })
       .then((response) => {
         return response.data;
@@ -390,7 +412,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0]?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <DivFormResiduo>
@@ -826,7 +848,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={unidadeProcessamento?.up051}
                                 onChange={handleOnChange}
                               >
-                                <option></option>
+                                <option value="">{unidadeProcessamento?.up051 ? unidadeProcessamento?.up051 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -879,7 +901,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 {...register("UP004")}
                                 onChange={handleOnChange}
                               >
-                                <option value={""}>{unidadeProcessamento?.up004 ? unidadeProcessamento?.up004 : "Selecione uma opção"}</option>
+                                <option value="">{unidadeProcessamento?.up004 ? unidadeProcessamento?.up004 : "Opções"}</option>
                                 <option>Prefeitura</option>
                                 <option>Empresa privada</option>
                                 <option>Associação de catadores</option>
@@ -903,7 +925,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 {...register("UP084")}
                                 defaultValue={unidadeProcessamento?.up084}
                               >
-                                <option value={""}>{unidadeProcessamento?.up084 ? unidadeProcessamento?.up084 : "Selecione uma opção"}</option>
+                                <option value="">{unidadeProcessamento?.up084 ? unidadeProcessamento?.up084 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -926,7 +948,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={unidadeProcessamento?.up050}
                                 onChange={handleOnChange}
                               >
-                                <option></option>
+                                <option value="">{unidadeProcessamento?.up050 ? unidadeProcessamento?.up050 : "Opções"}</option>
                                 <option>Operação</option>
                                 <option>Instalação</option>
                                 <option>Prévia</option>
@@ -947,9 +969,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                             <InputG>
                               <select
                                 {...register("UP012")}
-                                defaultValue={unidadeProcessamento?.up012}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{unidadeProcessamento?.up012 ? unidadeProcessamento?.up012 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1028,6 +1050,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up027}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up027 ? dadosUnidade?.up027 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1049,6 +1072,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up028}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up028 ? dadosUnidade?.up028 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1070,6 +1094,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up029}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up029 ? dadosUnidade?.up029 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1090,7 +1115,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up030}
                                 onChange={handleOnChange}
                               >
-                                <option></option>
+                                <option value="">{dadosUnidade?.up030 ? dadosUnidade?.up030 : "Opções"}</option>
                                 <option>Não e realizado</option>
                                 <option>Diária</option>
                                 <option>Semanal</option>
@@ -1111,6 +1136,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up031}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up031 ? dadosUnidade?.up031 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1132,6 +1158,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up052}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up052 ? dadosUnidade?.up052 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1153,6 +1180,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up032}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up032 ? dadosUnidade?.up032 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1174,6 +1202,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up033}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up033 ? dadosUnidade?.up033 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1195,6 +1224,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up053}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up053 ? dadosUnidade?.up053 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1215,6 +1245,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up054}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up054 ? dadosUnidade?.up054 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1236,6 +1267,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up034}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up034 ? dadosUnidade?.up034 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1257,6 +1289,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up035}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up035 ? dadosUnidade?.up035 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1279,6 +1312,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up036}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up036 ? dadosUnidade?.up036 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1299,6 +1333,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up037}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up037 ? dadosUnidade?.up037 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1321,6 +1356,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up038}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up038 ? dadosUnidade?.up038 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1342,6 +1378,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up081}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up081 ? dadosUnidade?.up081 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1403,6 +1440,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up039}
                                 onChange={handleOnChange}
                               >
+                                <option value="">{dadosUnidade?.up039 ? dadosUnidade?.up039 : "Opções"}</option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1890,7 +1928,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                       </table>
                     </Tabela>
                   </DivFormConteudoModal>
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
                 </ModalStepContent>
 
                 <ModalStepperNavigation>
@@ -2062,7 +2100,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     </tbody>
                   </table>
                 </DivFormConteudoModal>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
                 
               </ConteudoModal>
             </FormModal>
@@ -2074,35 +2112,4 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
 
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
-
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
-
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
-
-  return {
-    props: {
-      municipio,
-    },
-  };
-};

@@ -95,11 +95,43 @@ export function AuthProvider({ children }) {
     const usuarioLogado = await resUsuarioLogado.data;
 
     usuarioLogado.map((user) => {
-      if (user.id_permissao === 3 && user.id_sistema === 2) {
-        Router.push("/indicadores/home_indicadores");
-      } else {
+      // Editor de plataforma TedPlan
+      if(user.id_permissao === 3 && user.id_sistema === 1){
         Router.push("/dashboard");
       }
+      // Editor de plataforma Município
+      if (user.id_permissao === 3 && user.id_sistema === 2) {
+        Router.push("/indicadores/home_indicadores");
+      }     
+      // Administrador de plataforma TedPlan
+      if(user.id_permissao === 2 && user.id_sistema === 1){
+        Router.push("/dashboard");
+      }
+      // Administrador de plataforma Município
+      if (user.id_permissao === 2 && user.id_sistema === 2) {
+        Router.push("/indicadores/home_indicadores");
+      } 
+      // Revisor de plataforma Município
+      if (user.id_permissao === 4 && user.id_sistema === 2) {
+        Router.push("/indicadores/home_indicadores");
+      } 
+      // Administrador Geral
+      if(user.id_permissao === 1){
+        Router.push("/dashboard");
+      }
+      // Revisor
+      if(user.id_permissao === 4){
+        Router.push("/dashboard");
+      }
+      // Supervisor
+      if(user.id_permissao === 5){
+        Router.push("/dashboard");
+      }
+
+      if(user.id_permissao === null || user.id_permissao === undefined){
+        Router.push("/");
+      }
+      
     });
   }
   async function signOut() {
@@ -109,8 +141,8 @@ export function AuthProvider({ children }) {
     Router.push("/");
   }
 
-  function setMunicipioUser(id) {
-    usuario.id_municipio = id;
+  function setMunicipioUser(id) {    
+    usuario.id_municipio = Number(id);
     localStorage.setItem("usuario", JSON.stringify(usuario));
     setUser(usuario);
   }
