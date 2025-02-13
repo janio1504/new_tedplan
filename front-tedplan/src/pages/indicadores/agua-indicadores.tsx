@@ -35,9 +35,6 @@ import {
   StepperButton,
 } from "../../styles/esgoto-indicadores";
 
-
-
-
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -47,13 +44,12 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast, ToastContainer } from "react-nextjs-toast";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
-import { 
-  Sidebar, 
-  SidebarItem } from "../../styles/residuo-solidos-in";
+import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import { MainContent } from "../../styles/indicadores";
+import { anosSelect } from "../../util/util";
 
 interface IMunicipio {
   id_municipio: string;
@@ -81,16 +77,17 @@ export default function Agua() {
   const [activeForm, setActiveForm] = useState("ligacoes");
 
   useEffect(() => {
-    getMunicipio()
+    getMunicipio();
   }, []);
 
-  async function getMunicipio(){
-    const res = await api.get("getMunicipio", {
-      params: { id_municipio: usuario.id_municipio },
-    }).then(response =>{
-      setDadosMunicipio(response.data)
-    })
- 
+  async function getMunicipio() {
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        setDadosMunicipio(response.data);
+      });
   }
 
   function handleOnChange(content) {
@@ -98,29 +95,28 @@ export default function Agua() {
   }
 
   async function handleCadastro(data) {
-
-    data.id_agua = dadosAgua?.id_agua
-    data.id_municipio = dadosMunicipio[0]?.id_municipio
-    data.ano = anoSelected
+    data.id_agua = dadosAgua?.id_agua;
+    data.id_municipio = dadosMunicipio[0]?.id_municipio;
+    data.ano = anoSelected;
 
     const resCad = await api
       .post("create-agua", data)
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!', {
+        toast.notify("Dados gravados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
           type: "success",
-        })
+        });
         return response.data;
       })
       .catch((error) => {
         console.log(error);
       });
-    getDadosAgua(anoSelected)
+    getDadosAgua(anoSelected);
   }
 
   async function getDadosAgua(ano) {
-    const id_municipio = dadosMunicipio[0]?.id_municipio
+    const id_municipio = dadosMunicipio[0]?.id_municipio;
     const res = await api
       .post("get-agua-por-ano", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
@@ -130,24 +126,22 @@ export default function Agua() {
         console.log(error);
       });
 
-    
-    
-    setDadosAgua(res[0])
+    setDadosAgua(res[0]);
   }
 
-
   function seletcAno(ano: any) {
+    setAnoSelected(ano);
 
-    setAnoSelected(ano)
-
-    getDadosAgua(ano)
+    getDadosAgua(ano);
   }
 
   return (
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -182,332 +176,473 @@ export default function Agua() {
         </SidebarItem>
       </Sidebar>
       <MainContent>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm style={{ borderColor: "#12B2D5" }}>
-            <DivTituloForm>Água</DivTituloForm>
-            <DivFormEixo>
-              <DivFormConteudo active={activeForm === "ligacoes" || activeForm === "volumes" || activeForm === "extencao" || activeForm === "consumo" || activeForm === "observacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Ano</DivTituloConteudo>
-                </DivTitulo>
-                <label>Selecione o ano desejado:</label>
-                <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
-                  <option >Selecionar</option>
-                  <option value="2022">2022</option>
-                  <option value="2023">2023</option>
-                  <option value="2024">2024</option>
-                </select>
-              </DivFormConteudo >
-            </DivFormEixo>
-            <DivFormEixo>
-              <DivFormConteudo active={activeForm === "ligacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
-                </DivTitulo>
-                <InputSNIS>
-                  <label><b>Código SNIS</b></label>
-                  <p>AG021</p>
-                  <p>AG002</p>
-                  <p>AG004</p>
-                  <p>AG003</p>
-                  <p>AG014</p>
-                  <p>AG013</p>
-                  <p>AG022</p>
-                </InputSNIS>
-                <InputGG>
-                  <label><b>Descrição</b></label>
-                  <p>Quantidade de ligações totais de água</p>
-                  <p>Quantidade de ligações ativas de água</p>
-                  <p>Quantidade de ligações ativas de água micromedidas</p>
-                  <p>Quantidade de economias ativas de água</p>
-                  <p>Quantidade de economias ativas de água micromedidas</p>
-                  <p>Quantidade de economias residenciais ativas de água</p>
-                  <p>Quantidade de economias residenciais ativas de água micromedidas</p>
-                </InputGG>
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <DivForm style={{ borderColor: "#12B2D5" }}>
+              <DivTituloForm>Água</DivTituloForm>
+              <DivFormEixo>
+                <DivFormConteudo
+                  active={
+                    activeForm === "ligacoes" ||
+                    activeForm === "volumes" ||
+                    activeForm === "extencao" ||
+                    activeForm === "consumo" ||
+                    activeForm === "observacoes"
+                  }
+                >
+                  <DivTitulo>
+                    <DivTituloConteudo>Ano</DivTituloConteudo>
+                  </DivTitulo>
+                  <label>Selecione o ano desejado:</label>
+                  <select
+                    name="ano"
+                    id="ano"
+                    onChange={(e) => seletcAno(e.target.value)}
+                  >
+                    <option>Selecionar</option>
+                    {anosSelect().map((ano) => (
+                      <option value={ano}>{ano}</option>
+                    ))}
+                  </select>
+                </DivFormConteudo>
+              </DivFormEixo>
+              <DivFormEixo>
+                <DivFormConteudo active={activeForm === "ligacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
 
-                <InputP>
+                      <tr>
+                        <td>AG021</td>
+                        <td>Quantidade de ligações totais de água</td>
+                        <td>
+                          <input
+                            {...register("AG021")}
+                            defaultValue={dadosAgua?.ag021}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>ligação</td>
+                      </tr>
+                      <tr>
+                        <td>AG002</td>
+                        <td>Quantidade de ligações ativas de água</td>
+                        <td>
+                          <input
+                            {...register("AG002")}
+                            defaultValue={dadosAgua?.ag002}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>ligação</td>
+                      </tr>
+                      <tr>
+                        <td>AG004</td>
+                        <td>
+                          Quantidade de ligações ativas de água micromedidas
+                        </td>
+                        <td>
+                          <input
+                            {...register("AG004")}
+                            defaultValue={dadosAgua?.ag004}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>ligação</td>
+                      </tr>
+                      <tr>
+                        <td>AG003</td>
+                        <td>Quantidade de economias ativas de água</td>
+                        <td>
+                          <input
+                            {...register("AG003")}
+                            defaultValue={dadosAgua?.ag003}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>economia</td>
+                      </tr>
+                      <tr>
+                        <td>AG014</td>
+                        <td>
+                          Quantidade de economias ativas de água micromedidas
+                        </td>
+                        <td>
+                          <input
+                            {...register("AG014")}
+                            defaultValue={dadosAgua?.ag014}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>economia</td>
+                      </tr>
+                      <tr>
+                        <td>AG013</td>
+                        <td>
+                          Quantidade de economias residenciais ativas de água
+                        </td>
+                        <td>
+                          <input
+                            {...register("AG013")}
+                            defaultValue={dadosAgua?.ag013}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>economia</td>
+                      </tr>
+                      <tr>
+                        <td>AG022</td>
+                        <td>
+                          Quantidade de economias residenciais ativas de água
+                          micromedidas
+                        </td>
+                        <td>
+                          <input
+                            {...register("AG022")}
+                            defaultValue={dadosAgua?.ag022}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>economia</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                  <label>Ano: {anoSelected}</label>
+                <DivFormConteudo active={activeForm === "volumes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Volumes</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>AG006</td>
+                        <td>Volume de água produzido</td>
+                        <td>
+                          <input
+                            {...register("AG006")}
+                            defaultValue={dadosAgua?.ag006}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG024</td>
+                        <td>Volume de água de serviço</td>
+                        <td>
+                          <input
+                            {...register("AG024")}
+                            defaultValue={dadosAgua?.ag024}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG016</td>
+                        <td>Volume de água bruta importado</td>
+                        <td>
+                          <input
+                            {...register("AG016")}
+                            defaultValue={dadosAgua?.ag016}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG018</td>
+                        <td>Volume de água tratada importado</td>
+                        <td>
+                          <input
+                            {...register("AG018")}
+                            defaultValue={dadosAgua?.ag018}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG017</td>
+                        <td>Volume de água bruta exportado</td>
+                        <td>
+                          <input
+                            {...register("AG017")}
+                            defaultValue={dadosAgua?.ag017}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG019</td>
+                        <td>Volume de água tratada exportado</td>
+                        <td>
+                          <input
+                            {...register("AG019")}
+                            defaultValue={dadosAgua?.ag019}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG007</td>
+                        <td>Volume de água tratada em ETA(s)</td>
+                        <td>
+                          <input
+                            {...register("AG007")}
+                            defaultValue={dadosAgua?.ag007}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG015</td>
+                        <td>
+                          {" "}
+                          Volume de água de água tratada por simples desinfecção
+                        </td>
+                        <td>
+                          <input
+                            {...register("AG015")}
+                            defaultValue={dadosAgua?.ag015}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG027</td>
+                        <td>Volume de água fluoretada</td>
+                        <td>
+                          <input
+                            {...register("AG027")}
+                            defaultValue={dadosAgua?.ag027}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG012</td>
+                        <td>Volume de água macromedida</td>
+                        <td>
+                          <input
+                            {...register("AG012")}
+                            defaultValue={dadosAgua?.ag012}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG008</td>
+                        <td>Volume de água micromedida</td>
+                        <td>
+                          <input
+                            {...register("AG008")}
+                            defaultValue={dadosAgua?.ag008}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG010</td>
+                        <td>Volume de água consumido</td>
+                        <td>
+                          <input
+                            {...register("AG010")}
+                            defaultValue={dadosAgua?.ag010}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG011</td>
+                        <td>Volume de água faturado</td>
+                        <td>
+                          <input
+                            {...register("AG011")}
+                            defaultValue={dadosAgua?.ag011}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                      <tr>
+                        <td>AG020</td>
+                        <td>
+                          Volume micromedido nas economias residenciais de água
+                        </td>
+                        <td>
+                          <input
+                            {...register("AG020")}
+                            defaultValue={dadosAgua?.ag020}
+                            onChange={handleOnChange}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>1.000m³/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                  <input {...register("AG021")}
-                    defaultValue={dadosAgua?.ag021}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG002")}
-                    defaultValue={dadosAgua?.ag002}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG004")}
-                    defaultValue={dadosAgua?.ag004}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG003")}
-                    defaultValue={dadosAgua?.ag003}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG014")}
-                    defaultValue={dadosAgua?.ag014}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG013")}
-                    defaultValue={dadosAgua?.ag013}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG022")}
-                    defaultValue={dadosAgua?.ag022}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                </InputP>
-                <InputSNIS>
-                  <label>.</label>
-                  <p>ligação</p>
-                  <p>ligação</p>
-                  <p>ligação</p>
-                  <p>economia</p>
-                  <p>economia</p>
-                  <p>economia</p>
-                  <p>economia</p>
-                </InputSNIS>
-              </DivFormConteudo>
+                <DivFormConteudo active={activeForm === "extencao"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Extenção da rede</DivTituloConteudo>
+                  </DivTitulo>
+                  <InputSNIS>
+                    <label>
+                      <b>Código SNIS</b>
+                    </label>
+                    <p>AG005</p>
+                  </InputSNIS>
+                  <InputGG>
+                    <label>
+                      <b>Descrição</b>
+                    </label>
+                    <p>Extenção da rede de água</p>
+                  </InputGG>
 
-              <DivFormConteudo active={activeForm === "volumes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Volumes</DivTituloConteudo>
-                </DivTitulo>
-                <InputSNIS>
-                  <label><b>Código SNIS</b></label>
-                  <p>AG006</p>
-                  <p>AG024</p>
-                  <p>AG016</p>
-                  <p>AG018</p>
-                  <p>AG017</p>
-                  <p>AG019</p>
-                  <p>AG007</p>
-                  <p>AG015</p>
-                  <p>AG027</p>
-                  <p>AG012</p>
-                  <p>AG008</p>
-                  <p>AG010</p>
-                  <p>AG011</p>
-                  <p>AG020</p>
+                  <InputP>
+                    <label>Ano: {anoSelected}</label>
 
-                </InputSNIS>
-                <InputGG>
-                  <label><b>Descrição</b></label>
-                  <p>Volume de água produzido</p>
-                  <p>Volume de água de serviço</p>
-                  <p>Volume de água bruta importado</p>
-                  <p>Volume de água tratada importado</p>
-                  <p>Volume de água bruta exportado</p>
-                  <p>Volume de água tratada exportado</p>
-                  <p>Volume de água tratada em ETA(s)</p>
-                  <p>Volume de água de água tratada por simples desinfecção</p>
-                  <p>Volume de água fluoretada</p>
-                  <p>Volume de água macromedida</p>
-                  <p>Volume de água micromedida</p>
-                  <p>Volume de água consumido</p>
-                  <p>Volume de água faturado</p>
-                  <p>Volume micromedido nas economias residenciais de água</p>
-                </InputGG>
+                    <input
+                      {...register("AG005")}
+                      defaultValue={dadosAgua?.ag005}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  <InputSNIS>
+                    <label>.</label>
+                    <p>KM</p>
+                  </InputSNIS>
+                </DivFormConteudo>
 
-                <InputP>
+                <DivFormConteudo active={activeForm === "consumo"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Consumo de energia elétrica
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <InputSNIS>
+                    <label>
+                      <b>Código SNIS</b>
+                    </label>
+                    <p>AG028</p>
+                  </InputSNIS>
+                  <InputGG>
+                    <label>
+                      <b>Descrição</b>
+                    </label>
+                    <p>
+                      Consumo total de energia elétrica nos sistemas de água
+                    </p>
+                  </InputGG>
 
-                  <label>Ano: {anoSelected}</label>
+                  <InputP>
+                    <label>Ano: {anoSelected}</label>
 
-                  <input {...register("AG006")}
-                    defaultValue={dadosAgua?.ag006}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG024")}
-                    defaultValue={dadosAgua?.ag024}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG016")}
-                    defaultValue={dadosAgua?.ag016}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG018")}
-                    defaultValue={dadosAgua?.ag018}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG017")}
-                    defaultValue={dadosAgua?.ag017}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG019")}
-                    defaultValue={dadosAgua?.ag019}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG007")}
-                    defaultValue={dadosAgua?.ag007}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG015")}
-                    defaultValue={dadosAgua?.ag015}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG027")}
-                    defaultValue={dadosAgua?.ag027}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG012")}
-                    defaultValue={dadosAgua?.ag012}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG008")}
-                    defaultValue={dadosAgua?.ag008}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG010")}
-                    defaultValue={dadosAgua?.ag010}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG011")}
-                    defaultValue={dadosAgua?.ag011}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                  <input {...register("AG020")}
-                    defaultValue={dadosAgua?.ag020}
-                    onChange={handleOnChange}
-                    type="text"></input>
+                    <input
+                      {...register("AG028")}
+                      defaultValue={dadosAgua?.ag028}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  <InputSNIS>
+                    <label>.</label>
+                    <p>1.000kWh/ano</p>
+                  </InputSNIS>
+                </DivFormConteudo>
 
-                </InputP>
-                <InputSNIS>
-                  <label>.</label>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
-                  <p>1.000m³/ano</p>
+                <DivFormConteudo active={activeForm === "observacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Observações, esclarecimentos ou sugestões
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                      </tr>
+                      <tr>
+                        <td>AG098</td>
+                        <td>Campo de justificativa</td>
+                        <td>
+                          <textarea style={{width: "500px"}}
+                            {...register("AG098")}
+                            defaultValue={dadosAgua?.ag098}
+                            onChange={handleOnChange}
+                          />
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>AG099</td>
+                        <td>Observações</td>
+                        <td>
+                          <textarea style={{width: "500px"}}
+                            {...register("AG099")}
+                            defaultValue={dadosAgua?.ag099}
+                            onChange={handleOnChange}
+                          ></textarea>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+            
+                </DivFormConteudo>
+              </DivFormEixo>
+            </DivForm>
 
-                </InputSNIS>
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "extencao"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Extenção da rede
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <InputSNIS>
-                  <label><b>Código SNIS</b></label>
-                  <p>AG005</p>
-                </InputSNIS>
-                <InputGG>
-                  <label><b>Descrição</b></label>
-                  <p>Extenção da rede de água</p>
-                </InputGG>
-
-                <InputP>
-
-                  <label>Ano: {anoSelected}</label>
-
-                  <input {...register("AG005")}
-                    defaultValue={dadosAgua?.ag005}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                </InputP>
-                <InputSNIS>
-                  <label>.</label>
-                  <p>KM</p>
-                </InputSNIS>
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "consumo"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Consumo de energia elétrica
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <InputSNIS>
-                  <label><b>Código SNIS</b></label>
-                  <p>AG028</p>
-                </InputSNIS>
-                <InputGG>
-                  <label><b>Descrição</b></label>
-                  <p>Consumo total de energia elétrica nos sistemas de água</p>
-                </InputGG>
-
-                <InputP>
-
-                  <label>Ano: {anoSelected}</label>
-
-                  <input {...register("AG028")}
-                    defaultValue={dadosAgua?.ag028}
-                    onChange={handleOnChange}
-                    type="text"></input>
-                </InputP>
-                <InputSNIS>
-                  <label>.</label>
-                  <p>1.000kWh/ano</p>
-                </InputSNIS>
-              </DivFormConteudo>
-
-
-
-              <DivFormConteudo active={activeForm === "observacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Observações, esclarecimentos ou sugestões
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <InputSNIS>
-                  <label><b>Código SNIS</b></label>
-                  <p>AG098</p>
-                  <p></p>
-                  <p></p>
-                  <p></p>
-                  <p></p>
-                  <p></p>
-                  <p>AG099</p>
-                </InputSNIS>
-                <InputM>
-                  <label><b>Descrição</b></label>
-                  <p>Campo de justificativa</p>
-                  <p></p>
-                  <p></p>
-                  <p></p>
-                  <p></p>
-                  <p></p>
-                  <p>Observações</p>
-                </InputM>
-
-                <InputG>
-
-                  <label>Ano: {anoSelected}</label>
-
-                  <textarea {...register("AG098")}
-                    defaultValue={dadosAgua?.ag098}
-                    onChange={handleOnChange}
-                  />
-                  <textarea {...register("AG099")}
-                    defaultValue={dadosAgua?.ag099}
-                    onChange={handleOnChange}
-                  ></textarea>
-                </InputG>
-              </DivFormConteudo>
-
-            </DivFormEixo>
-          </DivForm>
-
-          <SubmitButton type="submit">Gravar</SubmitButton>
-
-        </Form>
-
-      </DivCenter>
+            <SubmitButton type="submit">Gravar</SubmitButton>
+          </Form>
+        </DivCenter>
       </MainContent>
     </Container>
   );
 }
-
-

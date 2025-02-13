@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 
 import {
   Container,
-  DivForm,
   DivInput,
   Form,
   InputP,
@@ -30,6 +29,7 @@ import {
 
 import {
   DivCenter,
+  DivForm,
   DivFormCadastro,
   DivTituloForm,
   StepButton,
@@ -61,6 +61,7 @@ import {
   SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import { MainContent } from "../../styles/indicadores";
+import { anosSelect } from "../../util/util";
 
 interface IMunicipio {
   id_municipio: string;
@@ -84,10 +85,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   const [activeForm, setActiveForm] = useState("ViasUrbanas");
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [content, setContent] = useState("");
+  const [anoSelected, setAnoSelected] = useState(null);
   
 
   useEffect(() => {
-    getDadosDrenagem()
+   // getDadosDrenagem()
   }, [municipio]);
 
   const setOptions = {
@@ -105,7 +107,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     data.id_drenagem_aguas_pluviais = dadosDrenagem?.id_drenagem_aguas_pluviais
    
     data.id_municipio = usuario.id_municipio
-    data.ano = new Date().getFullYear()     
+    data.ano = anoSelected    
     
     const resCad = await api
       .post("create-drenagem", data)
@@ -127,11 +129,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
       });
   }
 
-  async function getDadosDrenagem() {  
-    const id_municipio = usuario.id_municipio
-    const ano = new Date().getFullYear()  
-    
-    
+  async function getDadosDrenagem(ano) {  
+    const id_municipio = usuario.id_municipio 
     const res = await api
       .post("get-drenagem", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
@@ -157,6 +156,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
   function handleReporte() {
     Router.push("/indicadores/gestao");
+  }
+
+  function seletcAno(ano: any) {
+    setAnoSelected(ano)
+    getDadosDrenagem(ano)
   }
 
   return (
@@ -192,300 +196,377 @@ export default function Drenagem({ municipio }: MunicipioProps) {
         </SidebarItem>
         
       </Sidebar>
+      
       <MainContent>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm>
-              <DivTituloFormDrenagem>
+              <DivTituloForm>
               Drenagem e Águas Pluviais
-            </DivTituloFormDrenagem>
+              </DivTituloForm>
 
-            
+              <DivFormEixo>
+                   <DivFormConteudo active={activeForm === "ViasUrbanas" || activeForm === "CursosAguas" || activeForm === "observacoes" || activeForm === "eventosHidrologicos"}>
+                      <DivTitulo>
+                        <DivTituloConteudo>
+                          Ano
+                        </DivTituloConteudo>
+                      </DivTitulo>
+                       <label>Selecione o ano desejado:</label>
+                        <select
+                          name="ano"
+                          id="ano"
+                          onChange={(e) => seletcAno(e.target.value)}
+                        >
+                          <option>Selecionar</option>
+                          {anosSelect().map((ano) => (
+                            <option value={ano}>{ano}</option>
+                          ))}
+                        </select>
+                      
+                    </DivFormConteudo>
+                </DivFormEixo>              
+            <DivFormEixo>
             <DivFormConteudo active={activeForm === "ViasUrbanas"}>
               <DivTitulo>
                 <DivTituloConteudo>Vias urbanas</DivTituloConteudo>
               </DivTitulo>
-              <InputSNIS>
-                <th><b>Código SNIS</b></th>
-                <p>IE017</p>
-                <p>IE018</p>
-                <p>IE019</p>
-                <p>IE020</p>
-                <p>IE021</p>
-                <p>IE022</p>
-                <p>IE023</p>
-                <p>IE024</p>
-                <p>IE025</p>
-                <p>IE026</p>
-                <p>IE027</p>
-                <p>IE028</p>
-                <p>IE029</p>
-              </InputSNIS>
-              <InputXL>
-                <th><b>Descrição</b></th>
-                <p>Extensão total das vias públicas urbanas</p>
-                <p>Extensão total das vias públicas urbanas implantadas</p>
-                <p>
-                  Extensão total das vias públicas com pavimento e meio-fio (ou
-                  semelhante)
-                </p>
-                <p>
-                  Extensão total das vias públicas com pavimento e meio-fio (ou
-                  semelhante) implantadas no ano de referência
-                </p>
-                <p>Quantidade de bocas de lobo existentes</p>
-                <p>
-                  Quantidade de bocas de leão ou de bocas de lobo múltiplas (duas
-                  ou mais bocas de lobo conjugadas) existentes
-                </p>
-                <p>Quantidade de poços de visita (PV) existentes</p>
-                <p>
-                  Extensão total das vias públicas urbanas com redes de águas
-                  pluviais subterrâneos
-                </p>
-                <p>
-                  Extensão total das vias públicas urbanas com redes de águas
-                  pluviais subterrâneos implantados no ano de referência
-                </p>
-                <p>
-                  Existem vias públicas urbanas com canais artificiais abertos?
-                </p>
-                <p>
-                  Existem vias públicas urbanas com soluções de drenagem
-                  natural (faixas ou valas de infiltração)?
-                </p>
-                <p>
-                  Extensão total das vias públicas urbanas com soluções de
-                  drenagem natural (faixas ou valas de infiltração)
-                </p>
-                <p>
-                  Existem estenções elevatórias de águas pluviais na rede de
-                  drenagem?
-                </p>
-              </InputXL>
-
-              <InputP>              
-                <label>Ano: {new Date().getFullYear()}</label>
-
-                <input {...register("IE017")}
-                 defaultValue={dadosDrenagem?.ie017}
-                 onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE018")}
-                defaultValue={dadosDrenagem?.ie018}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE019")}
-                defaultValue={dadosDrenagem?.ie019}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE020")}
-                defaultValue={dadosDrenagem?.ie020}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE021")}
-                defaultValue={dadosDrenagem?.ie021}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE022")}
-                defaultValue={dadosDrenagem?.ie022}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE023")}
-                defaultValue={dadosDrenagem?.ie023}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE024")}
-                defaultValue={dadosDrenagem?.ie024}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE025")}
-                defaultValue={dadosDrenagem?.ie025}
-                onChange={handleOnChange}
-                type="text"></input>
-                
-                <select {...register('IE026')}
-                //defaultValue={dadosDrenagem?.ie041}
-                  onChange={handleOnChange}
-                >
-                  <option ></option>
-                  <option value="1">Sim</option>
-                  <option value="0">Não</option>
-                </select>
-
-                <select {...register('IE027')}
-                  onChange={handleOnChange}
-                >
-                  <option value={dadosDrenagem?.ie027}></option>
-                  <option value="1">Sim</option>
-                  <option value="0">Não</option>
-                </select>
-
-                <input {...register("IE028")}
-                defaultValue={dadosDrenagem?.ie028}
-                onChange={handleOnChange}
-                type="text"></input>
-
-                <select {...register('IE029')}
-                  onChange={handleOnChange}
-                >
-                  <option value={dadosDrenagem?.ie029}></option>
-                  <option value="1">Sim</option>
-                  <option value="0">Não</option>
-                </select>
-
-              </InputP>
-              <InputSNIS>
-                <label>.</label>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>unidades</p>
-                <p>unidades</p>
-                <p>unidades</p>
-                <p>km</p>
-                <p>km</p>
-                <p>.</p>
-                <p>.</p>
-                <p>km</p>
-                <p>.</p>
-              </InputSNIS>
+              
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano: {anoSelected}</th>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <td>IE017</td>
+                    <td>Extensão total das vias públicas urbanas</td>
+                    <td>
+                      <input {...register("IE017")}
+                        defaultValue={dadosDrenagem?.ie017}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE018</td>
+                    <td>Extensão total das vias públicas urbanas implantadas</td>
+                    <td>
+                      <input {...register("IE018")}
+                          defaultValue={dadosDrenagem?.ie018}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE019</td>
+                    <td>Extensão total das vias públicas com pavimento e meio-fio (ou
+                      semelhante)</td>
+                    <td>
+                    <input {...register("IE019")}
+                        defaultValue={dadosDrenagem?.ie019}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE020</td>
+                    <td> Extensão total das vias públicas com pavimento e meio-fio (ou
+                      semelhante) implantadas no ano de referência</td>
+                    <td>
+                      <input {...register("IE020")}
+                          defaultValue={dadosDrenagem?.ie020}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE021</td>
+                    <td>Quantidade de bocas de lobo existentes</td>
+                    <td>
+                      <input {...register("IE021")}
+                            defaultValue={dadosDrenagem?.ie021}
+                            onChange={handleOnChange}
+                            type="text"></input>
+                    </td>
+                    <td>unidades</td>
+                  </tr>
+                  <tr>
+                    <td>IE022</td>
+                    <td>Quantidade de bocas de leão ou de bocas de lobo múltiplas (duas
+                      ou mais bocas de lobo conjugadas) existentes</td>
+                    <td>
+                        <input {...register("IE022")}
+                            defaultValue={dadosDrenagem?.ie022}
+                            onChange={handleOnChange}
+                            type="text">                              
+                        </input>
+                    </td>
+                    <td>unidades</td>
+                  </tr>
+                  <tr>
+                    <td>IE023</td>
+                    <td>Quantidade de poços de visita (PV) existentes</td>
+                    <td>
+                        <input {...register("IE023")}
+                            defaultValue={dadosDrenagem?.ie023}
+                            onChange={handleOnChange}
+                            type="text">                              
+                        </input>
+                    </td>
+                    <td>unidades</td>
+                  </tr>
+                  <tr>
+                    <td>IE024</td>
+                    <td>Extensão total das vias públicas urbanas com redes de águas
+                      pluviais subterrâneos</td>
+                    <td>
+                        <input {...register("IE024")}
+                            defaultValue={dadosDrenagem?.ie024}
+                            onChange={handleOnChange}
+                            type="text">                              
+                        </input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE025</td>
+                    <td>Extensão total das vias públicas urbanas com redes de águas
+                      pluviais subterrâneos implantados no ano de referência</td>
+                    <td>
+                        <input {...register("IE025")}
+                            defaultValue={dadosDrenagem?.ie025}
+                            onChange={handleOnChange}
+                            type="text">                              
+                        </input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE026</td>
+                    <td>Existem vias públicas urbanas com canais artificiais abertos?</td>
+                    <td>
+                    <select {...register('IE026')}
+                        defaultValue={dadosDrenagem?.ie026}
+                        onChange={handleOnChange}
+                      >
+                        <option >{dadosDrenagem?.ie026}</option>
+                        <option value="1">Sim</option>
+                        <option value="0">Não</option>
+                      </select>
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>IE027</td>
+                    <td>Existem vias públicas urbanas com soluções de drenagem
+                      natural (faixas ou valas de infiltração)?</td>
+                    <td>
+                      <select {...register('IE027')}
+                          onChange={handleOnChange}
+                        >
+                          <option>{dadosDrenagem?.ie027}</option>
+                          <option value="1">Sim</option>
+                          <option value="0">Não</option>
+                        </select>
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>IE028</td>
+                    <td>Extensão total das vias públicas urbanas com soluções de drenagem natural (faixas ou valas de infiltração)</td>
+                    <td>
+                        <input {...register("IE028")}
+                            defaultValue={dadosDrenagem?.ie028}
+                            onChange={handleOnChange}
+                            type="text">                              
+                        </input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE029</td>
+                    <td>Existem estenções elevatórias de águas pluviais na rede de drenagem?</td>
+                    <td>
+                        <select {...register('IE029')}
+                            onChange={handleOnChange}
+                          >
+                            <option >{dadosDrenagem?.ie029}</option>
+                            <option value="1">Sim</option>
+                            <option value="0">Não</option>
+                          </select>
+                    </td>
+                    <td></td>
+                  </tr>                  
+                </tbody>
+              </table>
+            
             </DivFormConteudo>
-
+            
             <DivFormConteudo active={activeForm === "CursosAguas"}>
               <DivTitulo>
                 <DivTituloConteudo>
                   Cursos d’água - áreas urbanas
                 </DivTituloConteudo>
-              </DivTitulo>
-              <InputSNIS>
-                <label><b>Código SNIS</b></label>
-                <p>IE032</p>
-                <p>IE040</p>
-                <p>IE033</p>
-                <p>IE034</p>
-                <p>IE035</p>
-                <p>IE036</p>
-                <p>IE037</p>
-                <p>IE041</p>
-                <p>IE044</p>
-                <p>IE050</p>
-                <p>IE050A</p>
-              </InputSNIS>
-              <InputXL>
-                <label><b>Descrição</b></label>
-                <p>Extensão total dos Cursos d’água naturais perenes</p>
-                <p>
-                  Extensão total dos Cursos d’água naturais perenes com outro
-                  tipo de intervenção
-                </p>
-                <p>
-                  Extensão total dos Cursos d’água naturais perenes com diques
-                </p>
-                <p>
-                  Extensão total dos Cursos d’água naturais perenes
-                  canalizados abertos
-                </p>
-                <p>
-                  Extensão total dos Cursos d’água naturais perenes
-                  canalizados fechados
-                </p>
-                <p>
-                  Extensão total dos Cursos d’água naturais perenes com
-                  retificação
-                </p>
-                <p>
-                  Extensão total dos Cursos d’água naturais perenes com
-                  desenrocamento ou rebaixamento do leito
-                </p>
-                <p>
-                  Existe serviço de drenagem ou desassoreamento dos cursos de
-                  águas naturais perenes?
-                </p>
-                <p>
-                  Extensão total de parques lineares ao longo de Cursos d’água
-                  perenes
-                </p>
-                <p>Existem algum tipo de tratamento das águas pluviais?</p>
-                <p>
-                  Especifique qual é o outro tipo de tratamento das águas
-                  pluviais{" "}
-                </p>
-              </InputXL>
-              <InputP>
+              </DivTitulo>                
 
-                <label>Ano: {new Date().getFullYear()}</label>
-
-                <input {...register("IE032")}
-                defaultValue={dadosDrenagem?.ie032}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE040")}
-                defaultValue={dadosDrenagem?.ie040}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE033")}
-                defaultValue={dadosDrenagem?.ie033}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE034")}
-                defaultValue={dadosDrenagem?.ie034}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE035")}
-                defaultValue={dadosDrenagem?.ie035}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE036")}
-                defaultValue={dadosDrenagem?.ie036}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("IE037")}
-                defaultValue={dadosDrenagem?.ie037}
-                onChange={handleOnChange}
-                type="text"></input>
-                <select {...register("IE041")}
-                defaultValue={dadosDrenagem?.ie041}
-                onChange={handleOnChange}
-                >
-                  <option>Sim</option>
-                  <option>Não</option>
-                </select>
-                <input {...register("IE044")}
-                defaultValue={dadosDrenagem?.ie044}
-                onChange={handleOnChange}
-                type="text"></input>
-                <select {...register("IE050")}>
-                  <option></option>
-                  <option>Não existe tratamento</option>
-                  <option>Barragens</option>
-                  <option>Reservatórios de qualidade</option>
-                  <option>Reservatório de amortecimento</option>
-                  <option>Gradeamento e desarenação</option>
-                  <option>Decantação e/ou floculação</option>
-                  <option>Desinfecção quimica</option>
-                  <option>Outros(Especificar)</option>
-                </select>
-                <input {...register("IE050A")}
-                defaultValue={dadosDrenagem?.ie050a}
-                onChange={handleOnChange}
-                type="text"></input>
-              </InputP>
-              <InputSNIS>
-                <label>.</label>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>km</p>
-                <p>.</p>
-                <p>km</p>
-                <p>.</p>
-                <p>.</p>
-              </InputSNIS>
+              <table>
+                <tbody>  
+                  <tr>
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th>Ano: {anoSelected}</th>
+                    <th ></th>
+                  </tr>             
+                  <tr>
+                    <td>IE032</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes</td>
+                    <td>
+                      <input {...register("IE032")}
+                        defaultValue={dadosDrenagem?.ie032}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE040</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes com outro
+                    tipo de intervenção</td>
+                    <td>
+                        <input {...register("IE040")}
+                          defaultValue={dadosDrenagem?.ie040}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE033</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes com diques</td>
+                    <td>
+                        <input {...register("IE033")}
+                          defaultValue={dadosDrenagem?.ie033}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE034</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes
+                    canalizados abertos</td>
+                    <td>
+                      <input {...register("IE034")}
+                        defaultValue={dadosDrenagem?.ie034}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>              
+                  <tr>
+                    <td>IE035</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes
+                    canalizados fechados</td>
+                    <td>
+                        <input {...register("IE035")}
+                          defaultValue={dadosDrenagem?.ie035}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>              
+                  <tr>
+                    <td>IE036</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes com
+                    retificação</td>
+                    <td>
+                      <input {...register("IE036")}
+                        defaultValue={dadosDrenagem?.ie036}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE037</td>
+                    <td>Extensão total dos Cursos d’água naturais perenes com
+                    desenrocamento ou rebaixamento do leito</td>
+                    <td>
+                        <input {...register("IE037")}
+                          defaultValue={dadosDrenagem?.ie037}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE041</td>
+                    <td>Existe serviço de drenagem ou desassoreamento dos cursos de
+                    águas naturais perenes?</td>
+                    <td>
+                      <select {...register("IE041")}
+                        defaultValue={dadosDrenagem?.ie041}
+                        onChange={handleOnChange}
+                            >
+                        <option>Sim</option>
+                        <option>Não</option>
+                      </select>
+                      </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>IE044</td>
+                    <td>Extensão total de parques lineares ao longo de Cursos d’água
+                    perenes</td>
+                    <td>
+                        <input {...register("IE044")}
+                          defaultValue={dadosDrenagem?.ie044}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>km</td>
+                  </tr>
+                  <tr>
+                    <td>IE050</td>
+                    <td>Existem algum tipo de tratamento das águas pluviais?</td>
+                    <td>
+                        <select {...register("IE050")}>
+                          <option></option>
+                          <option>Não existe tratamento</option>
+                          <option>Barragens</option>
+                          <option>Reservatórios de qualidade</option>
+                          <option>Reservatório de amortecimento</option>
+                          <option>Gradeamento e desarenação</option>
+                          <option>Decantação e/ou floculação</option>
+                          <option>Desinfecção quimica</option>
+                          <option>Outros(Especificar)</option>
+                        </select>
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>IE050A</td>
+                    <td>Especifique qual é o outro tipo de tratamento das águas
+                    pluviais</td>
+                    <td>
+                        <input {...register("IE050A")}
+                          defaultValue={dadosDrenagem?.ie050a}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td></td>
+                  </tr>
+                </tbody>
+              </table>
+             
+              
             </DivFormConteudo>
 
             <DivFormConteudo active={activeForm === "observacoes"}>
@@ -494,25 +575,27 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                   Observações, esclarecimentos ou sugestões
                 </DivTituloConteudo>
               </DivTitulo>
-              <InputSNIS>
-                <label><b>Código SNIS</b></label>
-                <p>IE999</p>
-              </InputSNIS>
-              <InputM>
-                <label><b>Descrição</b></label>
-                <p>Observações, esclarecimentos ou sugestões</p>
-              </InputM>
-
-              <InputGG>
-
-                <label>Ano: {new Date().getFullYear()}</label>
-
-
-                <textarea {...register("IE999")}
-                defaultValue={dadosDrenagem?.ie999}
-                onChange={handleOnChange}
-                ></textarea>
-              </InputGG>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Código SNIS</th>
+                      <th>Descrição</th>
+                      <th>Ano: {anoSelected}</th>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>IE999</td>
+                      <td>Observações, esclarecimentos ou sugestões</td>
+                      <td>  
+                        <textarea {...register("IE999")} style={{width: "500px"}}
+                            defaultValue={dadosDrenagem?.ie999}
+                            onChange={handleOnChange}
+                            ></textarea></td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+          
             </DivFormConteudo>
 
             <DivFormConteudo active={activeForm === "eventosHidrologicos"}>
@@ -521,166 +604,156 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                   Eventos hidrológicos impactantes
                 </DivTituloConteudo>
               </DivTitulo>
-              <InputSNIS>
-                <label><b>Código SNIS</b></label>
-                <p>RI023</p>
-                <p>RI025</p>
-                <p>RI027</p>
-                <p>RI029</p>
-                <p>RI031</p>
-                <p>RI032</p>
-              </InputSNIS>
-              <InputXL>
-                <label><b>Descrição</b></label>
-                <p>Numero de enxurradas na área urbana do município</p>
-                <p>Numero de alagementos na área urbana do município</p>
-                <p>Numero de inundações na área urbana do município</p>
-                <p>
-                  Numero de pessoas desabrigadas ou desalojadas, na área urbana
-                  do município
-                </p>
-                <p>Numero de óbitos, na área urbana do município</p>
-                <p>Numero de imóveis urbanos atingidos</p>
-              </InputXL>
+              <table>
+                <tbody>
+                  <tr>
+                    <th>Código SNIS</th>
+                    <th>Descrição</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <td>RI023</td>
+                    <td>Numero de enxurradas na área urbana do município</td>
+                    <td>
+                      <input {...register("RI023")}
+                        defaultValue={dadosDrenagem?.ri023}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>enxurradas</td>
+                  </tr>
+                  <tr>
+                    <td>RI025</td>
+                    <td>Numero de alagementos na área urbana do município</td>
+                    <td>
+                        <input {...register("RI025")}
+                            defaultValue={dadosDrenagem?.ri025}
+                            onChange={handleOnChange}
+                            type="text"></input>
+                    </td>
+                    <td>alagamentos</td>
+                  </tr>
+                  <tr>
+                    <td>RI027</td>
+                    <td>Numero de inundações na área urbana do município</td>
+                    <td>
+                        <input {...register("RI027")}
+                            defaultValue={dadosDrenagem?.ri027}
+                            onChange={handleOnChange}
+                            type="text"></input>
+                    </td>
+                    <td>inundações</td>
+                  </tr>
+                  <tr>
+                    <td>RI029</td>
+                    <td>Numero de pessoas desabrigadas ou desalojadas, na área urbana
+                    do município</td>
+                    <td>
+                        <input {...register("RI029")}
+                            defaultValue={dadosDrenagem?.ri029}
+                            onChange={handleOnChange}
+                            type="text"></input>
+                    </td>
+                    <td>pessoas</td>
+                  </tr>
+                  <tr>
+                    <td>RI031</td>
+                    <td>Numero de óbitos, na área urbana do município</td>
+                    <td>
+                        <input {...register("RI031")}
+                            defaultValue={dadosDrenagem?.ri031}
+                            onChange={handleOnChange}
+                            type="text"></input>
+                    </td>
+                    <td>óbitos</td>
+                  </tr>
+                  <tr>
+                    <td>RI032</td>
+                    <td>Numero de imóveis urbanos atingidos</td>
+                    <td>                       
+                      <input {...register("RI032")}
+                        defaultValue={dadosDrenagem?.ri032}
+                        onChange={handleOnChange}
+                        type="text"></input>
+                    </td>
+                    <td>imóveis</td>
+                  </tr>
+                  <tr>
+                    <td>RI042</td>
+                    <td> Houve alojamento ou reassentamento de população residente em
+                          área de risco hidrológico, durante ou após eventos
+                          hidrológicos impactantes</td>
+                    <td>
+                      <select {...register("RI042")}
+                        defaultValue={dadosDrenagem?.ri042}
+                        onChange={handleOnChange}
+                        >
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
+                          
+                        </select>
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>RI043</td>
+                    <td> Quantidade de pessoas tranferidas para habitações provisórias
+                          durante ou após os eventos hidrológicos impactantes</td>
+                    <td>   
+                      <input {...register("RI043")}
+                          defaultValue={dadosDrenagem?.ri043}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>pessoas</td>
+                  </tr>
+                  <tr>
+                    <td>RI044</td>
+                    <td> Quantidade de pessoas realocadas para habitações permanentes
+                          durante ou após os eventos hidrológicos impactantes</td>
+                    <td>
+                        <input {...register("RI044")}
+                          defaultValue={dadosDrenagem?.ri044}
+                          onChange={handleOnChange}
+                          type="text"></input>
+                    </td>
+                    <td>pessoas</td>
+                  </tr>
+                  <tr>
+                    <td>RI045</td>
+                    <td>
+                          Houve atuação (federal, estadual ou municipal) para
+                        reassentamento da população e/ou para recuperação de imóveis
+                        urbanos afetados por eventos hidrológicos impactantes?
+                    </td>
+                    <td>
+                        <select {...register("RI045")}
+                          defaultValue={dadosDrenagem?.ri045}
+                          onChange={handleOnChange}
+                          >
+                            <option value="Sim">Sim</option>
+                            <option value="Não">Não</option>                  
+                          </select>
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>RI999</td>
+                    <td>Observações, esclarecimentos ou sugestões</td>
+                    <td colSpan={2}>
+                        <textarea 
+                        {...register("RI999")}
+                            defaultValue={dadosDrenagem?.ri999}
+                            onChange={handleOnChange}
+                            />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>        
 
-              <InputP>
-
-                <label>Ano: {new Date().getFullYear()}</label>
-
-                <input {...register("RI023")}
-                defaultValue={dadosDrenagem?.ri023}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("RI025")}
-                defaultValue={dadosDrenagem?.ri025}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("RI027")}
-                defaultValue={dadosDrenagem?.ri027}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("RI029")}
-                defaultValue={dadosDrenagem?.ri029}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("RI031")}
-                defaultValue={dadosDrenagem?.ri031}
-                onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("RI032")}
-                defaultValue={dadosDrenagem?.ri032}
-                onChange={handleOnChange}
-                type="text"></input>
-              </InputP>
-              <InputSNIS>
-                <label>.</label>
-                <p>enxurradas</p>
-                <p>alagamentos</p>
-                <p>inundações</p>
-                <p>pessoas</p>
-                <p>óbitos</p>
-                <p>imóveis</p>
-              </InputSNIS>
-              <DivSeparadora></DivSeparadora>
-              <InputSNIS>
-                <p>RI042</p>
-              </InputSNIS>
-              <InputXL>
-                <p>
-                  Houve alojamento ou reassentamento de população residente em
-                  área de risco hidrológico, durante ou após eventos
-                  hidrológicos impactantes
-                </p>
-              </InputXL>
-
-              <InputP>
-                <select {...register("RI042")}
-                defaultValue={dadosDrenagem?.ri042}
-                onChange={handleOnChange}
-                >
-                  <option value="Sim">Sim</option>
-                  <option value="Não">Não</option>
-                  
-                </select>
-              </InputP>
-              <InputSNIS>
-                <p>.</p>
-              </InputSNIS>
-
-              <DivSeparadora></DivSeparadora>
-
-              <InputSNIS>
-                <p>RI043</p>
-                <p>RI044</p>
-              </InputSNIS>
-              <InputXL>
-                <p>
-                  Quantidade de pessoas tranferidas para habitações provisórias
-                  durante ou após os eventos hidrológicos impactantes
-                </p>
-                <p>
-                  Quantidade de pessoas realocadas para habitações permanentes
-                  durante ou após os eventos hidrológicos impactantes
-                </p>
-              </InputXL>
-
-              <InputP>
-                <input {...register("RI043")}
-                 defaultValue={dadosDrenagem?.ri043}
-                 onChange={handleOnChange}
-                type="text"></input>
-                <input {...register("RI044")}
-                 defaultValue={dadosDrenagem?.ri044}
-                 onChange={handleOnChange}
-                type="text"></input>
-              </InputP>
-              <InputSNIS>
-                <p>pessoas</p>
-                <p>pessoas</p>
-              </InputSNIS>
-
-              <DivSeparadora></DivSeparadora>
-              <InputSNIS>
-                <p>RI045</p>
-              </InputSNIS>
-              <InputXL>
-                <p>
-                  Houve atuação (federal, estadual ou municipal) para
-                  reassentamento da população e/ou para recuperação de imóveis
-                  urbanos afetados por eventos hidrológicos impactantes?
-                </p>
-              </InputXL>
-
-              <InputP>
-                <select {...register("RI045")}
-                 defaultValue={dadosDrenagem?.ri045}
-                 onChange={handleOnChange}
-                >
-                  <option value="Sim">Sim</option>
-                  <option value="Não">Não</option>                  
-                </select>
-              </InputP>
-              <InputSNIS>
-                <p>.</p>
-              </InputSNIS>
-
-              <DivSeparadora></DivSeparadora>
-
-              <InputSNIS>
-                <p>RI999</p>
-              </InputSNIS>
-
-              <InputM>
-                <p>Observações, esclarecimentos ou sugestões</p>
-              </InputM>
-
-              <InputGG>
-                <textarea {...register("RI999")}
-                defaultValue={dadosDrenagem?.ri999}
-                onChange={handleOnChange}
-                ></textarea>
-              </InputGG>
             </DivFormConteudo>
+            </DivFormEixo>
           </DivForm>
 
           <SubmitButton type="submit">Gravar</SubmitButton>

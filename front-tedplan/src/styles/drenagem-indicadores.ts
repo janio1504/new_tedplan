@@ -269,14 +269,14 @@ export const LineSideBar = styled.div`
 `;
 
 export const DivFormConteudo = styled.div<{ active?: boolean }>`
-    display: ${props => props.active ? 'block' : 'none'}; 
-    float: left;
+  display: ${props => props.active ? 'block' : 'none'}; 
+  float: left;
   width: 97%;
   max-width: 1320;
   min-width: 1090px;
   padding: 10px 10px 10px 15px;
   border-radius: 10px;
-  margin-top: 30px;
+  margin-top: 10px;
   color: #667778;
   table{
     float: left;
@@ -311,16 +311,26 @@ export const DivFormConteudo = styled.div<{ active?: boolean }>`
     }
   }
   td{
-  
-    
-    
-    
+    input {
+      border: 2px solid #999999;
+      border-radius: 5px;
+      padding: 10px 15px;
+      margin: 10px;
+      color: #666;
+      text-align: right;
+      width: 100px;
+    }    
   }
   select{
     font-size: 14px;
     option{
     font-size: 16px;
   }
+  }
+
+  textarea {
+    border: 2px solid #999999;
+    border-radius: 5px;
   }
  
   

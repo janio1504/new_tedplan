@@ -429,7 +429,7 @@ export const DivForm = styled.div`
   justify-content: left;
   background-color: #fff;
   text-align: left;
-  padding: 10px 8px 10px 10px;
+  padding: 0;
   border-radius: 5px;
   font-size: 17px;
   margin-top: 50px;
@@ -441,10 +441,11 @@ export const DivForm = styled.div`
 `;
 
 export const DivTituloForm = styled.div`
-  width: 100%;
-  padding: 10px;
+ display: flex;
+  width: auto;
+  padding: 15px;
   color: #fff;
-  margin: -11px -10px 0 -11px;
+  margin: 0;
   background-color: #0085bd;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;

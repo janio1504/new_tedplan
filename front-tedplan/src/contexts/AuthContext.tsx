@@ -109,8 +109,8 @@ export function AuthProvider({ children }) {
     Router.push("/");
   }
 
-  function setMunicipioUser(id) {
-    usuario.id_municipio = id;
+  function setMunicipioUser(id) {    
+    usuario.id_municipio = Number(id);
     localStorage.setItem("usuario", JSON.stringify(usuario));
     setUser(usuario);
   }
