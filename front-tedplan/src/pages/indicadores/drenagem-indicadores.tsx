@@ -75,7 +75,7 @@ interface MunicipioProps {
 
 export default function Drenagem({ municipio }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
-  const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
+  const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
     handleSubmit,
@@ -89,7 +89,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   
 
   useEffect(() => {
-   // getDadosDrenagem()
+    getMunicipio()
   }, [municipio]);
 
   const setOptions = {
@@ -99,11 +99,28 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     defaultTag: "p",
   };
 
+  
+  async function getMunicipio() {
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        const res = response.data;       
+        setDadosMunicipio(res[0]);
+      });
+  }
+
   function handleOnChange(content) {
     setContent(content);
   }
   
   async function handleCadastro(data) {   
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     data.id_drenagem_aguas_pluviais = dadosDrenagem?.id_drenagem_aguas_pluviais
    
     data.id_municipio = usuario.id_municipio
@@ -167,7 +184,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={''}></MenuHorizontal>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -357,8 +374,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         onChange={handleOnChange}
                       >
                         <option >{dadosDrenagem?.ie026}</option>
-                        <option value="1">Sim</option>
-                        <option value="0">Não</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
                       </select>
                     </td>
                     <td></td>
@@ -372,8 +389,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                           onChange={handleOnChange}
                         >
                           <option>{dadosDrenagem?.ie027}</option>
-                          <option value="1">Sim</option>
-                          <option value="0">Não</option>
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
                         </select>
                     </td>
                     <td></td>
@@ -398,8 +415,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                             onChange={handleOnChange}
                           >
                             <option >{dadosDrenagem?.ie029}</option>
-                            <option value="1">Sim</option>
-                            <option value="0">Não</option>
+                            <option value="Sim">Sim</option>
+                            <option value="Não">Não</option>
                           </select>
                     </td>
                     <td></td>
@@ -756,7 +773,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
             </DivFormEixo>
           </DivForm>
 
-          <SubmitButton type="submit">Gravar</SubmitButton>
+          {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
         </Form>
       </DivCenter>
       </MainContent>
@@ -764,36 +781,4 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
- 
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
-
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
-
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
-
-  return {
-    props: {
-      municipio,
-    },
-  };
-};
 

@@ -90,7 +90,7 @@ export default function DashboardIndicadores() {
       <HeadPublico></HeadPublico>
       <BodyDashboard>
         <Sidebar />
-        {usuario?.id_permissao == 1 ?
+        {usuario?.id_permissao == 1 || usuario?.id_permissao == 4 ?
         <DivMunicipios>          
           <Form onSubmit={handleSubmit(handleSetMunicipio)}>
             <label>Municipios</label>

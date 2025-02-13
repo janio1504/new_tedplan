@@ -87,7 +87,7 @@ class PsResiduosUnidadeController {
   }
 
   async createUnidadeProcessamento({ request }){
-    const dados = request.all()
+    const dados = request.all()    
     try {
       if(!dados.id_unidade_processamento){
         const res = await PsFinanceiro.query()
@@ -108,6 +108,8 @@ class PsResiduosUnidadeController {
         .where('id_unidade_processamento', dados.id_unidade_processamento)
         .fetch()
         const ruc = dadosRuc.toJSON()[0]
+        console.log(dados);
+        
 
         const res = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
@@ -203,13 +205,14 @@ class PsResiduosUnidadeController {
           observacoes_unidade: dados.observacoes_unidade,
           id_municipio: dados.id_municipio,
           ano: dados.ano,
+          id_unidade_processamento: dados.id_unidade_processamento
           })
       }else{
         const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
         .where('id_residuos_unidade_processamento', dados.id_residuos_unidade_processamento)
         .fetch()
-        const ruc = dadosRuc.toJSON()[0]
+        const ruc = dadosRuc.toJSON()[0]        
 
         const res = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
@@ -261,8 +264,7 @@ class PsResiduosUnidadeController {
           municipio_unidade: dados.municipio_unidade ? dados.municipio_unidade : ruc.municipio_unidade,
           nome_unidade: dados.nome_unidade ? dados.nome_unidade : ruc.nome_unidade,
           observacoes_unidade: dados.observacoes_unidade ? dados.observacoes_unidade : ruc.observacoes_unidade,
-          })
-          console.log(dados);          
+          })          
 
           const dadosUprs = await PsFinanceiro.query()
           .from('tedplan.unidades_processamento_residuo_solido')

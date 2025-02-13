@@ -85,7 +85,7 @@ interface MunicipioProps {
 
 export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
-  const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
+  const [dadosMunicipio, setDadosMunicipio] = useState(null)
   const {
     register,
     handleSubmit,
@@ -97,15 +97,23 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [content, setContent] = useState("");
   const [activeForm, setActiveForm] = useState("agua");
 
-  useEffect(() => {}, [municipio]);
+  useEffect(() => {
+    getMunicipio()
+  }, [municipio]);
 
-  const setOptions = {
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
 
+  async function getMunicipio() {
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        const res = response.data;
+        setDadosMunicipio(res[0]);
+      });
+  }
+
+ 
   function handleOnChange(content) {
     setContent(content);
   }
@@ -113,9 +121,14 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   function handleCloseModalCO020() {}
 
   async function handleCadastro(data) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     data.id_qualidade = dadosQualidade?.id_qualidade;
     data.id_municipio = usuario.id_municipio;
-    data.ano = new Date().getFullYear();
+    data.ano = anoSelected;
     const resCad = await api
       .post("create-qualidade", data)
       .then((response) => {
@@ -134,16 +147,17 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
   async function getDadosQualidade(ano) {
     const id_municipio = usuario.id_municipio;
-    const res = await api
+    await api
       .post("get-qualidade", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
+        setDadosQualidade(response.data[0]);
         return response.data;
       })
       .catch((error) => {
         console.log(error);
       });
 
-    setDadosQualidade(res[0]);
+    
   }
 
   async function handleSignOut() {
@@ -165,6 +179,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [anoSelected, setAnoSelected] = useState(null);
 
   function seletcAno(ano: any) {
+    setDadosQualidade(null);
     setAnoSelected(ano);
 
     getDadosQualidade(ano);
@@ -174,7 +189,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={""}></MenuHorizontal>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -486,7 +501,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                       <tr >
                         <th>Código SNIS</th>
                         <th style={{ width: "500px" }}>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
 
                       <tr>
@@ -893,7 +908,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
               </DivFormEixo>
             </DivForm>
 
-            <SubmitButton type="submit">Gravar</SubmitButton>
+            {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>

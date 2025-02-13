@@ -262,11 +262,10 @@ export const DivFormConteudo= styled.div`
   margin-top: 30px;
   color: #667778;
   table{
-    float: left;
+    width: 100%;
     margin-bottom: 20px;
   }
-  th{
-    text-align: left;
+  th{    
     padding: 0 10px 0 0px;
     span{
       text-align: center;
@@ -294,9 +293,7 @@ export const DivFormConteudo= styled.div`
     }
   }
   td{
-  
-    
-    
+     
     
   }
   select{
@@ -419,9 +416,11 @@ export const SubmitButton = styled.button`
   margin: 30px 10px;
   color: #fff;
   border: 0px;
-  background: #008080;
-  border-radius: 3px;
+  background: #0085bd;
+  border-radius: 5px;
   flex-direction: row;
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
   width: 80px;
   display: flex;

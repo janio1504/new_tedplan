@@ -86,7 +86,7 @@ export default function Agua() {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data);
+        setDadosMunicipio(response.data[0]);
       });
   }
 
@@ -95,13 +95,17 @@ export default function Agua() {
   }
 
   async function handleCadastro(data) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     data.id_agua = dadosAgua?.id_agua;
-    data.id_municipio = dadosMunicipio[0]?.id_municipio;
+    data.id_municipio = usuario?.id_municipio;
     data.ano = anoSelected;
 
     const resCad = await api
       .post("create-agua", data)
-      .then((response) => {
+      .then((response) => {    
         toast.notify("Dados gravados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
@@ -116,7 +120,7 @@ export default function Agua() {
   }
 
   async function getDadosAgua(ano) {
-    const id_municipio = dadosMunicipio[0]?.id_municipio;
+    const id_municipio = usuario?.id_municipio;
     const res = await api
       .post("get-agua-por-ano", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
@@ -639,7 +643,7 @@ export default function Agua() {
               </DivFormEixo>
             </DivForm>
 
-            <SubmitButton type="submit">Gravar</SubmitButton>
+            {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>

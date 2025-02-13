@@ -442,26 +442,28 @@ export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: left;
-
+  background-color: #fff;
   text-align: left;
   padding: 10px 8px 10px 10px;
-  border: solid #008080 2px;
-  border-radius: 5px;
+  
+  border-radius: 12px;
   margin-top: 50px;
   color: #fff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
   table {
-    display: flex;
-    justify-content: left;
+   
   }
 `;
 
 export const DivTituloForm = styled.div`
   width: 100%;
-  padding: 10px;
+  padding: 15px 10px;
   color: #fff;
   margin: -11px -10px 0 -11px;
-  background-color: #008080;
-  border-radius: 2px;
+  background-color: #0085bd;
+  border-top-right-radius: 12px;
+  border-top-left-radius: 12px;
   font-weight: bolder;
 `;
 
@@ -689,12 +691,14 @@ export const DivBotaoAdicionar = styled.div`
 
 export const SubmitButton = styled.button`
   padding: 10px 15px;
-  margin: 30px 10px 8px 10px;
+  margin: 30px 10px 50px 10px;
   color: #fff;
   border: 0px;
-  background: #008080;
-  border-radius: 3px;
+  background: #0085bd;
+  border-radius: 5px;
   flex-direction: row;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   width: 80px;
   display: flex;
@@ -786,9 +790,9 @@ export const Form = styled.form`
   background-color: #f3f4f6;
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #ccc;
     border-radius: 5px;
-    padding: 10px 15px;
+    padding: 15px 15px;
     margin: 10px;
     color: #666;
     float: left;
@@ -804,11 +808,12 @@ export const Form = styled.form`
     padding: 10px 15px;
     margin: 10px;
     height: 200px;
-    border: 2px solid #2dd9d0;
+    border: 2px solid #ccc;
   }
   label {
     color: #666;
     margin: 10px 0 0 15px;
+    font-size: 14px;
   }
 
   select {

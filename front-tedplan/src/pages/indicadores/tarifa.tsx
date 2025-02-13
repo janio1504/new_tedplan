@@ -70,6 +70,7 @@ import {
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import api from "../../services/api";
 import { anosSelect } from "../../util/util";
+import MenuHorizontal from "../../components/MenuHorizontal";
 
 interface IMunicipio {
   id_municipio: string;
@@ -107,7 +108,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data);
+        setDadosMunicipio(response.data[0]);
       });
   }
 
@@ -123,6 +124,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastro(data) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     data.id_tarifa = dadosTarifa?.id_tarifa;
     data.id_municipio = usuario.id_municipio;
     data.ano = anoSelected;
@@ -182,18 +188,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuMunicipio>
-        <Municipio>Municipio: {}</Municipio>
-        <MenuMunicipioItem>
-          <ul>
-            <li onClick={handleHome}>Home</li>
-            <li onClick={handleGestao}>Gestão</li>
-            <li onClick={handleIndicadores}>Indicadores</li>
-            <li onClick={handleReporte}>Reporte</li>
-            <li onClick={handleSignOut}>Sair</li>
-          </ul>
-        </MenuMunicipioItem>
-      </MenuMunicipio>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>  
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -1005,8 +1000,8 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                 </DivFormConteudo>
               </DivFormEixo>
             </DivForm>
-
-            <SubmitButton type="submit">Gravar</SubmitButton>
+            
+            {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>

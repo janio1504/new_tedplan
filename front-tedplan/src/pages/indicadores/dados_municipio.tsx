@@ -105,6 +105,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   };
 
   async function handleCadastro(data: any) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     try {
       await updateMunicipio({
         ...data,
@@ -422,7 +427,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </tbody>
               </table>
               <SubmitButtonContainer>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
             <DivFormCadastro active={activeForm === "titularServicos"}>
@@ -534,7 +539,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </tbody>
               </table>
               <SubmitButtonContainer>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
 
@@ -1571,7 +1576,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </table>
               <div style={{ color: "#fff" }}>;</div>
               <SubmitButtonContainer>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
             <DivFormCadastro active={activeForm === "controleSocial"}>
@@ -1618,7 +1623,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 ></input>
               </InputG>
               <SubmitButtonContainer>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
             <DivFormCadastro active={activeForm === "controleSocial"}>
@@ -1663,7 +1668,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 ></input>
               </InputG>
               <SubmitButtonContainer>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
 
@@ -1726,7 +1731,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </InputM>
 
               <SubmitButtonContainer>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
           </Form>

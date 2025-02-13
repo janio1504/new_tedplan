@@ -115,7 +115,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     }
   }
 
-  async function handleCadastro(data) {    
+  async function handleCadastro(data) {  
+    
+    if(usuario?.id_permissao === 4){
+      return
+    }
     // CALCULO DA FORMULAS DO SNIS
     // AGUA E ESGOTO
     data.AES_FN005 =
@@ -2556,7 +2560,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
               </DivFormEixo>
           </DivForm>
 
-          {anoSelected && <SubmitButton type="submit">Gravar</SubmitButton>}
+          {anoSelected && usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
         </Form>
       </DivCenter>
       </MainContent>

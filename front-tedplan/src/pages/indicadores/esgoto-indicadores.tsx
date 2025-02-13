@@ -100,6 +100,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastro(data) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     data.id_esgoto = dadosEsgoto?.id_esgoto;
     data.id_municipio = usuario.id_municipio;
     data.ano = anoSelected;
@@ -494,7 +499,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
               </DivFormEixo>
             </DivForm>
 
-            <SubmitButton type="submit">Gravar</SubmitButton>
+            {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>

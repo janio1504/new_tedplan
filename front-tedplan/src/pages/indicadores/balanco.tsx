@@ -99,9 +99,14 @@ export default function Balanco({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastro(data) {
+
+    if(usuario?.id_permissao === 4){
+      return
+    }
+
     data.id_balanco = dadosBalanco?.id_balanco;
-    data.id_municipio = municipio[0].id_municipio;
-    data.ano = new Date().getFullYear();
+    data.id_municipio = usuario?.id_municipio;
+    data.ano = anoSelected;
     const resCad = await api
       .post("create-balanco", data)
       .then((response) => {

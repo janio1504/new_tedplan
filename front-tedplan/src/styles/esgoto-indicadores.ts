@@ -435,8 +435,7 @@ export const DivForm = styled.div`
   margin-top: 50px;
   color: #fff;
   table {
-    display: flex;
-    justify-content: left;
+    
   }
 `;
 

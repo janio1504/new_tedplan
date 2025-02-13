@@ -60,6 +60,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [unidadesRsc, setDadosUnidadesRsc] = useState(null);
   const [unidadesRss, setDadosUnidadesRss] = useState(null);
   const [associacoes, setAssociacoes] = useState(null);
+  const [anoSelected, setAnoSelected] = useState(null);
 
   const [ listPoliticas, setPoliticas] = useState(null)
   const [ listPlanos, setPlanos] = useState(null)
@@ -68,11 +69,11 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [ representantes, setRepresentantes] = useState(null);
 
   useEffect(() => {
-    setDadosMunicipio(municipio[0]);
+    // setDadosMunicipio(municipio[0]);
     
-     municipio.map((value) => {
-      setMunicipio(value.municipio_nome);
-    });
+    //  municipio.map((value) => {
+    //   setMunicipio(value.municipio_nome);
+    // });
     getDadosGerais()
     getConcessionarias()
     getDadosFinanceiros()
@@ -91,8 +92,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
   
   async function getDadosGerais(){
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const resCad = await api
       .post("get-geral", { id_municipio: id_municipio, ano: ano })
       .then((response) => {
@@ -104,8 +105,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getDadosAgua() {  
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()  
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected 
     const res = await api
       .post("get-agua", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
@@ -119,8 +120,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getDadosEsgoto() {  
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()  
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const res = await api
       .post("get-esgoto", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
@@ -134,8 +135,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getDadosDrenagem() {  
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()  
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected 
     const res = await api
       .post("get-drenagem", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
@@ -148,8 +149,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getDadosResiduosColeta() {  
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()  
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected 
     const res = await api
       .post("getPsResiduosColeta", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
@@ -163,8 +164,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
 
   async function getConcessionarias(){
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const resCad = await api
       .post("get-concessionarias", { id_municipio: id_municipio, ano: ano})
       .then((response) => {       
@@ -176,8 +177,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getDadosFinanceiros(){
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const resCad = await api
       .post("getPsFinanceiro", { id_municipio: id_municipio, ano: ano})
       .then((response) => {         
@@ -188,8 +189,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       });
   }
   async function getUnidadesRsc(){
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const res = await api
       .post("list-unidades-rsc", { id_municipio: id_municipio, ano: ano})
       .then((response) => {         
@@ -201,8 +202,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getUnidadesRss(){
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const res = await api
       .post("list-unidades-rss", { id_municipio: id_municipio, ano: ano})
       .then((response) => {         
@@ -214,8 +215,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   }
 
   async function getCooperativas(){
-    const id_municipio = municipio[0].id_municipio
-    const ano = new Date().getFullYear()
+    const id_municipio = usuario?.id_municipio
+    const ano = anoSelected
     const res = await api
       .post("list-cooperativas-catadores", { id_municipio: id_municipio, ano: ano})
       .then((response) => {         
@@ -232,7 +233,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   async function getPoliticas(){
     
     const resPoliticas = await api.get("getPoliticas", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const politicas = resPoliticas.data
     setPoliticas(politicas)
@@ -240,7 +241,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
   async function getPlanos(){
     const resPlanos = await api.get("getPlanos", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const planos = await resPlanos.data
     setPlanos(planos)
@@ -248,7 +249,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
   async function getParticipacoes(){
     const resParticipacao = await api.get("getParticipacaoControleSocial", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
    const participacao = await resParticipacao.data;
    setListParticipacoes(participacao)
@@ -256,7 +257,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
   async function getRepresentantes(){
     const resRepresentantes = await api.get("getRepresentantesServicos", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const representantes = await resRepresentantes.data;
         
@@ -265,7 +266,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
 
   async function getGestao(){
     const resGestao = await api.get("getGestao", {
-      params: { id_municipio: municipio[0]?.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
     const rsGestao = await resGestao.data;
     setGestao(rsGestao)
@@ -284,12 +285,16 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     Router.push("/indicadores/gestao"); 
   }
 
+  function seletcAno(ano: any) {
+    setAnoSelected(ano);
+  }
+
   
 
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <div style={{marginTop:"50px"}}>
 
@@ -334,34 +339,3 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
-
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
-
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
-
-  return {
-    props: {
-      municipio,
-    },
-  };
-};

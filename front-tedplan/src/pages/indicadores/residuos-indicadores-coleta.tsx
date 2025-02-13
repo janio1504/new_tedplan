@@ -186,10 +186,13 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastroCAC(data) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
     try {
       const result = await createDataCoopCat({
         nome_associacao: data.nome_associacao,
-        id_municipio: dadosMunicipio?.id_municipio,
+        id_municipio: usuario?.id_municipio,
         numero_associados: data.numero_associados,
         ano: anoSelected,
       }).then((response) => {
@@ -200,7 +203,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         });
         loadDadosCooperativasCatadores({
           ano: anoSelected,
-          id: dadosMunicipio?.id_municipio,
+          id: usuario?.id_municipio,
         });
       });
     } catch (error) {
@@ -237,11 +240,14 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     }
     loadDadosCooperativasCatadores({
       ano: anoSelected,
-      id: dadosMunicipio?.id_municipio,
+      id: usuario?.id_municipio,
     });
   }
 
   function handleCadastro(data) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
     if (anoSelected === null || anoSelected === "Selecionar") {
       toast.notify("Selecione um ano!", {
         title: "Erro",
@@ -487,7 +493,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
    
     data.id_residuos_solidos_coleta = dadosResiduos?.id_residuos_solidos_coleta
    
-    data.id_municipio = dadosMunicipio?.id_municipio;
+    data.id_municipio = usuario?.id_municipio;
     data.ano = anoSelected;
     const apiClient = getAPIClient();
     const resCad = apiClient
@@ -498,7 +504,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
           duration: 7,
           type: "success",
         });
-        loadDadosResiduos({ano: anoSelected, id: dadosMunicipio?.id_municipio});
+        loadDadosResiduos({ano: anoSelected, id: usuario?.id_municipio});
         return response;
       })
       .catch((error) => {
@@ -512,9 +518,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastroUnidadeRsc(data) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
     try {
       const result = await createDataUnidadeRsc({
-        id_municipio: dadosMunicipio?.id_municipio,
+        id_municipio: usuario?.id_municipio,
         codigo: "CO020",
         id_unidade_processamento: unidadeP?.id_unidade_processamento,
         ano: anoSelected,
@@ -527,7 +536,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         });
         loadDadosUnidadesRsc({
           ano: anoSelected,
-          id: dadosMunicipio?.id_municipio,
+          id: usuario?.id_municipio,
         });
       });
     } catch (error) {
@@ -551,7 +560,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         });
         loadDadosUnidadesRss({
           ano: anoSelected,
-          id: dadosMunicipio?.id_municipio,
+          id: usuario?.id_municipio,
         });
       });
     }
@@ -567,16 +576,19 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         });
         loadDadosUnidadesRsc({
           ano: anoSelected,
-          id: dadosMunicipio?.id_municipio,
+          id: usuario?.id_municipio,
         });
       });
     }
   };
 
   async function handleCadastroUnidadeRss(data) {
+    if(usuario?.id_permissao === 4){
+      return
+    }
     try {
       const result = await createDataUnidadeRss({
-        id_municipio: dadosMunicipio?.id_municipio,
+        id_municipio: usuario?.id_municipio,
         codigo: "RS031",
         id_unidade_processamento: unidadeP?.id_unidade_processamento,
         ano: anoSelected,
@@ -590,7 +602,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
       });
       loadDadosUnidadesRss({
         ano: anoSelected,
-        id: dadosMunicipio?.id_municipio,
+        id: usuario?.id_municipio,
       });
     } catch (error) {
       toast.notify(error.message || "Erro ao cadastrar unidade RSS", {
@@ -622,12 +634,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     
     setAnoSelected(ano);
     //resetExternal()
-    loadDadosResiduos({ ano: ano, id: dadosMunicipio?.id_municipio });
-    loadDadosUnidadesRss({ ano: ano, id: dadosMunicipio?.id_municipio });
-    loadDadosUnidadesRsc({ ano: ano, id: dadosMunicipio?.id_municipio });
+    loadDadosResiduos({ ano: ano, id: usuario?.id_municipio });
+    loadDadosUnidadesRss({ ano: ano, id: usuario?.id_municipio });
+    loadDadosUnidadesRsc({ ano: ano, id: usuario?.id_municipio });
     loadDadosCooperativasCatadores({
       ano: ano,
-      id: dadosMunicipio?.id_municipio,
+      id: usuario?.id_municipio,
     });
   }
 
@@ -1896,120 +1908,135 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       Residuos sólidos domiciliares e públicos coletados
                     </DivTituloConteudo>
                   </DivTitulo>
-                  <InputSNIS>
-                    <label>
-                      <b>Código SNIS</b>
-                    </label>
-                    <p>CO154</p>
-                    <p>CO012</p>
-                    <p>CO146</p>
-                    <p>CO148</p>
-                    <p>CO149</p>
-                    <p>CO150</p>
-                    <p>CO151</p>
-                    <p>CO152</p>
-                  </InputSNIS>
-                  <InputXL>
-                    <label>
-                      <b>Descrição</b>
-                    </label>
-                    <p>
-                      Os residuos provenientes da varrição ou limpeza de
+                  <table>
+                    <tr>
+                      <th>Código SNIS</th>
+                      <th>Descrição</th>
+                      <th>Ano: {anoSelected}</th>
+                      <th></th>
+                    </tr>
+                    <tr>
+                      <td>CO154</td>
+                      <td> Os residuos provenientes da varrição ou limpeza de
                       logradouros públicos são recolhidos junto com os residuos
-                      domiciliares?
-                    </p>
-                    <p>
-                      Valor contratado (preço unitário) do serviço de RDO e RPU
-                      diurna
-                    </p>
-                    <p>
-                      Valor contratual (preço unitário) do serviço de transporte
-                      de RDO e RPU até a unidade de destinação final
-                    </p>
-                    <p>
-                      No preço acima está incluido o transporte de RDO e RPU
-                      coletados até a destinação final?
-                    </p>
-                    <p>
-                      A distancia média do centro de massa à unidade de
-                      destinação final é superior a 15 km?
-                    </p>
-                    <p>
-                      Especifique a distancia do centro de massa à unidade de
-                      destinação final superior a 15km
-                    </p>
-                    <p>
-                      A distancia média de transporte à unidade de destinação
-                      final é superior a 15km?
-                    </p>
-                    <p>
-                      Especifique a distancia de transporte à unidade de
-                      destinação final superior a 15km
-                    </p>
-                  </InputXL>
-
-                  <InputP>
-                    <label>Ano: {anoSelected}</label>
-
-                    <select {...registerExternal("CO154")}>
-                      <option>{dadosResiduos?.co154}</option>
+                      domiciliares?</td>
+                      <td>
+                      <select {...registerExternal("CO154")}>
+                      <option value="">{dadosResiduos?.co154 ? dadosResiduos?.co154 : "Opções" }</option>
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
                     </select>
-                    <input
+                      </td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>CO012</td>
+                      <td> Valor contratado (preço unitário) do serviço de RDO e RPU
+                      diurna</td>
+                      <td>
+                      <InputP>
+                      <input
                       {...registerExternal("CO012")}
                       type="text"
                       defaultValue={dadosResiduos?.co012}
                       onChange={handleOnChange}
                     ></input>
-                    <input
+                    </InputP>
+                      </td>
+                      <td>R$/tonelada</td>
+                    </tr>
+                    <tr>
+                      <td>CO146</td>
+                      <td>  Valor contratual (preço unitário) do serviço de transporte
+                      de RDO e RPU até a unidade de destinação final</td>
+                      <td>
+                      <InputP>
+                      <input
                       {...registerExternal("CO146")}
                       type="text"
                       defaultValue={dadosResiduos?.co146}
                       onChange={handleOnChange}
                     ></input>
-                    <select {...registerExternal("CO148")}>
-                      <option>{dadosResiduos?.co148}</option>
+                    </InputP>
+                      </td>
+                      <td>R$/tonelada</td>
+                    </tr>
+                    <tr>
+                      <td>CO148</td>
+                      <td>No preço acima está incluido o transporte de RDO e RPU
+                      coletados até a destinação final?</td>
+                      <td>
+                      <select {...registerExternal("CO148")}>
+                      <option value="">{dadosResiduos?.co148 ? dadosResiduos?.co148 : "Opções"}</option>
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
                     </select>
-                    <select {...registerExternal("CO149")}>
-                      <option>{dadosResiduos?.co149}</option>
+                      </td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>CO149</td>
+                      <td> A distancia média do centro de massa à unidade de
+                      destinação final é superior a 15 km?</td>
+                      <td>
+                      <select {...registerExternal("CO149")}>
+                      <option value="">{dadosResiduos?.co149 ? dadosResiduos?.co149 : "Opções"}</option>
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
-                    </select>
-                    <input
+                      </select>
+                      </td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>CO150</td>
+                      <td>Especifique a distancia do centro de massa à unidade de
+                      destinação final superior a 15km</td>
+                      <td>
+                      <InputP>
+                      <input
                       {...registerExternal("CO150")}
                       type="text"
                       defaultValue={dadosResiduos?.co150}
                       onChange={handleOnChange}
                     ></input>
-                    <select {...registerExternal("CO151")}>
-                      <option>{dadosResiduos?.co151}</option>
+                    </InputP>
+                      </td>
+                      <td>Km</td>
+                    </tr>
+                    <tr>
+                      <td>CO151</td>
+                      <td> A distancia média de transporte à unidade de destinação
+                      final é superior a 15km?</td>
+                      <td>
+                      <select {...registerExternal("CO151")}>
+                      <option value="">{dadosResiduos?.co151 ? dadosResiduos?.co151 : "Opções"}</option>
                       <option value="Sim">Sim</option>
                       <option value="Não">Não</option>
                     </select>
-                    <input
+                      </td>
+                      <td></td>
+                    </tr>
+                    <tr>
+                      <td>CO152</td>
+                      <td> Especifique a distancia de transporte à unidade de
+                      destinação final superior a 15km</td>
+                      <td>
+                      <InputP>
+                      <input
                       {...registerExternal("CO152")}
                       type="text"
                       defaultValue={dadosResiduos?.co152}
                       onChange={handleOnChange}
                     ></input>
-                  </InputP>
-                  <InputSNIS>
-                    <label>.</label>
-                    <p>.</p>
-                    <p>R$/tonelada</p>
-                    <p>R$/tonelada</p>
-                    <p>.</p>
-                    <p>.</p>
-                    <p>Km</p>
-                    <p>.</p>
-                    <p>Km</p>
-                  </InputSNIS>
+                    </InputP>
+                      </td>
+                      <td>Km</td>
+                    </tr>
+                  </table>
+                
 
                   <table>
-                    <thead>
+                  <tbody>
                       <tr>
                         <th>
                           <span>
@@ -2036,8 +2063,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                           <span>Total</span>
                         </th>
                       </tr>
-                    </thead>
-                    <tbody>
+                    
+                    
                       <tr>
                         <td></td>
                         <td>
@@ -2298,7 +2325,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2424,7 +2451,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2504,7 +2531,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -3117,7 +3144,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -3258,7 +3285,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -3422,7 +3449,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -3881,7 +3908,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -4227,7 +4254,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                       <tr>
                         <th>Código SNIS</th>
                         <th>Descrição</th>
-                        <th>Ano {new Date().getFullYear()}</th>
+                        <th>Ano {anoSelected}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -5539,7 +5566,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   Proximo
                 </ModalStepperButton>
               )}
-              {currentStep === 11 && <SubmitButton type="submit">Gravar</SubmitButton>}
+              {currentStep === 11 && usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
             </ModalStepperNavigation>
           </ModalStepperContainer>
         </Form>
@@ -5557,7 +5584,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 >
                   <span></span>
                 </CloseModalButton>
-                <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
+                {usuario?.id_permissao !== 4 &&  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>}
                 <table>
                   <tr>
                     <th>Município</th>
@@ -5704,7 +5731,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 >
                   <span></span>
                 </CloseModalButton>
-                <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
+                {usuario?.id_permissao !== 4 &&  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>}
                 <table>
                   <tr>
                     <th>Município</th>
@@ -5851,7 +5878,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 >
                   <span></span>
                 </CloseModalButton>
-                <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
+                {usuario?.id_permissao !== 4 &&  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>}
                 <TabelaModal>
                   <table>
                     <tbody>
