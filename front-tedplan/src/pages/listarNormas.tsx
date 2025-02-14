@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast, ToastContainer } from "react-nextjs-toast";
 import "suneditor/dist/css/suneditor.min.css";
 import { getData } from "./api/post";
 
@@ -90,9 +90,10 @@ export default function Postagens({ normas }: NormasProps) {
   const [idNorma, setIdNorma] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
-  
 
-  useEffect(() => {},[0]);
+  console.log(normas);
+
+  useEffect(() => {}, [0]);
 
   async function handleShowModal(id_imagem, id_norma) {
     if (id_imagem) {
@@ -101,15 +102,17 @@ export default function Postagens({ normas }: NormasProps) {
         url: "getImagem",
         params: { id: id_imagem },
         responseType: "blob",
-      }).then((response) => {
-        setImagem(URL.createObjectURL(response.data));        
-      }).catch(()=>{
-        setImagem(null);
-      });
+      })
+        .then((response) => {
+          setImagem(URL.createObjectURL(response.data));
+        })
+        .catch(() => {
+          setImagem(null);
+        });
     }
 
-    setIdNorma(id_norma)
-    setIdImagem(id_imagem)
+    setIdNorma(id_norma);
+    setIdImagem(id_imagem);
 
     setModalVisible(true);
   }
@@ -121,12 +124,13 @@ export default function Postagens({ normas }: NormasProps) {
         url: "getFile",
         params: { id: id_arquivo },
         responseType: "blob",
-      }).then((response) => {
-        setArquivo(URL.createObjectURL(response.data));        
-      }).catch(()=>{
-        setArquivo(null);
-      });
-      
+      })
+        .then((response) => {
+          setArquivo(URL.createObjectURL(response.data));
+        })
+        .catch(() => {
+          setArquivo(null);
+        });
     }
 
     if (id_norma) {
@@ -160,7 +164,7 @@ export default function Postagens({ normas }: NormasProps) {
   async function handleUpdateNorma(data: INorma) {
     const formData = new FormData();
     console.log(data);
-    
+
     formData.append("arquivo", data.arquivo[0]);
     formData.append("titulo", data.titulo);
     formData.append("id_arquivo", data.id_arquivo);
@@ -172,11 +176,11 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!',{
+        toast.notify("Dados gravados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
           type: "success",
-        })
+        });
       })
       .catch((error) => {
         console.log(error);
@@ -194,20 +198,20 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        toast.notify('Norma removida com sucesso!',{
+        toast.notify("Norma removida com sucesso!", {
           title: "Sucesso!",
           duration: 7,
           type: "success",
-        })
+        });
         setModalConfirm(false);
         Router.push("/listarNormas");
       })
       .catch((error) => {
-        toast.notify('Aconteceu um erro!',{
+        toast.notify("Aconteceu um erro!", {
           title: "Erro!",
           duration: 7,
           type: "error",
-        })
+        });
         setModalConfirm(false);
         Router.push("/listarNormas");
       });
@@ -232,11 +236,11 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!',{
+        toast.notify("Dados gravados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
           type: "success",
-        })
+        });
         return response;
       })
       .catch((error) => {
@@ -306,8 +310,6 @@ export default function Postagens({ normas }: NormasProps) {
                     >
                       Editar Imagem
                     </BotaoVisualizar>
-
-                    
                   </td>
                 </tr>
               </tbody>
@@ -318,130 +320,118 @@ export default function Postagens({ normas }: NormasProps) {
       <Footer>&copy; Todos os direitos reservados </Footer>
 
       {isModalConfirm && (
-                      <ContainerModal>
-                        <Modal>
-                          <ConteudoModal>
-                            <TituloModal>
-                              <h3>
-                                <b>Você confirma a exclusão!</b>
-                              </h3>
-                            </TituloModal>
-                            <ConfirmModal>
-                              <CancelButton onClick={handleCloseConfirm}>
-                                <b>Cancelar</b>
-                              </CancelButton>
-                              <ConfirmButton
-                                onClick={() => handleRemoverNorma()}
-                              >
-                                <b>Confirmar</b>
-                              </ConfirmButton>
-                            </ConfirmModal>
-                          </ConteudoModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+        <ContainerModal>
+          <Modal>
+            <ConteudoModal>
+              <TituloModal>
+                <h3>
+                  <b>Você confirma a exclusão!</b>
+                </h3>
+              </TituloModal>
+              <ConfirmModal>
+                <CancelButton onClick={handleCloseConfirm}>
+                  <b>Cancelar</b>
+                </CancelButton>
+                <ConfirmButton onClick={() => handleRemoverNorma()}>
+                  <b>Confirmar</b>
+                </ConfirmButton>
+              </ConfirmModal>
+            </ConteudoModal>
+          </Modal>
+        </ContainerModal>
+      )}
 
-                    {isModalVisible && (
-                      <ContainerModal>
-                        <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
-                          <FormModal
-                            onSubmit={handleSubmit(handleUpdateImagem)}
-                          >
-                            <ConteudoModal>
-                              <input
-                                type="hidden"
-                                {...register("id_norma")}
-                                defaultValue={idNorma}
-                                onChange={handleOnChange}
-                                name="id_norma"
-                              />
-                              <input
-                                type="hidden"
-                                {...register("id_imagem")}
-                                defaultValue={idImagem}
-                                onChange={handleOnChange}
-                                name="id_imagem"
-                              />
-                              <label>
-                                Selecione uma imagem para substituir a atual!
-                              </label>
-                              <input
-                                {...register("imagem")}
-                                type="file"
-                                accept="image/*"
-                                onChange={(event) => {
-                                  const files = event.target.files;
-                                  if (files) {
-                                    setImagem(URL.createObjectURL(files[0]));
-                                  }
-                                }}
-                              />
+      {isModalVisible && (
+        <ContainerModal>
+          <Modal>
+            <CloseModalButton onClick={handleCloseModal}>
+              Fechar
+            </CloseModalButton>
+            <FormModal onSubmit={handleSubmit(handleUpdateImagem)}>
+              <ConteudoModal>
+                <input
+                  type="hidden"
+                  {...register("id_norma")}
+                  defaultValue={idNorma}
+                  onChange={handleOnChange}
+                  name="id_norma"
+                />
+                <input
+                  type="hidden"
+                  {...register("id_imagem")}
+                  defaultValue={idImagem}
+                  onChange={handleOnChange}
+                  name="id_imagem"
+                />
+                <label>Selecione uma imagem para substituir a atual!</label>
+                <input
+                  {...register("imagem")}
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) => {
+                    const files = event.target.files;
+                    if (files) {
+                      setImagem(URL.createObjectURL(files[0]));
+                    }
+                  }}
+                />
 
-                              <ImagemModal>
-                                <img src={`${imagem}`} alt="TedPlan" />
-                              </ImagemModal>
-                            </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
-                          </FormModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+                <ImagemModal>
+                  <img src={`${imagem}`} alt="TedPlan" />
+                </ImagemModal>
+              </ConteudoModal>
+              <SubmitButton type="submit">Gravar</SubmitButton>
+            </FormModal>
+          </Modal>
+        </ContainerModal>
+      )}
 
-                    {isModalUpdateVisible && (
-                      <ContainerModal>
-                        <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
-                          <FormModal onSubmit={handleSubmit(handleUpdateNorma)}>
-                            <ConteudoModal>
-                              <TituloModal>
-                                <input
-                                  type="hidden"
-                                  {...register("id_norma")}
-                                  value={isNorma.id_norma}
-                                />
-                                <input
-                                  type="hidden"
-                                  {...register("id_arquivo")}
-                                  value={isNorma.id_arquivo}
-                                />
-                                <ImagemModal></ImagemModal>
-                                <label>Titulo</label>
-                                <input
-                                  {...register("titulo")}
-                                  defaultValue={isNorma.titulo}
-                                  name="titulo"
-                                  onChange={handleOnChange}
-                                />
-                                <button>
-                                  <a
-                                    href={arquivo}
-                                    rel="noreferrer"
-                                    target="_blank"
-                                  >
-                                    Clique aqui para ver o arquivo atual!
-                                  </a>
-                                </button>
-                                <label>
-                                  Para trocar o arquivo, selecione outro!
-                                </label>
-                                <input
-                                  {...register("arquivo")}
-                                  accept=".pdf, .doc, .docx, .xls, .xlsx"
-                                  type="file"
-                                  name="arquivo"
-                                />
-                              </TituloModal>
-                            </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
-                          </FormModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+      {isModalUpdateVisible && (
+        <ContainerModal>
+          <Modal>
+            <CloseModalButton onClick={handleCloseModal}>
+              Fechar
+            </CloseModalButton>
+            <FormModal onSubmit={handleSubmit(handleUpdateNorma)}>
+              <ConteudoModal>
+                <TituloModal>
+                  <input
+                    type="hidden"
+                    {...register("id_norma")}
+                    value={isNorma.id_norma}
+                  />
+                  <input
+                    type="hidden"
+                    {...register("id_arquivo")}
+                    value={isNorma.id_arquivo}
+                  />
+                  <ImagemModal></ImagemModal>
+                  <label>Titulo</label>
+                  <input
+                    {...register("titulo")}
+                    defaultValue={isNorma.titulo}
+                    name="titulo"
+                    onChange={handleOnChange}
+                  />
+                  <button>
+                    <a href={arquivo} rel="noreferrer" target="_blank">
+                      Clique aqui para ver o arquivo atual!
+                    </a>
+                  </button>
+                  <label>Para trocar o arquivo, selecione outro!</label>
+                  <input
+                    {...register("arquivo")}
+                    accept=".pdf, .doc, .docx, .xls, .xlsx"
+                    type="file"
+                    name="arquivo"
+                  />
+                </TituloModal>
+              </ConteudoModal>
+              <SubmitButton type="submit">Gravar</SubmitButton>
+            </FormModal>
+          </Modal>
+        </ContainerModal>
+      )}
     </Container>
   );
 }
@@ -471,7 +461,7 @@ export const getServerSideProps: GetServerSideProps<NormasProps> = async (
   const eixos = await resEixo.data;
 
   const resNormas = await apiClient.get("/getNormas");
-  const normas = await resNormas.data;
+  const normas = await resNormas.data.data;
 
   return {
     props: {

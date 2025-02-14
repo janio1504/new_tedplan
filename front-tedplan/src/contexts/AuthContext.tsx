@@ -54,8 +54,8 @@ export function AuthProvider({ children }) {
       });
     }
 
-    if(!token){
-      Router.push('/')
+    if (!token) {
+      Router.push("/");
     }
   }, [usuario]);
 
@@ -83,11 +83,11 @@ export function AuthProvider({ children }) {
         return error;
       });
 
-      const { "tedplan.token": token } = parseCookies();
+    const { "tedplan.token": token } = parseCookies();
 
-      if (!token) {
-        Router.push("/login_indicadores");
-      }
+    if (!token) {
+      Router.push("/login_indicadores");
+    }
 
     const resUsuarioLogado = await api.get("getUsuario", {
       params: { id_usuario: data.id_usuario },
@@ -96,42 +96,41 @@ export function AuthProvider({ children }) {
 
     usuarioLogado.map((user) => {
       // Editor de plataforma TedPlan
-      if(user.id_permissao === 3 && user.id_sistema === 1){
+      if (user.id_permissao === 3 && user.id_sistema === 1) {
         Router.push("/dashboard");
       }
       // Editor de plataforma Município
       if (user.id_permissao === 3 && user.id_sistema === 2) {
         Router.push("/indicadores/home_indicadores");
-      }     
+      }
       // Administrador de plataforma TedPlan
-      if(user.id_permissao === 2 && user.id_sistema === 1){
+      if (user.id_permissao === 2 && user.id_sistema === 1) {
         Router.push("/dashboard");
       }
       // Administrador de plataforma Município
       if (user.id_permissao === 2 && user.id_sistema === 2) {
         Router.push("/indicadores/home_indicadores");
-      } 
+      }
       // Revisor de plataforma Município
       if (user.id_permissao === 4 && user.id_sistema === 2) {
         Router.push("/indicadores/home_indicadores");
-      } 
+      }
       // Administrador Geral
-      if(user.id_permissao === 1){
+      if (user.id_permissao === 1) {
         Router.push("/dashboard");
       }
       // Revisor
-      if(user.id_permissao === 4){
+      if (user.id_permissao === 4) {
         Router.push("/dashboard");
       }
       // Supervisor
-      if(user.id_permissao === 5){
+      if (user.id_permissao === 5) {
         Router.push("/dashboard");
       }
 
-      if(user.id_permissao === null || user.id_permissao === undefined){
+      if (user.id_permissao === null || user.id_permissao === undefined) {
         Router.push("/");
       }
-      
     });
   }
   async function signOut() {
@@ -141,7 +140,7 @@ export function AuthProvider({ children }) {
     Router.push("/");
   }
 
-  function setMunicipioUser(id) {    
+  function setMunicipioUser(id) {
     usuario.id_municipio = Number(id);
     localStorage.setItem("usuario", JSON.stringify(usuario));
     setUser(usuario);

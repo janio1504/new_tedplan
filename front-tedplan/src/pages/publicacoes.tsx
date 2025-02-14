@@ -83,8 +83,6 @@ export default function ViewPublicacoes({
   const [idTipo, setIdTipo] = useState(null);
   const [titulo, setTitulo] = useState(null);
 
-  console.log("Publicacoes recebidas:", publicacoes);
-
   useEffect(() => {
     if (publicacoes) {
       const page = 1;
