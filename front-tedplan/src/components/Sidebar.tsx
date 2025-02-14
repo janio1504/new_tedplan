@@ -93,7 +93,8 @@ const Sidebar = () => {
       {usuario?.id_permissao == 1 ?<>
       <MenuItem onClick={handleUsuarios}>
         <FaUsers /> Lista de Usuários
-      </MenuItem>
+      </MenuItem></>: ''}
+      {usuario?.id_permissao == 2 || usuario?.id_permissao == 1 ?<>
       <MenuItem onClick={handlePublicacoes}>
         <FaAddressBook /> Publicações
       </MenuItem>
