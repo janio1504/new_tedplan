@@ -54,7 +54,7 @@ const MenuItem = styled.div`
 
   &:hover {
     background-color: rgba(26, 35, 126, 0.08);
-    color: ##2C3E50;
+    color: #2C3E50;
     transform: translateX(4px);
   }
 
@@ -79,6 +79,10 @@ const Sidebar = () => {
     Router.push("/listarNormas");
   }
 
+  function handleGalerias() {
+    Router.push("/listarGalerias");
+  }
+
   function handleSimisab() {
     Router.push("/indicadores/home_indicadores");
   }
@@ -100,7 +104,11 @@ const Sidebar = () => {
       </MenuItem>
       <MenuItem onClick={handleNormas}>
         <FaFileAlt /> Normas
-      </MenuItem></>: ''}
+      </MenuItem>
+      <MenuItem onClick={handleGalerias}>
+        <FaFileAlt /> Galerias
+      </MenuItem>
+      </>: ''}
       {usuario?.id_permissao == 3 && usuario?.id_sistema == 1 ?
       <MenuItem onClick={handleSimisab}>
         <FaSignInAlt /> SIMISAB
