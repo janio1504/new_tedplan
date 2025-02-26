@@ -54,9 +54,9 @@ export function AuthProvider({ children }) {
       });
     }
 
-    if(!token){
-      Router.push('/')
-    }
+    // if(!token){
+    //   Router.push('/')
+    // }
   }, [usuario]);
 
   async function signIn({ login, senha, id_sistema }: SignInData) {

@@ -108,7 +108,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   function seletcAno(ano: any) {
     if (ano) {
       setAnoSelected(ano);
-      getFinaceiroMunicipio(ano);
+      getFinaceiroMunicipio(ano);      
     } else {
       setAnoSelected("");
       setDadosFinanceiros([]);
@@ -614,6 +614,8 @@ export default function Financeiro({ municipio }: MunicipioProps) {
         ano: ano,
       })
       .then((response) => {
+        
+      console.log(response.data[0]);
         setDadosFinanceiros(response.data[0]);
       })
       .catch((error) => {
@@ -1081,7 +1083,6 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       <td>Despesas com juros e encargos do serviço da divida</td>
                       <td>
                       <input
-                    {...register("FN016")}
                     type="text"
                     disabled={true}
                     defaultValue={dadosFinanceiros?.aes_fn016}
