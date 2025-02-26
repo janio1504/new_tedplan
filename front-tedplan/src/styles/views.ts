@@ -107,11 +107,13 @@ export const BotaoRemover = styled.button`
 `;
 
 export const Menu = styled.div`
+  display: flex;
   width: 100%;
   margin: 0;
   padding: 0;
-  background: #eee;
-  border-bottom: solid 1px #ccc;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  //border-bottom: solid 1px #ccc;
   color: #666;
   float: left;
 `;

@@ -131,19 +131,19 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
+  display: flex;
   max-width: 85%;
   min-width: 1280px;
   width: 100%;
   height: 100%;
-  background: #fff;
+  min-height: 1000px;
+  //background: #fff;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 50px;
   text-align: left;
   justify-content: left;
   align-items: left;
-  padding: 0px ;
-  display: flex;
+  padding: 0px;
   flex-direction: column;
 `;
 
@@ -225,7 +225,6 @@ export const DivConteudo = styled.div`
   flex-direction: row;
 `;
 
-
 export const DivColRelatorios = styled.div`
   float: left;
   width: 30%;
@@ -245,45 +244,45 @@ export const DivFormEixo = styled.div`
   width: 97%;
   min-width: 1000px;
   padding: 10px 8px 10px 15px;
-  
+
   margin-top: 30px;
   color: #667778;
 
   margin-left: 5px;
 `;
 
-export const DivFormConteudo= styled.div`
- float: left;
+export const DivFormConteudo = styled.div`
+  float: left;
   width: 97%;
   max-width: 1320;
   min-width: 1090px;
   padding: 10px 10px 10px 15px;
- 
+
   margin-top: 30px;
   color: #667778;
-  table{
+  table {
     width: 100%;
     margin-bottom: 20px;
   }
-  th{    
+  th {
     padding: 0 10px 0 0px;
-    span{
+    span {
       text-align: center;
       color: blue;
     }
-    p{
+    p {
       padding: 10px;
-      background:  #2dd9d0;
-      color: #008080; 
+      background: #2dd9d0;
+      color: #008080;
       font-weight: bolder;
       border-radius: 5px;
       cursor: pointer;
       width: auto;
       width: 70px;
     }
-    button{
+    button {
       border: none;
-      background:  #2dd9d0;
+      background: #2dd9d0;
       color: #008080;
       padding: 10px;
       text-align: center;
@@ -292,28 +291,250 @@ export const DivFormConteudo= styled.div`
       cursor: pointer;
     }
   }
-  td{
-     
-    
+  td {
   }
-  select{
+  select {
     font-size: 14px;
-    option{
-    font-size: 16px;
+    option {
+      font-size: 16px;
+    }
   }
-  }
- 
-  
 `;
 export const DivForm = styled.div`
-  float: left;
+  display: flex;
+  flex-direction: column;
   width: 97%;
-  min-width: 1280px;
+  min-width: 600px;
   padding: 10px 12px 10px 10px;
-  
+
   border-radius: 5px;
   margin-top: 20px;
   background-color: #ffff;
+`;
+
+export const TabsList = styled.div`
+  display: "flex";
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 20px;
+  justify-content: space-between;
+`;
+
+export const TabsInstructons = styled.div`
+  display: "flex";
+  width: 100%;
+  font-size: 16px;
+  padding-left: 20px; 
+  color: #053d68;
+`;
+
+export const TabsMenuReports = styled.div`
+  display: flex;
+  width: 100%;
+  font-size: 16px;
+  text-align: end;
+  justify-content: end;
+  flex-direction: row;
+  color: #053d68;
+  svg {
+    font-size: 24px;
+    margin-right: 10px;
+    cursor: pointer;
+    &:hover {
+       color: #000;
+    }
+  }
+`;
+
+export const TabsMenuChartsOnClick = styled.div<{ visibleMenuChart: boolean }>`
+   opacity: ${({ visibleMenuChart }) => (visibleMenuChart ? "1" : "0")};
+   visibility: ${({ visibleMenuChart }) => (visibleMenuChart ? "visible" : "hidden")};
+  position: absolute;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  z-index: 1;
+  right: 120px;
+  border-radius: 5px;
+  color: #053d68;
+  font-size: 16px;
+  ul{
+    list-style-type: none;
+    text-align: left;
+  }
+  li{
+    padding: 10px 10px 10px 5px;
+    cursor: pointer;
+  }
+  svg {
+    margin-bottom: -7px;
+    }  
+`;
+
+export const TabsMenuReportsOnClick = styled.div<{ visibleMenuReports: boolean }>`
+   opacity: ${({ visibleMenuReports }) => (visibleMenuReports ? "1" : "0")};
+   visibility: ${({ visibleMenuReports }) => (visibleMenuReports ? "visible" : "hidden")};
+  position: absolute;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  z-index: 1;
+  right: 120px;
+  border-radius: 5px;
+  color: #053d68;
+  font-size: 16px;
+  ul{
+    list-style-type: none;
+    text-align: left;
+  }
+  li{
+    padding: 10px 10px 10px 5px;
+    cursor: pointer;
+  }
+  svg {
+    margin-bottom: -7px;
+    }  
+`;
+
+export const TabButtonGrafico = styled.button<{activeButtonGrafico: boolean}>`
+  padding: 10px 20px;
+  font-size: 16px;
+  border-right: 2px solid #eeeeee;
+  border-left: 2px solid #eeeeee;
+  border-top: 2px solid #eeeeee;
+  border-bottom: none;
+  color:${({ activeButtonGrafico }) => (activeButtonGrafico ? "#fff" : "#053d68")};
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  cursor: pointer;
+  background-color: ${({ activeButtonGrafico }) => (activeButtonGrafico ? "#0085bd" : "#fff")};
+  /* &:hover {
+    background: #0085bd;
+    color: #fff;
+  } */
+`;
+
+export const TabButtonDados = styled.button<{activeButtonDados: boolean}>`
+  padding: 10px 20px;
+  font-size: 16px;
+  border-right: 2px solid #eeeeee;
+  border-left: 2px solid #eeeeee;
+  border-top: 2px solid #eeeeee;
+  border-bottom: none;
+  color: ${({ activeButtonDados }) => (activeButtonDados ? "#fff" : "#053d68")};
+  border-top-left-radius: 10px;
+  border-top-right-radius:10px;
+  cursor: pointer;
+  background-color: ${({ activeButtonDados }) => (activeButtonDados ? "#0085bd" : "#fff")};
+  /* &:hover {
+    background: #0085bd;
+    color: #fff;
+  } */
+`;
+
+export const Tabs = styled.div`
+  display: "flex";
+  justify-content: "center";
+  width: "100%";
+  //border-top: 1px solid #eeeeee;
+  color: #999;
+`;
+
+export const TabsForm = styled.div`
+  display: "flex";
+  width: "100%";
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 10px 10px 10px 10px;
+  margin: 0px 10px 10px 10px;
+  border-radius: 10px;
+  form{
+    margin: 10px 0 10px 15px;
+    padding: 0;
+  }
+  select {
+    border-radius: 5px;
+    border: 1px solid #eeeeee;
+    color: #666;
+    padding: 10px 15px;
+    font-size: 14px;
+    option {
+      font-size: 16px;
+    }
+  }
+`;
+
+export const TabFormSubmit = styled.button`
+  padding: 10px 15px;
+  margin: 0px 10px;
+  color: #fff;
+  border: 0px;
+  background: #0085bd;
+  border-radius: 5px;
+  flex-direction: row;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  float: right;
+  svg {
+    margin-right: 8px;
+  }
+`;
+
+export const TabsContent = styled.div`
+  display: "flex";
+  justify-content: "center";
+  width: "100%";
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  background-color: #fff;
+`;
+
+export const TabsError = styled.div`
+  display: "flex";
+  justify-content: "center";
+  width: "100%";
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background-color:rgb(237, 175, 175);
+  border: 2px solid red;
+  color: red;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+`;
+
+export const TabsTable = styled.table`
+  width: 100%;
+  border-spacing: 0;
+  text-align: center;
+  th:first-child {
+    border-left-style: solid;
+    border-top-left-radius: 10px;
+  }
+  th:last-child {
+    border-right-style: solid;
+    border-top-right-radius: 10px;
+  }
+
+  th {
+    background-color: #0085bd;
+    color: #fff;
+    padding: 10px;
+    border: #0085bd solid 1px;
+  }
+ 
+  td {
+    border-spacing: 0;
+    padding: 10px 15px;
+    border: #cccccc solid 1px;
+  }
 `;
 
 export const DivFormResiduo = styled.div`
@@ -321,7 +542,6 @@ export const DivFormResiduo = styled.div`
   width: 97%;
   min-width: 1280px;
   padding: 10px 12px 10px 10px;
-  
   border-radius: 5px;
   margin-top: 20px;
   margin-bottom: 0px;
@@ -330,8 +550,8 @@ export const DivFormResiduo = styled.div`
 `;
 
 export const DivSeparadora = styled.div`
-   width: 100%;
-   display: flex;
+  width: 100%;
+  display: flex;
 `;
 
 export const DivTituloFormResiduo = styled.div`
@@ -374,7 +594,7 @@ export const DivTituloEixo = styled.div`
   float: right;
   padding: 10px 40px;
   margin: -30px 10px 0 -11px;
-  background-color: #3A8191;
+  background-color: #3a8191;
   border-radius: 25px;
   font-weight: bolder;
   text-align: center;
@@ -386,7 +606,7 @@ export const DivTituloEixoDrenagem = styled.div`
   float: right;
   padding: 10px 40px;
   margin: -30px 10px 0 -11px;
-  background-color: #0F4C81;
+  background-color: #0f4c81;
   border-radius: 25px;
   font-weight: bolder;
   text-align: center;
@@ -408,7 +628,7 @@ export const DivTituloConteudo = styled.div`
 
 export const DivTitulo = styled.div`
   min-width: 60%;
-  margin-bottom: 18px;  
+  margin-bottom: 18px;
 `;
 
 export const SubmitButton = styled.button`
@@ -438,7 +658,7 @@ export const DivInput = styled.div`
   display: flex;
 `;
 export const LabelCenter = styled.div`
-text-align: center;
+  text-align: center;
 `;
 
 export const InputSNIS = styled.div`
@@ -451,7 +671,6 @@ export const InputSNIS = styled.div`
     padding: 18.5px 0;
   }
 `;
-
 
 export const DivChekbox = styled.div`
   float: left;
@@ -469,7 +688,7 @@ export const CheckBox = styled.div`
   flex-direction: row;
   display: flex;
   color: #999;
-  span{
+  span {
     font-size: 14px;
     margin-top: 9px;
     color: #999;
@@ -498,10 +717,10 @@ export const InputM = styled.div`
   display: flex;
   width: 350px;
   p {
-  margin-left: 20px;
-  padding: 22px 0;
+    margin-left: 20px;
+    padding: 22px 0;
   }
-  span{
+  span {
     margin-left: 20px;
     color: red;
   }
@@ -513,8 +732,8 @@ export const InputG = styled.div`
   display: flex;
   width: 500px;
   p {
-  margin-left: 20px;
-  padding: 21.5px 0;
+    margin-left: 20px;
+    padding: 21.5px 0;
   }
 `;
 export const InputGG = styled.div`
@@ -523,8 +742,8 @@ export const InputGG = styled.div`
   display: flex;
   width: 650px;
   p {
-  margin-left: 20px;
-  padding: 18.5px 0;
+    margin-left: 20px;
+    padding: 18.5px 0;
   }
   text-align: left;
 `;
@@ -537,8 +756,8 @@ export const InputAno = styled.div`
   text-align: right;
   font-size: 16px;
   p {
-  margin-left: 20px;
-  padding: 21.5px 0;
+    margin-left: 20px;
+    padding: 21.5px 0;
   }
 `;
 export const InputXL = styled.div`
@@ -547,8 +766,8 @@ export const InputXL = styled.div`
   display: flex;
   width: 850px;
   p {
-  margin-left: 20px;
-  padding: 21.5px 0;
+    margin-left: 20px;
+    padding: 21.5px 0;
   }
 `;
 
@@ -707,7 +926,6 @@ export const Modal = styled.div`
   border: 1px solid #bebebe;
   border-radius: 5px;
   padding: 12px 16px 32px 16px;
-  
 `;
 
 export const ModalGaleria = styled.div`
@@ -748,10 +966,8 @@ export const ConteudoModal = styled.div`
     background: #fff;
   }
   option {
-   
     padding: 10px 15px;
     margin: 10px;
-   
   }
   p {
     color: #000;
@@ -807,4 +1023,3 @@ export const TableColumn = styled.div`
   flex: 1;
   padding: 10px;
 `;
-

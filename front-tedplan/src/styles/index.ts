@@ -217,9 +217,13 @@ export const BotaoMenuTexto = styled.button`
 
 export const DivEixosEstatisticas= styled.div`
   display: flex;
+  margin: 20px 10px 0 10px;
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 `;
 
 export const DivColEstatisticas = styled.div`
