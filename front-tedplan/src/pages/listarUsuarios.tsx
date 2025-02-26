@@ -68,6 +68,8 @@ export default function Postagens({
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm();
@@ -75,19 +77,30 @@ export default function Postagens({
   const [usuarioModal, setUsuarioModal] = useState(null);
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [permissoes, setPermissoes] = useState<any>(null);
-  const [visibleMunicipiosSistemas, setVisibleMunicipiosSistemas] =
-    useState(false);
+
   const editor = useRef();
   const [municipios, setMunicipios] = useState<any>(null);
 
- 
+  const watchPermissao = watch("id_permissao");
+
+  const visibleMunicipiosSistemas = useMemo(() => {
+    return watchPermissao === 2 || watchPermissao === 3;
+  }, [watchPermissao]);
+
   useEffect(() => {
     getPermissoes();
     getMunicipios();
   }, []);
-  
+
   async function handleShowModal(usuario: IUsuario) {
     setUsuarioModal(usuario);
+
+    setValue("id_usuario", usuario.id_usuario);
+    setValue("ativo", usuario.ativo ? "true" : "false");
+    setValue("id_permissao", usuario.id_permissao);
+    setValue("id_sistema", usuario.id_sistema);
+    setValue("id_municipio", usuario.id_municipio);
+
     setModalVisible(true);
   }
 
@@ -113,12 +126,9 @@ export default function Postagens({
   }
 
   async function getMunicipios() {
-    
-    const resMunicipio = await api
-      .get("/getMunicipios")
-      .then((response) => {
-        return response.data;
-      });
+    const resMunicipio = await api.get("/getMunicipios").then((response) => {
+      return response.data;
+    });
     setMunicipios(resMunicipio);
   }
 
@@ -143,7 +153,6 @@ export default function Postagens({
   }
 
   async function handleUpdateUsuario(data: IUsuario) {
-    
     const usuario = await api
       .post("updatePermissoes", {
         id_usuario: data.id_usuario,
@@ -176,12 +185,6 @@ export default function Postagens({
   };
 
   const { usuario } = useContext(AuthContext);
-
-  function onChange(e) { 
-    e.target.value == 2 || e.target.value == 3
-      ? setVisibleMunicipiosSistemas(true)
-      : setVisibleMunicipiosSistemas(false);
-  }
 
   return (
     <Container>
@@ -261,23 +264,14 @@ export default function Postagens({
                                 <p>Login: {usuarioModal.login}</p>
                                 <label>Status Usuário</label>
                                 <select {...register("ativo")} name="ativo">
-                                  <option value="">
-                                    {usuarioModal.ativo ? "Ativo" : "Inativo"}
-                                  </option>
-                                  <option
-                                    value={
-                                      usuarioModal.ativo ? "false" : "true"
-                                    }
-                                  >
-                                    {usuarioModal.ativo ? "Inativar" : "Ativar"}
-                                  </option>
+                                  <option value="true">Ativo</option>
+                                  <option value="false">Inativo</option>
                                 </select>
-                               
+
                                 <label>Permissões</label>
                                 <select
                                   {...register("id_permissao")}
                                   name="id_permissao"
-                                  onChange={(e) => onChange(e)}
                                 >
                                   <option value="">
                                     Selecione uma permissão
@@ -300,27 +294,22 @@ export default function Postagens({
                                       })}
                                       name="id_sistema"
                                     >
-                                      aria-invalid=
-                                      {errors.value ? "true" : "false"}
                                       <option value="">
                                         Selecione um Sistema
                                       </option>
                                       <option value="1">Sou Tedplan</option>
                                       <option value="2">Sou Municipio</option>
                                     </select>
-                                    {errors.id_sistema &&
-                                      errors.id_sistema.type && (
-                                        <span>
-                                          Selecionar um Sistema é obrigatório!
-                                        </span>
-                                      )}
+                                    {errors.id_sistema && (
+                                      <span>
+                                        Selecionar um Sistema é obrigatório!
+                                      </span>
+                                    )}
                                     <label>Municipios</label>
                                     <select
                                       {...register("id_municipio")}
                                       name="id_municipio"
                                     >
-                                      aria-invalid=
-                                      {errors.value ? "true" : "false"}
                                       <option value="">
                                         Selecione um Municipio
                                       </option>
@@ -340,7 +329,7 @@ export default function Postagens({
                                   <input
                                     {...register("senha")}
                                     type="password"
-                                  ></input>
+                                  />
                                 </InputP>
                               </ConteudoModal>
                             </TextoModal>
