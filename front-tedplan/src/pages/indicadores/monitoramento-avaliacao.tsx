@@ -152,7 +152,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     const id_municipio = usuario?.id_municipio
     const ano = anoSelected 
     const res = await api
-      .post("getPsResiduosColeta", {id_municipio: id_municipio, ano: ano})
+      .post("get-ps-residuos-coleta-por-ano", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
         return response.data;
       })

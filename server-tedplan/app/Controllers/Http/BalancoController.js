@@ -3,12 +3,27 @@ const Balanco = use('App/Models/Concessionaria')
 class BalancoController {
 
   async getBalanco({ request }){
+    const { id_municipio } = request.all()
+   try {
+    const res = await Balanco.query()
+    .from('tedplan.balanco')
+    .where('id_municipio', id_municipio)
+    .fetch()
+
+    return res
+   } catch (error) {
+    console.log(error);
+   }
+  }
+
+  async getBalancoPorAno({ request }){
     const { id_municipio, ano } = request.all()
    try {
     const res = await Balanco.query()
     .from('tedplan.balanco')
     .where('id_municipio', id_municipio)
     .where('ano', ano)
+    .where("ano", "is not", null)
     .fetch()
 
     return res

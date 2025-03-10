@@ -5,7 +5,7 @@ export const getPsResiduosColeta = async (
   ano: number
 ) => {
   try {
-    const response = await api.post("getPsResiduosColeta", {
+    const response = await api.post("get-ps-residuos-coleta-por-ano", {
       id_municipio,
       ano,
     });

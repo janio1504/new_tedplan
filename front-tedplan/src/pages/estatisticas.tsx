@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   DivCenter, 
@@ -22,38 +22,13 @@ import ResiduosComp from "../components/ResiduosSolidos";
 
 
 export default function Estatistica() {
-  const [aguaVisible, setAguaVisible ] = useState(true)
-  const [drenagemVisible, setDrenagemVisible ] = useState(false)
-  const [esgotoVisible, setEsgotoVisible ] = useState(false)
-  const [residuosVisible, setResiduosVisible ] = useState(false)
   
-  
-  function handleAgua(){
-    setAguaVisible(true)
-    setDrenagemVisible(false)
-    setEsgotoVisible(false)
-    setResiduosVisible(false)
-  }
-  function handleDrenagem(){
-    setAguaVisible(false)
-    setDrenagemVisible(true)
-    setEsgotoVisible(false)
-    setResiduosVisible(false)
-  }
-  function handleEsgoto(){
-    setAguaVisible(false)
-    setDrenagemVisible(false)
-    setEsgotoVisible(true)
-    setResiduosVisible(false)
-  }
-  function handleResiduos(){
-    setAguaVisible(false)
-    setDrenagemVisible(false)
-    setEsgotoVisible(false)
-    setResiduosVisible(true)
-  }
-  
- 
+
+  const [active, setActive ] = useState("agua")
+
+  function handleActive(e: string){
+    setActive(e)
+  } 
     
   return (
     <Container>
@@ -61,30 +36,30 @@ export default function Estatistica() {
       <DivCenter>     
       <DivEixosEstatisticas>
           <DivColEstatisticas>
-            {aguaVisible ? <Image onClick={handleAgua} src={AguaActive} alt="Agua" /> : <Image onClick={handleAgua} src={Agua} alt="Agua" />}
-            {aguaVisible ? <BotaoAgua>Água</BotaoAgua> : <BotaoAguaEscuro>Água</BotaoAguaEscuro>}
+            {active === 'agua' ? <Image onClick={()=>handleActive('agua')} src={AguaActive} alt="Agua" /> : <Image onClick={()=>handleActive('agua')} src={Agua} alt="Agua" />}
+            {active === 'agua' ? <BotaoAgua>Água</BotaoAgua> : <BotaoAguaEscuro>Água</BotaoAguaEscuro>}
           </DivColEstatisticas>
 
           <DivColEstatisticas>
-            {drenagemVisible ? <Image onClick={handleDrenagem} src={DrenagemActive} alt="Drenagem" /> : <Image onClick={handleDrenagem} src={Drenagem} alt="Drenagem" />}
-            {drenagemVisible ? <BotaoDrenagem>Drenagem</BotaoDrenagem>: <BotaoDrenagemEscuro>Drenagem</BotaoDrenagemEscuro>}
+            {active === 'drenagen' ? <Image onClick={()=>handleActive('drenagen')} src={DrenagemActive} alt="Drenagem" /> : <Image onClick={()=>handleActive('drenagen')} src={Drenagem} alt="Drenagem" />}
+            {active === 'grenagen' ? <BotaoDrenagem>Drenagem</BotaoDrenagem>: <BotaoDrenagemEscuro>Drenagem</BotaoDrenagemEscuro>}
           </DivColEstatisticas>
 
           <DivColEstatisticas>
-            {esgotoVisible ? <Image onClick={handleEsgoto} src={EsgotoActive} alt="Esgoto" /> : <Image onClick={handleEsgoto} src={Esgoto} alt="Esgoto" />}
-            {esgotoVisible ? <BotaoEsgoto>Esgoto</BotaoEsgoto> : <BotaoEsgotoEscuro>Esgoto</BotaoEsgotoEscuro>}
+            {active === 'esgoto' ? <Image onClick={()=>handleActive('esgoto')} src={EsgotoActive} alt="Esgoto" /> : <Image onClick={()=>handleActive('esgoto')} src={Esgoto} alt="Esgoto" />}
+            {active === 'esgoto' ? <BotaoEsgoto>Esgoto</BotaoEsgoto> : <BotaoEsgotoEscuro>Esgoto</BotaoEsgotoEscuro>}
           </DivColEstatisticas>
        
           <DivColEstatisticas>
-            {residuosVisible ? <Image onClick={handleResiduos} src={ResiduosActive} alt="Residuos" /> : <Image onClick={handleResiduos} src={Residuos} alt="Residuos" />}
-            {residuosVisible ? <BotaoResiduosSolido>Resíduos</BotaoResiduosSolido> : <BotaoResiduosSolidoEscuro>Resíduos</BotaoResiduosSolidoEscuro>}
+            {active === 'residuos' ? <Image onClick={()=>handleActive('residuos')} src={ResiduosActive} alt="Residuos" /> : <Image onClick={()=>handleActive('residuos')} src={Residuos} alt="Residuos" />}
+            {active === 'residuos' ? <BotaoResiduosSolido>Resíduos</BotaoResiduosSolido> : <BotaoResiduosSolidoEscuro>Resíduos</BotaoResiduosSolidoEscuro>}
           </DivColEstatisticas>      
           
         </DivEixosEstatisticas> 
-        {aguaVisible &&  <AguaComp municipio={[]}></AguaComp>}
-        {drenagemVisible && <DrenagemComp municipio={[]}></DrenagemComp>}
-        {esgotoVisible && <EsgotoComp municipio={[]}></EsgotoComp>} 
-        {residuosVisible && <ResiduosComp municipio={[]}></ResiduosComp>}
+        {active === 'agua' &&  <AguaComp municipio={[]}></AguaComp>}
+        {active === 'drenagen' && <DrenagemComp municipio={[]}></DrenagemComp>}
+        {active === 'esgoto' && <EsgotoComp municipio={[]}></EsgotoComp>} 
+        {active === 'residuos' && <ResiduosComp municipio={[]}></ResiduosComp>}
       </DivCenter>
     </Container>
   );

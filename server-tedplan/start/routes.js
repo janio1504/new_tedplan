@@ -66,7 +66,8 @@ Route.post("addFinanceiro", "FinanceiroController.store");
 Route.post("addDadosFinanceiros", "FinanceiroController.store");
 
 Route.post("addPsResiduosColeta", "PsResiduosColetaController.store");
-Route.post("getPsResiduosColeta", "PsResiduosColetaController.getRsc");
+Route.post("get-ps-residuos-coleta", "PsResiduosColetaController.getRsc");
+Route.post("get-ps-residuos-coleta-por-ano", "PsResiduosColetaController.getRscPorAno");
 
 Route.post("create-unidade-rsc", "PsResiduosColetaController.createUnidadeRsc");
 Route.post("list-unidades-rsc", "PsResiduosColetaController.getUnidadesRsc");
@@ -98,16 +99,18 @@ Route.post("get-agua-por-ano", "AguaController.getAguaAno");
 
 Route.post("create-balanco", "BalancoController.createBalanco");
 Route.post("get-balanco", "BalancoController.getBalanco");
+Route.post("get-balanco-por-ano", "BalancoController.getBalancoPorAno");
 
 Route.post("create-drenagem", "DrenagemController.createDrenagem");
 Route.post("get-drenagem", "DrenagemController.getDrenagem");
+Route.post("get-drenagem-por-ano", "DrenagemController.getDrenagemPorAno");
 
 Route.post("create-qualidade", "QualidadeController.createQualidade");
 Route.post("get-qualidade", "QualidadeController.getQualidade");
 
 Route.post("create-esgoto", "EsgotoController.createEsgoto");
 Route.post("get-esgoto", "EsgotoController.getEsgoto");
-Route.post("get-esgoto-por-ano", "EsgotoController.getEsgotoAno");
+Route.post("get-esgoto-por-ano", "EsgotoController.getEsgotoPorAno");
 
 Route.post("create-tarifa", "TarifaController.createTarifa");
 Route.post("get-tarifa", "TarifaController.getTarifa");

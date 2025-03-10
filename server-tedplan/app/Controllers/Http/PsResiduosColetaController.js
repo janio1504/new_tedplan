@@ -104,14 +104,34 @@ class PsResiduosColetaController {
   }
 
   async getRsc({ request }){
+    const { id_municipio } = request.all()
+   
+   try {
+
+    const rs = await PsFinanceiro.query()
+    .from('tedplan.residuos_solidos_coleta')
+    .where('id_municipio', id_municipio)
+    .where("ano", "is not", null)
+    .fetch()
+    
+    return rs
+    
+   } catch (error) {
+    console.log(error);
+    
+   }
+  }
+
+  async getRscPorAno({ request }){
     const { ano, id_municipio } = request.all()
-    if(ano && id_municipio){
-    return await PsFinanceiro.query()
+   
+    const rs =  await PsFinanceiro.query()
     .from('tedplan.residuos_solidos_coleta')
     .where('id_municipio', id_municipio)
     .where('ano', ano)
+    .where("ano", "is not", null)
     .fetch()
-    }
+    
     return null
   }
 

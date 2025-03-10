@@ -47,7 +47,7 @@ export default function Home() {
             <b>Sou TedPlan</b>
           </BotaoMenuTexto>
         </DivBotao>
-        <DivBotao>
+        {/* <DivBotao>
           <BotaoMenu onClick={handleLoginIndicadores}>
             <Image
               width="100px;"
@@ -59,7 +59,7 @@ export default function Home() {
           <BotaoMenuTexto onClick={handleLoginIndicadores}>
             <b>Sou Municipio</b>
           </BotaoMenuTexto>
-        </DivBotao>
+        </DivBotao> */}
       </DivMenu>
       <Footer>&copy; Todos os direitos reservados </Footer>
     </Container>
