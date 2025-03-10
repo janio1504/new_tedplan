@@ -456,12 +456,17 @@ export const TabsForm = styled.div`
     border-radius: 5px;
     border: 1px solid #eeeeee;
     color: #666;
+    margin-right: 10px;
     padding: 10px 15px;
     font-size: 14px;
     option {
       font-size: 16px;
     }
   }
+  span {
+      padding-top: 10px;
+      color: red;
+    }
 `;
 
 export const TabFormSubmit = styled.button`
@@ -495,6 +500,18 @@ export const TabsContent = styled.div`
   margin: 10px;
   border-radius: 10px;
   background-color: #fff;
+`;
+
+export const TabsTitleIndicador = styled.div`
+  display: "flex";
+  text-align: center;
+  justify-content: "center";
+  width: "100%"; 
+  padding: 10px;
+  margin: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #053d68;
 `;
 
 export const TabsError = styled.div`
@@ -533,8 +550,9 @@ export const TabsTable = styled.table`
   td {
     border-spacing: 0;
     padding: 10px 15px;
-    border: #cccccc solid 1px;
+    border: #cccccc solid 1px;    
   }
+  
 `;
 
 export const DivFormResiduo = styled.div`

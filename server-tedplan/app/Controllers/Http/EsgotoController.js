@@ -16,13 +16,14 @@ class EsgotoController {
    }
   }
 
-  async getEsgotoAno({ request }){
+  async getEsgotoPorAno({ request }){
     const { id_municipio, ano } = request.all()
    try {
     const res = await Esgoto.query()
     .from('tedplan.esgoto')
     .where('id_municipio', id_municipio)
     .where('ano', ano)
+    .where("ano", "is not", null)
     .fetch()
 
     return res

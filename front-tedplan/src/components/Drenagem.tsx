@@ -1,16 +1,33 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
-  DivForm,
-  DivTituloForm,
-  DivTituloFormResiduo,
-  Form,
-  SubmitButton,
+  TabButtonDados,
+  TabButtonGrafico,
+  TabFormSubmit,
+  Tabs,
+  TabsContent,
+  TabsError,
+  TabsForm,
+  TabsInstructons,
+  TabsList,
+  TabsMenuChartsOnClick,
+  TabsMenuReports,
+  TabsMenuReportsOnClick,
+  TabsTable,
+  TabsTitleIndicador,
 } from "../styles/financeiro";
-import { AuthContext } from "../contexts/AuthContext";
-import { Chart } from "react-google-charts";
+import { Chart, GoogleChartWrapperChartType } from "react-google-charts";
 import { useForm } from "react-hook-form";
 import api from "../services/api";
-
+import {
+  FaBars,
+  FaChartArea,
+  FaChartBar,
+  FaChartLine,
+  FaEllipsisV,
+  FaFileCsv,
+  FaFileExcel,
+  FaPrint,
+} from "react-icons/fa";
 
 interface IMunicipio {
   id_municipio: string;
@@ -23,595 +40,1290 @@ interface MunicipioProps {
 }
 
 export default function Drenagem({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
   const [title, setTitle] = useState<IMunicipio | any>(municipio);
-  const [ municipios, setMunicipios ] = useState(null)
+  const [municipios, setMunicipios] = useState(null);
+  const [indicador, setIndicador] = useState(null);
+  const [tituloIndicador, setTituloIndicador] = useState(null);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
+  const [typeChart, setTypeChart] =
+    useState<GoogleChartWrapperChartType>("LineChart");
+  const chartRef = useRef(null);
+  const reportRef = useRef(null);
 
   const [data, setData] = useState(null);
   var options = {
     title: title,
-    curveType: 'default',
-    legend: { position: 'rigth' }
+    curveType: "default",
+    legend: { position: "rigth" },
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     let data = {
       ano: new Date().getFullYear(),
       id_municipio: 1,
+    };
+    data.ano = new Date().getFullYear();
+    getMunucipios();
+    const handleClickOutside = (event) => {
+      if (chartRef.current && !chartRef.current.contains(event.target)) {
+        setVisibleMenuChart(false);
+      }
+
+      if (reportRef.current && !reportRef.current.contains(event.target)) {
+        setVisibleMenuReports(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  async function getMunucipios() {
+    await api
+      .get("getMunicipios")
+      .then((response) => {
+        setMunicipios(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  function handleIndicador(data) {
+    if (data.indicador == "IN042") {
+      IN042(data);
     }
-    data.ano = new Date().getFullYear() 
-    getMunucipios()
-
-  },[])
-
-  async function getMunucipios(){
-    await api.get('getMunicipios').then(response=>{
-      setMunicipios(response.data)
-    }).catch((error)=>{
-      console.log(error);
-      
-    })
+    if (data.indicador == "IN043") {
+      IN043(data);
+    }
+    if (data.indicador == "IN044") {
+      IN044(data);
+    }
+    if (data.indicador == "IN001") {
+      IN001(data);
+    }
+    if (data.indicador == "IN006") {
+      IN006(data);
+    }
+    if (data.indicador == "IN010") {
+      IN010(data);
+    }
+    if (data.indicador == "IN050") {
+      IN050(data);
+    }
+    if (data.indicador == "IN054") {
+      IN054(data);
+    }
+    if (data.indicador == "IN005") {
+      IN005(data);
+    }
+    if (data.indicador == "IN009") {
+      IN009(data);
+    }
+    if (data.indicador == "IN048") {
+      IN048(data);
+    }
+    if (data.indicador == "IN049") {
+      IN049(data);
+    }
+    if (data.indicador == "IN053") {
+      IN053(data);
+    }
+    if (data.indicador == "IN020") {
+      IN020(data);
+    }
+    if (data.indicador == "IN021") {
+      IN021(data);
+    }
+    if (data.indicador == "IN025") {
+      IN025(data);
+    }
+    if (data.indicador == "IN026") {
+      IN026(data);
+    }
+    if (data.indicador == "IN027") {
+      IN027(data);
+    }
+    if (data.indicador == "IN029") {
+      IN029(data);
+    }
+    if (data.indicador == "IN035") {
+      IN035(data);
+    }
+    if (data.indicador == "IN051") {
+      IN051(data);
+    }
+    if (data.indicador == "IN040") {
+      IN040(data);
+    }
+    if (data.indicador == "IN041") {
+      IN041(data);
+    }
+    if (data.indicador == "IN046") {
+      IN046(data);
+    }
+    if (data.indicador == "IN047") {
+      IN047(data);
+    }
   }
 
-  function handleIndicador(data){       
-   if(data.indicador == 'IN042'){
-    IN042(data)
-   }
-   if(data.indicador == 'IN043'){
-    IN043(data)
-   }
-   if(data.indicador == 'IN044'){
-    IN044(data)
-   }
-   if(data.indicador == 'IN001'){
-    IN001(data)
-   }
-   if(data.indicador == 'IN006'){
-    IN006(data)
-   }
-   if(data.indicador == 'IN010'){
-    IN010(data)
-   }
-   if(data.indicador == 'IN050'){
-    IN050(data)
-   }
-   if(data.indicador == 'IN054'){
-    IN054(data)
-   }
-   if(data.indicador == 'IN005'){
-    IN005(data)
-   }
-   if(data.indicador == 'IN009'){
-    IN009(data)
-   }
-   if(data.indicador == 'IN048'){
-    IN048(data)
-   }
-   if(data.indicador == 'IN049'){
-    IN049(data)
-   }
-   if(data.indicador == 'IN053'){
-    IN053(data)
-   }
-   if(data.indicador == 'IN020'){
-    IN020(data)
-   }
-   if(data.indicador == 'IN021'){
-    IN021(data)
-   }
-   if(data.indicador == 'IN025'){
-    IN025(data)
-   }
-   if(data.indicador == 'IN026'){
-    IN026(data)
-   }
-   if(data.indicador == 'IN027'){
-    IN027(data)
-   }
-   if(data.indicador == 'IN029'){
-    IN029(data)
-   }
-   if(data.indicador == 'IN035'){
-    IN035(data)
-   }
-   if(data.indicador == 'IN051'){
-    IN051(data)
-   }
-   if(data.indicador == 'IN040'){
-    IN040(data)
-   }
-   if(data.indicador == 'IN046'){
-    IN046(data)
-   }
-   if(data.indicador == 'IN047'){
-    IN047(data)
-   }   
+  async function IN042(data) {
+    const rsGe = await api
+      .post("get-geral", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+      const rs = await Promise.all(
+        rsGe.map(async (drenagem) => {
+          if(!drenagem.ge002 || !drenagem.ge001) {
+            return null;
+          }
+          const result = (parseFloat(drenagem.ge002) / parseFloat(drenagem.ge001)) * 100;
+          const ano = drenagem.ano.toString();
+          const dados = [ano,parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+          return dados;
+        })
+      )
+
+      const rsFilter = rs.filter((item) => item !== null);
+
+      if (rsFilter.length === 0) {
+        setActiveTab("error");
+        setData(null);
+      } else {
+        setActiveTab("dados");
+      }
+  
+      //retorno para o grafico e para os dados
+      const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+  
+      setTituloIndicador(
+        "IN042 - Parcela de área urbana em relação à área total"
+      );
+      setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+      setData(dados);
   }
 
+  async function IN043(data) {
+    const rsGe = await api
+      .post("get-geral", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
 
-  async function IN042(data){
-       
-    const rsGe = await api.post('get-geral', {id_municipio: data.id_municipio, ano: data.ano})
-    .then(response=>{ return response.data[0] })
-    
-    const GE002 = rsGe?.ge002
-    const GE001 = rsGe?.ge001
+    const rs = await Promise.all(
+      rsGe.map(async (drenagem) => {
+        if (!drenagem.ge002 || !drenagem.ge006) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ge006) / parseFloat(drenagem.ge002)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
 
-    const result = (GE002 / GE001) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN043 - Densidade Demográfica na Área Urbana");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN043(data){          
-    const rsGe = await api.post('get-geral', {id_municipio: data.id_municipio, ano: data.ano})
-    .then(response=>{ return response.data[0] })
-    
-    const GE002 = rsGe?.ge002
-    const GE006 = rsGe?.ge006
+  async function IN044(data) {
+    const rsGe = await api
+      .post("get-geral", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
 
-    const result = (GE006 / (GE002 * 100)) 
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+    const rs = await Promise.all(
+      rsGe.map(async (drenagem) => {
+        if (!drenagem.ge002 || !drenagem.ge008) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ge008) / parseFloat(drenagem.ge002)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN044 - Densidade de Domicílios na Área Urbana");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN044(data){          
-    const rsGe = await api.post('get-geral', {id_municipio: data.id_municipio, ano: data.ano})
-    .then(response=>{ return response.data[0] })
-    
-    const GE002 = rsGe?.ge002
-    const GE008 = rsGe?.ge008
+  async function IN001(data) {
+    const rsGe = await api
+      .post("get-geral", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
 
-    const result = (GE008 / (GE002 * 100)) 
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+    const rs = await Promise.all(
+      rsGe.map(async (drenagem) => {
+        if (!drenagem.ag001 || !drenagem.ag003) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ag001) / parseFloat(drenagem.ag003)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN001 - Participação do Pessoal Próprio Sobre o Total de Pessoal Alocado nos Serviços de Drenagem e Manejo das Águas Pluviais Urbanas");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN001(data){          
-    const rsGe = await api.post('get-geral', {id_municipio: data.id_municipio, ano: data.ano})
-    .then(response=>{ return response.data[0] })
-    
-    const AD001 = rsGe?.ag001
-    const AD003 = rsGe?.ag003
-    const result = (AD001 / AD003) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN006(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn005 || !financeiro.cb003) {
+          return null;
+        }
+        const result = parseFloat(financeiro.fn005) / parseFloat(financeiro.cb003);
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN006 - Receita Operacional Média do Serviço por Unidades Tributadas");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN006(data){          
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })
-    
-    const FN005 = rsFn?.fn005
-    const CB003 = rsFn?.cb003
-    const result = (FN005 / CB003)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN010(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn012 || !financeiro.fn016) {
+          return null;
+        }
+        const result = (parseFloat(financeiro.fn016) / parseFloat(financeiro.fn012)) * 100;
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN010 - Despesa per capita com manejo de rsu em relação à população urbana");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN010(data){     
-   
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })    
-    
-    const FN012 = rsFn?.fn012
-    const FN016 = rsFn?.fn016
+  async function IN050(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
 
-    const result = (FN016 / FN012) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn009 || !financeiro.fn016) {
+          return null;
+        }
+        const result = ((parseFloat(financeiro.fn009) - parseFloat(financeiro.fn016)) / parseFloat(financeiro.fn009)) * 100;
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN050 - Diferença relativa entre despesas e receitas de Drenagem e Manejo de Águas Pluviais urbanas");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN050(data){  
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN009 = rsFn?.fn009
-    const FN016 = rsFn?.fn016
-    const result = ((FN009 - FN016) / FN009) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN054(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn023 || !financeiro.fn022) {
+          return null;
+        }
+        const result = (parseFloat(financeiro.fn023) / parseFloat(financeiro.fn022)) * 100;
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN054 - Investimentos totais desembolsados em relação aos investimentos totais contratados");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN054(data){  
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN023 = rsFn?.fn023
-    const FN022 = rsFn?.fn022
-    const result = (FN023 / FN022)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN005(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn005 || !financeiro.ge007) {
+          return null;
+        }
+        const result = (parseFloat(financeiro.fn005) / parseFloat(financeiro.ge007));
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN005 - Taxa Média Praticada para os Serviços de Drenagem e Manejo das Águas Pluviais Urbanas");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN005(data){  
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN005 = rsFn?.fn005
-    const GE007 = rsFn?.ge007
-    const result = (FN005 / GE007)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN009(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn016 || !financeiro.ge007) {
+          return null;
+        }
+        const result = (parseFloat(financeiro.fn016) / parseFloat(financeiro.ge007));
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN009 - Despesa Média Praticada para os Serviços de Drenagem e Manejo das Águas Pluviais Urbanas");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN009(data){     
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN016 = rsFn?.fn016
-    const GE007 = rsFn?.ge007
-    const result = (FN016 / GE007)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN048(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn016 || !financeiro.ge006) {
+          return null;
+        }
+        const result = parseFloat(financeiro.fn016) / parseFloat(financeiro.ge006);
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN048 - Despesa per capita com serviços de Drenagem e Manejo das Águas Pluviais Urbanas");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN048(data){     
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN016 = rsFn?.fn016
-    const GE006 = rsFn?.ge006
-    const result = (FN016 / GE006)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN049(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn022 || !financeiro.ge006) {
+          return null;
+        }
+        const result = parseFloat(financeiro.fn022) / parseFloat(financeiro.ge006);
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN049 - Indicador de exemplo");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN049(data){     
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN022 = rsFn?.fn022
-    const GE006 = rsFn?.ge006
-    const result = (FN022 / GE006)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN053(data) {
+    const rsFn = await api
+      .post("get-ps-financeiro", {
+        id_municipio: data.id_municipio,
+      })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsFn.map(async (financeiro) => {
+        if (!financeiro.fn023 || !financeiro.ge006) {
+          return null;
+        }
+        const result = parseFloat(financeiro.fn023) / parseFloat(financeiro.ge006);
+        const ano = financeiro.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN053 - Desembolso de investimentos per capta");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN053(data){     
-    const rsFn = await api.post('getPsFinanceiro', {id_municipio: data.id_municipio, ano: data.ano })
-    .then(response=>{ return response.data[0] })  
-    
-    const FN023 = rsFn?.fn023
-    const GE006 = rsFn?.ge006
-    const result = (FN023 / GE006)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN020(data) {
+    const rsDr = await api
+      .post("get-drenagem",{ id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie019 || !drenagem.ie017) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie019) / parseFloat(drenagem.ie017)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN020 - Taxa de Cobertura de Pavimentação e Meio-Fio na Área Urbana do Município");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN020(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE019 = rsDr?.ie019
-    const IE017 = rsDr?.ie017
-   
-    const result = (IE019 / IE017) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN021(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie024 || !drenagem.ie017) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie024) / parseFloat(drenagem.ie017)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN021 - Taxa de cobertura de vias públicas com redes ou canais pluviais subterrâneos na área urbana");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN021(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE024 = rsDr?.ie024
-    const IE017 = rsDr?.ie017
-   
-    const result = (IE024 / IE017) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN025(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie044 || !drenagem.ie032) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie044) / parseFloat(drenagem.ie032)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN025 - Parcela de Cursos d’Água Naturais Perenes em Área Urbana com Parques Lineares");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN025(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE044 = rsDr?.ie044
-    const IE032 = rsDr?.ie032
-   
-    const result = (IE044 / IE032) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN026(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie034 || !drenagem.ie032) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie034) / parseFloat(drenagem.ie032)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN026 - Parcela de Cursos d’Água Naturais Perenes com Canalização Aberta");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN026(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE034 = rsDr?.ie034
-    const IE032 = rsDr?.ie032
-   
-    const result = (IE034 / IE032) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN027(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie035 || !drenagem.ie032) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie035) / parseFloat(drenagem.ie032)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN027 - Parcela de Cursos d’Água Naturais Perenes com Canalização Fechada");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN027(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE035 = rsDr?.ie035
-    const IE032 = rsDr?.ie032
-   
-    const result = (IE035 / IE032) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN029(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie033 || !drenagem.ie032) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie033) / parseFloat(drenagem.ie032)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN029 - Parcela de Cursos d’Água Naturais Perenes com Diques");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN029(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE033 = rsDr?.ie033
-    const IE032 = rsDr?.ie032
-   
-    const result = (IE033 / IE032) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN035(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie058 || !drenagem.ge002) {
+          return null;
+        }
+        const result = parseFloat(drenagem.ie058) / parseFloat(drenagem.ge002);
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN035 - Volume de reservação de águas pluviais por unidade de área urbana");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN035(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE058 = rsDr?.ie058
-    const GE002 = rsDr?.ge002
-   
-    const result = (IE058 / GE002)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN051(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ie021 || !drenagem.ie022 || !drenagem.ge002) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ie021) + parseFloat(drenagem.ie022)) / parseFloat(drenagem.ge002);
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN051 - Densidade de captações de águas pluviais na área urbana");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN051(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    const IE021 = rsDr?.ie021
-    const IE022 = rsDr?.ie022
-    const GE002 = rsDr?.ge002
-   
-    const result = (IE021 + IE022) / GE002
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN040(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ri013 || !drenagem.ge008) {
+          return null;
+        }
+        const result = (parseFloat(drenagem.ri013) / parseFloat(drenagem.ge008)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN040 - Parcela de Domicílios em Situação de Risco de Inundação");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN040(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    
-    const RI013 = rsDr?.ri013
-    const GE008 = rsDr?.ge008
-   
-    const result = (RI013 / GE008) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+  async function IN041(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
+
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ri029 || !drenagem.ri067 || !drenagem.ge006) {
+          return null;
+        }
+        const result = ((parseFloat(drenagem.ri029) + parseFloat(drenagem.ri067)) / parseFloat(drenagem.ge006)) * 100;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN041 - Parcela da População Impactada por Eventos Hidrológicos");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
-  async function IN041(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    
-    const RI029 = rsDr?.ri029
-    const RI067 = rsDr?.ri067
-    const GE006 = rsDr?.ge006
-   
-    const result = ((RI029 + RI067) / GE006) * 100
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
-  }
-  async function IN046(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    
-    const RI031 = rsDr?.ri031
-    const RI068 = rsDr?.ri068
-    const GE006 = rsDr?.ge006
-   
-    const result = (((RI031 + RI068)  * 10^5) / GE006)
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
-  }
+  async function IN046(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
 
-  async function IN047(data){     
-    const rsDr = await api.get('get-drenagem', {params: {id_municipio: data.id_municipio}})
-    .then(response=>{ return response.data[0]})  
-    
-    
-    const RI043 = rsDr?.ri043
-    const RI044 = rsDr?.ri044
-    const GE005 = rsDr?.ge005
-   
-    const result = ((RI043 + RI044) / GE005) * 10^5
-    const ano = data.ano
-    const dados = [
-      ['Ano', 'Dados'],
-      [ano, result],
-    ]
-    setData(dados)
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ri031 || !drenagem.ri068 || !drenagem.ge006) {
+          return null;
+        }
+        const result = (((parseFloat(drenagem.ri031) + parseFloat(drenagem.ri068)) * 10) ** 5) / parseFloat(drenagem.ge006);
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN046 - Índice de Óbitos");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
   }
 
+  async function IN047(data) {
+    const rsDr = await api
+      .post("get-drenagem", { id_municipio: data.id_municipio })
+      .then((response) => {
+        return response.data;
+      });
 
+    const rs = await Promise.all(
+      rsDr.map(async (drenagem) => {
+        if (!drenagem.ri043 || !drenagem.ri044 || !drenagem.ge005) {
+          return null;
+        }
+        const result = (((parseFloat(drenagem.ri043) + parseFloat(drenagem.ri044)) / parseFloat(drenagem.ge005)) * 10) ** 5;
+        const ano = drenagem.ano.toString();
+        const dados = [ano, parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
+        return dados;
+      })
+    );
+
+    const rsFilter = rs.filter((item) => item !== null);
+
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+    } else {
+      setActiveTab("dados");
+    }
+
+    const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+    setTituloIndicador("IN047 - Habitantes Realocados em Decorrência de Eventos Hidrológicos");
+    setIndicador(rsFilter.sort((a, b) => b[0] - a[0]));
+    setData(dados);
+  }
+
+  const [activeTab, setActiveTab] = useState("dados");
+  const [activeButtonDados, setActiveButtonDados] = useState(true);
+  const [activeButtonGrafico, setActiveButtonGrafico] = useState(false);
+
+  const [visibleMenuChart, setVisibleMenuChart] = useState(false);
+  const [visibleMenuReports, setVisibleMenuReports] = useState(false);
+
+  function handleActiveTab({ value }) {
+    value === "dados"
+      ? setActiveButtonDados(true)
+      : setActiveButtonDados(false);
+    value === "graficos"
+      ? setActiveButtonGrafico(true)
+      : setActiveButtonGrafico(false);
+
+    if (data == null) {
+      setActiveTab("error");
+      return;
+    }
+
+    setActiveTab(value);
+  }
+
+  const printRef = useRef(null);
+
+  const handlePrint = () => {
+    const printContent = printRef.current;
+    const printWindow = window.open("", "", "width=800,height=600");
+    printWindow.document.write(
+      "<html><head><title>Impressão</title></head><body>"
+    );
+    printWindow.document.write(printContent.outerHTML);
+    printWindow.document.write("</body></html>");
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   return (
-    
-        <Form onSubmit={handleSubmit(handleIndicador)}>
-          <DivForm>
-            <DivTituloFormResiduo>Drenagem de Águas Pluviais</DivTituloFormResiduo> 
+    <>
+      <TabsList>
+        <TabButtonDados
+          activeButtonDados={activeButtonDados}
+          onClick={() => handleActiveTab({ value: "dados" })}
+        >
+          Dados
+        </TabButtonDados>
+        <TabButtonGrafico
+          activeButtonGrafico={activeButtonGrafico}
+          onClick={() => handleActiveTab({ value: "graficos" })}
+        >
+          Gráficos
+        </TabButtonGrafico>
+      </TabsList>
+      <Tabs>
+        <TabsForm>
+          <TabsMenuReports>
+            <div ref={chartRef} onClick={() => setVisibleMenuChart(true)}>
+              <FaEllipsisV />
+            </div>
+            <div ref={reportRef} onClick={() => setVisibleMenuReports(true)}>
+              <FaBars />
+            </div>
+            <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
+              <ul>
+                <li onClick={() => setTypeChart("ColumnChart")}>
+                  <FaChartBar /> Gráfico Barra
+                </li>
+                <li onClick={() => setTypeChart("LineChart")}>
+                  <FaChartLine /> Gráfico Linea
+                </li>
+                <li onClick={() => setTypeChart("AreaChart")}>
+                  <FaChartArea /> Gráfico Àrea
+                </li>
+              </ul>
+            </TabsMenuChartsOnClick>
+            <TabsMenuReportsOnClick visibleMenuReports={visibleMenuReports}>
+              <ul>
+                <li onClick={() => handlePrint()}>
+                  <FaPrint /> Imprimir
+                </li>
+                <li>
+                  <FaFileExcel /> Gerar Excel
+                </li>
+                <li>
+                  <FaFileCsv /> Gerar CSV
+                </li>
+              </ul>
+            </TabsMenuReportsOnClick>
+          </TabsMenuReports>
+          <TabsInstructons>
+            Para obter os indicadores, selecione o município e o indicador.
+          </TabsInstructons>
+          <form onSubmit={handleSubmit(handleIndicador)}>
             <table>
-             <thead>
-              <tr>
-                <th></th>
-              </tr>
-             </thead>
-             <tbody>
-              <tr>
-              <td>
-                  <select {...register("id_municipio")}>
-                  <option>Município</option>
-                    {municipios?.map((municipio, key)=>(
-                      <option key={key} value={municipio.id_municipio}>{municipio.nome}</option>
-                    ))}
-                    
-                  </select>
-                </td>
-                <td>
-                  <select {...register("ano")} >
-                  <option>Ano</option>
-                    <option value="2022">2022</option>                   
-                  </select>
-                </td>
-                <td>
-                <select {...register("indicador")}>
-                   <option>Indicardor</option>
-                   <option value="IN042">IN042 - Parcela de área urbana em relação à área total</option>
-                   <option value="IN043">IN043 - Densidade Demográfica na Área Urbana</option>
-                   <option value="IN044">IN044 - Densidade de Domicílios na Área Urbana</option>
-                   <option value="IN001">IN001 - Participação do Pessoal Próprio Sobre o Total de Pessoal Alocado nos Serviços de Drenagem e Manejo das Águas Pluviais Urbanas</option>
-                   <option value="IN006">IN006 - Receita Operacional Média do Serviço por Unidades Tributadas</option>
-                   <option value="IN010">IN006 - Despesa per capita com manejo de rsu em relação à população urbana</option>
-                   <option value="IN050">IN050 - Diferença relativa entre despesas e receitas de Drenagem e Manejo de Águas Pluviais urbanas</option>
-                   <option value="IN054">IN054 - Investimentos totais desembolsados em relação aos investimentos totais contratados</option>
-                   <option value="IN005">IN005 - Taxa Média Praticada para os Serviços de Drenagem e Manejo das Águas Pluviais Urbanas</option>
-                   <option value="IN009">IN009 - Despesa Média Praticada para os Serviços de Drenagem e Manejo das Águas Pluviais Urbanas</option>
-                   <option value="IN048">IN048 - Despesa per capita com serviços de Drenagem e Manejo das Águas Pluviais Urbanas</option>
-                   <option value="IN053">IN053 - Desembolso de investimentos per capta</option>
-                   <option value="IN020">IN020 - Taxa de Cobertura de Pavimentação e Meio-Fio na Área Urbana do Município</option>
-                   <option value="IN021">IN021 - Taxa de cobertura de vias públicas com redes ou canais pluviais subterrâneos na área urbana</option>
-                   <option value="IN025">IN025 - Parcela de Cursos d’Água Naturais Perenes em Área Urbana com Parques Lineares</option>
-                   <option value="IN026">IN026 - Parcela de Cursos d’Água Naturais Perenes com Canalização Aberta</option>
-                   <option value="IN027">IN027 - Parcela de Cursos d’Água Naturais Perenes com Canalização Fechada</option>
-                   <option value="IN029">IN029 - Parcela de Cursos d’Água Naturais Perenes com Diques</option>
-                   <option value="IN035">IN035 - Volume de reservação de águas pluviais por unidade de área urbana</option>
-                   <option value="IN051">IN051 - Densidade de captações de águas pluviais na área urbana</option>
-                   <option value="IN040">IN040 - Parcela de Domicílios em Situação de Risco de Inundação</option>
-                   <option value="IN041">IN041 - Parcela da População Impactada por Eventos Hidrológicos</option>
-                   <option value="IN046">IN046 - Índice de Óbitos</option>
-                   <option value="IN047">IN047 - Habitantes Realocados em Decorrência de Eventos Hidrológicos</option>
-                                
-                </select>
-                </td>
-                <td> <SubmitButton type="submit">Buscar</SubmitButton></td>
-              </tr>
-             </tbody>
-            </table> 
+              <thead>
+                <tr>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <select {...register("id_municipio")}>
+                      <option>Município</option>
+                      {municipios?.map((municipio, key) => (
+                        <option key={key} value={municipio.id_municipio}>
+                          {municipio.nome}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
 
-            <Chart
-              chartType="LineChart"
-              data={data}
-              options={options}
-              width={"100%"}
-              height={"500px"}
-            />        
-            
-            
-          </DivForm>
-         
-        </Form>
-     
+                  <td>
+                    <select {...register("indicador")}>
+                      <option>Indicardor</option>
+                      <option value="IN042">
+                        IN042 - Parcela de área urbana em relação à área total
+                      </option>
+                      <option value="IN043">
+                        IN043 - Densidade Demográfica na Área Urbana
+                      </option>
+                      <option value="IN044">
+                        IN044 - Densidade de Domicílios na Área Urbana
+                      </option>
+                      <option value="IN001">
+                        IN001 - Participação do Pessoal Próprio Sobre o Total de
+                        Pessoal Alocado nos Serviços de Drenagem e Manejo das
+                        Águas Pluviais Urbanas
+                      </option>
+                      <option value="IN006">
+                        IN006 - Receita Operacional Média do Serviço por
+                        Unidades Tributadas
+                      </option>
+                      <option value="IN010">
+                        IN006 - Despesa per capita com manejo de rsu em relação
+                        à população urbana
+                      </option>
+                      <option value="IN050">
+                        IN050 - Diferença relativa entre despesas e receitas de
+                        Drenagem e Manejo de Águas Pluviais urbanas
+                      </option>
+                      <option value="IN054">
+                        IN054 - Investimentos totais desembolsados em relação
+                        aos investimentos totais contratados
+                      </option>
+                      <option value="IN005">
+                        IN005 - Taxa Média Praticada para os Serviços de
+                        Drenagem e Manejo das Águas Pluviais Urbanas
+                      </option>
+                      <option value="IN009">
+                        IN009 - Despesa Média Praticada para os Serviços de
+                        Drenagem e Manejo das Águas Pluviais Urbanas
+                      </option>
+                      <option value="IN048">
+                        IN048 - Despesa per capita com serviços de Drenagem e
+                        Manejo das Águas Pluviais Urbanas
+                      </option>
+                      <option value="IN053">
+                        IN053 - Desembolso de investimentos per capta
+                      </option>
+                      <option value="IN020">
+                        IN020 - Taxa de Cobertura de Pavimentação e Meio-Fio na
+                        Área Urbana do Município
+                      </option>
+                      <option value="IN021">
+                        IN021 - Taxa de cobertura de vias públicas com redes ou
+                        canais pluviais subterrâneos na área urbana
+                      </option>
+                      <option value="IN025">
+                        IN025 - Parcela de Cursos d’Água Naturais Perenes em
+                        Área Urbana com Parques Lineares
+                      </option>
+                      <option value="IN026">
+                        IN026 - Parcela de Cursos d’Água Naturais Perenes com
+                        Canalização Aberta
+                      </option>
+                      <option value="IN027">
+                        IN027 - Parcela de Cursos d’Água Naturais Perenes com
+                        Canalização Fechada
+                      </option>
+                      <option value="IN029">
+                        IN029 - Parcela de Cursos d’Água Naturais Perenes com
+                        Diques
+                      </option>
+                      <option value="IN035">
+                        IN035 - Volume de reservação de águas pluviais por
+                        unidade de área urbana
+                      </option>
+                      <option value="IN051">
+                        IN051 - Densidade de captações de águas pluviais na área
+                        urbana
+                      </option>
+                      <option value="IN040">
+                        IN040 - Parcela de Domicílios em Situação de Risco de
+                        Inundação
+                      </option>
+                      <option value="IN041">
+                        IN041 - Parcela da População Impactada por Eventos
+                        Hidrológicos
+                      </option>
+                      <option value="IN046">IN046 - Índice de Óbitos</option>
+                      <option value="IN047">
+                        IN047 - Habitantes Realocados em Decorrência de Eventos
+                        Hidrológicos
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <TabFormSubmit type="submit">Buscar</TabFormSubmit>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            </form>
+            </TabsForm>
+            {activeTab === "dados" && (
+              <TabsContent ref={printRef}>
+                <TabsTitleIndicador>{tituloIndicador}</TabsTitleIndicador>
+                <TabsTable>
+                  <tbody>
+                    <tr>
+                      <th>Ano</th>
+                      <th>Indicador</th>
+                    </tr>
+                    {indicador?.map((item, index) => (
+                      <tr key={index}>
+                        <td>{item[0]}</td>
+                        <td>{item[1]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </TabsTable>
+              </TabsContent>
+            )}
+            {activeTab === "graficos" && (
+              <TabsContent ref={printRef}>
+                <TabsTitleIndicador>{tituloIndicador}</TabsTitleIndicador>
+                <Chart
+                  chartType={typeChart}
+                  data={data}
+                  options={options}
+                  width={"100%"}
+                  height={"500px"}
+                />
+              </TabsContent>
+            )}
+            {activeTab === "error" && (
+              <TabsError>
+                Não foram encontrados dados suficientes para gerar o indicador
+                desejado!
+              </TabsError>
+            )}
+          
+        
+      </Tabs>
+    </>
   );
 }

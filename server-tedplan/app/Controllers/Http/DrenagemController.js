@@ -3,12 +3,28 @@ const Drenagem = use('App/Models/Concessionaria')
 class DrenagemController {
 
   async getDrenagem({ request }){
+    const { id_municipio } = request.all()
+   try {
+    const res = await Drenagem.query()
+    .from('tedplan.drenagem_aguas_pluviais')
+    .where('id_municipio', id_municipio)
+    .where("ano", "is not", null)
+    .fetch()
+
+    return res
+   } catch (error) {
+    console.log(error);
+   }
+  }
+
+  async getDrenagemPorAno({ request }){
     const { id_municipio, ano } = request.all()
    try {
     const res = await Drenagem.query()
     .from('tedplan.drenagem_aguas_pluviais')
     .where('id_municipio', id_municipio)
-    .where('ano', ano)
+    .where('ano', ano)    
+    .where("ano", "is not", null)
     .fetch()
 
     return res
