@@ -72,6 +72,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   }, [usuario]);
   useEffect(() => {
     if (dadosMunicipio) {
+      console.log(dadosMunicipio);
+      
       Object.entries(dadosMunicipio).forEach(([key, value]) => {
         setValue(key, value);
       });

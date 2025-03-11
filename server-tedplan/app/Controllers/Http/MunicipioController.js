@@ -40,7 +40,7 @@ class MunicipioController {
           "m.nome_prefeito as municipio_prefeito",
           "m.nome_prefeitura as municipio_nome_prefeitura",
 
-          "tsms.setor_responsavel_tsms as ts_setor_reponsavel",
+          "tsms.setor_responsavel_tsms as ts_setor_responsavel",
           "tsms.telefone_comercial_tsms as ts_telefone_comercial",
           "tsms.nome_responsavel_tsms as ts_responsavel",
           "tsms.cargo_tsms as ts_cargo",
