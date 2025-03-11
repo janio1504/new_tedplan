@@ -82,12 +82,13 @@ export default function AddNorma({
       id_tipo_norma: "",
       id_eixo: "",
       id_escala: "",
+      imagem: null,
+      arquivo: null,
     },
   });
   const [imagem, setImagem] = useState(null);
   const router = useRouter();
   const { id } = router.query;
-  console.log(normas);
 
   useEffect(() => {
     if (id) {
@@ -115,13 +116,6 @@ export default function AddNorma({
           id_tipo_norma: tipoNormaEncontrado?.id_tipo_norma || "",
           id_eixo: eixoEncontrado?.id_eixo || "",
           id_escala: escalaEncontrada?.id_escala || "",
-        });
-
-        console.log("Valores definidos:", {
-          titulo: normaSelecionada.titulo,
-          id_tipo_norma: tipoNormaEncontrado?.id_tipo_norma,
-          id_eixo: eixoEncontrado?.id_eixo,
-          id_escala: escalaEncontrada?.id_escala,
         });
       }
     }
