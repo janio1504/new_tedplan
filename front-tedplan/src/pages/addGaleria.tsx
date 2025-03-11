@@ -1,25 +1,23 @@
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from 'react-nextjs-toast';
-
+import { toast, ToastContainer } from "react-nextjs-toast";
 
 import {
   Container,
-     Form,
-     Footer, DivCenter, DivInstrucoes,
-  } from '../styles/dashboard';
+  Form,
+  Footer,
+  DivCenter,
+  DivInstrucoes,
+} from "../styles/dashboard";
 
-
-  import {
-  SubmitButton,
-       
-    } from '../styles/dashboard-original';
+import { SubmitButton } from "../styles/dashboard-original";
 
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
 import Textarea from "@uiw/react-md-editor/lib/components/TextArea/Textarea";
+import { useRouter } from "next/router";
 
 interface IGaleria {
   id_galeria: string;
@@ -69,66 +67,107 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
     formState: { errors },
   } = useForm();
 
-
   const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
   const editor = useRef(null);
   let txtArea = useRef();
   const firstRender = useRef(true);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
-  
-  async function handleAddGaleria({
-    titulo,
-    mes,
-    ano,
-    imagem,
-    id_municipio,
-    id_eixo,
-  }) {
-    const descricao = content.toString();
+  const router = useRouter();
+
+  // async function handleAddGaleria({
+  //   titulo,
+  //   mes,
+  //   ano,
+  //   imagem,
+  //   id_municipio,
+  //   id_eixo,
+  // }) {
+  //   const descricao = content.toString();
+  //   const formData = new FormData();
+
+  //   formData.append("imagem", imagem[0]);
+  //   formData.append("titulo", titulo);
+  //   formData.append("descricao", descricao);
+  //   formData.append("mes", mes);
+  //   formData.append("ano", ano);
+  //   formData.append("id_municipio", id_municipio);
+  //   formData.append("id_eixo", id_eixo);
+  //   const apiClient = getAPIClient();
+  //   const response = await apiClient
+  //     .post("addGaleria", formData, {
+  //       headers: {
+  //         "Content-Type": `multipart/form-data=${formData}`,
+  //       },
+  //     })
+  //     .then((response) => {
+  //       toast.notify('Dados gravados com sucesso!',{
+  //         title: "Sucesso!",
+  //         duration: 7,
+  //         type: "success",
+  //       })
+  //       reset({
+  //         imagem: "",
+  //         titulo: "",
+  //         descricao: "",
+  //         mes: "",
+  //         ano: "",
+  //         eixo: "",
+  //         id_municipio: "",
+  //       });
+  //     })
+  //     .catch((error) => {
+  //       if (error) {
+  //         toast.notify('Erro ao gravar dados!',{
+  //           title: "Erro!",
+  //           duration: 7,
+  //           type: "error",
+  //         })
+  //         return error;
+  //       }
+  //     });
+  // }
+
+  const onSubmit = async (data) => {
+    // const descricao = content.toString();
     const formData = new FormData();
 
-    formData.append("imagem", imagem[0]);
-    formData.append("titulo", titulo);
-    formData.append("descricao", descricao);
-    formData.append("mes", mes);
-    formData.append("ano", ano);
-    formData.append("id_municipio", id_municipio);
-    formData.append("id_eixo", id_eixo);
+    formData.append("imagem", data.imagem[0]);
+    formData.append("titulo", data.titulo);
+    formData.append("descricao", data.descricao);
+    formData.append("mes", data.mes);
+    formData.append("ano", data.ano);
+    formData.append("id_municipio", data.id_municipio);
+    formData.append("id_eixo", data.id_eixo);
+
     const apiClient = getAPIClient();
-    const response = await apiClient
-      .post("addGaleria", formData, {
+
+    try {
+      await apiClient.post("addGaleria", formData, {
         headers: {
-          "Content-Type": `multipart/form-data=${formData}`,
+          "Content-Type": "multipart/form-data",
         },
-      })
-      .then((response) => {
-        toast.notify('Dados gravados com sucesso!',{
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        })   
-        reset({
-          imagem: "",
-          titulo: "",
-          descricao: "",
-          mes: "",
-          ano: "",
-          eixo: "",
-          id_municipio: "",
-        });
-      })
-      .catch((error) => {
-        if (error) {
-          toast.notify('Erro ao gravar dados!',{
-            title: "Erro!",
-            duration: 7,
-            type: "error",
-          })   
-          return error;
-        }
       });
-  }
+
+      toast.notify("Galeria criada com sucesso!", {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      });
+
+      // Adicionar redirecionamento
+      setTimeout(() => {
+        router.push("/listarGalerias");
+      }, 2000);
+    } catch (error) {
+      console.error("Erro ao criar galeria:", error);
+      toast.notify("Erro ao criar galeria!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+    }
+  };
   const anos = [
     { ano: "2015" },
     { ano: "2016" },
@@ -163,7 +202,6 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
     setContent(content);
   }
 
-  
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>
@@ -171,12 +209,17 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
       <DivCenter>
         <DivInstrucoes>
           <b>Cadastro de galeria: </b>
-          <p>Adicione uma galeria com os dados solicitados abaixo, escolha uma imagem de capa 
-          que será mostrada no portal galerias, e se desejar, escreva uma <b>Descrição</b>.</p>
-          <p>Após gravar a galeria clique no menu galerias e na lista clique no botão Adicionar imagens!</p>
-          
+          <p>
+            Adicione uma galeria com os dados solicitados abaixo, escolha uma
+            imagem de capa que será mostrada no portal galerias, e se desejar,
+            escreva uma <b>Descrição</b>.
+          </p>
+          <p>
+            Após gravar a galeria clique no menu galerias e na lista clique no
+            botão Adicionar imagens!
+          </p>
         </DivInstrucoes>
-        <Form onSubmit={handleSubmit(handleAddGaleria)}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <label>Titulo</label>
           <input
             aria-invalid={errors.name ? "true" : "false"}
@@ -266,12 +309,17 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
             <span>Selecionar uma imagem é obrigatório!</span>
           )}
           <label>Descricão</label>
-          <textarea ref={txtArea} {...register("descricao")} onChange={handleOnChange}></textarea>
+          <textarea
+            {...register("descricao")}
+            onChange={handleOnChange}
+          ></textarea>
 
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
+      <Footer>
+        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+      </Footer>
     </Container>
   );
 }

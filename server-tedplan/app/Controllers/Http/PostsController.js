@@ -54,15 +54,21 @@ class PostsController {
         subtype: upload.subtype,
       });
 
-      const post = await Posts.query().from("tedplan.posts").insert({
-        titulo: titulo,
-        texto: texto,
-        id_categoria: id_categoria,
-        id_municipio: id_municipio,
-        id_imagem: imagem.id,
-      });
+      const post = await Posts.query()
+        .returning("*")
+        .from("tedplan.posts").insert({
+          titulo: titulo,
+          texto: texto,
+          id_categoria: id_categoria,
+          id_municipio: id_municipio,
+          id_imagem: imagem.id,
+        });
 
-      return post;
+      return response.status(201).json({
+        success: true,
+        message: 'Postagem criada com sucesso',
+        ...post[0]
+      });
     } catch (error) {
       console.log(error);
       return error;
@@ -79,7 +85,7 @@ class PostsController {
         .fetch();
 
       return post;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   async update({ request, response }) {

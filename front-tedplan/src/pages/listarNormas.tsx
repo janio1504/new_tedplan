@@ -163,7 +163,6 @@ export default function Postagens({ normas }: NormasProps) {
 
   async function handleUpdateNorma(data: INorma) {
     const formData = new FormData();
-    console.log(data);
 
     formData.append("arquivo", data.arquivo[0]);
     formData.append("titulo", data.titulo);
@@ -172,7 +171,7 @@ export default function Postagens({ normas }: NormasProps) {
     const resNorma = await api
       .post("updateNorma", formData, {
         headers: {
-          "Content-Type": `multipart/form-data=${formData}`,
+          "Content-Type": `multipart/form-data`,
         },
       })
       .then((response) => {
@@ -298,18 +297,22 @@ export default function Postagens({ normas }: NormasProps) {
                     </BotaoRemover>
                     <BotaoEditar
                       onClick={() =>
-                        handleShowUpdateModal(norma.id_arquivo, norma.id_norma)
+                        Router.push(`/addNorma?id=${norma.id_norma}`)
                       }
+
+                      // onClick={() =>
+                      //   handleShowUpdateModal(norma.id_arquivo, norma.id_norma)
+                      // }
                     >
                       Editar
                     </BotaoEditar>
-                    <BotaoVisualizar
+                    {/* <BotaoVisualizar
                       onClick={() =>
                         handleShowModal(norma.id_imagem, norma.id_norma)
                       }
                     >
                       Editar Imagem
-                    </BotaoVisualizar>
+                    </BotaoVisualizar> */}
                   </td>
                 </tr>
               </tbody>
@@ -328,14 +331,14 @@ export default function Postagens({ normas }: NormasProps) {
                   <b>Você confirma a exclusão!</b>
                 </h3>
               </TituloModal>
-              <ConfirmModal>
+              <TextoModal>
                 <CancelButton onClick={handleCloseConfirm}>
                   <b>Cancelar</b>
                 </CancelButton>
                 <ConfirmButton onClick={() => handleRemoverNorma()}>
                   <b>Confirmar</b>
                 </ConfirmButton>
-              </ConfirmModal>
+              </TextoModal>
             </ConteudoModal>
           </Modal>
         </ContainerModal>
@@ -344,43 +347,45 @@ export default function Postagens({ normas }: NormasProps) {
       {isModalVisible && (
         <ContainerModal>
           <Modal>
-            <CloseModalButton onClick={handleCloseModal}>
-              Fechar
-            </CloseModalButton>
             <FormModal onSubmit={handleSubmit(handleUpdateImagem)}>
-              <ConteudoModal>
-                <input
-                  type="hidden"
-                  {...register("id_norma")}
-                  defaultValue={idNorma}
-                  onChange={handleOnChange}
-                  name="id_norma"
-                />
-                <input
-                  type="hidden"
-                  {...register("id_imagem")}
-                  defaultValue={idImagem}
-                  onChange={handleOnChange}
-                  name="id_imagem"
-                />
-                <label>Selecione uma imagem para substituir a atual!</label>
-                <input
-                  {...register("imagem")}
-                  type="file"
-                  accept="image/*"
-                  onChange={(event) => {
-                    const files = event.target.files;
-                    if (files) {
-                      setImagem(URL.createObjectURL(files[0]));
-                    }
-                  }}
-                />
+              <TextoModal>
+                <CloseModalButton onClick={handleCloseModal}>
+                  Fechar
+                </CloseModalButton>
+                <SubmitButton type="submit">Gravar</SubmitButton>
+                <ConteudoModal>
+                  <input
+                    type="hidden"
+                    {...register("id_norma")}
+                    defaultValue={idNorma}
+                    onChange={handleOnChange}
+                    name="id_norma"
+                  />
+                  <input
+                    type="hidden"
+                    {...register("id_imagem")}
+                    defaultValue={idImagem}
+                    onChange={handleOnChange}
+                    name="id_imagem"
+                  />
+                  <label>Selecione uma imagem para substituir a atual!</label>
+                  <input
+                    {...register("imagem")}
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => {
+                      const files = event.target.files;
+                      if (files) {
+                        setImagem(URL.createObjectURL(files[0]));
+                      }
+                    }}
+                  />
 
-                <ImagemModal>
-                  <img src={`${imagem}`} alt="TedPlan" />
-                </ImagemModal>
-              </ConteudoModal>
-              <SubmitButton type="submit">Gravar</SubmitButton>
+                  <ImagemModal>
+                    <img src={`${imagem}`} alt="TedPlan" />
+                  </ImagemModal>
+                </ConteudoModal>
+              </TextoModal>
             </FormModal>
           </Modal>
         </ContainerModal>
@@ -389,45 +394,47 @@ export default function Postagens({ normas }: NormasProps) {
       {isModalUpdateVisible && (
         <ContainerModal>
           <Modal>
-            <CloseModalButton onClick={handleCloseModal}>
-              Fechar
-            </CloseModalButton>
             <FormModal onSubmit={handleSubmit(handleUpdateNorma)}>
-              <ConteudoModal>
-                <TituloModal>
-                  <input
-                    type="hidden"
-                    {...register("id_norma")}
-                    value={isNorma.id_norma}
-                  />
-                  <input
-                    type="hidden"
-                    {...register("id_arquivo")}
-                    value={isNorma.id_arquivo}
-                  />
-                  <ImagemModal></ImagemModal>
-                  <label>Titulo</label>
-                  <input
-                    {...register("titulo")}
-                    defaultValue={isNorma.titulo}
-                    name="titulo"
-                    onChange={handleOnChange}
-                  />
-                  <button>
-                    <a href={arquivo} rel="noreferrer" target="_blank">
-                      Clique aqui para ver o arquivo atual!
-                    </a>
-                  </button>
-                  <label>Para trocar o arquivo, selecione outro!</label>
-                  <input
-                    {...register("arquivo")}
-                    accept=".pdf, .doc, .docx, .xls, .xlsx"
-                    type="file"
-                    name="arquivo"
-                  />
-                </TituloModal>
-              </ConteudoModal>
-              <SubmitButton type="submit">Gravar</SubmitButton>
+              <TextoModal>
+                <CloseModalButton onClick={handleCloseModal}>
+                  Fechar
+                </CloseModalButton>
+                <SubmitButton type="submit">Gravar</SubmitButton>
+                <ConteudoModal>
+                  <TituloModal>
+                    <input
+                      type="hidden"
+                      {...register("id_norma")}
+                      value={isNorma.id_norma}
+                    />
+                    <input
+                      type="hidden"
+                      {...register("id_arquivo")}
+                      value={isNorma.id_arquivo}
+                    />
+                    <ImagemModal></ImagemModal>
+                    <label>Titulo</label>
+                    <input
+                      {...register("titulo")}
+                      defaultValue={isNorma.titulo}
+                      name="titulo"
+                      onChange={handleOnChange}
+                    />
+                    <button>
+                      <a href={arquivo} rel="noreferrer" target="_blank">
+                        Clique aqui para ver o arquivo atual!
+                      </a>
+                    </button>
+                    <label>Para trocar o arquivo, selecione outro!</label>
+                    <input
+                      {...register("arquivo")}
+                      accept=".pdf, .doc, .docx, .xls, .xlsx"
+                      type="file"
+                      name="arquivo"
+                    />
+                  </TituloModal>
+                </ConteudoModal>
+              </TextoModal>
             </FormModal>
           </Modal>
         </ContainerModal>

@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { toast, ToastContainer } from 'react-nextjs-toast';
+import { toast, ToastContainer } from "react-nextjs-toast";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
@@ -23,13 +23,11 @@ import {
   Container,
   NewButton,
   ListPost,
- 
   Footer,
   DivCenter,
   BotaoVisualizar,
   BotaoEditar,
   BotaoRemover,
-
   ModalGaleria,
   ImagemGaleria,
   ImagensGaleria,
@@ -37,9 +35,6 @@ import {
   ModalImgAmpliada,
   ImagenAmpliada,
 } from "../styles/dashboard";
-
-
-
 
 import {
   ContainerModal,
@@ -91,8 +86,6 @@ export default function Postagens({ galerias }: GaleriaProps) {
   const [modalImagemAmpliada, setModalImagemAmpliada] = useState(false);
   const [imagemAmpliada, setImagemAmpliada] = useState(null);
 
- 
-
   const fileInputRef = useRef<HTMLInputElement>();
 
   async function handleShowModal(galeria) {
@@ -100,12 +93,12 @@ export default function Postagens({ galerias }: GaleriaProps) {
     setModalVisible(true);
   }
 
-  function handleImagemAmpliada(imagem){
-    setImagemAmpliada(imagem)
-    setModalImagemAmpliada(true)
+  function handleImagemAmpliada(imagem) {
+    setImagemAmpliada(imagem);
+    setModalImagemAmpliada(true);
   }
   function handleCloseModalImgAmpliada() {
-    setModalImagemAmpliada(false)
+    setModalImagemAmpliada(false);
   }
 
   function handleCloseModal() {
@@ -137,11 +130,16 @@ export default function Postagens({ galerias }: GaleriaProps) {
           url: "getImagem",
           params: { id: imagem.id },
           responseType: "blob",
-        }).then((response) => {          
-          return { imagen: URL.createObjectURL(response.data), id: imagem.id };
-        }).catch((error)=>{          
-          console.log(error);          
-        });
+        })
+          .then((response) => {
+            return {
+              imagen: URL.createObjectURL(response.data),
+              id: imagem.id,
+            };
+          })
+          .catch((error) => {
+            console.log(error);
+          });
         return img;
       })
     );
@@ -158,45 +156,56 @@ export default function Postagens({ galerias }: GaleriaProps) {
     const resDelete = await api.delete("deleteGaleria", {
       params: { id_galeria: idGaleria, id_imagem: idImagem },
     });
-    toast.notify('Os dados foram removidos!',{
+    toast.notify("Os dados foram removidos!", {
       title: "Atenção!",
       duration: 7,
       type: "error",
-    })  
+    });
     setModalConfirm(false);
     Router.push("/listarGalerias");
   }
 
   async function handleAddImagens(data) {
-    const formData = new FormData();
-    
-    for (let img of data.imagem) {
-      
-      formData.append("imagem", img);
-      formData.append("id_galeria", data.id_galeria);
-      const res = await api
-        .post("/addImagensGaleria", formData, {
-          headers: {  
-            "Content-Type": `multipart/form-data=${formData}`,
-          },
-        })
-        .then((response) => {
-          toast.notify('Dados gravados com sucesso!',{
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
-          })   
-        })
-        .catch((error) => {
-          toast.notify('Erro ao gravar dados!',{
-            title: "Erro!",
-            duration: 7,
-            type: "error",
-          })   
+    try {
+      // Verificar se há arquivos selecionados
+      if (!data.imagem || !data.imagem.length) {
+        toast.notify("Selecione pelo menos uma imagem!", {
+          title: "Atenção!",
+          duration: 7,
+          type: "warning",
         });
+        return;
+      }
+
+      for (let img of data.imagem) {
+        const formData = new FormData();
+        formData.append("imagem", img);
+        formData.append("id_galeria", data.id_galeria);
+
+        await api.post("/addImagensGaleria", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data", // Corrigido o Content-Type
+          },
+        });
+      }
+
+      toast.notify("Imagens adicionadas com sucesso!", {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      });
+
+      // Fechar modal e atualizar lista
+      setModalVisible(false);
+      Router.reload();
+    } catch (error) {
+      console.error("Erro ao adicionar imagens:", error);
+      toast.notify("Erro ao adicionar imagens!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
     }
-    
-    setModalVisible(false);
   }
 
   async function handleRemoverImagem(id_imagem) {
@@ -206,11 +215,11 @@ export default function Postagens({ galerias }: GaleriaProps) {
     const resDelete = await api.delete("deleteImagem", {
       params: { id_imagem: id_imagem },
     });
-    toast.notify('Os dados foram removidos!',{
+    toast.notify("Os dados foram removidos!", {
       title: "Atenção!",
       duration: 7,
       type: "error",
-    })  
+    });
     handleModalGaleriaOpen({ id_galeria: idGaleria });
   }
 
@@ -234,11 +243,10 @@ export default function Postagens({ galerias }: GaleriaProps) {
 
   function handleOnChange(event) {
     const files = event.target.files;
-    const imagem = []
-      imagem[0] = URL.createObjectURL(files[0]);
-   
-     setImagem(imagem);                             
-    
+    const imagem = [];
+    imagem[0] = URL.createObjectURL(files[0]);
+
+    setImagem(imagem);
   }
 
   function handleAddGaleria() {
@@ -287,8 +295,6 @@ export default function Postagens({ galerias }: GaleriaProps) {
                     >
                       Remover
                     </BotaoRemover>
-                    
-
 
                     <BotaoVisualizar onClick={() => handleShowModal(galeria)}>
                       Adicionar imagens
@@ -302,8 +308,6 @@ export default function Postagens({ galerias }: GaleriaProps) {
                     >
                       Visualizar imagens
                     </BotaoVisualizar>
-
-                   
                   </td>
                 </tr>
               </tbody>
@@ -311,145 +315,140 @@ export default function Postagens({ galerias }: GaleriaProps) {
           })}
         </ListPost>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer> </Footer>
-          {isModalConfirm && (
-                      <ContainerModal>
-                        <Modal>
-                          <ConteudoModal>
-                            <TituloModal>
-                              <h3>
-                                <b>Você confirma a exclusão!</b>
-                              </h3>
-                            </TituloModal>
-                            <ConfirmModal>
-                              <CancelButton onClick={handleCloseConfirm}>
-                                <b>Cancelar</b>
-                              </CancelButton>
-                              <ConfirmButton
-                                onClick={() => handleRemoverGaleria()}
-                              >
-                                <b>Confirmar</b>
-                              </ConfirmButton>
-                            </ConfirmModal>
-                          </ConteudoModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+      <Footer>
+        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>{" "}
+      </Footer>
+      {isModalConfirm && (
+        <ContainerModal>
+          <Modal>
+            <ConteudoModal>
+              <TituloModal>
+                <h3>
+                  <b>Você confirma a exclusão!</b>
+                </h3>
+              </TituloModal>
+              <ConfirmModal>
+                <CancelButton onClick={handleCloseConfirm}>
+                  <b>Cancelar</b>
+                </CancelButton>
+                <ConfirmButton onClick={() => handleRemoverGaleria()}>
+                  <b>Confirmar</b>
+                </ConfirmButton>
+              </ConfirmModal>
+            </ConteudoModal>
+          </Modal>
+        </ContainerModal>
+      )}
 
-                    {isModalVisible && (
-                      <ContainerModal>
-                        <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
-                          <Form onSubmit={handleSubmit(handleAddImagens)}>
-                          <SubmitButton type="submit">Gravar</SubmitButton>
-                            <ConteudoModal>
-                              <TituloModal>
-                              <input
-                                {...register("id_galeria")}
-                                type="hidden"
-                                value={isGaleria.id_galeria}
-                              />
-                              <label>Insira uma imagem!</label>
-                              <input
-                                {...register("imagem")}
-                                type="file"
-                                accept="image/*"
-                                onChange={(event) => {
-                                  const files = event.target.files;
-                                  if (files) {                                    
-                                    setImagem(URL.createObjectURL(files[0]));
-                                  }
-                                }}
-                              />
+      {isModalVisible && (
+        <ContainerModal>
+          <Modal>
+            <CloseModalButton onClick={handleCloseModal}>
+              Fechar
+            </CloseModalButton>
+            <Form onSubmit={handleSubmit(handleAddImagens)}>
+              <SubmitButton type="submit">Gravar</SubmitButton>
+              <ConteudoModal>
+                <TituloModal>
+                  <input
+                    {...register("id_galeria")}
+                    type="hidden"
+                    value={isGaleria.id_galeria}
+                  />
+                  <label>Insira uma imagem!</label>
+                  <input
+                    {...register("imagem")}
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) => {
+                      const files = event.target.files;
+                      if (files) {
+                        setImagem(URL.createObjectURL(files[0]));
+                      }
+                    }}
+                  />
 
-                                    <ImagemModal>
-                                      {imagem && (
-                                          <img src={`${imagem}`} alt="TedPlan" />
-                                          )
-                                      }
-                                    </ImagemModal>  
-                                    </TituloModal>
-                            </ConteudoModal>
-                            
-                          </Form>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+                  <ImagemModal>
+                    {imagem && <img src={`${imagem}`} alt="TedPlan" />}
+                  </ImagemModal>
+                </TituloModal>
+              </ConteudoModal>
+            </Form>
+          </Modal>
+        </ContainerModal>
+      )}
 
-                    {isModalGaleria && (
-                      <ContainerModal>
-                        <ModalGaleria>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
+      {isModalGaleria && (
+        <ContainerModal>
+          <ModalGaleria>
+            <CloseModalButton onClick={handleCloseModal}>
+              Fechar
+            </CloseModalButton>
 
-                          <ContainerImagems>
-                            {imagensGaleria.map((imagem, key) => (
-                              <ImagensGaleria key={key}>
-                                <button
-                                  onClick={() => handleRemoverImagem(imagem.id)}
-                                >
-                                  <b>Remover</b>
-                                </button>
-                                <p>
-                                  <img onClick={()=>handleImagemAmpliada(imagem.imagen)} src={imagem.imagen} alt="TedPlan" />
-                                </p>
-                              </ImagensGaleria>
-                            ))}
-                          </ContainerImagems>
-                        </ModalGaleria>
-                      </ContainerModal>
-                    )}
+            <ContainerImagems>
+              {imagensGaleria.map((imagem, key) => (
+                <ImagensGaleria key={key}>
+                  <button onClick={() => handleRemoverImagem(imagem.id)}>
+                    <b>Remover</b>
+                  </button>
+                  <p>
+                    <img
+                      onClick={() => handleImagemAmpliada(imagem.imagen)}
+                      src={imagem.imagen}
+                      alt="TedPlan"
+                    />
+                  </p>
+                </ImagensGaleria>
+              ))}
+            </ContainerImagems>
+          </ModalGaleria>
+        </ContainerModal>
+      )}
 
-                  {modalImagemAmpliada && (
-                      <ContainerModal>
-                        <ModalImgAmpliada>
-                          <CloseModalButton onClick={handleCloseModalImgAmpliada}>
-                            Fechar
-                          </CloseModalButton>
-                          <ImagenAmpliada>
-                            <img src={`${imagemAmpliada}`} />
-                          </ImagenAmpliada>
-                        </ModalImgAmpliada>
-                      </ContainerModal>
-                    )}
+      {modalImagemAmpliada && (
+        <ContainerModal>
+          <ModalImgAmpliada>
+            <CloseModalButton onClick={handleCloseModalImgAmpliada}>
+              Fechar
+            </CloseModalButton>
+            <ImagenAmpliada>
+              <img src={`${imagemAmpliada}`} />
+            </ImagenAmpliada>
+          </ModalImgAmpliada>
+        </ContainerModal>
+      )}
 
+      {isModalUpdateVisible && (
+        <ContainerModal>
+          <Modal>
+            <CloseModalButton onClick={handleCloseModal}>
+              Fechar
+            </CloseModalButton>
+            <FormModal onSubmit={handleSubmit(handleUpdateGaleria)}>
+              <ConteudoModal>
+                <TituloModal>
+                  <input
+                    type="hidden"
+                    {...register("id_galeria")}
+                    value={isGaleria.id_galeria}
+                    onChange={handleOnChange}
+                    name="id_galeria"
+                  />
 
-                    {isModalUpdateVisible && (
-                      <ContainerModal>
-                        <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
-                          <FormModal
-                            onSubmit={handleSubmit(handleUpdateGaleria)}
-                          >
-                            <ConteudoModal>
-                              <TituloModal>
-                                <input
-                                  type="hidden"
-                                  {...register("id_galeria")}
-                                  value={isGaleria.id_galeria}
-                                  onChange={handleOnChange}
-                                  name="id_galeria"
-                                />
-
-                                <label>Titulo</label>
-                                <input
-                                  {...register("titulo")}
-                                  defaultValue={isGaleria.titulo}
-                                  onChange={handleOnChange}
-                                  name="titulo"
-                                />
-                              </TituloModal>
-                            </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
-                          </FormModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+                  <label>Titulo</label>
+                  <input
+                    {...register("titulo")}
+                    defaultValue={isGaleria.titulo}
+                    onChange={handleOnChange}
+                    name="titulo"
+                  />
+                </TituloModal>
+              </ConteudoModal>
+              <SubmitButton type="submit">Gravar</SubmitButton>
+            </FormModal>
+          </Modal>
+        </ContainerModal>
+      )}
     </Container>
   );
 }

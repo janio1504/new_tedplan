@@ -631,9 +631,62 @@ class NormaController {
     } catch (error) { }
   }
 
+  // async update({ request, response }) {
+  //   try {
+  //     const { id_norma, id_arquivo, titulo } = request.all();
+  //     if (request.file("arquivo")) {
+  //       const upload = request.file("arquivo", { size: "2mb" });
+  //       const fileName = `${Date.now()}.${upload.subtype}`;
+  //       await upload.move(Helpers.tmpPath("uploads"), {
+  //         name: fileName,
+  //       });
+
+  //       if (!upload.moved()) {
+  //         throw upload.error;
+  //       }
+
+  //       const file = await File.create({
+  //         file: fileName,
+  //         name: upload.clientName,
+  //         type: upload.type,
+  //         subtype: upload.subtype,
+  //       });
+
+  //       const arquivoAnterior = await File.findBy("id", id_arquivo);
+  //       if (arquivoAnterior) {
+  //         Fs.unlinkSync(Helpers.tmpPath(`uploads/${arquivoAnterior.file}`));
+  //         arquivoAnterior.delete();
+  //       }
+
+  //       const norm = await Normas.query()
+  //         .from("tedplan.normas as n")
+  //         .where("n.id_norma", id_norma)
+  //         .update({ id_arquivo: file.id });
+  //     }
+  //     const norma = await Normas.query()
+  //       .from("tedplan.normas as n")
+  //       .where("n.id_norma", id_norma)
+  //       .update({ titulo: titulo });
+
+  //     return norma;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return error;
+  //   }
+  // }
+
   async update({ request, response }) {
     try {
-      const { id_norma, id_arquivo, titulo } = request.all();
+      const {
+        id_norma,
+        id_arquivo,
+        titulo,
+        id_eixo,
+        id_tipo_norma,
+        id_escala
+      } = request.all();
+
+      // Atualizar arquivo se fornecido
       if (request.file("arquivo")) {
         const upload = request.file("arquivo", { size: "2mb" });
         const fileName = `${Date.now()}.${upload.subtype}`;
@@ -658,20 +711,52 @@ class NormaController {
           arquivoAnterior.delete();
         }
 
-        const norm = await Normas.query()
+        await Normas.query()
           .from("tedplan.normas as n")
           .where("n.id_norma", id_norma)
           .update({ id_arquivo: file.id });
       }
+
+      // Atualizar imagem se fornecida
+      if (request.file("imagem")) {
+        const upload = request.file("imagem", { size: "2mb" });
+        const fileName = `${Date.now()}.${upload.subtype}`;
+        await upload.move(Helpers.tmpPath("uploads"), {
+          name: fileName,
+        });
+
+        if (!upload.moved()) {
+          throw upload.error;
+        }
+
+        const file = await File.create({
+          file: fileName,
+          name: upload.clientName,
+          type: upload.type,
+          subtype: upload.subtype,
+        });
+
+        await Normas.query()
+          .from("tedplan.normas as n")
+          .where("n.id_norma", id_norma)
+          .update({ id_imagem: file.id });
+      }
+
+      // Atualizar os dados da norma
       const norma = await Normas.query()
         .from("tedplan.normas as n")
         .where("n.id_norma", id_norma)
-        .update({ titulo: titulo });
+        .update({
+          titulo,
+          id_eixo,
+          id_tipo_norma,
+          id_escala
+        });
 
-      return norma;
+      return response.status(200).json(norma);
     } catch (error) {
       console.log(error);
-      return error;
+      return response.status(500).json({ error: error.message });
     }
   }
 

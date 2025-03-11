@@ -1,20 +1,18 @@
 import {} from "next";
+import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { toast, ToastContainer } from "react-nextjs-toast";
 
-
 import {
   Container,
-     Form,
-     Footer, DivCenter, DivInstrucoes,
-  } from '../styles/dashboard';
+  Form,
+  Footer,
+  DivCenter,
+  DivInstrucoes,
+} from "../styles/dashboard";
 
-
-  import {
-  SubmitButton,
-       
-    } from '../styles/dashboard-original';
+import { SubmitButton } from "../styles/dashboard-original";
 
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
@@ -52,7 +50,9 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
 
   const [municipios, setMunicipios] = useState<any>(municipio);
   const [permissoes, setPermissoes] = useState<any>(null);
-  const [visibleMunicipiosSistemas, setVisibleMunicipiosSistemas] = useState(false);
+  const [visibleMunicipiosSistemas, setVisibleMunicipiosSistemas] =
+    useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
@@ -126,10 +126,15 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
       telefone: "",
       curriculo_lattes: "",
     });
+    setTimeout(() => {
+      router.push("/listarUsuarios");
+    }, 2000);
   }
 
-  function onChange(e){
-    e.target.value == 2 || e.target.value == 3 ? setVisibleMunicipiosSistemas(true) : setVisibleMunicipiosSistemas(false)
+  function onChange(e) {
+    e.target.value == 2 || e.target.value == 3
+      ? setVisibleMunicipiosSistemas(true)
+      : setVisibleMunicipiosSistemas(false);
   }
   return (
     <Container>
@@ -188,7 +193,11 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             <span>O campo Email é obrigatório!</span>
           )}
 
-          <select {...register("id_permissao")} name="id_permissao" onChange={(e) => onChange(e)}>
+          <select
+            {...register("id_permissao")}
+            name="id_permissao"
+            onChange={(e) => onChange(e)}
+          >
             aria-invalid={errors.value ? "true" : "false"}
             <option value="">Selecione a permissão</option>
             {permissoes?.map((permissao, key) => (
@@ -198,29 +207,32 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
             ))}
           </select>
 
-          {visibleMunicipiosSistemas && <><select
-            {...register("id_sistema", { required: true })}
-            name="id_sistema"
-          >
-            aria-invalid={errors.value ? "true" : "false"}
-            <option value="">Selecione um Sistema</option>
-            <option value="1">Sou Tedplan</option>
-            <option value="2">Sou Municipio</option>
-          </select>
-          {errors.id_sistema && errors.id_sistema.type && (
-            <span>Selecionar um Sistema é obrigatório!</span>
-          )}
+          {visibleMunicipiosSistemas && (
+            <>
+              <select
+                {...register("id_sistema", { required: true })}
+                name="id_sistema"
+              >
+                aria-invalid={errors.value ? "true" : "false"}
+                <option value="">Selecione um Sistema</option>
+                <option value="1">Sou Tedplan</option>
+                <option value="2">Sou Municipio</option>
+              </select>
+              {errors.id_sistema && errors.id_sistema.type && (
+                <span>Selecionar um Sistema é obrigatório!</span>
+              )}
 
-          <select {...register("id_municipio")} name="id_municipio">
-            aria-invalid={errors.value ? "true" : "false"}
-            <option value="">Selecione um Municipio</option>
-            {municipios?.map((municipio, key) => (
-              <option key={key} value={municipio.id_municipio}>
-                {municipio.nome}
-              </option>
-            ))}
-          </select>
-          </>}
+              <select {...register("id_municipio")} name="id_municipio">
+                aria-invalid={errors.value ? "true" : "false"}
+                <option value="">Selecione um Municipio</option>
+                {municipios?.map((municipio, key) => (
+                  <option key={key} value={municipio.id_municipio}>
+                    {municipio.nome}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
           {errors.id_sistema && errors.id_sistema.type && (
             <span>Selecionar um Sistema é obrigatório!</span>
           )}
