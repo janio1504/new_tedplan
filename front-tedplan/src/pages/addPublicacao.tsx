@@ -238,8 +238,6 @@ export default function AddPublicacao({
   }
 
   function handleDisabledTp(id) {
-    console.log(id);
-
     if (id === 1) {
       setdisabledTipoPublicacao(true);
     }
