@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { 
   TabButtonDados,
   TabButtonGrafico,
+  TabButtonIndicador,
   TabFormSubmit,
   Tabs,
   TabsContent,
   TabsError,
   TabsForm,
+  TabsInfoOnClick,
   TabsInstructons,
   TabsList,
   TabsMenuChartsOnClick,
@@ -24,13 +26,14 @@ import {
   FaChartArea,
   FaChartBar,
   FaChartLine,
+  FaDatabase,
   FaEllipsisV,
   FaFileCsv,
   FaFileExcel,
   FaFilePdf,
+  FaInfo,
   FaPrint,
 } from "react-icons/fa";
-import { parse } from "path";
 
 interface IMunicipio {
   id_municipio: string;
@@ -54,13 +57,16 @@ export default function Agua({ municipio }: MunicipioProps) {
   } = useForm();
   const chartRef = useRef(null);
   const reportRef = useRef(null);
+  const infoRef = useRef(null);
   const [data, setData] = useState(null);
   const [indicador, setIndicador] = useState(null);
+  const [descricaoIndicador, setDescricaoIndicador] = useState(null);
   const [tituloIndicador, setTituloIndicador] = useState(null);
   const [typeChart, setTypeChart] =
     useState<GoogleChartWrapperChartType>("LineChart");
   const [visibleMenuChart, setVisibleMenuChart] = useState(false);
   const [visibleMenuReports, setVisibleMenuReports] = useState(false);
+  const [visibleInfo, setVisibleInfo] = useState(false);
   var options = {
     title: title,
     curveType: "function",
@@ -75,10 +81,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   };
 
   useEffect(() => {
-    let data = {
-      ano: new Date().getFullYear(),
-      id_municipio: 1,
-    };
+    IN002({indicador: "IN002", id_municipio: 2});
     getMunucipios();
     const handleClickOutside = (event) => {
       if (chartRef.current && !chartRef.current.contains(event.target)) {
@@ -88,12 +91,18 @@ export default function Agua({ municipio }: MunicipioProps) {
       if (reportRef.current && !reportRef.current.contains(event.target)) {
         setVisibleMenuReports(false);
       }
+
+      if (infoRef.current && !infoRef.current.contains(event.target)) {
+        setVisibleInfo(false);
+      }
     };
 
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
+    
+
   }, []);
 
   async function getMunucipios() {
@@ -272,7 +281,41 @@ export default function Agua({ municipio }: MunicipioProps) {
     }
   }
 
+  async function getDescricaoIndicador(data) {
+    const res = await api.get("get-indicador-por-codigo/"+data.indicador)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    
+    const indicador = await Promise.all(
+      res.map(async (ind) => {
+        const img = await api({
+          method: "GET",
+          url: "getImagem",
+          params: { id: ind.id_imagem },
+          responseType: "blob",
+        }).then((response) => {          
+          return URL.createObjectURL(response.data);
+        }).catch((error)=>{          
+          console.log(error);          
+        }); 
+        const dados = {
+          ...ind,
+          imagem: img,
+        }
+      return dados
+        
+      })
+    );    
+    setDescricaoIndicador(indicador[0]);
+  }
+  
+
   async function IN002(data) {
+    getDescricaoIndicador(data);
     //Request Agua do municipio com todos os anos cadastrados
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
@@ -376,11 +419,13 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     //retorno para o grafico e para os dados
     const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+
 
     setTituloIndicador(
       "IN002 - Índice de produtividade: economias ativas por pessoal próprio"
@@ -447,7 +492,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -515,7 +560,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -573,7 +618,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -628,7 +673,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -676,7 +721,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -746,7 +791,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -787,7 +832,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -856,7 +901,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     if (!data?.indicador) {
@@ -959,7 +1004,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1024,7 +1069,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1086,7 +1131,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1131,7 +1176,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1176,7 +1221,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1221,7 +1266,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1267,7 +1312,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1313,7 +1358,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1358,7 +1403,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1403,7 +1448,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1447,7 +1492,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1494,7 +1539,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1540,7 +1585,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1586,7 +1631,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1634,7 +1679,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1682,7 +1727,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1730,7 +1775,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1817,7 +1862,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1928,7 +1973,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1974,7 +2019,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2038,7 +2083,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2093,7 +2138,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2186,7 +2231,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2247,7 +2292,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2305,7 +2350,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2345,7 +2390,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2386,7 +2431,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2426,7 +2471,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2477,7 +2522,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2529,7 +2574,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2587,7 +2632,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2625,7 +2670,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2663,7 +2708,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2718,7 +2763,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2758,7 +2803,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2818,7 +2863,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2857,7 +2902,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2897,7 +2942,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2953,7 +2998,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3009,7 +3054,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3049,7 +3094,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3103,7 +3148,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3142,7 +3187,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3181,7 +3226,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3220,7 +3265,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3229,17 +3274,19 @@ export default function Agua({ municipio }: MunicipioProps) {
     setData(dados);
   }
 
-  const [activeTab, setActiveTab] = useState("dados");
-  const [activeButtonDados, setActiveButtonDados] = useState(true);
-  const [activeButtonGrafico, setActiveButtonGrafico] = useState(false);
+  const [activeTab, setActiveTab] = useState("graficos");
+  const [activeButtonDados, setActiveButtonDados] = useState(false);
+  const [activeButtonGrafico, setActiveButtonGrafico] = useState(true);
+  
 
   function handleActiveTab({ value }) {
-    value === "dados"
-      ? setActiveButtonDados(true)
-      : setActiveButtonDados(false);
     value === "graficos"
       ? setActiveButtonGrafico(true)
       : setActiveButtonGrafico(false);
+    value === "dados"
+      ? setActiveButtonDados(true)
+      : setActiveButtonDados(false);
+    
 
     if (data == null) {
       setActiveTab("error");
@@ -3264,18 +3311,19 @@ export default function Agua({ municipio }: MunicipioProps) {
   return (
     <>
       <TabsList>
+      <TabButtonGrafico
+          activeButtonGrafico={activeButtonGrafico}
+          onClick={() => handleActiveTab({ value: "graficos" })}
+        >
+         <FaChartLine /> Gráficos
+        </TabButtonGrafico>
         <TabButtonDados
           activeButtonDados={activeButtonDados}
           onClick={() => handleActiveTab({ value: "dados" })}
         >
-          Dados
+         <FaDatabase /> Dados
         </TabButtonDados>
-        <TabButtonGrafico
-          activeButtonGrafico={activeButtonGrafico}
-          onClick={() => handleActiveTab({ value: "graficos" })}
-        >
-          Gráficos
-        </TabButtonGrafico>
+              
       </TabsList>
       <Tabs>
         <TabsForm>
@@ -3285,6 +3333,9 @@ export default function Agua({ municipio }: MunicipioProps) {
             </div>
             <div ref={reportRef} onClick={() => setVisibleMenuReports(true)}>
               <FaBars />
+            </div>
+            <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
+            <FaInfo />
             </div>
             <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
               <ul>
@@ -3312,6 +3363,51 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuReportsOnClick>
+            <TabsInfoOnClick visibleInfo={visibleInfo}>
+              <div style={{width: '100%', marginTop: '10px', borderBottom: 'solid 2px  #0085bd', fontSize: '18px', textAlign: 'center', color: '#0085bd'}}>
+                Informações do Indicador </div>
+            <table style={{ borderSpacing: "0", padding: '20px', width: "100%" }} >
+              <tbody>
+                <tr style={{width: "100%"}}>
+                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Nome:</td>
+                </tr>
+                <tr>                                   
+                  <td style={{padding: '5px 10px'}} >{descricaoIndicador?.nome_indicador}</td>                  
+                </tr>
+                <tr style={{width: "100%"}}>
+                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Código:</td>
+                </tr>
+                <tr>                                   
+                  <td style={{padding: '5px 10px'}} >{descricaoIndicador?.codigo}</td>                  
+                </tr> 
+                <tr >
+                  <td style={{textAlign: "left",color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Método de Cálculo:</td>
+                </tr>               
+                <tr>
+                <td style={{padding: '5px 10px'}}>                  
+                  <img src={descricaoIndicador?.imagem} style={{width: "200px", borderRadius: "10px" }} /></td>
+                </tr>
+                <tr >
+                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Descrição:</td>
+                </tr>
+                <tr>                 
+                  <td style={{textAlign: "justify", padding: '5px 10px'}}>{descricaoIndicador?.descricao}</td>                  
+                </tr>
+                <tr >
+                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Finalidade:</td>
+                </tr>
+                <tr>
+                <td style={{textAlign: "justify", padding: '5px 10px'}}>{descricaoIndicador?.finalidade}</td>
+                </tr>
+                <tr >
+                  <td style={{textAlign: "left",color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Limitações:</td>
+                </tr>
+                <tr>               
+                  <td style={{textAlign: "justify", padding: '5px 10px'}}>{descricaoIndicador?.limitacoes}</td>
+                </tr>   
+              </tbody>
+            </table>
+            </TabsInfoOnClick>
           </TabsMenuReports>
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.
@@ -3331,7 +3427,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                     {...register("id_municipio", {
                       required: true,
                     })}>
-                      <option value="">Município</option>
+                      <option value="2">Cutias</option>
                       {municipios?.map((municipio, key) => (
                         <option key={key} value={municipio.id_municipio}>
                           {municipio.nome}
@@ -3350,7 +3446,6 @@ export default function Agua({ municipio }: MunicipioProps) {
                      {...register("indicador", {
                       required: true,
                     })}>
-                      <option value="">Indicardor</option>
                       <option value="IN002">
                         IN002 - Índice de produtividade: economias ativas por
                         pessoal próprio
@@ -3547,10 +3642,10 @@ export default function Agua({ municipio }: MunicipioProps) {
               </tbody>
             </table>
           </form>
-        </TabsForm>
-        {activeTab === "dados" && (
-          <TabsContent ref={printRef}>
-            <TabsTitleIndicador>{tituloIndicador}</TabsTitleIndicador>
+        </TabsForm>        
+        {activeTab === "dados" && indicador && (
+          <TabsContent>  
+            <TabsTitleIndicador>{tituloIndicador}</TabsTitleIndicador>         
             <TabsTable>
               <tbody>
                 <tr>
@@ -3589,3 +3684,5 @@ export default function Agua({ municipio }: MunicipioProps) {
     </>
   );
 }
+
+

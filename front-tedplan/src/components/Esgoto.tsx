@@ -29,7 +29,6 @@ import {
   FaFileExcel,
   FaPrint,
 } from "react-icons/fa";
-import { parse } from "path";
 
 interface IMunicipio {
   id_municipio: string;
