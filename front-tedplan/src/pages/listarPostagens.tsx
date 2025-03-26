@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast, ToastContainer } from "react-nextjs-toast";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 //import suneditor from "suneditor";
@@ -71,12 +71,12 @@ export default function Postagens({ posts }: PostProps) {
   const [idImagem, setIdImagem] = useState(null);
   const [idPost, setIdPost] = useState(null);
   const [imagem, setImagem] = useState<ArrayBuffer | any>(null);
- 
+
   const editor = useRef(null);
   let txtArea = useRef();
   const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
-  
+
   const firstRender = useRef(true);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
 
@@ -95,7 +95,6 @@ export default function Postagens({ posts }: PostProps) {
   }
 
   async function handleShowUpdateModal({ id_posts }) {
-    
     if (id_posts) {
       const p = await api.get("getPost", { params: { id_posts: id_posts } });
       const isp = p.data.map((r: IPost) => {
@@ -140,11 +139,11 @@ export default function Postagens({ posts }: PostProps) {
     const resDelete = await api.delete("deletePost", {
       params: { id_posts: idPost, id_imagem: idImagem },
     });
-    toast.notify('Usuário removido com sucesso!',{
+    toast.notify("Post removido com sucesso!", {
       title: "Ação executada com sucesso!",
       duration: 7,
       type: "success",
-    })    
+    });
     setModalConfirm(false);
     Router.push("/listarPostagens");
   }
@@ -168,11 +167,11 @@ export default function Postagens({ posts }: PostProps) {
         },
       })
       .then((response) => {
-        toast.notify('Imagem atualizada com sucesso!',{
+        toast.notify("Imagem atualizada com sucesso!", {
           title: "Ação executada com sucesso!",
           duration: 7,
           type: "success",
-        })    
+        });
         return response;
       })
       .catch((error) => {
@@ -234,14 +233,14 @@ export default function Postagens({ posts }: PostProps) {
 
                     <BotaoEditar
                       onClick={() =>
-                        handleShowUpdateModal({                          
+                        handleShowUpdateModal({
                           id_posts: post.id_posts,
                         })
                       }
                     >
                       Editar
                     </BotaoEditar>
-                    
+
                     <BotaoVisualizar
                       onClick={() =>
                         handleShowModal({
@@ -255,37 +254,39 @@ export default function Postagens({ posts }: PostProps) {
                     {isModalVisible && (
                       <ContainerModal>
                         <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
                           <FormModal
                             onSubmit={handleSubmit(handleUpdateImagem)}
                           >
-                            <ConteudoModal>
-                              <input
-                                type="hidden"
-                                {...register("id_posts")}
-                                defaultValue={idPost}
-                                onChange={handleOnChange}
-                                name="id_publicacao"
-                              />
-                              <input
-                                type="hidden"
-                                {...register("id_imagem")}
-                                defaultValue={idImagem}
-                                onChange={handleOnChange}
-                                name="id_imagem"
-                              />
-                              <label>
-                                Selecione uma imagem para substituir a atual!
-                              </label>
-                              <input
-                                {...register("imagem")}
-                                type="file"
-                                accept="image/*"
-                              />
-                            </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
+                            <TextoModal>
+                              <CloseModalButton onClick={handleCloseModal}>
+                                Fechar
+                              </CloseModalButton>
+                              <SubmitButton type="submit">Gravar</SubmitButton>
+                              <ConteudoModal>
+                                <input
+                                  type="hidden"
+                                  {...register("id_posts")}
+                                  defaultValue={idPost}
+                                  onChange={handleOnChange}
+                                  name="id_publicacao"
+                                />
+                                <input
+                                  type="hidden"
+                                  {...register("id_imagem")}
+                                  defaultValue={idImagem}
+                                  onChange={handleOnChange}
+                                  name="id_imagem"
+                                />
+                                <label>
+                                  Selecione uma imagem para substituir a atual!
+                                </label>
+                                <input
+                                  {...register("imagem")}
+                                  type="file"
+                                  accept="image/*"
+                                />
+                              </ConteudoModal>
+                            </TextoModal>
                           </FormModal>
                         </Modal>
                       </ContainerModal>
@@ -300,7 +301,7 @@ export default function Postagens({ posts }: PostProps) {
                                 <b>Você confirma a exclusão!</b>
                               </h3>
                             </TituloModal>
-                            <ConfirmModal>
+                            <TextoModal>
                               <CancelButton onClick={handleCloseConfirm}>
                                 <b>Cancelar</b>
                               </CancelButton>
@@ -309,7 +310,7 @@ export default function Postagens({ posts }: PostProps) {
                               >
                                 <b>Confirmar</b>
                               </ConfirmButton>
-                            </ConfirmModal>
+                            </TextoModal>
                           </ConteudoModal>
                         </Modal>
                       </ContainerModal>
@@ -318,33 +319,39 @@ export default function Postagens({ posts }: PostProps) {
                     {isModalUpdateVisible && (
                       <ContainerModal>
                         <Modal>
-                          <CloseModalButton onClick={handleCloseModal}>
-                            Fechar
-                          </CloseModalButton>
                           <FormModal onSubmit={handleSubmit(handleUpdatePost)}>
-                            <ConteudoModal>
-                              <TituloModal>
-                                <input
-                                  type="hidden"
-                                  {...register("id_posts")}
-                                  value={isPost.id_posts}
-                                  onChange={handleOnChange}
-                                  name="id_posts"
-                                />
+                            <TextoModal>
+                              <CloseModalButton onClick={handleCloseModal}>
+                                Fechar
+                              </CloseModalButton>
+                              <SubmitButton type="submit">Gravar</SubmitButton>
+                              <ConteudoModal>
+                                <TituloModal>
+                                  <input
+                                    type="hidden"
+                                    {...register("id_posts")}
+                                    value={isPost.id_posts}
+                                    onChange={handleOnChange}
+                                    name="id_posts"
+                                  />
 
-                                <label>Titulo</label>
-                                <input
-                                  {...register("titulo")}
-                                  defaultValue={isPost.titulo}
-                                  onChange={handleOnChange}
-                                  name="titulo"
-                                />
-                              </TituloModal>
-                              <TextoModal>
-                              <textarea ref={txtArea} {...register("texto")} onChange={handleOnChange}></textarea>
-                              </TextoModal>
-                            </ConteudoModal>
-                            <SubmitButton type="submit">Gravar</SubmitButton>
+                                  <label>Titulo</label>
+                                  <input
+                                    {...register("titulo")}
+                                    defaultValue={isPost.titulo}
+                                    onChange={handleOnChange}
+                                    name="titulo"
+                                  />
+                                </TituloModal>
+                                <TextoModal>
+                                  <textarea
+                                    ref={txtArea}
+                                    {...register("texto")}
+                                    onChange={handleOnChange}
+                                  ></textarea>
+                                </TextoModal>
+                              </ConteudoModal>
+                            </TextoModal>
                           </FormModal>
                         </Modal>
                       </ContainerModal>
@@ -356,7 +363,9 @@ export default function Postagens({ posts }: PostProps) {
           })}
         </ListPost>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados </Footer>
+      <Footer>
+        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+      </Footer>
     </Container>
   );
 }

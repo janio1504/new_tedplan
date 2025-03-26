@@ -73,6 +73,7 @@ export default function Postagens({
     reset,
     formState: { errors },
   } = useForm();
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [usuarioModal, setUsuarioModal] = useState(null);
   const [isModalConfirm, setModalConfirm] = useState(false);
@@ -83,8 +84,9 @@ export default function Postagens({
 
   const watchPermissao = watch("id_permissao");
 
+  const permissao = Number(watchPermissao);
   const visibleMunicipiosSistemas = useMemo(() => {
-    return watchPermissao === 2 || watchPermissao === 3;
+    return permissao === 2 || permissao === 3;
   }, [watchPermissao]);
 
   useEffect(() => {
@@ -163,18 +165,20 @@ export default function Postagens({
         senha: data.senha,
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
+        toast.notify("Dados atualizados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
           type: "success",
         });
-        setTimeout(() => {
-          setModalVisible(false);
-        }, 2000);
       })
       .catch((error) => {
         console.log(error);
       });
+
+    setTimeout(() => {
+      setModalVisible(false);
+      Router.push("/listarUsuarios");
+    }, 2000);
   }
 
   const setOptions = {

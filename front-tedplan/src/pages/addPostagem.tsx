@@ -2,25 +2,22 @@ import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
-import { useToasts } from "react-toast-notifications";
+import { toast, ToastContainer } from "react-nextjs-toast";
 
 import {
   Container,
-     Form,
-     Footer, DivCenter, DivInstrucoes,
-  } from '../styles/dashboard';
+  Form,
+  Footer,
+  DivCenter,
+  DivInstrucoes,
+} from "../styles/dashboard";
 
-
-  import {
-  SubmitButton,
-       
-    } from '../styles/dashboard-original';
+import { SubmitButton } from "../styles/dashboard-original";
 
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
-
-
+import { useRouter } from "next/router";
 
 interface IPost {
   id_posts: string;
@@ -64,6 +61,7 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
   let txtArea = useRef();
   const firstRender = useRef(true);
   const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
+  const router = useRouter();
 
   const getSunEditorInstance = (sunEditor) => {
     editor.current = sunEditor;
@@ -102,15 +100,10 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
     */
   }, []);
 
-  async function handleAddPost({
-    titulo,
-    id_categoria,
-    id_municipio,
-    arquivo,
-  }) {
-    const texto = content.toString();
-    console.log(texto);
-    return
+  async function handleAddPost(data) {
+    // try {
+    const { titulo, id_categoria, id_municipio, arquivo, texto } = data;
+
     const formData = new FormData();
 
     formData.append("imagem", arquivo[0]);
@@ -118,12 +111,28 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
     formData.append("texto", texto);
     formData.append("id_categoria", id_categoria);
     formData.append("id_municipio", id_municipio);
+
     const apiClient = getAPIClient();
-    const res = await apiClient.post("addPost", formData, {
-      headers: {
-        "Content-Type": `multipart/form-data=${formData}`,
-      },
-    });
+    const response = await apiClient
+      .post("addPost", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        toast.notify("Dados gravados com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        toast.notify("Erro ao gravar dados!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
 
     reset({
       arquivo: "",
@@ -132,14 +141,12 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
       id_categoria: "",
       id_municipio: "",
     });
-    setContentForEditor("");
 
-    if (res.data.error) {
-    
-    } else {
-   
-    }
+    setTimeout(() => {
+      router.push("/listarPostagens");
+    }, 2000);
   }
+
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>
@@ -148,7 +155,7 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
         <DivInstrucoes>
           <b>Cadastro de Postagens:</b>
         </DivInstrucoes>
-       
+
         <Form onSubmit={handleSubmit(handleAddPost)}>
           <label>Titulo</label>
           <input
@@ -203,13 +210,16 @@ export default function AddPostagem({ municipios, posts }: PostProps) {
           )}
           <label>Texto</label>
           <textarea
-          onChange={handleOnChange}          
-          />          
-          
+            {...register("texto", { required: true })}
+            // onChange={handleOnChange}
+          />
+          {errors.texto && <span>Texto é obrigatório!</span>}
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
-       
       </DivCenter>
+      <Footer>
+        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+      </Footer>
     </Container>
   );
 }

@@ -7,30 +7,30 @@ class UsuariosController {
   async index() {
     try {
       const usuarios = await Usuario.query()
-      .select(
-        "u.id_usuario",
-        "u.id_pessoa",
-        "u.login",
-        "u.ultimo_login",
-        "u.ativo",
-        "p.nome",
-        "u.id_municipio",
-        "ps.id_permissao",
-        "ps.id_sistema",
-        "pss.nome as permissao_usuario"
-      )
-      .from("tedplan.usuario as u")
-      .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
-      .leftJoin(
-        "tedplan.permissao_sistema as ps",
-        "u.id_usuario",
-        "ps.id_usuario"
-      )
-      .leftJoin(
-        "tedplan.permissoes as pss",
-        "ps.id_permissao",
-        "pss.id_permissao"
-      )
+        .select(
+          "u.id_usuario",
+          "u.id_pessoa",
+          "u.login",
+          "u.ultimo_login",
+          "u.ativo",
+          "p.nome",
+          "u.id_municipio",
+          "ps.id_permissao",
+          "ps.id_sistema",
+          "pss.nome as permissao_usuario"
+        )
+        .from("tedplan.usuario as u")
+        .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
+        .leftJoin(
+          "tedplan.permissao_sistema as ps",
+          "u.id_usuario",
+          "ps.id_usuario"
+        )
+        .leftJoin(
+          "tedplan.permissoes as pss",
+          "ps.id_permissao",
+          "pss.id_permissao"
+        )
         .fetch();
 
       return usuarios;
@@ -70,43 +70,43 @@ class UsuariosController {
 
   async getUsuario({ request }) {
     const { id_usuario } = request.all();
- 
+
     try {
       const user = await Usuario.query()
-      .select(
-        "u.id_usuario",
-        "u.id_pessoa",
-        "u.login",
-        "u.ultimo_login",
-        "p.nome",
-        "u.id_municipio",
-        "ps.id_permissao",
-        "ps.id_sistema",
-        "pss.nome as permissao_usuario"
-      )
-      .from("tedplan.usuario as u")
-      .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
-      .leftJoin(
-        "tedplan.permissao_sistema as ps",
-        "u.id_usuario",
-        "ps.id_usuario"
-      )
-      .leftJoin(
-        "tedplan.permissoes as pss",
-        "ps.id_permissao",
-        "pss.id_permissao"
-      )
-      .where("u.id_usuario", id_usuario)
-      .fetch();
-      
+        .select(
+          "u.id_usuario",
+          "u.id_pessoa",
+          "u.login",
+          "u.ultimo_login",
+          "p.nome",
+          "u.id_municipio",
+          "ps.id_permissao",
+          "ps.id_sistema",
+          "pss.nome as permissao_usuario"
+        )
+        .from("tedplan.usuario as u")
+        .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
+        .leftJoin(
+          "tedplan.permissao_sistema as ps",
+          "u.id_usuario",
+          "ps.id_usuario"
+        )
+        .leftJoin(
+          "tedplan.permissoes as pss",
+          "ps.id_permissao",
+          "pss.id_permissao"
+        )
+        .where("u.id_usuario", id_usuario)
+        .fetch();
+
 
       return user.toJSON();
     } catch (error) {
       console.log(error);
-      
+
     }
 
-   
+
   }
 
   async updatePermissoesUsuario({ request, response }) {
@@ -126,11 +126,11 @@ class UsuariosController {
           .where("id_usuario", id_usuario)
           .update({ id_municipio: id_municipio });
       }
-      
+
       if (id_permissao) {
         await Usuario.query().from("tedplan.permissao_sistema")
           .where("id_usuario", id_usuario)
-          .update({ id_permissao: id_permissao,  id_sistema: id_sistema});
+          .update({ id_permissao: id_permissao, id_sistema: id_sistema });
       }
 
       // const sistema = await Usuario.query()
@@ -154,7 +154,7 @@ class UsuariosController {
       return response().status(200).send('As permissões do usuário foram atualizadas!');
     } catch (error) {
       console.log(error);
-      
+
       return error;
     }
   }
