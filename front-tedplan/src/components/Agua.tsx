@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { 
   TabButtonDados,
   TabButtonGrafico,
+  TabButtonIndicador,
   TabFormSubmit,
   Tabs,
   TabsContent,
   TabsError,
   TabsForm,
+  TabsInfoOnClick,
   TabsInstructons,
   TabsList,
   TabsMenuChartsOnClick,
@@ -24,13 +26,15 @@ import {
   FaChartArea,
   FaChartBar,
   FaChartLine,
+  FaDatabase,
   FaEllipsisV,
   FaFileCsv,
   FaFileExcel,
   FaFilePdf,
+  FaInfo,
   FaPrint,
 } from "react-icons/fa";
-import { parse } from "path";
+import { TabsInfoIndicador } from "./TabsInfoIndicador";
 
 interface IMunicipio {
   id_municipio: string;
@@ -54,13 +58,16 @@ export default function Agua({ municipio }: MunicipioProps) {
   } = useForm();
   const chartRef = useRef(null);
   const reportRef = useRef(null);
+  const infoRef = useRef(null);
   const [data, setData] = useState(null);
   const [indicador, setIndicador] = useState(null);
+  const [descricaoIndicador, setDescricaoIndicador] = useState(null);
   const [tituloIndicador, setTituloIndicador] = useState(null);
   const [typeChart, setTypeChart] =
     useState<GoogleChartWrapperChartType>("LineChart");
   const [visibleMenuChart, setVisibleMenuChart] = useState(false);
   const [visibleMenuReports, setVisibleMenuReports] = useState(false);
+  const [visibleInfo, setVisibleInfo] = useState(false);
   var options = {
     title: title,
     curveType: "function",
@@ -75,10 +82,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   };
 
   useEffect(() => {
-    let data = {
-      ano: new Date().getFullYear(),
-      id_municipio: 1,
-    };
+    IN002({indicador: "IN002", id_municipio: 2});
     getMunucipios();
     const handleClickOutside = (event) => {
       if (chartRef.current && !chartRef.current.contains(event.target)) {
@@ -88,12 +92,18 @@ export default function Agua({ municipio }: MunicipioProps) {
       if (reportRef.current && !reportRef.current.contains(event.target)) {
         setVisibleMenuReports(false);
       }
+
+      if (infoRef.current && !infoRef.current.contains(event.target)) {
+        setVisibleInfo(false);
+      }
     };
 
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
     };
+    
+
   }, []);
 
   async function getMunucipios() {
@@ -272,7 +282,44 @@ export default function Agua({ municipio }: MunicipioProps) {
     }
   }
 
+  async function getDescricaoIndicador(data) {
+    const res = await api.post("get-indicador-por-codigo/",{codigo: data.indicador, eixo: "agua"})
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    if (res?.length === 0) {      
+      return
+    }
+    const indicador = await Promise.all(
+      res?.map(async (ind) => {
+        const img = await api({
+          method: "GET",
+          url: "getImagem",
+          params: { id: ind.id_imagem },
+          responseType: "blob",
+        }).then((response) => {          
+          return URL.createObjectURL(response.data);
+        }).catch((error)=>{          
+          console.log(error);          
+        }); 
+        const dados = {
+          ...ind,
+          imagem: img,
+        }
+      return dados
+        
+      })
+    );    
+    setDescricaoIndicador(indicador[0]);
+  
+  }
+  
+
   async function IN002(data) {
+    getDescricaoIndicador(data);
     //Request Agua do municipio com todos os anos cadastrados
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
@@ -376,11 +423,13 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     //retorno para o grafico e para os dados
     const dados = [["Ano", "Dados", { role: "annotation" }], ...rsFilter];
+
+
 
     setTituloIndicador(
       "IN002 - Índice de produtividade: economias ativas por pessoal próprio"
@@ -390,6 +439,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN003(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -447,7 +497,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -457,6 +507,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN004(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -515,7 +566,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -525,6 +576,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN005(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -573,7 +625,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -582,6 +634,7 @@ export default function Agua({ municipio }: MunicipioProps) {
     setData(dados);
   }
   async function IN006(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -628,7 +681,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -638,6 +691,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN007(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -676,7 +730,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -688,6 +742,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN008(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -746,7 +801,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -756,6 +811,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN012(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -787,7 +843,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -797,6 +853,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN018(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data?.id_municipio })
       .then((response) => {
@@ -856,7 +913,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     if (!data?.indicador) {
@@ -870,6 +927,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN019(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -959,7 +1017,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -971,6 +1029,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN026(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1024,7 +1083,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1034,6 +1093,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN027(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1086,7 +1146,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1096,6 +1156,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN029(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1131,7 +1192,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1141,6 +1202,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN030(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1176,7 +1238,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1186,6 +1248,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN031(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1221,7 +1284,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1231,6 +1294,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN032(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1267,7 +1331,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1277,6 +1341,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN033(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1313,7 +1378,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1323,6 +1388,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN034(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1358,7 +1424,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1368,6 +1434,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN035(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1403,7 +1470,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1415,6 +1482,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN036(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1447,7 +1515,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1459,6 +1527,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN037(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1494,7 +1563,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1506,6 +1575,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN038(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1540,7 +1610,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1552,6 +1622,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN039(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1586,7 +1657,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1598,6 +1669,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN040(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1634,7 +1706,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1646,6 +1718,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN041(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1682,7 +1755,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1694,6 +1767,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN042(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1730,7 +1804,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1742,6 +1816,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN045(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1817,7 +1892,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1829,6 +1904,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN048(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1928,7 +2004,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1940,6 +2016,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN054(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1974,7 +2051,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -1986,6 +2063,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN060(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2038,7 +2116,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2050,6 +2128,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN101(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2093,7 +2172,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2103,6 +2182,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN102(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2186,7 +2266,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2198,6 +2278,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN001(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2247,7 +2328,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2257,6 +2338,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN009(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2305,7 +2387,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2315,6 +2397,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN010(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2345,7 +2428,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2357,6 +2440,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN011(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2386,7 +2470,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2396,6 +2480,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN013(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2426,7 +2511,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2436,6 +2521,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN014(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2477,7 +2563,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2487,6 +2573,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN017(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2529,7 +2616,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2539,6 +2626,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN020(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2587,7 +2675,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2597,6 +2685,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN022(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2625,7 +2714,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2635,6 +2724,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN023(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2663,7 +2753,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2673,6 +2763,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN025(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2718,7 +2809,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2728,6 +2819,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN028(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2758,7 +2850,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2768,6 +2860,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN043(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2818,7 +2911,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2828,6 +2921,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN044(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2857,7 +2951,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2867,6 +2961,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN049(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2897,7 +2992,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2907,6 +3002,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN050(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2953,7 +3049,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -2963,6 +3059,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN051(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3009,7 +3106,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3019,6 +3116,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN052(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3049,7 +3147,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3059,6 +3157,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN053(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3103,7 +3202,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3113,6 +3212,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN055(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3142,7 +3242,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3152,6 +3252,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN057(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3181,7 +3282,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3191,6 +3292,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN058(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3220,7 +3322,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       setActiveTab("error");
       setData(null);
     } else {
-      setActiveTab("dados");
+      setActiveTab("graficos")
     }
 
     const dados = [["Ano", "Dados"], ...rsFilter];
@@ -3229,17 +3331,19 @@ export default function Agua({ municipio }: MunicipioProps) {
     setData(dados);
   }
 
-  const [activeTab, setActiveTab] = useState("dados");
-  const [activeButtonDados, setActiveButtonDados] = useState(true);
-  const [activeButtonGrafico, setActiveButtonGrafico] = useState(false);
+  const [activeTab, setActiveTab] = useState("graficos");
+  const [activeButtonDados, setActiveButtonDados] = useState(false);
+  const [activeButtonGrafico, setActiveButtonGrafico] = useState(true);
+  
 
   function handleActiveTab({ value }) {
-    value === "dados"
-      ? setActiveButtonDados(true)
-      : setActiveButtonDados(false);
     value === "graficos"
       ? setActiveButtonGrafico(true)
       : setActiveButtonGrafico(false);
+    value === "dados"
+      ? setActiveButtonDados(true)
+      : setActiveButtonDados(false);
+    
 
     if (data == null) {
       setActiveTab("error");
@@ -3264,18 +3368,19 @@ export default function Agua({ municipio }: MunicipioProps) {
   return (
     <>
       <TabsList>
+      <TabButtonGrafico
+          activeButtonGrafico={activeButtonGrafico}
+          onClick={() => handleActiveTab({ value: "graficos" })}
+        >
+         <FaChartLine /> Gráficos
+        </TabButtonGrafico>
         <TabButtonDados
           activeButtonDados={activeButtonDados}
           onClick={() => handleActiveTab({ value: "dados" })}
         >
-          Dados
+         <FaDatabase /> Dados
         </TabButtonDados>
-        <TabButtonGrafico
-          activeButtonGrafico={activeButtonGrafico}
-          onClick={() => handleActiveTab({ value: "graficos" })}
-        >
-          Gráficos
-        </TabButtonGrafico>
+              
       </TabsList>
       <Tabs>
         <TabsForm>
@@ -3285,6 +3390,9 @@ export default function Agua({ municipio }: MunicipioProps) {
             </div>
             <div ref={reportRef} onClick={() => setVisibleMenuReports(true)}>
               <FaBars />
+            </div>
+            <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
+            <FaInfo />
             </div>
             <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
               <ul>
@@ -3312,6 +3420,8 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuReportsOnClick>
+            {visibleInfo && <TabsInfoIndicador data={descricaoIndicador}>     
+            </TabsInfoIndicador>}
           </TabsMenuReports>
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.
@@ -3331,7 +3441,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                     {...register("id_municipio", {
                       required: true,
                     })}>
-                      <option value="">Município</option>
+                      <option value="2">Cutias</option>
                       {municipios?.map((municipio, key) => (
                         <option key={key} value={municipio.id_municipio}>
                           {municipio.nome}
@@ -3350,7 +3460,6 @@ export default function Agua({ municipio }: MunicipioProps) {
                      {...register("indicador", {
                       required: true,
                     })}>
-                      <option value="">Indicardor</option>
                       <option value="IN002">
                         IN002 - Índice de produtividade: economias ativas por
                         pessoal próprio
@@ -3547,10 +3656,10 @@ export default function Agua({ municipio }: MunicipioProps) {
               </tbody>
             </table>
           </form>
-        </TabsForm>
-        {activeTab === "dados" && (
-          <TabsContent ref={printRef}>
-            <TabsTitleIndicador>{tituloIndicador}</TabsTitleIndicador>
+        </TabsForm>        
+        {activeTab === "dados" && indicador && (
+          <TabsContent>  
+            <TabsTitleIndicador>{tituloIndicador}</TabsTitleIndicador>         
             <TabsTable>
               <tbody>
                 <tr>
@@ -3589,3 +3698,5 @@ export default function Agua({ municipio }: MunicipioProps) {
     </>
   );
 }
+
+

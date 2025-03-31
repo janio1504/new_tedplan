@@ -67,6 +67,10 @@ export default function MenuSuperior(usuarios: UsuarioProps) {
     Router.push("/dashboard");
   }
 
+  function handleInfoIndicadores() {
+    Router.push("/listarInfoIndicador");
+  }
+
   return (
     <Menu>
       <Logo>
@@ -90,6 +94,7 @@ export default function MenuSuperior(usuarios: UsuarioProps) {
           <li onClick={handleGalerias}>Galerias</li>
           <li onClick={handleNormas}>Normas</li>
           <li onClick={handleUsuarios}>Usuários</li>
+          <li onClick={handleInfoIndicadores}>Indicadores</li>
           <li onClick={handleSignOut}>Sair</li>
         </ul>
       </ItensMenu>

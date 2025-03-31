@@ -26,8 +26,10 @@ import {
   FaEllipsisV,
   FaFileCsv,
   FaFileExcel,
+  FaInfo,
   FaPrint,
 } from "react-icons/fa";
+import { TabsInfoIndicador } from "./TabsInfoIndicador";
 
 interface IMunicipio {
   id_municipio: string;
@@ -44,6 +46,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   const [municipios, setMunicipios] = useState(null);
   const [indicador, setIndicador] = useState(null);
   const [tituloIndicador, setTituloIndicador] = useState(null);
+  const [visibleInfo, setVisibleInfo] = useState(false);
+  const [descricaoIndicador, setDescricaoIndicador] = useState(null);
   const {
     register,
     handleSubmit,
@@ -54,7 +58,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     useState<GoogleChartWrapperChartType>("LineChart");
   const chartRef = useRef(null);
   const reportRef = useRef(null);
-
+  const infoRef = useRef(null);
   const [data, setData] = useState(null);
   var options = {
     title: title,
@@ -77,6 +81,10 @@ export default function Drenagem({ municipio }: MunicipioProps) {
       if (reportRef.current && !reportRef.current.contains(event.target)) {
         setVisibleMenuReports(false);
       }
+
+      if (infoRef.current && !infoRef.current.contains(event.target)) {
+        setVisibleInfo(false);
+      }
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -84,6 +92,41 @@ export default function Drenagem({ municipio }: MunicipioProps) {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  async function getDescricaoIndicador(data) {
+    const res = await api.post("get-indicador-por-codigo/",{codigo: data.indicador, eixo: 'drenagem'})
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    if (res?.length === 0) {      
+      return
+    }
+    
+    const indicador = await Promise.all(
+      res.map(async (ind) => {
+        const img = await api({
+          method: "GET",
+          url: "getImagem",
+          params: { id: ind.id_imagem },
+          responseType: "blob",
+        }).then((response) => {          
+          return URL.createObjectURL(response.data);
+        }).catch((error)=>{          
+          console.log(error);          
+        }); 
+        const dados = {
+          ...ind,
+          imagem: img,
+        }
+      return dados
+        
+      })
+    );    
+    setDescricaoIndicador(indicador[0]);
+  }
 
   async function getMunucipios() {
     await api
@@ -175,6 +218,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN042(data) {
+    getDescricaoIndicador(data);
     const rsGe = await api
       .post("get-geral", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -213,6 +257,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN043(data) {
+    getDescricaoIndicador(data);
     const rsGe = await api
       .post("get-geral", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -248,6 +293,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN044(data) {
+    getDescricaoIndicador(data);
     const rsGe = await api
       .post("get-geral", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -283,6 +329,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN001(data) {
+    getDescricaoIndicador(data);
     const rsGe = await api
       .post("get-geral", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -318,6 +365,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN006(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio })
@@ -354,6 +402,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN010(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -391,6 +440,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN050(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -428,6 +478,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN054(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -465,6 +516,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN005(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -502,6 +554,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN009(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -539,6 +592,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN048(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -576,6 +630,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN049(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -613,6 +668,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN053(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -650,6 +706,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN020(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem",{ id_municipio: data.id_municipio })
       .then((response) => {
@@ -685,6 +742,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN021(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -720,6 +778,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN025(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -755,6 +814,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN026(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -790,6 +850,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN027(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -825,6 +886,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN029(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -860,6 +922,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN035(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -895,6 +958,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN051(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -930,6 +994,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN040(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -965,6 +1030,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN041(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1000,6 +1066,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN046(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1035,6 +1102,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   }
 
   async function IN047(data) {
+    getDescricaoIndicador(data);
     const rsDr = await api
       .post("get-drenagem", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1131,6 +1199,9 @@ export default function Drenagem({ municipio }: MunicipioProps) {
             <div ref={reportRef} onClick={() => setVisibleMenuReports(true)}>
               <FaBars />
             </div>
+              <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
+              <FaInfo />
+              </div>
             <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
               <ul>
                 <li onClick={() => setTypeChart("ColumnChart")}>
@@ -1157,6 +1228,8 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuReportsOnClick>
+             {visibleInfo && <TabsInfoIndicador data={descricaoIndicador}>     
+                        </TabsInfoIndicador>}
           </TabsMenuReports>
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.

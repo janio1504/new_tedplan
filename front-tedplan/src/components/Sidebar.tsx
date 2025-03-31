@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import styled from "styled-components";
 import {
   FaAddressBook,
@@ -6,6 +6,8 @@ import {
   FaSignInAlt,
   FaSignOutAlt,
   FaUsers,
+  FaCaretDown,
+  FaDatabase,
 } from "react-icons/fa";
 import Router from "next/router";
 import { AuthContext } from "../contexts/AuthContext";
@@ -14,11 +16,11 @@ import { AuthContext } from "../contexts/AuthContext";
 const SidebarContainer = styled.div`
   width: 280px;
   height: 100vh;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8F9FA 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  color: #2C3E50;
+  color: #2c3e50;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
 `;
@@ -49,12 +51,12 @@ const MenuItem = styled.div`
 
   svg {
     font-size: 20px;
-    color: #2C3E50;
+    color: #2c3e50;
   }
 
   &:hover {
     background-color: rgba(26, 35, 126, 0.08);
-    color: #2C3E50;
+    color: #2c3e50;
     transform: translateX(4px);
   }
 
@@ -64,9 +66,39 @@ const MenuItem = styled.div`
   }
 `;
 
+const MenuItemWithSubmenu = styled(MenuItem)`
+  position: relative;
+  justify-content: space-between;
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+`;
+
+const SubmenuContainer = styled.div<{ isOpen: boolean }>`
+  max-height: ${(props) => (props.isOpen ? "500px" : "0")};
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+`;
+
+const SubmenuItem = styled(MenuItem)`
+  padding-left: 48px;
+  font-size: 14px;
+  background: rgba(0, 0, 0, 0.02);
+`;
+
 const Sidebar = () => {
   const { signOut, usuario } = useContext(AuthContext);
-  
+  const [isCadastroOpen, setIsCadastroOpen] = useState(false);
+
+  function handleAddIndicador() {
+    Router.push("/addInfoIndicador");
+  }
+
   function handlePublicacoes() {
     Router.push("/listarPublicacoes");
   }
@@ -90,33 +122,62 @@ const Sidebar = () => {
   async function handleSignOut() {
     signOut();
   }
-  
+
   return (
     <SidebarContainer>
       <MenuTitle>{usuario?.permissao_usuario}</MenuTitle>
-      {usuario?.id_permissao == 1 ?<>
-      <MenuItem onClick={handleUsuarios}>
-        <FaUsers /> Lista de Usuários
-      </MenuItem></>: ''}
-      {usuario?.id_permissao == 2 || usuario?.id_permissao == 1 ?<>
-      <MenuItem onClick={handlePublicacoes}>
-        <FaAddressBook /> Publicações
-      </MenuItem>
-      <MenuItem onClick={handleNormas}>
-        <FaFileAlt /> Normas
-      </MenuItem>
-      <MenuItem onClick={handleGalerias}>
-        <FaFileAlt /> Galerias
-      </MenuItem>
-      </>: ''}
-      {usuario?.id_permissao == 3 && usuario?.id_sistema == 1 ?
-      <MenuItem onClick={handleSimisab}>
-        <FaSignInAlt /> SIMISAB
-      </MenuItem>: ''}
+      {usuario?.id_permissao == 1 ? (
+        <>
+          <MenuItemWithSubmenu
+            onClick={() => setIsCadastroOpen(!isCadastroOpen)}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <FaDatabase /> Cadastros
+            </div>
+            <FaCaretDown
+              style={{
+                transform: isCadastroOpen ? "rotate(180deg)" : "rotate(0)",
+                transition: "transform 0.3s ease",
+              }}
+            />
+          </MenuItemWithSubmenu>
+          <SubmenuContainer isOpen={isCadastroOpen}>
+            <SubmenuItem onClick={handleAddIndicador}>
+              Informações de Indicador
+            </SubmenuItem>
+          </SubmenuContainer>
+          <MenuItem onClick={handleUsuarios}>
+            <FaUsers /> Lista de Usuários
+          </MenuItem>
+        </>
+      ) : (
+        ""
+      )}
+      {usuario?.id_permissao == 2 || usuario?.id_permissao == 1 ? (
+        <>
+          <MenuItem onClick={handlePublicacoes}>
+            <FaAddressBook /> Publicações
+          </MenuItem>
+          <MenuItem onClick={handleNormas}>
+            <FaFileAlt /> Normas
+          </MenuItem>
+          <MenuItem onClick={handleGalerias}>
+            <FaFileAlt /> Galerias
+          </MenuItem>
+        </>
+      ) : (
+        ""
+      )}
+      {usuario?.id_permissao == 3 && usuario?.id_sistema == 1 ? (
+        <MenuItem onClick={handleSimisab}>
+          <FaSignInAlt /> SIMISAB
+        </MenuItem>
+      ) : (
+        ""
+      )}
       <MenuItem onClick={handleSignOut}>
         <FaSignOutAlt /> Sair
       </MenuItem>
-     
     </SidebarContainer>
   );
 };

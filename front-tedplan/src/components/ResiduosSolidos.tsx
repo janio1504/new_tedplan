@@ -27,9 +27,11 @@ import {
   FaEllipsisV,
   FaFileCsv,
   FaFileExcel,
+  FaInfo,
   FaPrint,
 } from "react-icons/fa";
 import { parse } from "path";
+import { TabsInfoIndicador } from "./TabsInfoIndicador";
 
 interface IMunicipio {
   id_municipio: string;
@@ -58,8 +60,10 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     useState<GoogleChartWrapperChartType>("LineChart");
   const chartRef = useRef(null);
   const reportRef = useRef(null);
-
+  const infoRef = useRef(null);
   const [data, setData] = useState(null);
+  const [visibleInfo, setVisibleInfo] = useState(false);
+  const [descricaoIndicador, setDescricaoIndicador] = useState(null);
   var options = {
     title: title,
     curveType: "default",
@@ -81,6 +85,10 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
       if (reportRef.current && !reportRef.current.contains(event.target)) {
         setVisibleMenuReports(false);
       }
+
+      if (infoRef.current && !infoRef.current.contains(event.target)) {
+        setVisibleInfo(false);
+      }
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -88,6 +96,42 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  async function getDescricaoIndicador(data) {
+    const res = await api.post("get-indicador-por-codigo/",{codigo: data.indicador, eixo: 'residuos'})
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
+    if (res.length === 0) {
+      return
+    }
+    
+    const indicador = await Promise.all(
+      res?.map(async (ind) => {
+        const img = await api({
+          method: "GET",
+          url: "getImagem",
+          params: { id: ind.id_imagem },
+          responseType: "blob",
+        }).then((response) => {          
+          return URL.createObjectURL(response.data);
+        }).catch((error)=>{          
+          console.log(error);          
+        }); 
+        const dados = {
+          ...ind,
+          imagem: img,
+        }
+      return dados
+        
+      })
+    );    
+    setDescricaoIndicador(indicador[0]);
+  }
 
   async function getMunucipios() {
     await api
@@ -246,6 +290,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN001(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -293,6 +338,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN002(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -346,6 +392,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN003(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
         .post("get-ps-financeiro", {
           id_municipio: data.id_municipio
@@ -387,6 +434,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN004(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -428,6 +476,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN005(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -469,6 +518,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN006(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -518,6 +568,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN007(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio
@@ -559,6 +610,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN008(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -602,6 +654,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN010(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -648,6 +701,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN011(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -696,6 +750,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN014(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -743,6 +798,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN015(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -790,6 +846,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN016(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -837,6 +894,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN017(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -882,6 +940,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN018(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -927,6 +986,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN019(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -977,6 +1037,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN021(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -1029,6 +1090,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN022(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -1080,6 +1142,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN023(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1135,6 +1198,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     setData(dados);
   }
   async function IN024(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -1176,6 +1240,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN025(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("getPsResiduosColeta", {
         id_municipio: data.id_municipio,
@@ -1199,6 +1264,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN027(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("getPsResiduosColeta", {
         id_municipio: data.id_municipio,
@@ -1226,6 +1292,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN028(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1274,6 +1341,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN030(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -1321,6 +1389,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN031(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1367,6 +1436,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN032(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -1416,6 +1486,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN034(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("getPsResiduosColeta", {
         id_municipio: data.id_municipio,
@@ -1459,6 +1530,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN035(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1502,6 +1574,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN038(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1545,6 +1618,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN039(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1588,6 +1662,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN040(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1631,6 +1706,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN053(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1677,6 +1753,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN054(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -1726,6 +1803,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN036(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -1775,6 +1853,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN037(data) {
+    getDescricaoIndicador(data);
     const rsRc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1821,6 +1900,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN041(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1864,6 +1944,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN042(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1907,6 +1988,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN043(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -1961,6 +2043,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN044(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("getPsResiduosColeta", {
         id_municipio: data.id_municipio,
@@ -1983,6 +2066,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN045(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -2033,6 +2117,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN046(data) {
+    getDescricaoIndicador(data);
     const rsFn = await api
       .post("get-ps-financeiro", {
         id_municipio: data.id_municipio,
@@ -2074,6 +2159,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN047(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -2119,6 +2205,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN048(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -2168,6 +2255,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN051(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -2218,6 +2306,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN052(data) {   
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -2263,6 +2352,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN026(data) {
+    getDescricaoIndicador(data);
     const rsRsc = await api
       .post("get-ps-residuos-coleta", {
         id_municipio: data.id_municipio,
@@ -2309,6 +2399,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
   }
 
   async function IN029(data) {
+    getDescricaoIndicador(data);
     const rsDd = await api
       .get("getMunicipio", { params: { id_municipio: data.id_municipio } })
       .then((response) => {
@@ -2421,6 +2512,9 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
             <div ref={reportRef} onClick={() => setVisibleMenuReports(true)}>
               <FaBars />
             </div>
+            <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
+              <FaInfo />
+            </div>
             <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
               <ul>
                 <li onClick={() => setTypeChart("ColumnChart")}>
@@ -2447,6 +2541,8 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuReportsOnClick>
+              {visibleInfo && <TabsInfoIndicador data={descricaoIndicador}>     
+                                    </TabsInfoIndicador>}
           </TabsMenuReports>
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.

@@ -129,12 +129,23 @@ Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinancei
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
 
-
+Route.post("create-descricao-indicador", "IndicadorController.createDescricaoIndicador");
+Route.get("get-indicador/:id", "IndicadorController.getIndicador");
+Route.post("get-indicador-por-codigo", "IndicadorController.getIndicadorPorCodigo");
+Route.get("get-indicadores", "IndicadorController.getIndicadores");
+Route.put("update-descricao-indicador", "IndicadorController.updateIndicador");
+Route.delete("delete-descricao-indicador/:id", "IndicadorController.deleteIndicador");
 
 Route.get("getNormas", "NormaController.index");
 Route.get("getNorma", "NormaController.getNorma");
 Route.get("getPorFiltroNormas", "NormaController.buscaPorFiltro");
 Route.get("listTipoNorma", "NormaController.listTipoNormas");
+
+Route.get('codigo-snis', 'CodigoSnisController.getAll');
+Route.get('codigo-snis/:id', 'CodigoSnisController.getById');
+Route.post('codigo-snis', 'CodigoSnisController.create');
+Route.put('codigo-snis/:id', 'CodigoSnisController.update');
+Route.delete('codigo-snis/:id', 'CodigoSnisController.delete');
 
 // Rotas autenticadas ------------------------------- //
 Route.group(() => {
