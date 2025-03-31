@@ -49,7 +49,8 @@ class IndicadorController {
   async createDescricaoIndicador({ request, response }) {
     const dados = request.all()
     try {
-
+       console.log(dados);
+       
       if(!dados.codigo) {
         return response.status(400).send({ message: 'Código do indicador é obrigatório' })
       }
@@ -57,14 +58,13 @@ class IndicadorController {
         const res = await Indicador.query()
         .from('tedplan.descricao_indicador')
         .where('codigo', dados.codigo)
+        .where('eixo',dados.eixo)
         .fetch()
-        const rd = res.toJSON()[0]
-
-        if(rd.codigo) {
+        if(res.rows.length > 0) {
           return response.status(400).send({ message: 'Código do indicador já cadastrado' })
         }
-
-        if (!request.file("imagem")) return;
+       
+        if (!request.file("imagem")) return response.status(400).send({ message: 'Imagem é obrigatória' });
 
         const upload = request.file("imagem", { size: "2mb" });
         const fileName = `${Date.now()}.${upload.subtype}`;
