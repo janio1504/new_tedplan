@@ -286,8 +286,8 @@ class MunicipioController {
       dd_populacao_rural,
       dd_populacao_total,
       dd_total_moradias,
+      dd_ano,
     } = request.all();
-    console.log(request.all());
     
     try {
       const municipios = await Municipio.query()
