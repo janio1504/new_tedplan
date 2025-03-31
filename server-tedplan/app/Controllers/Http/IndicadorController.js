@@ -17,11 +17,13 @@ class IndicadorController {
     }
   }
 
-  async getIndicadorPorCodigo({ params }) {
+  async getIndicadorPorCodigo({ request }) {
+    const { codigo, eixo } = request.all()
     try {
       const res = await Indicador.query()
         .from('tedplan.descricao_indicador')
-        .where('codigo',params.id)
+        .where('codigo',codigo)
+        .where('eixo',eixo)
         .fetch()
 
       return res
@@ -44,9 +46,23 @@ class IndicadorController {
     }
   }
 
-  async createDescricaoIndicador({ request }) {
+  async createDescricaoIndicador({ request, response }) {
     const dados = request.all()
     try {
+
+      if(!dados.codigo) {
+        return response.status(400).send({ message: 'Código do indicador é obrigatório' })
+      }
+
+        const res = await Indicador.query()
+        .from('tedplan.descricao_indicador')
+        .where('codigo', dados.codigo)
+        .fetch()
+        const rd = res.toJSON()[0]
+
+        if(rd.codigo) {
+          return response.status(400).send({ message: 'Código do indicador já cadastrado' })
+        }
 
         if (!request.file("imagem")) return;
 
@@ -76,31 +92,52 @@ class IndicadorController {
             codigo: dados.codigo,
             unidade: dados.unidade,
             descricao: dados.descricao,
-            id_imagem: imagem.id            
+            id_imagem: imagem.id,
+            finalidade: dados.finalidade,
+            limitacoes: dados.limitacoes,          
           })
-      return { message: 'Indicador criado com sucesso' }
-      } else {
-        const res = await Indicador.query()
-          .from('tedplan.descricao_indicador')
-          .where('id_descricao_indicador', dados.id_indicador)
-          .fetch()
-        const rd = res.toJSON()[0]
-        await Indicador.query()
-          .from('tedplan.descricao_indicador')
-          .where('id_descricao_indicador', dados.id_descricao_indicador)
-          .update({
-            nome_indicador: dados.nome_indicador,
-            eixo: dados.eixo,
-            codigo: dados.codigo,
-            unidade: dados.unidade,
-            descricao: dados.descricao,
-            id_imagem: imagem.id
-          })
+      return response.status(200).send({ message: 'Indicador cadastrado com sucesso' })
       }
     } catch (error) {
       console.log(error)
     }
   }
+
+  async updateIndicador({ request, response }) {
+    const dados = request.all()
+    try {
+      await Indicador.query()
+        .from('tedplan.descricao_indicador')
+        .where('id_descricao_indicador', dados.id_descricao_indicador)
+        .update({
+          nome_indicador: dados.nome_indicador,
+          eixo: dados.eixo,
+          codigo: dados.codigo,
+          unidade: dados.unidade,
+          descricao: dados.descricao,
+          finalidade: dados.finalidade,
+          limitacoes: dados.limitacoes,
+        })
+
+      return response.status(200).send({ message: 'Indicador atualizado com sucesso' })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  async deleteIndicador({ params, response }) {
+    try {
+      await Indicador.query()
+        .from('tedplan.descricao_indicador')
+        .where('id_descricao_indicador', params.id)
+        .delete()
+
+      return response.status(200).send({ message: 'Indicador excluído com sucesso' })
+    } catch (error) {
+      console.log(error)
+    }
+  }
 }
+
 
 module.exports = IndicadorController

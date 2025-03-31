@@ -131,9 +131,9 @@ Route.get("getUsuario", "UsuariosController.getUsuario");
 
 Route.post("create-descricao-indicador", "IndicadorController.createDescricaoIndicador");
 Route.get("get-indicador/:id", "IndicadorController.getIndicador");
-Route.get("get-indicador-por-codigo/:id", "IndicadorController.getIndicadorPorCodigo");
-Route.post("get-indicadores", "IndicadorController.getIndicadores");
-Route.post("update-descricao-indicador", "IndicadorController.updateIndicador");
+Route.post("get-indicador-por-codigo", "IndicadorController.getIndicadorPorCodigo");
+Route.get("get-indicadores", "IndicadorController.getIndicadores");
+Route.put("update-descricao-indicador", "IndicadorController.updateIndicador");
 Route.delete("delete-descricao-indicador/:id", "IndicadorController.deleteIndicador");
 
 Route.get("getNormas", "NormaController.index");

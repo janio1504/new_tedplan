@@ -34,6 +34,7 @@ import {
   FaInfo,
   FaPrint,
 } from "react-icons/fa";
+import { TabsInfoIndicador } from "./TabsInfoIndicador";
 
 interface IMunicipio {
   id_municipio: string;
@@ -282,16 +283,18 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function getDescricaoIndicador(data) {
-    const res = await api.get("get-indicador-por-codigo/"+data.indicador)
+    const res = await api.post("get-indicador-por-codigo/",{codigo: data.indicador, eixo: "agua"})
     .then((response) => {
       return response.data;
     })
     .catch((error) => {
       console.log(error);
     });
-    
+    if (res?.length === 0) {      
+      return
+    }
     const indicador = await Promise.all(
-      res.map(async (ind) => {
+      res?.map(async (ind) => {
         const img = await api({
           method: "GET",
           url: "getImagem",
@@ -311,6 +314,7 @@ export default function Agua({ municipio }: MunicipioProps) {
       })
     );    
     setDescricaoIndicador(indicador[0]);
+  
   }
   
 
@@ -435,6 +439,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN003(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -502,6 +507,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN004(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -570,6 +576,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN005(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -627,6 +634,7 @@ export default function Agua({ municipio }: MunicipioProps) {
     setData(dados);
   }
   async function IN006(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -683,6 +691,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN007(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -733,6 +742,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN008(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -801,6 +811,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN012(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -842,6 +853,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN018(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data?.id_municipio })
       .then((response) => {
@@ -915,6 +927,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN019(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1016,6 +1029,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN026(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1079,6 +1093,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN027(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1141,6 +1156,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN029(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1186,6 +1202,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN030(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1231,6 +1248,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN031(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1276,6 +1294,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN032(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1322,6 +1341,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN033(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1368,6 +1388,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN034(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1413,6 +1434,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN035(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1460,6 +1482,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN036(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1504,6 +1527,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN037(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1551,6 +1575,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN038(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1597,6 +1622,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN039(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1643,6 +1669,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN040(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1691,6 +1718,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN041(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1739,6 +1767,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN042(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1787,6 +1816,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN045(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1874,6 +1904,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN048(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -1985,6 +2016,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN054(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2031,6 +2063,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN060(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2095,6 +2128,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN101(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2148,6 +2182,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN102(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2243,6 +2278,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN001(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2302,6 +2338,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN009(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2360,6 +2397,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN010(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2402,6 +2440,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN011(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2441,6 +2480,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN013(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2481,6 +2521,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN014(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2532,6 +2573,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN017(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2584,6 +2626,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN020(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2642,6 +2685,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN022(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2680,6 +2724,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN023(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2718,6 +2763,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN025(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2773,6 +2819,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN028(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2813,6 +2860,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN043(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2873,6 +2921,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN044(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2912,6 +2961,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN049(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -2952,6 +3002,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN050(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3008,6 +3059,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN051(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3064,6 +3116,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN052(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3104,6 +3157,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN053(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3158,6 +3212,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN055(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3197,6 +3252,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN057(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3236,6 +3292,7 @@ export default function Agua({ municipio }: MunicipioProps) {
   }
 
   async function IN058(data) {
+    getDescricaoIndicador(data);
     const rsRa = await api
       .post("get-agua", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -3363,51 +3420,8 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuReportsOnClick>
-            <TabsInfoOnClick visibleInfo={visibleInfo}>
-              <div style={{width: '100%', marginTop: '10px', borderBottom: 'solid 2px  #0085bd', fontSize: '18px', textAlign: 'center', color: '#0085bd'}}>
-                Informações do Indicador </div>
-            <table style={{ borderSpacing: "0", padding: '20px', width: "100%" }} >
-              <tbody>
-                <tr style={{width: "100%"}}>
-                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Nome:</td>
-                </tr>
-                <tr>                                   
-                  <td style={{padding: '5px 10px'}} >{descricaoIndicador?.nome_indicador}</td>                  
-                </tr>
-                <tr style={{width: "100%"}}>
-                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Código:</td>
-                </tr>
-                <tr>                                   
-                  <td style={{padding: '5px 10px'}} >{descricaoIndicador?.codigo}</td>                  
-                </tr> 
-                <tr >
-                  <td style={{textAlign: "left",color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Método de Cálculo:</td>
-                </tr>               
-                <tr>
-                <td style={{padding: '5px 10px'}}>                  
-                  <img src={descricaoIndicador?.imagem} style={{width: "200px", borderRadius: "10px" }} /></td>
-                </tr>
-                <tr >
-                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Descrição:</td>
-                </tr>
-                <tr>                 
-                  <td style={{textAlign: "justify", padding: '5px 10px'}}>{descricaoIndicador?.descricao}</td>                  
-                </tr>
-                <tr >
-                  <td style={{textAlign: "left", color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Finalidade:</td>
-                </tr>
-                <tr>
-                <td style={{textAlign: "justify", padding: '5px 10px'}}>{descricaoIndicador?.finalidade}</td>
-                </tr>
-                <tr >
-                  <td style={{textAlign: "left",color: '#053d68', fontSize: '16px', padding: '5px 0px'}}>Limitações:</td>
-                </tr>
-                <tr>               
-                  <td style={{textAlign: "justify", padding: '5px 10px'}}>{descricaoIndicador?.limitacoes}</td>
-                </tr>   
-              </tbody>
-            </table>
-            </TabsInfoOnClick>
+            {visibleInfo && <TabsInfoIndicador data={descricaoIndicador}>     
+            </TabsInfoIndicador>}
           </TabsMenuReports>
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.

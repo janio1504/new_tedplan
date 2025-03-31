@@ -27,8 +27,10 @@ import {
   FaEllipsisV,
   FaFileCsv,
   FaFileExcel,
+  FaInfo,
   FaPrint,
 } from "react-icons/fa";
+import { TabsInfoIndicador } from "./TabsInfoIndicador";
 
 interface IMunicipio {
   id_municipio: string;
@@ -57,8 +59,10 @@ export default function Esgoto({ municipio }: MunicipioProps) {
     useState<GoogleChartWrapperChartType>("LineChart");
   const chartRef = useRef(null);
   const reportRef = useRef(null);
-
+  const infoRef = useRef(null);
   const [data, setData] = useState(null);
+  const [visibleInfo, setVisibleInfo] = useState(false);
+  const [descricaoIndicador, setDescricaoIndicador] = useState(null);
   var options = {
     title: title,
     curveType: "default",
@@ -80,6 +84,10 @@ export default function Esgoto({ municipio }: MunicipioProps) {
       if (reportRef.current && !reportRef.current.contains(event.target)) {
         setVisibleMenuReports(false);
       }
+
+      if (infoRef.current && !infoRef.current.contains(event.target)) {
+        setVisibleInfo(false);
+      }
     };
 
     document.addEventListener("click", handleClickOutside);
@@ -87,6 +95,40 @@ export default function Esgoto({ municipio }: MunicipioProps) {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  async function getDescricaoIndicador(data) {
+    const res = await api.post("get-indicador-por-codigo/",{codigo: data.indicador, eixo: 'esgoto'})
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    if (res?.length === 0) {      
+      return
+    }
+    const indicador = await Promise.all(
+      res.map(async (ind) => {
+        const img = await api({
+          method: "GET",
+          url: "getImagem",
+          params: { id: ind.id_imagem },
+          responseType: "blob",
+        }).then((response) => {          
+          return URL.createObjectURL(response.data);
+        }).catch((error)=>{          
+          console.log(error);          
+        }); 
+        const dados = {
+          ...ind,
+          imagem: img,
+        }
+      return dados
+        
+      })
+    );    
+    setDescricaoIndicador(indicador[0]);
+  }
 
   async function getMunucipios() {
     await api
@@ -154,6 +196,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN015(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -207,6 +250,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
   //NÃO HA ENTRADA DE DADOS NO SISTEMA PARA O CAMPO ES013, ES014
   async function IN016(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -253,6 +297,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN021(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -320,6 +365,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
   //NÃO HA ENTRADA DE DADOS NO SISTEMA PARA O CAMPO GE06a
   async function IN024(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -363,6 +409,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN046(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -419,6 +466,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   //NÃO HA ENTRADA DE DADOS NO SISTEMA PARA O CAMPO GE06b
 
   async function IN047(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -464,6 +512,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   //NÃO HA ENTRADA DE DADOS NO SISTEMA PARA O CAMPO GE012a
 
   async function IN056(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -507,6 +556,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN059(data) {
+    getDescricaoIndicador(data);
     const rsEs = await api
       .post("get-esgoto", { id_municipio: data.id_municipio, ano: data.ano })
       .then((response) => {
@@ -526,6 +576,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN061(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -569,6 +620,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN062(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -614,6 +666,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN063(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -659,6 +712,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN064(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -702,6 +756,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN065(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -745,6 +800,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN066(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -788,6 +844,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN067(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -831,6 +888,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN068(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -874,6 +932,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   }
 
   async function IN069(data) {
+    getDescricaoIndicador(data);
     const rsBl = await api
       .post("get-balanco", { id_municipio: data.id_municipio })
       .then((response) => {
@@ -978,6 +1037,9 @@ export default function Esgoto({ municipio }: MunicipioProps) {
             <div ref={reportRef} onClick={() => setVisibleMenuReports(true)}>
               <FaBars />
             </div>
+              <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
+              <FaInfo />
+              </div>
             <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
               <ul>
                 <li onClick={() => setTypeChart("ColumnChart")}>
@@ -1004,6 +1066,8 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuReportsOnClick>
+               {visibleInfo && <TabsInfoIndicador data={descricaoIndicador}>     
+                        </TabsInfoIndicador>}
           </TabsMenuReports>
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.
