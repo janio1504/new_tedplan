@@ -174,7 +174,6 @@ export default function AddIndicador() {
             name="nome"
           />
           {errors.nome && <span>O campo Nome é obrigatório!</span>}
-
           <label>Código</label>
           <select {...register("codigo", { required: true })} name="codigo">
             <option value="">Selecione o código</option>
@@ -184,8 +183,22 @@ export default function AddIndicador() {
               </option>
             ))}
           </select>
-          {errors.codigo && <span>O código do indicador é obrigatório!</span>}
 
+          {errors.codigo && <span>O código do indicador é obrigatório!</span>}
+          <label>Eixo</label>
+          <select {...register("eixo", { required: true })} name="eixo">
+            <option value="">Selecione o eixo</option>
+            <option value={"agua"}>Água</option>
+            <option value={"esgoto"}>Esgoto</option>
+            <option value={"drenagem"}>Drenagem</option>
+            <option value={"residuos"}>Resíduos</option>
+            {/* {codigosIndicadores.map((codigo) => (
+              <option key={codigo} value={codigo}>
+                {codigo}
+              </option>
+            ))} */}
+          </select>
+          {errors.codigo && <span>O código do indicador é obrigatório!</span>}
           <label>Método de Cálculo (Imagem)</label>
           <input
             type="file"
@@ -207,7 +220,6 @@ export default function AddIndicador() {
           {errors.metodo_calculo && (
             <span>A imagem do método de cálculo é obrigatória!</span>
           )}
-
           <label>Descrição</label>
           <textarea
             {...register("descricao", { required: true })}
@@ -216,7 +228,6 @@ export default function AddIndicador() {
             rows={4}
           />
           {errors.descricao && <span>A descrição é obrigatória!</span>}
-
           <label>Finalidade</label>
           <input
             {...register("finalidade", { required: true })}
@@ -225,7 +236,6 @@ export default function AddIndicador() {
             name="finalidade"
           />
           {errors.finalidade && <span>A finalidade é obrigatória!</span>}
-
           <label>Limitações</label>
           <input
             {...register("limitacoes", { required: true })}
@@ -234,7 +244,6 @@ export default function AddIndicador() {
             name="limitacoes"
           />
           {errors.limitacoes && <span>As limitações são obrigatórias!</span>}
-
           <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>

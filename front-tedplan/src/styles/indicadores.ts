@@ -445,14 +445,13 @@ export const DivForm = styled.div`
   background-color: #fff;
   text-align: left;
   padding: 10px 8px 10px 10px;
-  
+
   border-radius: 12px;
   margin-top: 50px;
   color: #fff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   table {
-   
   }
 `;
 

@@ -96,7 +96,7 @@ const Sidebar = () => {
   const [isCadastroOpen, setIsCadastroOpen] = useState(false);
 
   function handleAddIndicador() {
-    Router.push("/addInfoIndicador");
+    Router.push("/listarInfoIndicador");
   }
 
   function handlePublicacoes() {
