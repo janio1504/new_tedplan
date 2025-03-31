@@ -1,6 +1,7 @@
 'use strict'
 const Indicador = use('App/Models/Indicador')
 const Imagem = use("App/Models/Imagem");
+const Helpers = use("Helpers");
 
 class IndicadorController {
 
