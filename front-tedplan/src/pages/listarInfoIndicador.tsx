@@ -51,7 +51,6 @@ export default function ListarIndicadores() {
   const [idImagem, setIdImagem] = useState(null);
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  console.log(indicadores);
 
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
@@ -59,7 +58,6 @@ export default function ListarIndicadores() {
       Router.push("/login");
       return;
     }
-    console.log("carregou");
 
     loadInfoIndicadores();
   }, [loadInfoIndicadores]);

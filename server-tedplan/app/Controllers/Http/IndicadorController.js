@@ -49,7 +49,7 @@ class IndicadorController {
   async createDescricaoIndicador({ request, response }) {
     const dados = request.all()
     try {
-      console.log(dados);
+
 
       if (!dados.codigo) {
         return response.status(400).send({ message: 'Código do indicador é obrigatório' })

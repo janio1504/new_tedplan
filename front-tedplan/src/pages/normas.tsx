@@ -81,10 +81,6 @@ export default function Normas({
   const [idTipoNorma, setIdTipoNorma] = useState(null);
   const [idEscala, setIdEscala] = useState(null);
 
-  console.log("Normas recebidas:", normas);
-  console.log("Normas processadas:", normasList);
-  console.log("Paginação:", paginacao);
-
   useEffect(() => {
     if (normas) {
       const page = 1;
@@ -255,7 +251,6 @@ export default function Normas({
   // }
 
   async function getNormas(normas?: any, page?) {
-    console.log("getNormas chamada com:", normas);
     const apiClient = getAPIClient();
 
     if (normas && normas.data && normas.data.length > 0) {
@@ -301,7 +296,6 @@ export default function Normas({
           })
         );
 
-        console.log("Normas processadas:", norma);
         setNormasList(norma);
       } catch (error) {
         console.error("Erro ao processar normas:", error);
@@ -340,7 +334,6 @@ export default function Normas({
         totalItens: normas.total || 0,
       };
 
-      console.log("Paginação calculada:", pages);
       setPaginacao(pages);
     } else {
       console.log("Dados insuficientes para calcular paginação");
