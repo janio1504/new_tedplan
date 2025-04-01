@@ -87,8 +87,12 @@ export default function AddIndicador() {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const { id } = router.query;
 
-  const { createInfoIndicador, updateInfoIndicador, currentInfoIndicador } =
-    useInfoIndicador();
+  const {
+    createInfoIndicador,
+    updateInfoIndicador,
+    currentInfoIndicador,
+    loadInfoIndicadores,
+  } = useInfoIndicador();
 
   useEffect(() => {
     const loadIndicador = async () => {
@@ -143,6 +147,8 @@ export default function AddIndicador() {
           type: "success",
           duration: 7,
         });
+
+        loadInfoIndicadores();
       } else {
         await createInfoIndicador(formData);
         toast.notify("Indicador cadastrado com sucesso!", {

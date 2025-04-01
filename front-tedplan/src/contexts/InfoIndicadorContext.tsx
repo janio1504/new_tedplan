@@ -8,9 +8,12 @@ interface InfoIndicadorContextData {
   error: string | null;
   loadInfoIndicadores: () => Promise<void>;
   currentInfoIndicador: (id: number) => Promise<InfoIndicador>;
-  createInfoIndicador: (data: Partial<InfoIndicador>) => Promise<void>;
-  updateInfoIndicador: (data: Partial<InfoIndicador>) => Promise<void>;
-  deleteInfoIndicador: (id: string | number) => Promise<void>;
+  createInfoIndicador: (data: FormData) => Promise<void>;
+  updateInfoIndicador: (data: FormData) => Promise<void>;
+  deleteInfoIndicador: (
+    id: string | number,
+    id_imagem?: number
+  ) => Promise<void>;
   clearError: () => void;
 }
 
@@ -54,9 +57,8 @@ export const InfoIndicadorProvider: React.FC<{ children: React.ReactNode }> = ({
   const createInfoIndicador = useCallback(async (data: FormData) => {
     try {
       setLoading(true);
-      const newIndicador = await infoIndicadorService.createInfoIndicador(data);
-      setInfoIndicadores((prev) => [...prev, newIndicador]);
-      return newIndicador;
+      await infoIndicadorService.createInfoIndicador(data);
+      await loadInfoIndicadores();
     } catch (err) {
       setError("Erro ao criar indicador");
       console.error(err);
@@ -69,17 +71,8 @@ export const InfoIndicadorProvider: React.FC<{ children: React.ReactNode }> = ({
   const updateInfoIndicador = useCallback(async (data: FormData) => {
     try {
       setLoading(true);
-      const updatedIndicador = await infoIndicadorService.updateInfoIndicador(
-        data
-      );
-      setInfoIndicadores((prev) =>
-        prev.map((item) =>
-          item.id_descricao_indicador ===
-          updatedIndicador.id_descricao_indicador
-            ? updatedIndicador
-            : item
-        )
-      );
+      await infoIndicadorService.updateInfoIndicador(data);
+      await loadInfoIndicadores();
     } catch (err) {
       setError("Erro ao atualizar indicador");
       console.error(err);
