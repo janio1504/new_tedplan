@@ -1,7 +1,10 @@
-import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
 import { toast, ToastContainer } from "react-nextjs-toast";
+import { useForm } from "react-hook-form";
+import { useInfoIndicador } from "../contexts/InfoIndicadorContext";
+import MenuSuperior from "../components/head";
 import {
   Container,
   Form,
@@ -10,20 +13,6 @@ import {
   DivInstrucoes,
 } from "../styles/dashboard";
 import { SubmitButton } from "../styles/dashboard-original";
-import { getAPIClient } from "../services/axios";
-import { useForm } from "react-hook-form";
-import MenuSuperior from "../components/head";
-import Router from "next/router";
-
-interface IIndicador {
-  id_indicador: string;
-  nome: string;
-  codigo: string;
-  metodo_calculo: string;
-  descricao: string;
-  finalidade: string;
-  limitacoes: string;
-}
 
 const codigosIndicadores = [
   "IN002",
@@ -90,61 +79,91 @@ export default function AddIndicador() {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm();
 
   const router = useRouter();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const { id } = router.query;
+
+  const { createInfoIndicador, updateInfoIndicador, currentInfoIndicador } =
+    useInfoIndicador();
 
   useEffect(() => {
-    const { ["tedplan.token"]: token } = parseCookies();
-    if (!token) {
-      Router.push("/login");
-    }
-  }, []);
+    const loadIndicador = async () => {
+      if (id) {
+        try {
+          const response = await currentInfoIndicador(id);
 
-  async function handleAddIndicador({
-    nome,
-    codigo,
-    metodo_calculo,
-    descricao,
-    finalidade,
-    limitacoes,
-  }) {
+          const indicador = response[0];
+
+          if (indicador) {
+            setValue("nome_indicador", indicador.nome_indicador || "");
+            setValue("codigo", indicador.codigo || "");
+            setValue("eixo", indicador.eixo || "");
+            setValue("descricao", indicador.descricao || "");
+            setValue("finalidade", indicador.finalidade || "");
+            setValue("limitacoes", indicador.limitacoes || "");
+
+            if (indicador.metodo_calculo) {
+              setPreviewImage(indicador.metodo_calculo);
+            }
+          }
+        } catch (error) {
+          console.error("Error loading indicator:", error);
+          toast.notify("Erro ao carregar dados do indicador!", {
+            type: "error",
+            duration: 7,
+          });
+        }
+      }
+    };
+
+    loadIndicador();
+  }, [id, setValue, currentInfoIndicador]);
+
+  const onSubmit = async (data) => {
     const formData = new FormData();
-    formData.append("metodo_calculo", metodo_calculo[0]);
+    if (data?.metodo_calculo[0]) {
+      formData.append("imagem", data?.metodo_calculo[0]);
+    }
+    formData.append("nome_indicador", data.nome_indicador);
+    formData.append("codigo", data.codigo);
+    formData.append("eixo", data.eixo);
+    formData.append("descricao", data.descricao);
+    formData.append("finalidade", data.finalidade);
+    formData.append("limitacoes", data.limitacoes);
 
-    const apiClient = getAPIClient();
     try {
-      await apiClient.post("addIndicador", {
-        nome,
-        codigo,
-        metodo_calculo: formData,
-        descricao,
-        finalidade,
-        limitacoes,
-      });
-
-      toast.notify("Indicador cadastrado com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      if (id) {
+        formData.append("id_descricao_indicador", id as string);
+        await updateInfoIndicador(formData);
+        toast.notify("Indicador atualizado com sucesso!", {
+          type: "success",
+          duration: 7,
+        });
+      } else {
+        await createInfoIndicador(formData);
+        toast.notify("Indicador cadastrado com sucesso!", {
+          type: "success",
+          duration: 7,
+        });
+      }
 
       reset();
       setPreviewImage(null);
-
       setTimeout(() => {
-        router.push("/listarIndicadores");
+        router.push("/listarInfoIndicador");
       }, 2000);
     } catch (error) {
-      toast.notify("Erro ao cadastrar indicador!", {
-        title: "Erro!",
-        duration: 7,
+      console.error(error);
+      toast.notify(`Erro ao ${id ? "atualizar" : "cadastrar"} indicador!`, {
         type: "error",
+        duration: 7,
       });
     }
-  }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -159,23 +178,29 @@ export default function AddIndicador() {
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
-
+      <MenuSuperior usuarios={[]} />
+      <ToastContainer></ToastContainer>
       <DivCenter>
         <DivInstrucoes>
-          <b>Informações de Indicador:</b>
+          <b>{id ? "Editar" : "Adicionar"} Informações de Indicador:</b>
         </DivInstrucoes>
-        <Form onSubmit={handleSubmit(handleAddIndicador)}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <label>Nome</label>
           <input
-            {...register("nome", { required: true })}
+            {...register("nome_indicador", {
+              required: "O campo Nome é obrigatório!",
+            })}
             type="text"
             placeholder="Nome do indicador"
-            name="nome"
           />
-          {errors.nome && <span>O campo Nome é obrigatório!</span>}
+          {errors.nome && <span>{errors.nome.message}</span>}
+
           <label>Código</label>
-          <select {...register("codigo", { required: true })} name="codigo">
+          <select
+            {...register("codigo", {
+              required: "O código do indicador é obrigatório!",
+            })}
+          >
             <option value="">Selecione o código</option>
             {codigosIndicadores.map((codigo) => (
               <option key={codigo} value={codigo}>
@@ -183,26 +208,22 @@ export default function AddIndicador() {
               </option>
             ))}
           </select>
+          {errors.codigo && <span>{errors.codigo.message}</span>}
 
-          {errors.codigo && <span>O código do indicador é obrigatório!</span>}
           <label>Eixo</label>
-          <select {...register("eixo", { required: true })} name="eixo">
+          <select {...register("eixo", { required: "O eixo é obrigatório!" })}>
             <option value="">Selecione o eixo</option>
-            <option value={"agua"}>Água</option>
-            <option value={"esgoto"}>Esgoto</option>
-            <option value={"drenagem"}>Drenagem</option>
-            <option value={"residuos"}>Resíduos</option>
-            {/* {codigosIndicadores.map((codigo) => (
-              <option key={codigo} value={codigo}>
-                {codigo}
-              </option>
-            ))} */}
+            <option value="agua">Água</option>
+            <option value="esgoto">Esgoto</option>
+            <option value="drenagem">Drenagem</option>
+            <option value="residuos">Resíduos</option>
           </select>
-          {errors.codigo && <span>O código do indicador é obrigatório!</span>}
+          {errors.eixo && <span>{errors.eixo.message}</span>}
+
           <label>Método de Cálculo (Imagem)</label>
           <input
             type="file"
-            {...register("metodo_calculo", { required: true })}
+            {...register("metodo_calculo", { required: !id })}
             accept="image/*"
             onChange={handleImageChange}
           />
@@ -220,6 +241,7 @@ export default function AddIndicador() {
           {errors.metodo_calculo && (
             <span>A imagem do método de cálculo é obrigatória!</span>
           )}
+
           <label>Descrição</label>
           <textarea
             {...register("descricao", { required: true })}
@@ -229,28 +251,28 @@ export default function AddIndicador() {
           />
           {errors.descricao && <span>A descrição é obrigatória!</span>}
           <label>Finalidade</label>
-          <input
+
+          <textarea
             {...register("finalidade", { required: true })}
-            type="text"
             placeholder="Finalidade do indicador"
             name="finalidade"
+            rows={4}
           />
           {errors.finalidade && <span>A finalidade é obrigatória!</span>}
           <label>Limitações</label>
-          <input
+          <textarea
             {...register("limitacoes", { required: true })}
-            type="text"
-            placeholder="Limitacoes do indicador"
+            placeholder="Limitações do indicador"
             name="limitacoes"
+            rows={4}
           />
           {errors.limitacoes && <span>As limitações são obrigatórias!</span>}
-          <SubmitButton type="submit">Gravar</SubmitButton>
+          <SubmitButton type="submit">
+            {id ? "Atualizar" : "Gravar"}
+          </SubmitButton>
         </Form>
       </DivCenter>
-      <Footer>
-        &copy; Todos os direitos reservados
-        <ToastContainer />
-      </Footer>
+      <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );
 }

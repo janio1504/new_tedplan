@@ -1,3 +1,4 @@
+import { InfoIndicadorProvider } from "@/contexts/InfoIndicadorContext";
 import { AuthProvider } from "../contexts/AuthContext";
 import { MunicipioProvider } from "../contexts/MunicipioContext";
 import { ResiduosProvider } from "../contexts/ResiduosContext";
@@ -9,9 +10,11 @@ function MyApp({ Component, pageProps }) {
     <AuthProvider>
       <MunicipioProvider>
         <ResiduosProvider>
-          <GlobalStyle />
-          <NextNProgress />
-          <Component {...pageProps} />
+          <InfoIndicadorProvider>
+            <GlobalStyle />
+            <NextNProgress />
+            <Component {...pageProps} />
+          </InfoIndicadorProvider>
         </ResiduosProvider>
       </MunicipioProvider>
     </AuthProvider>
