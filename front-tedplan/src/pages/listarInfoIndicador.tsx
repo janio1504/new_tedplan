@@ -94,10 +94,7 @@ export default function ListarIndicadores() {
     setPreviewImage(null);
   }
 
-  function handleOpenConfirm({
-    id_descricao_indicador,
-    id_imagem,
-  }: InfoIndicador) {
+  function handleOpenConfirm({ id_descricao_indicador, id_imagem }) {
     setIndicadorModal(id_descricao_indicador);
     setIdImagem(id_imagem);
     setModalConfirm(true);

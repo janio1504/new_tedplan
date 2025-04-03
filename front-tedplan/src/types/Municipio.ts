@@ -100,6 +100,9 @@ export type Municipio = {
   simisab_responsavel: string;
   simisab_telefone: string;
   simisab_email: string;
+  cs_setor_responsavel: string;
+  cs_telefone: string;
+  cs_email: string;
 
   //Dados demográficos
   id_dados_demograficos: string;

@@ -168,7 +168,7 @@ class MunicipioController {
           "dd.id_municipio"
         )
         .fetch();
-        
+
       return municipio;
     } catch (error) {
       console.log(error);
@@ -176,6 +176,9 @@ class MunicipioController {
   }
 
   async store({ request, response }) {
+    console.log(request.all());
+
+
     const {
       //dados do municipio
       id_municipio,
@@ -288,7 +291,7 @@ class MunicipioController {
       dd_total_moradias,
       dd_ano,
     } = request.all();
-    
+
     try {
       const municipios = await Municipio.query()
         .from("tedplan.municipios")

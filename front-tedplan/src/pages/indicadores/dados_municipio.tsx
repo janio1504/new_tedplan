@@ -7,7 +7,6 @@ import {
   SidebarItem,
   MainContent,
   DivCenter,
-  DivFormCadastro,
   DivTituloForm,
   Form,
   InputP,
@@ -18,13 +17,14 @@ import {
   DivEixo,
   TextArea,
   DivTextArea,
-  StepButton,
   StepContent,
   StepLabel,
   StepperNavigation,
   StepperWrapper,
   StepperContainer,
   StepperButton,
+  DivFormCadastro,
+  StepButton,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -36,7 +36,8 @@ import Router from "next/router";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Municipio } from "../../types";
 import { useMunicipio } from "../../contexts/MunicipioContext";
-import InputMask from "react-input-mask";
+const InputMask = require("react-input-mask");
+// import InputMask from "react-input-mask";
 import { onlyLettersAndCharacters, toTitleCase } from "@/util/util";
 interface MunicipioProps {
   municipio: Municipio;
@@ -53,16 +54,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     setValue,
     control,
     formState: { errors },
-  } = useForm({
-    defaultValues: {
-      aa_natureza_juridica: dadosMunicipio?.aa_natureza_juridica || "",
-    },
-  });
+  } = useForm<Municipio>({});
   const [activeForm, setActiveForm] = useState("dadosMunicipio");
   const { usuario, signOut } = useAuth();
   const [content, setContent] = useState("");
-  // const { dadosMunicipio, loadMunicipio, loading, updateMunicipio } =
-  //   useMunicipio();
+  console.log(usuario?.id_permissao);
 
   const urbanPopulation = watch("dd_populacao_urbana");
   const ruralPopulation = watch("dd_populacao_rural");
@@ -97,7 +93,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   useEffect(() => {
     if (dadosMunicipio) {
       Object.entries(dadosMunicipio).forEach(([key, value]) => {
-        setValue(key, value);
+        setValue(key as keyof Municipio, value);
       });
     }
   }, [dadosMunicipio, setValue]);
@@ -115,22 +111,26 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   };
 
   async function handleCadastro(data: any) {
-    if (usuario?.id_permissao === 4) {
-      return;
-    }
-
+    console.log("handleCadastro chamado", data);
     try {
-      await updateMunicipio({
+      if (usuario?.id_permissao === 4) {
+        return;
+      }
+
+      const submitData = {
         ...data,
         id_municipio: usuario?.id_municipio,
-      });
+      };
+
+      await updateMunicipio(submitData);
+
       toast.notify("Dados gravados com sucesso!", {
         title: "Sucesso!",
         duration: 7,
         type: "success",
       });
     } catch (error) {
-      console.log(error);
+      console.error("Erro ao gravar dados:", error);
       toast.notify("Erro ao gravar dados", {
         title: "Erro",
         duration: 7,
@@ -156,7 +156,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
           top: "16px",
           right: "16px",
         }}
-      ></ToastContainer>
+      />
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
@@ -264,9 +264,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Prefeitura<span> *</span>
                         </label>
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_nome_prefeitura", {
-                            required: false,
+                            required: "Este campo é obrigatório",
                           })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
@@ -276,10 +275,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           }}
                           onKeyPress={onlyLettersAndCharacters}
                         />
-                        {errors.municipio_nome_prefeitura &&
-                          errors.municipio_nome_prefeitura.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
+                        {errors.municipio_nome_prefeitura && (
+                          <span>
+                            {errors.municipio_nome_prefeitura.message}
+                          </span>
+                        )}
                       </InputG>
                     </td>
                     <td>
@@ -290,33 +290,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <Controller
                           name="municipio_cep"
                           control={control}
-                          defaultValue=""
-                          render={({ field: { onChange, value } }) => (
-                            <InputMask
-                              mask="99999-999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                onChange(justNumbers);
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input
-                                  {...inputProps}
-                                  type="text"
-                                  aria-invalid={errors.value ? "true" : "false"}
-                                />
-                              )}
-                            </InputMask>
+                          rules={{ required: "O CEP é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="99999-999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  onChange(justNumbers);
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <input
+                                    {...inputProps}
+                                    type="text"
+                                    style={{ borderColor: error ? "red" : "" }}
+                                  />
+                                )}
+                              </InputMask>
+                              {error && <span>{error.message}</span>}
+                            </>
                           )}
                         />
-                        {errors.municipio_cep && errors.municipio_cep.type && (
-                          <span>O campo é obrigatório!</span>
-                        )}
                       </InputP>
                     </td>
                   </tr>
@@ -331,9 +334,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Endereço<span> *</span>
                         </label>
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_endereco", {
-                            required: false,
+                            required: "Este campo é obrigatório",
                           })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
@@ -343,10 +345,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           }}
                           onKeyPress={onlyLettersAndCharacters}
                         />
-                        {errors.municipio_endereco &&
-                          errors.municipio_endereco.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
+                        {errors.municipio_endereco && (
+                          <span>{errors.municipio_endereco.message}</span>
+                        )}
                       </InputG>
                     </td>
                     <td>
@@ -355,8 +356,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Número<span> *</span>
                         </label>
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
-                          {...register("municipio_numero", { required: false })}
+                          {...register("municipio_numero", {
+                            required: "Este campo é obrigatório",
+                          })}
                           type="text"
                           onKeyPress={(e) => {
                             if (!/[0-9]/.test(e.key)) {
@@ -364,10 +366,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                             }
                           }}
                         />
-                        {errors.municipio_numero &&
-                          errors.municipio_numero.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
+                        {errors.municipio_numero && (
+                          <span>{errors.municipio_numero.message}</span>
+                        )}
                       </InputP>
                     </td>
                     <td>
@@ -376,20 +377,20 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Bairro<span> *</span>
                         </label>
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
-                          {...register("municipio_bairro", { required: false })}
+                          {...register("municipio_bairro", {
+                            required: "Este campo é obrigatório",
+                          })}
                           type="text"
                           onKeyPress={onlyLettersAndCharacters}
                           style={{ textTransform: "capitalize" }}
                           onChange={(e) => {
                             const value = toTitleCase(e.target.value);
-                            setValue("municipio_nome_prefeitura", value);
+                            setValue("municipio_bairro", value);
                           }}
                         />
-                        {errors.municipio_bairro &&
-                          errors.municipio_bairro.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
+                        {errors.municipio_bairro && (
+                          <span>{errors.municipio_bairro.message}</span>
+                        )}
                       </InputM>
                     </td>
                   </tr>
@@ -406,36 +407,34 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <Controller
                           name="municipio_telefone"
                           control={control}
-                          defaultValue=""
-                          render={({ field: { onChange, value } }) => (
-                            <InputMask
-                              mask="(99) 99999-9999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                if (justNumbers.length <= 11) {
-                                  onChange(justNumbers);
-                                }
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input
-                                  {...inputProps}
-                                  type="text"
-                                  aria-invalid={errors.value ? "true" : "false"}
-                                />
-                              )}
-                            </InputMask>
+                          rules={{ required: "O telefone é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="(99) 99999-9999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  if (justNumbers.length <= 11) {
+                                    onChange(justNumbers);
+                                  }
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <input {...inputProps} type="text" />
+                                )}
+                              </InputMask>
+                              {error && <span>{error.message}</span>}
+                            </>
                           )}
                         />
-                        {errors.municipio_telefone &&
-                          errors.municipio_telefone.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
                       </InputP>
                     </td>
                     <td>
@@ -444,15 +443,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           E-mail<span> *</span>
                         </label>
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_email", {
-                            required: false,
                             pattern: {
                               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                               message: "Endereço de email inválido",
                             },
                           })}
-                          type="email"
+                          type="text"
                         />
                         {errors.municipio_email &&
                           errors.municipio_email.type && (
@@ -466,22 +463,20 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Nome do Prefeito<span> *</span>
                         </label>
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
                           {...register("municipio_prefeito", {
-                            required: false,
+                            required: "Este campo é obrigatório",
                           })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
                           onChange={(e) => {
                             const value = toTitleCase(e.target.value);
-                            setValue("municipio_nome_prefeitura", value);
+                            setValue("municipio_prefeito", value);
                           }}
                           onKeyPress={onlyLettersAndCharacters}
                         />
-                        {errors.municipio_prefeito &&
-                          errors.municipio_prefeito.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
+                        {errors.municipio_prefeito && (
+                          <span>{errors.municipio_prefeito.message}</span>
+                        )}
                       </InputG>
                     </td>
                   </tr>
@@ -507,8 +502,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Setor Responsável<span> *</span>
                         </label>
                         <input
-                          {...register("ts_setor_responsavel")}
-                          defaultValue={dadosMunicipio?.ts_setor_responsavel}
+                          {...register("ts_setor_responsavel", {
+                            required: "Este campo é obrigatório",
+                          })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
                           onChange={(e) => {
@@ -518,6 +514,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           onKeyPress={onlyLettersAndCharacters}
                         ></input>
                       </InputG>
+                      {errors.ts_setor_responsavel && (
+                        <span>{errors.ts_setor_responsavel.message}</span>
+                      )}
                     </td>
                     <td>
                       <InputP>
@@ -528,36 +527,34 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <Controller
                           name="ts_telefone_comercial"
                           control={control}
-                          defaultValue=""
-                          render={({ field: { onChange, value } }) => (
-                            <InputMask
-                              mask="(99) 99999-9999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                if (justNumbers.length <= 11) {
-                                  onChange(justNumbers);
-                                }
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input
-                                  {...inputProps}
-                                  type="text"
-                                  aria-invalid={errors.value ? "true" : "false"}
-                                />
-                              )}
-                            </InputMask>
+                          rules={{ required: "O telefone é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="(99) 99999-9999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  if (justNumbers.length <= 11) {
+                                    onChange(justNumbers);
+                                  }
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <input {...inputProps} type="text" />
+                                )}
+                              </InputMask>
+                              {error && <span>{error.message}</span>}
+                            </>
                           )}
                         />
-                        {errors.ts_telefone_comercial &&
-                          errors.ts_telefone_comercial.type && (
-                            <span>O campo é obrigatório!</span>
-                          )}
                       </InputP>
                     </td>
                   </tr>
@@ -573,7 +570,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Nome do Responsável<span> *</span>
                         </label>
                         <input
-                          {...register("ts_responsavel")}
+                          {...register("ts_responsavel", {
+                            required: "Este campo é obrigatório",
+                          })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
                           onChange={(e) => {
@@ -583,6 +582,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           onKeyPress={onlyLettersAndCharacters}
                         ></input>
                       </InputG>
+                      {errors.ts_responsavel && (
+                        <span>{errors.ts_responsavel.message}</span>
+                      )}
                     </td>
                     <td>
                       <InputM>
@@ -590,7 +592,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Cargo<span> *</span>
                         </label>
                         <input
-                          {...register("ts_cargo")}
+                          {...register("ts_cargo", {
+                            required: "Este campo é obrigatório",
+                          })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
                           onChange={(e) => {
@@ -600,50 +604,47 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           onKeyPress={onlyLettersAndCharacters}
                         ></input>
                       </InputM>
+                      {errors.ts_cargo && (
+                        <span>{errors.ts_cargo.message}</span>
+                      )}
                     </td>
                     <td>
                       <InputP>
                         <label>
                           Telefone<span> *</span>
                         </label>
-                        {/* <input
-                          {...register("ts_telefone")}
-                          // defaultValue={dadosMunicipio?.ts_telefone}
-                          onChange={handleOnChange}
-                          type="text"
-                        /> */}
+
                         <Controller
                           name="ts_telefone"
                           control={control}
-                          defaultValue=""
-                          render={({ field: { onChange, value } }) => (
-                            <InputMask
-                              mask="(99) 99999-9999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                if (justNumbers.length <= 11) {
-                                  onChange(justNumbers);
-                                }
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input
-                                  {...inputProps}
-                                  type="text"
-                                  aria-invalid={errors.value ? "true" : "false"}
-                                />
-                              )}
-                            </InputMask>
+                          rules={{ required: "O telefone é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="(99) 99999-9999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  if (justNumbers.length <= 11) {
+                                    onChange(justNumbers);
+                                  }
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <input {...inputProps} type="text" />
+                                )}
+                              </InputMask>
+                              {error && <span>{error.message}</span>}
+                            </>
                           )}
                         />
-                        {errors.ts_telefone && errors.ts_telefone.type && (
-                          <span>O campo é obrigatório!</span>
-                        )}
                       </InputP>
                     </td>
                   </tr>
@@ -658,24 +659,18 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>
                           Email<span> *</span>
                         </label>
-                        {/* <input
-                          {...register("ts_email")}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input> */}
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
                           {...register("ts_email", {
-                            required: false,
+                            required: "Este campo é obrigatório",
                             pattern: {
                               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                               message: "Endereço de email inválido",
                             },
                           })}
-                          type="email"
+                          type="text"
                         />
-                        {errors.ts_email && errors.ts_email.type && (
-                          <span>O campo é obrigatório!</span>
+                        {errors.ts_email && (
+                          <span>{errors.ts_email.message}</span>
                         )}
                       </InputG>
                     </td>
@@ -718,8 +713,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     ></DivEixo>
                     <input
                       {...register("id_ps_abastecimento_agua")}
-                      // defaultValue={dadosMunicipio?.id_ps_abastecimento_agua}
-                      onChange={handleOnChange}
                       type="hidden"
                     />
                     <table>
@@ -731,11 +724,23 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Secretaria ou Setor Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("aa_secretaria_setor_responsavel")}
-                                onChange={handleOnChange}
+                                {...register(
+                                  "aa_secretaria_setor_responsavel",
+                                  {
+                                    required: "Este campo é obrigatório",
+                                  }
+                                )}
                                 type="text"
                                 onKeyPress={onlyLettersAndCharacters}
                               ></input>
+                              {errors.aa_secretaria_setor_responsavel && (
+                                <span>
+                                  {
+                                    errors.aa_secretaria_setor_responsavel
+                                      .message
+                                  }
+                                </span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -768,12 +773,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Natureza jurídica<span> *</span>
                               </label>
                               <select {...register("aa_natureza_juridica")}>
-                                {/* <option value="">Selecione uma opção</option> */}
-                                {/* <option
-                                  value={dadosMunicipio?.aa_natureza_juridica}
-                                >
-                                  {dadosMunicipio?.aa_natureza_juridica}
-                                </option> */}
                                 <option value="Empresa Privada">
                                   Empresa Privada
                                 </option>
@@ -803,57 +802,45 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CNPJ<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("aa_cnpj")}
-                                onChange={handleOnChange}
-                                type="text"
-                                onKeyPress={(e) => {
-                                  if (!/[0-9]/.test(e.key)) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              ></input> */}
                               <Controller
                                 name="aa_cnpj"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99.999.999/9999-99"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      // Limit to 14 digits
-                                      if (justNumbers.length <= 14) {
-                                        // Store raw numbers in form state
-                                        onChange(justNumbers);
-
-                                        // Format display value (mask will handle this automatically)
-                                        const formattedValue = e.target.value;
-                                        e.target.value = formattedValue;
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        placeholder="00.000.000/0000-00"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
-                                )}
                                 rules={{
-                                  required: true,
+                                  required: "Campo obrigatório",
                                   minLength: 14,
                                   maxLength: 14,
                                   pattern: /^\d{14}$/,
                                 }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99.999.999/9999-99"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 14) {
+                                          onChange(justNumbers);
+                                          const formattedValue = e.target.value;
+                                          e.target.value = formattedValue;
+                                        }
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input
+                                          {...inputProps}
+                                          type="text"
+                                          placeholder="00.000.000/0000-00"
+                                        />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
+                                )}
                               />
                             </InputM>
                           </td>
@@ -862,43 +849,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Telefone<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("aa_telefone")}
-                                onChange={handleOnChange}
-                                type="text"
-                                onKeyPress={(e) => {
-                                  if (!/[0-9]/.test(e.key)) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              ></input> */}
+
                               <Controller
                                 name="aa_telefone"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="(99) 99999-9999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      if (justNumbers.length <= 11) {
-                                        onChange(justNumbers);
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="(99) 99999-9999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 11) {
+                                          onChange(justNumbers);
                                         }
-                                      />
-                                    )}
-                                  </InputMask>
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -915,42 +895,34 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CEP<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("aa_cep")}
-                                // defaultValue={dadosMunicipio?.aa_cep}
-                                onChange={handleOnChange}
-                                type="text"
-                                onKeyPress={(e) => {
-                                  if (!/[0-9]/.test(e.key)) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              ></input> */}
+
                               <Controller
                                 name="aa_cep"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99999-999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      onChange(justNumbers);
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99999-999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        onChange(justNumbers);
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -961,12 +933,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Endereço<span> *</span>
                               </label>
                               <input
-                                {...register("aa_endereco")}
-                                // defaultValue={dadosMunicipio?.aa_endereco}
-                                onChange={handleOnChange}
+                                {...register("aa_endereco", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                                 onKeyPress={onlyLettersAndCharacters}
                               ></input>
+                              {errors.aa_endereco && (
+                                <span>{errors.aa_endereco.message}</span>
+                              )}
                             </InputM>
                           </td>
                           <td>
@@ -975,9 +950,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Número<span> *</span>
                               </label>
                               <input
-                                {...register("aa_numero")}
-                                // defaultValue={dadosMunicipio?.aa_numero}
-                                onChange={handleOnChange}
+                                {...register("aa_numero", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                                 onKeyPress={(e) => {
                                   if (!/[0-9]/.test(e.key)) {
@@ -985,6 +960,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                   }
                                 }}
                               ></input>
+                              {errors.aa_numero && (
+                                <span>{errors.aa_numero.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -993,12 +971,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Bairro<span> *</span>
                               </label>
                               <input
-                                {...register("aa_bairro")}
-                                // defaultValue={dadosMunicipio?.aa_bairro}
-                                onChange={handleOnChange}
+                                {...register("aa_bairro", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                                 onKeyPress={onlyLettersAndCharacters}
                               ></input>
+                              {errors.aa_bairro && (
+                                <span>{errors.aa_bairro.message}</span>
+                              )}
                             </InputM>
                           </td>
                         </tr>
@@ -1014,12 +995,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Nome do Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("aa_responsavel")}
-                                // defaultValue={dadosMunicipio?.aa_responsavel}
-                                onChange={handleOnChange}
+                                {...register("aa_responsavel", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                                 onKeyPress={onlyLettersAndCharacters}
                               ></input>
+                              {errors.aa_responsavel && (
+                                <span>{errors.aa_responsavel.message}</span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1028,12 +1012,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Cargo<span> *</span>
                               </label>
                               <input
-                                {...register("aa_cargo")}
-                                // defaultValue={dadosMunicipio?.aa_cargo}
-                                onChange={handleOnChange}
+                                {...register("aa_cargo", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                                 onKeyPress={onlyLettersAndCharacters}
                               ></input>
+                              {errors.aa_cargo && (
+                                <span>{errors.aa_cargo.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -1041,23 +1028,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Email<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("aa_email")}
-                                onChange={handleOnChange}
-                                type="text"
-                                onKeyPress={onlyLettersAndCharacters}
-                              ></input> */}
+
                               <input
-                                aria-invalid={errors.value ? "true" : "false"}
                                 {...register("aa_email", {
-                                  required: false,
+                                  required: "Este campo é obrigatório",
                                   pattern: {
                                     value:
                                       /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: "Endereço de email inválido",
                                   },
                                 })}
-                                type="email"
+                                type="text"
                               />
                               {errors.aa_email && errors.aa_email.type && (
                                 <span>O campo é obrigatório!</span>
@@ -1075,8 +1056,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     ></DivEixo>
                     <input
                       {...register("id_ps_esgotamento_sanitario")}
-                      // defaultValue={dadosMunicipio?.id_ps_esgotamento_sanitario}
-                      onChange={handleOnChange}
                       type="hidden"
                     />
                     <table>
@@ -1088,9 +1067,23 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Secretaria ou Setor Responsável<span> *</span>
                               </label>
                               <input
+                                {...register(
+                                  "es_secretaria_setor_responsavel",
+                                  {
+                                    required: "Este campo é obrigatório",
+                                  }
+                                )}
                                 type="text"
                                 onKeyPress={onlyLettersAndCharacters}
                               ></input>
+                              {errors.es_secretaria_setor_responsavel && (
+                                <span>
+                                  {
+                                    errors.es_secretaria_setor_responsavel
+                                      .message
+                                  }
+                                </span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1098,12 +1091,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Abrangência<span> *</span>
                               </label>
-                              <input
-                                {...register("es_abrangencia")}
-                                // defaultValue={dadosMunicipio?.es_abrangencia}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input>
+                              <select {...register("es_abrangencia")}>
+                                <option value={dadosMunicipio?.es_abrangencia}>
+                                  {dadosMunicipio?.es_abrangencia}
+                                </option>
+                                <option value="Regional">Regional</option>
+                                <option value="Microregional">
+                                  Microregional
+                                </option>
+                                <option value="Local">Local</option>
+                              </select>
                             </InputP>
                           </td>
                         </tr>
@@ -1147,52 +1144,46 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CNPJ<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("es_cnpj")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="es_cnpj"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99.999.999/9999-99"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      // Limit to 14 digits
-                                      if (justNumbers.length <= 14) {
-                                        // Store raw numbers in form state
-                                        onChange(justNumbers);
-
-                                        // Format display value (mask will handle this automatically)
-                                        const formattedValue = e.target.value;
-                                        e.target.value = formattedValue;
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        placeholder="00.000.000/0000-00"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
-                                )}
                                 rules={{
-                                  required: true,
+                                  required: "Campo obrigatório",
                                   minLength: 14,
                                   maxLength: 14,
                                   pattern: /^\d{14}$/,
                                 }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99.999.999/9999-99"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 14) {
+                                          onChange(justNumbers);
+                                          const formattedValue = e.target.value;
+                                          e.target.value = formattedValue;
+                                        }
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input
+                                          {...inputProps}
+                                          type="text"
+                                          placeholder="00.000.000/0000-00"
+                                        />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
+                                )}
                               />
                             </InputM>
                           </td>
@@ -1201,38 +1192,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Telefone<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("es_telefone")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="es_telefone"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="(99) 99999-9999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      if (justNumbers.length <= 11) {
-                                        onChange(justNumbers);
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="(99) 99999-9999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 11) {
+                                          onChange(justNumbers);
                                         }
-                                      />
-                                    )}
-                                  </InputMask>
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -1249,37 +1238,34 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CEP<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("es_cep")}
-                                // defaultValue={dadosMunicipio?.es_cep}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="es_cep"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99999-999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      onChange(justNumbers);
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99999-999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        onChange(justNumbers);
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -1290,11 +1276,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Endereço<span> *</span>
                               </label>
                               <input
-                                {...register("es_endereco")}
-                                // defaultValue={dadosMunicipio?.es_endereco}
-                                onChange={handleOnChange}
+                                {...register("es_endereco", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.es_endereco && (
+                                <span>{errors.es_endereco.message}</span>
+                              )}
                             </InputM>
                           </td>
                           <td>
@@ -1303,11 +1292,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Número<span> *</span>
                               </label>
                               <input
-                                {...register("es_numero")}
-                                // defaultValue={dadosMunicipio?.es_numero}
-                                onChange={handleOnChange}
+                                {...register("es_numero", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.es_numero && (
+                                <span>{errors.es_numero.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -1316,11 +1308,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Bairro<span> *</span>
                               </label>
                               <input
-                                {...register("es_bairro")}
-                                // defaultValue={dadosMunicipio?.es_bairro}
-                                onChange={handleOnChange}
+                                {...register("es_bairro", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.es_bairro && (
+                                <span>{errors.es_bairro.message}</span>
+                              )}
                             </InputM>
                           </td>
                         </tr>
@@ -1336,11 +1331,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Nome do Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("es_responsavel")}
-                                // defaultValue={dadosMunicipio?.es_responsavel}
-                                onChange={handleOnChange}
+                                {...register("es_responsavel", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.es_responsavel && (
+                                <span>{errors.es_responsavel.message}</span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1349,11 +1347,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Cargo<span> *</span>
                               </label>
                               <input
-                                {...register("es_cargo")}
-                                // defaultValue={dadosMunicipio?.es_cargo}
-                                onChange={handleOnChange}
+                                {...register("es_cargo", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.es_cargo && (
+                                <span>{errors.es_cargo.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -1361,22 +1362,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Email<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("es_email")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <input
-                                aria-invalid={errors.value ? "true" : "false"}
                                 {...register("es_email", {
-                                  required: false,
+                                  required: "Campo obrigatório",
                                   pattern: {
                                     value:
                                       /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: "Endereço de email inválido",
                                   },
                                 })}
-                                type="email"
+                                type="text"
                               />
                               {errors.es_email && errors.es_email.type && (
                                 <span>O campo é obrigatório!</span>
@@ -1394,10 +1390,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     ></DivEixo>
                     <input
                       {...register("id_ps_drenagem_aguas_pluviais")}
-                      // defaultValue={
-                      //   dadosMunicipio?.id_ps_drenagem_aguas_pluviais
-                      // }
-                      // onChange={handleOnChange}
                       type="hidden"
                     />
                     <table>
@@ -1409,13 +1401,22 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Secretaria ou Setor Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("da_secretaria_setor_responsavel")}
-                                // defaultValue={
-                                //   dadosMunicipio?.da_secretaria_setor_responsavel
-                                // }
-                                // onChange={handleOnChange}
+                                {...register(
+                                  "da_secretaria_setor_responsavel",
+                                  {
+                                    required: "Campo obrigatório",
+                                  }
+                                )}
                                 type="text"
                               ></input>
+                              {errors.da_secretaria_setor_responsavel && (
+                                <span>
+                                  {
+                                    errors.da_secretaria_setor_responsavel
+                                      .message
+                                  }
+                                </span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1423,12 +1424,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Abrangência<span> *</span>
                               </label>
-                              <input
-                                {...register("da_abrangencia")}
-                                // defaultValue={dadosMunicipio?.da_abrangencia}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input>
+                              <select {...register("da_abrangencia")}>
+                                <option value={dadosMunicipio?.da_abrangencia}>
+                                  {dadosMunicipio?.da_abrangencia}
+                                </option>
+                                <option value="Regional">Regional</option>
+                                <option value="Microregional">
+                                  Microregional
+                                </option>
+                                <option value="Local">Local</option>
+                              </select>
                             </InputP>
                           </td>
                           <td></td>
@@ -1474,52 +1479,47 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CNPJ<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("da_cnpj")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="da_cnpj"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99.999.999/9999-99"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      // Limit to 14 digits
-                                      if (justNumbers.length <= 14) {
-                                        // Store raw numbers in form state
-                                        onChange(justNumbers);
-
-                                        // Format display value (mask will handle this automatically)
-                                        const formattedValue = e.target.value;
-                                        e.target.value = formattedValue;
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        placeholder="00.000.000/0000-00"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
-                                )}
                                 rules={{
-                                  required: true,
+                                  required: "Campo obrigatório",
                                   minLength: 14,
                                   maxLength: 14,
                                   pattern: /^\d{14}$/,
                                 }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99.999.999/9999-99"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 14) {
+                                          onChange(justNumbers);
+
+                                          const formattedValue = e.target.value;
+                                          e.target.value = formattedValue;
+                                        }
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input
+                                          {...inputProps}
+                                          type="text"
+                                          placeholder="00.000.000/0000-00"
+                                        />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
+                                )}
                               />
                             </InputM>
                           </td>
@@ -1528,38 +1528,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Telefone<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("da_telefone")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="da_telefone"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="(99) 99999-9999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      if (justNumbers.length <= 11) {
-                                        onChange(justNumbers);
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="(99) 99999-9999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 11) {
+                                          onChange(justNumbers);
                                         }
-                                      />
-                                    )}
-                                  </InputMask>
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -1576,36 +1574,34 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CEP<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("da_cep")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="da_cep"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99999-999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      onChange(justNumbers);
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99999-999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        onChange(justNumbers);
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -1616,11 +1612,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Endereço<span> *</span>
                               </label>
                               <input
-                                {...register("da_endereco")}
-                                // defaultValue={dadosMunicipio?.da_endereco}
-                                onChange={handleOnChange}
+                                {...register("da_endereco", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.da_endereco && (
+                                <span>{errors.da_endereco.message}</span>
+                              )}
                             </InputM>
                           </td>
                           <td>
@@ -1629,11 +1628,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Número<span> *</span>
                               </label>
                               <input
-                                {...register("da_numero")}
-                                // defaultValue={dadosMunicipio?.da_numero}
-                                onChange={handleOnChange}
+                                {...register("da_numero", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.da_numero && (
+                                <span>{errors.da_numero.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -1642,11 +1644,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Bairro<span> *</span>
                               </label>
                               <input
-                                {...register("da_bairro")}
-                                // defaultValue={dadosMunicipio?.da_bairro}
-                                onChange={handleOnChange}
+                                {...register("da_bairro", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.da_bairro && (
+                                <span>{errors.da_bairro.message}</span>
+                              )}
                             </InputM>
                           </td>
                         </tr>
@@ -1662,11 +1667,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Nome do Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("da_responsavel")}
-                                // defaultValue={dadosMunicipio?.da_responsavel}
-                                onChange={handleOnChange}
+                                {...register("da_responsavel", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.da_responsavel && (
+                                <span>{errors.da_responsavel.message}</span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1675,11 +1683,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Cargo<span> *</span>
                               </label>
                               <input
-                                {...register("da_cargo")}
-                                // defaultValue={dadosMunicipio?.da_cargo}
-                                onChange={handleOnChange}
+                                {...register("da_cargo", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.da_cargo && (
+                                <span>{errors.da_cargo.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -1687,22 +1698,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Email<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("da_email")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <input
-                                aria-invalid={errors.value ? "true" : "false"}
                                 {...register("da_email", {
-                                  required: false,
                                   pattern: {
                                     value:
                                       /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: "Endereço de email inválido",
                                   },
                                 })}
-                                type="email"
+                                type="text"
                               />
                               {errors.da_email && errors.da_email.type && (
                                 <span>O campo é obrigatório!</span>
@@ -1727,13 +1732,22 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Secretaria ou Setor Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("rs_secretaria_setor_responsavel")}
-                                // defaultValue={
-                                //   dadosMunicipio?.rs_secretaria_setor_responsavel
-                                // }
-                                onChange={handleOnChange}
+                                {...register(
+                                  "rs_secretaria_setor_responsavel",
+                                  {
+                                    required: "Campo obrigatório",
+                                  }
+                                )}
                                 type="text"
                               ></input>
+                              {errors.rs_secretaria_setor_responsavel && (
+                                <span>
+                                  {
+                                    errors.rs_secretaria_setor_responsavel
+                                      .message
+                                  }
+                                </span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1741,12 +1755,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Abrangência<span> *</span>
                               </label>
-                              <input
-                                {...register("rs_abrangencia")}
-                                // defaultValue={dadosMunicipio?.rs_abrangencia}
-                                // onChange={handleOnChange}
-                                type="text"
-                              ></input>
+                              <select {...register("rs_abrangencia")}>
+                                <option value={dadosMunicipio?.rs_abrangencia}>
+                                  {dadosMunicipio?.rs_abrangencia}
+                                </option>
+                                <option value="Regional">Regional</option>
+                                <option value="Microregional">
+                                  Microregional
+                                </option>
+                                <option value="Local">Local</option>
+                              </select>
                             </InputP>
                           </td>
                         </tr>
@@ -1754,8 +1772,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </table>
                     <input
                       {...register("id_ps_residuo_solido")}
-                      // defaultValue={dadosMunicipio?.id_ps_residuo_solido}
-                      // onChange={handleOnChange}
                       type="hidden"
                     />
 
@@ -1797,51 +1813,47 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CNPJ<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("rs_cnpj")}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="rs_cnpj"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99.999.999/9999-99"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      // Limit to 14 digits
-                                      if (justNumbers.length <= 14) {
-                                        // Store raw numbers in form state
-                                        onChange(justNumbers);
-
-                                        // Format display value (mask will handle this automatically)
-                                        const formattedValue = e.target.value;
-                                        e.target.value = formattedValue;
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        placeholder="00.000.000/0000-00"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
-                                )}
                                 rules={{
-                                  required: true,
+                                  required: "Campo obrigatório",
                                   minLength: 14,
                                   maxLength: 14,
                                   pattern: /^\d{14}$/,
                                 }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99.999.999/9999-99"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 14) {
+                                          onChange(justNumbers);
+
+                                          const formattedValue = e.target.value;
+                                          e.target.value = formattedValue;
+                                        }
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input
+                                          {...inputProps}
+                                          type="text"
+                                          placeholder="00.000.000/0000-00"
+                                        />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
+                                )}
                               />
                             </InputM>
                           </td>
@@ -1850,38 +1862,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Telefone<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("rs_telefone")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="rs_telefone"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="(99) 99999-9999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      if (justNumbers.length <= 11) {
-                                        onChange(justNumbers);
-                                      }
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="(99) 99999-9999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        if (justNumbers.length <= 11) {
+                                          onChange(justNumbers);
                                         }
-                                      />
-                                    )}
-                                  </InputMask>
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -1897,36 +1907,34 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 CEP<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("rs_cep")}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <Controller
                                 name="rs_cep"
                                 control={control}
-                                defaultValue=""
-                                render={({ field: { onChange, value } }) => (
-                                  <InputMask
-                                    mask="99999-999"
-                                    maskChar={null}
-                                    value={value}
-                                    onChange={(e) => {
-                                      const justNumbers =
-                                        e.target.value.replace(/\D/g, "");
-                                      onChange(justNumbers);
-                                    }}
-                                  >
-                                    {(inputProps) => (
-                                      <input
-                                        {...inputProps}
-                                        type="text"
-                                        aria-invalid={
-                                          errors.value ? "true" : "false"
-                                        }
-                                      />
-                                    )}
-                                  </InputMask>
+                                rules={{
+                                  required: "Campo obrigatório",
+                                }}
+                                render={({
+                                  field: { onChange, value },
+                                  fieldState: { error },
+                                }) => (
+                                  <>
+                                    <InputMask
+                                      mask="99999-999"
+                                      maskChar={null}
+                                      value={value}
+                                      onChange={(e) => {
+                                        const justNumbers =
+                                          e.target.value.replace(/\D/g, "");
+                                        onChange(justNumbers);
+                                      }}
+                                    >
+                                      {(inputProps) => (
+                                        <input {...inputProps} type="text" />
+                                      )}
+                                    </InputMask>
+                                    {error && <span>{error.message}</span>}
+                                  </>
                                 )}
                               />
                             </InputP>
@@ -1937,11 +1945,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Endereço<span> *</span>
                               </label>
                               <input
-                                {...register("rs_endereco")}
-                                // defaultValue={dadosMunicipio?.rs_endereco}
-                                onChange={handleOnChange}
+                                {...register("rs_endereco", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.rs_endereco && (
+                                <span>{errors.rs_endereco.message}</span>
+                              )}
                             </InputM>
                           </td>
                           <td>
@@ -1950,11 +1961,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Número<span> *</span>
                               </label>
                               <input
-                                {...register("rs_numero")}
-                                // defaultValue={dadosMunicipio?.rs_numero}
-                                onChange={handleOnChange}
+                                {...register("rs_numero", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.rs_numero && (
+                                <span>{errors.rs_numero.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -1963,11 +1977,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Bairro<span> *</span>
                               </label>
                               <input
-                                {...register("rs_bairro")}
-                                // defaultValue={dadosMunicipio?.rs_bairro}
-                                onChange={handleOnChange}
+                                {...register("rs_bairro", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.rs_bairro && (
+                                <span>{errors.rs_bairro.message}</span>
+                              )}
                             </InputM>
                           </td>
                         </tr>
@@ -1982,11 +1999,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Nome do Responsável<span> *</span>
                               </label>
                               <input
-                                {...register("rs_responsavel")}
-                                // defaultValue={dadosMunicipio?.rs_responsavel}
-                                onChange={handleOnChange}
+                                {...register("rs_responsavel", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.rs_responsavel && (
+                                <span>{errors.rs_responsavel.message}</span>
+                              )}
                             </InputG>
                           </td>
                           <td>
@@ -1995,11 +2015,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                                 Cargo<span> *</span>
                               </label>
                               <input
-                                {...register("rs_cargo")}
-                                // defaultValue={dadosMunicipio?.rs_cargo}
-                                onChange={handleOnChange}
+                                {...register("rs_cargo", {
+                                  required: "Campo obrigatório",
+                                })}
                                 type="text"
                               ></input>
+                              {errors.rs_cargo && (
+                                <span>{errors.rs_cargo.message}</span>
+                              )}
                             </InputP>
                           </td>
                           <td>
@@ -2007,22 +2030,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                               <label>
                                 Email<span> *</span>
                               </label>
-                              {/* <input
-                                {...register("rs_email")}                          
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input> */}
+
                               <input
-                                aria-invalid={errors.value ? "true" : "false"}
                                 {...register("rs_email", {
-                                  required: false,
                                   pattern: {
                                     value:
                                       /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                                     message: "Endereço de email inválido",
                                   },
                                 })}
-                                type="email"
+                                type="text"
                               />
                               {errors.rs_email && errors.rs_email.type && (
                                 <span>O campo é obrigatório!</span>
@@ -2049,7 +2066,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           : handleNext
                       }
                     >
-                      {activeStep === steps.length - 1 ? "Gravar" : "Gravar"}
+                      {activeStep === steps.length - 1 ? "Gravar" : "Próximo"}
                     </StepperButton>
                   </StepperNavigation>
                 </StepperContainer>
@@ -2063,8 +2080,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </DivTituloForm>
               <input
                 {...register("id_regulador_fiscalizador_ss")}
-                // defaultValue={dadosMunicipio?.id_regulador_fiscalizador_ss}
-                onChange={handleOnChange}
                 type="hidden"
               />
               <table>
@@ -2076,9 +2091,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Setor Responsável<span> *</span>
                         </label>
                         <input
-                          {...register("rf_setor_responsavel")}
-                          // defaultValue={dadosMunicipio?.rf_setor_responsavel}
-                          // onChange={handleOnChange}
+                          {...register("rf_setor_responsavel", {
+                            required: "Campo obrigatório",
+                          })}
                           type="text"
                           style={{ textTransform: "capitalize" }}
                           onChange={(e) => {
@@ -2086,6 +2101,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                             setValue("rf_setor_responsavel", value);
                           }}
                         ></input>
+                        {errors.rf_setor_responsavel && (
+                          <span>{errors.rf_setor_responsavel.message}</span>
+                        )}
                       </InputG>
                     </td>
                     <td>
@@ -2093,38 +2111,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>
                           Telefone Comercial<span> *</span>
                         </label>
-                        {/* <input
-                          {...register("rf_telefone_comercial")}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input> */}
+
                         <Controller
                           name="rf_telefone_comercial"
                           control={control}
-                          defaultValue=""
-                          render={({ field: { onChange, value } }) => (
-                            <InputMask
-                              mask="(99) 99999-9999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                if (justNumbers.length <= 11) {
-                                  onChange(justNumbers);
-                                }
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input
-                                  {...inputProps}
-                                  type="text"
-                                  aria-invalid={errors.value ? "true" : "false"}
-                                />
-                              )}
-                            </InputMask>
+                          rules={{ required: "O telefone é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="(99) 99999-9999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  if (justNumbers.length <= 11) {
+                                    onChange(justNumbers);
+                                  }
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <input {...inputProps} type="text" />
+                                )}
+                              </InputMask>
+                              {error && <span>{error.message}</span>}
+                            </>
                           )}
                         />
                       </InputP>
@@ -2142,15 +2158,18 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Nome do Responsável<span> *</span>
                         </label>
                         <input
-                          {...register("rf_responsavel")}
-                          // defaultValue={dadosMunicipio?.rf_responsavel}
-                          // onChange={handleOnChange}
+                          {...register("rf_responsavel", {
+                            required: "Campo obrigatório",
+                          })}
                           type="text"
                           onChange={(e) => {
                             const value = toTitleCase(e.target.value);
                             setValue("rf_responsavel", value);
                           }}
                         ></input>
+                        {errors.rf_responsavel && (
+                          <span>{errors.rf_responsavel.message}</span>
+                        )}
                       </InputG>
                     </td>
                     <td>
@@ -2159,15 +2178,18 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                           Cargo<span> *</span>
                         </label>
                         <input
-                          {...register("rf_cargo")}
-                          // defaultValue={dadosMunicipio?.rf_cargo}
-                          // onChange={handleOnChange}
+                          {...register("rf_cargo", {
+                            required: "Campo obrigatório",
+                          })}
                           type="text"
                           onChange={(e) => {
                             const value = toTitleCase(e.target.value);
-                            setValue("rf_responsavel", value);
+                            setValue("rf_cargo", value);
                           }}
                         ></input>
+                        {errors.rf_cargo && (
+                          <span>{errors.rf_cargo.message}</span>
+                        )}
                       </InputM>
                     </td>
                     <td>
@@ -2175,38 +2197,36 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>
                           Telefone<span> *</span>
                         </label>
-                        {/* <input
-                          {...register("rf_telefone")}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input> */}
+
                         <Controller
                           name="rf_telefone"
                           control={control}
-                          defaultValue=""
-                          render={({ field: { onChange, value } }) => (
-                            <InputMask
-                              mask="(99) 99999-9999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                if (justNumbers.length <= 11) {
-                                  onChange(justNumbers);
-                                }
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input
-                                  {...inputProps}
-                                  type="text"
-                                  aria-invalid={errors.value ? "true" : "false"}
-                                />
-                              )}
-                            </InputMask>
+                          rules={{ required: "O telefone é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="(99) 99999-9999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  if (justNumbers.length <= 11) {
+                                    onChange(justNumbers);
+                                  }
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <input {...inputProps} type="text" />
+                                )}
+                              </InputMask>
+                              {error && <span>{error.message}</span>}
+                            </>
                           )}
                         />
                       </InputP>
@@ -2223,24 +2243,19 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>
                           Email<span> *</span>
                         </label>
-                        {/* <input
-                          {...register("rf_email")}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input> */}
+
                         <input
-                          aria-invalid={errors.value ? "true" : "false"}
                           {...register("rf_email", {
-                            required: false,
+                            required: "Campo obrigatório",
                             pattern: {
                               value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                               message: "Endereço de email inválido",
                             },
                           })}
-                          type="email"
+                          type="text"
                         />
-                        {errors.rf_email && errors.rf_email.type && (
-                          <span>O campo é obrigatório!</span>
+                        {errors.rf_email && (
+                          <span>{errors.rf_email.message}</span>
                         )}
                       </InputG>
                     </td>
@@ -2259,12 +2274,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         </label>
                         <TextArea>
                           <textarea
-                            {...register("rf_descricao")}
-                            // defaultValue={dadosMunicipio?.rf_descricao}
-                            onChange={handleOnChange}
+                            {...register("rf_descricao", {
+                              required: "Campo obrigatório",
+                            })}
                             name="rf_descricao"
                           />
                         </TextArea>
+                        {errors.rf_descricao && (
+                          <span>{errors.rf_descricao.message}</span>
+                        )}
                       </DivTextArea>
                     </td>
                   </tr>
@@ -2281,59 +2299,57 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <DivTituloForm>
                 Controle Social dos Serviços Municipais de Saneamento Básico
               </DivTituloForm>
-              <input
-                {...register("id_controle_social_sms")}
-                onChange={handleOnChange}
-                type="hidden"
-              />
+              <input {...register("id_controle_social_sms")} type="hidden" />
               <InputG>
                 <label>
                   Setor Responsável<span> *</span>
                 </label>
                 <input
-                  {...register("cs_setor_responsavel")}
+                  {...register("cs_setor_responsavel", {
+                    required: "Campo obrigatório",
+                  })}
                   style={{ textTransform: "capitalize" }}
                   onChange={(e) => {
                     const value = toTitleCase(e.target.value);
-                    setValue("municipio_nome_prefeitura", value);
+                    setValue("cs_setor_responsavel", value);
                   }}
                   onKeyPress={onlyLettersAndCharacters}
                   type="text"
                 ></input>
+                {errors.cs_setor_responsavel && (
+                  <span>{errors.cs_setor_responsavel.message}</span>
+                )}
               </InputG>
+
               <InputP>
                 <label>
                   Telefone<span> *</span>
                 </label>
-                {/* <input
-                  {...register("cs_telefone")}
-                  onChange={handleOnChange}
-                  type="text"
-                ></input> */}
+
                 <Controller
-                  name="cs_telefone"
+                  name="simisab_telefone"
                   control={control}
-                  defaultValue=""
-                  render={({ field: { onChange, value } }) => (
-                    <InputMask
-                      mask="(99) 99999-9999"
-                      maskChar={null}
-                      value={value}
-                      onChange={(e) => {
-                        const justNumbers = e.target.value.replace(/\D/g, "");
-                        if (justNumbers.length <= 11) {
-                          onChange(justNumbers);
-                        }
-                      }}
-                    >
-                      {(inputProps) => (
-                        <input
-                          {...inputProps}
-                          type="text"
-                          aria-invalid={errors.value ? "true" : "false"}
-                        />
-                      )}
-                    </InputMask>
+                  rules={{ required: "O telefone é obrigatório" }}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => (
+                    <>
+                      <InputMask
+                        mask="(99) 99999-9999"
+                        maskChar={null}
+                        value={value}
+                        onChange={(e) => {
+                          const justNumbers = e.target.value.replace(/\D/g, "");
+                          if (justNumbers.length <= 11) {
+                            onChange(justNumbers);
+                          }
+                        }}
+                      >
+                        {(inputProps) => <input {...inputProps} type="text" />}
+                      </InputMask>
+                      {error && <span>{error.message}</span>}
+                    </>
                   )}
                 />
               </InputP>
@@ -2341,24 +2357,19 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 <label>
                   Email<span> *</span>
                 </label>
-                {/* <input
-                  {...register("cs_email")}
-                  onChange={handleOnChange}
-                  type="text"
-                ></input> */}
+
                 <input
-                  aria-invalid={errors.value ? "true" : "false"}
                   {...register("cs_email", {
-                    required: false,
+                    required: "Campo obrigatório",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                       message: "Endereço de email inválido",
                     },
                   })}
-                  type="email"
+                  type="text"
                 />
                 {errors.cs_email && errors.cs_email.type && (
-                  <span>O campo é obrigatório!</span>
+                  <span>{errors.cs_email.message}</span>
                 )}
               </InputG>
               <SubmitButtonContainer>
@@ -2369,60 +2380,57 @@ export default function Cadastro({ municipio }: MunicipioProps) {
             </DivFormCadastro>
             <DivFormCadastro active={activeForm === "controleSocial"}>
               <DivTituloForm>Responsável Técnico do SIMISAB</DivTituloForm>
-              <input
-                {...register("id_responsavel_simisab")}
-                // defaultValue={dadosMunicipio?.id_responsavel_simisab}
-                onChange={handleOnChange}
-                type="hidden"
-              />
+              <input {...register("id_responsavel_simisab")} type="hidden" />
               <InputG>
                 <label>
                   Nome<span> *</span>
                 </label>
                 <input
-                  {...register("simisab_responsavel")}
+                  {...register("simisab_responsavel", {
+                    required: "Campo obrigatório",
+                  })}
                   onKeyPress={onlyLettersAndCharacters}
                   style={{ textTransform: "capitalize" }}
                   onChange={(e) => {
                     const value = toTitleCase(e.target.value);
-                    setValue("municipio_nome_prefeitura", value);
+                    setValue("simisab_responsavel", value);
                   }}
                   type="text"
                 ></input>
+                {errors.simisab_responsavel && (
+                  <span>{errors.simisab_responsavel.message}</span>
+                )}
               </InputG>
+
               <InputP>
                 <label>
                   Telefone<span> *</span>
                 </label>
-                {/* <input
-                  {...register("simisab_telefone")}
-                  onChange={handleOnChange}
-                  type="text"
-                ></input> */}
+
                 <Controller
-                  name="simisab_telefone"
+                  name="cs_telefone"
                   control={control}
-                  defaultValue=""
-                  render={({ field: { onChange, value } }) => (
-                    <InputMask
-                      mask="(99) 99999-9999"
-                      maskChar={null}
-                      value={value}
-                      onChange={(e) => {
-                        const justNumbers = e.target.value.replace(/\D/g, "");
-                        if (justNumbers.length <= 11) {
-                          onChange(justNumbers);
-                        }
-                      }}
-                    >
-                      {(inputProps) => (
-                        <input
-                          {...inputProps}
-                          type="text"
-                          aria-invalid={errors.value ? "true" : "false"}
-                        />
-                      )}
-                    </InputMask>
+                  rules={{ required: "O telefone é obrigatório" }}
+                  render={({
+                    field: { onChange, value },
+                    fieldState: { error },
+                  }) => (
+                    <>
+                      <InputMask
+                        mask="(99) 99999-9999"
+                        maskChar={null}
+                        value={value}
+                        onChange={(e) => {
+                          const justNumbers = e.target.value.replace(/\D/g, "");
+                          if (justNumbers.length <= 11) {
+                            onChange(justNumbers);
+                          }
+                        }}
+                      >
+                        {(inputProps) => <input {...inputProps} type="text" />}
+                      </InputMask>
+                      {error && <span>{error.message}</span>}
+                    </>
                   )}
                 />
               </InputP>
@@ -2430,24 +2438,19 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 <label>
                   Email<span> *</span>
                 </label>
-                {/* <input
-                  {...register("simisab_email")}
-                  onChange={handleOnChange}
-                  type="text"
-                ></input> */}
+
                 <input
-                  aria-invalid={errors.value ? "true" : "false"}
                   {...register("simisab_email", {
-                    required: false,
+                    required: "Campo obrigatório",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                       message: "Endereço de email inválido",
                     },
                   })}
-                  type="email"
+                  type="text"
                 />
-                {errors.simisab_email && errors.simisab_email.type && (
-                  <span>O campo é obrigatório!</span>
+                {errors.simisab_email && (
+                  <span>{errors.simisab_email.message}</span>
                 )}
               </InputG>
               <SubmitButtonContainer>
@@ -2461,8 +2464,6 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <DivTituloForm>Dados Demográficos</DivTituloForm>
               <input
                 {...register("id_dados_demograficos")}
-                // defaultValue={dadosMunicipio?.id_dados_demograficos}
-                onChange={handleOnChange}
                 type="hidden"
                 name="id_dados_demograficos"
               />
@@ -2471,7 +2472,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   População Urbana<span> *</span>
                 </label>
                 <input
-                  {...register("dd_populacao_urbana")}
+                  {...register("dd_populacao_urbana", {
+                    required: "Campo obrigatório",
+                  })}
                   type="text"
                   name="dd_populacao_urbana"
                   onKeyPress={(e) => {
@@ -2481,12 +2484,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   }}
                 ></input>
               </InputM>
+              {errors.dd_populacao_urbana && (
+                <span>{errors.dd_populacao_urbana.message}</span>
+              )}
               <InputM>
                 <label>
                   População Rural<span> *</span>
                 </label>
                 <input
-                  {...register("dd_populacao_rural")}
+                  {...register("dd_populacao_rural", {
+                    required: "Campo obrigatório",
+                  })}
                   type="text"
                   name="dd_populacao_rural"
                   onKeyPress={(e) => {
@@ -2496,22 +2504,18 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   }}
                 ></input>
               </InputM>
+              {errors.dd_populacao_rural && (
+                <span>{errors.dd_populacao_rural.message}</span>
+              )}
               <InputM>
                 <label>
                   População Total<span> *</span>
                 </label>
                 <input
                   {...register("dd_populacao_total")}
-                  // defaultValue={dadosMunicipio?.dd_populacao_total}
-                  onChange={handleOnChange}
                   type="text"
                   disabled={true}
                   readOnly
-                  // onKeyPress={(e) => {
-                  //   if (!/[0-9]/.test(e.key)) {
-                  //     e.preventDefault();
-                  //   }
-                  // }}
                 ></input>
               </InputM>
               <InputM>
@@ -2519,9 +2523,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   Total de Moradias<span> *</span>
                 </label>
                 <input
-                  {...register("dd_total_moradias")}
-                  // defaultValue={dadosMunicipio?.dd_total_moradias}
-                  onChange={handleOnChange}
+                  {...register("dd_total_moradias", {
+                    required: "Campo obrigatório",
+                  })}
                   type="text"
                   name="dd_total_moradias"
                   onKeyPress={(e) => {
@@ -2531,6 +2535,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   }}
                 ></input>
               </InputM>
+              {errors.dd_total_moradias && (
+                <span>{errors.dd_total_moradias.message}</span>
+              )}
 
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (

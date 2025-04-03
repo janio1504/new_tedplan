@@ -8,4 +8,5 @@ export type InfoIndicador = {
   id_imagem?: number;
   finalidade: string;
   limitacoes: string;
+  metodo_calculo: string;
 };

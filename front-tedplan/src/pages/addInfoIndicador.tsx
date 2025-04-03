@@ -98,7 +98,8 @@ export default function AddIndicador() {
     const loadIndicador = async () => {
       if (id) {
         try {
-          const response = await currentInfoIndicador(id);
+          const numericId = Number(id);
+          const response = await currentInfoIndicador(numericId);
 
           const indicador = response[0];
 
