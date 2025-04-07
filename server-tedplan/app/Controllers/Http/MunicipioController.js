@@ -115,10 +115,45 @@ class MunicipioController {
           "simisab_telefone as simisab_telefone",
           "simisab_email as simisab_email",
 
-          "populacao_urbana as dd_populacao_urbana",
-          "populacao_rural as dd_populacao_rural",
-          "populacao_total as dd_populacao_total",
-          "total_moradias as dd_total_moradias"
+          "dd.populacao_urbana as dd_populacao_urbana",
+          "dd.populacao_rural as dd_populacao_rural",
+          "dd.populacao_total as dd_populacao_total",
+          "dd.total_moradias as dd_total_moradias",
+          
+          // Campos de dados demográficos completos
+          "dd.ogm4001 as OGM4001",
+          "dd.ogm4002 as OGM4002",
+          "dd.ogm4003 as OGM4003",
+          "dd.ogm4004 as OGM4004",
+          "dd.ogm4005 as OGM4005",
+          "dd.ogm4006 as OGM4006",
+          "dd.ogm4007 as OGM4007",
+          "dd.ogm4008 as OGM4008",
+          "dd.ogm4009 as OGM4009",
+          
+          // Campos de dados geográficos completos
+          "dg.id_dados_geograficos as id_dados_geograficos",
+          "dg.ogm0001 as OGM0001",
+          "dg.ogm0002 as OGM0002",
+          "dg.ogm0003 as OGM0003",
+          "dg.ogm0004 as OGM0004",
+          "dg.ogm0005 as OGM0005",
+          "dg.ogm0006 as OGM0006",
+          "dg.ogm0007 as OGM0007",
+          "dg.ogm0008 as OGM0008",
+          "dg.ogm0009 as OGM0009",
+          "dg.ogm0010 as OGM0010",
+          "dg.ogm0011 as OGM0011",
+          "dg.ogm0012 as OGM0012",
+          "dg.ogm0101 as OGM0101",
+          "dg.ogm0102 as OGM0102",
+          "dg.ogm0103 as OGM0103",
+          "dg.ogm0104 as OGM0104",
+          "dg.ogm0105 as OGM0105",
+          "dg.ogm0106 as OGM0106",
+          "dg.ogm0107 as OGM0107",
+          "dg.ogm0108 as OGM0108",
+          "dg.ogm0109 as OGM0109"
         )
         .from("tedplan.municipios as m")
         .where("m.id_municipio", id_municipio)
@@ -167,6 +202,11 @@ class MunicipioController {
           "m.id_municipio",
           "dd.id_municipio"
         )
+        .leftJoin(
+          "tedplan.dados_geograficos as dg",
+          "m.id_municipio",
+          "dg.id_municipio"
+        )
         .fetch();
 
       return municipio;
@@ -176,9 +216,6 @@ class MunicipioController {
   }
 
   async store({ request, response }) {
-    console.log(request.all());
-
-
     const {
       //dados do municipio
       id_municipio,
@@ -290,6 +327,41 @@ class MunicipioController {
       dd_populacao_total,
       dd_total_moradias,
       dd_ano,
+      
+      // Novos campos OGM
+      OGM4001,
+      OGM4002,
+      OGM4003,
+      OGM4004,
+      OGM4005,
+      OGM4006,
+      OGM4007,
+      OGM4008,
+      OGM4009,
+      
+      // Dados geográficos
+      id_dados_geograficos,
+      OGM0001,
+      OGM0002,
+      OGM0003,
+      OGM0004,
+      OGM0005,
+      OGM0006,
+      OGM0007,
+      OGM0008,
+      OGM0009,
+      OGM0010,
+      OGM0011,
+      OGM0012,
+      OGM0101,
+      OGM0102,
+      OGM0103,
+      OGM0104,
+      OGM0105,
+      OGM0106,
+      OGM0107,
+      OGM0108,
+      OGM0109
     } = request.all();
 
     try {
@@ -358,6 +430,12 @@ class MunicipioController {
         addResponsavelSimisab();
       }
 
+      if (id_dados_geograficos) {
+        updateDadosGeograficos();
+      } else {
+        addDadosGeograficos();
+      }
+      
       if (id_dados_demograficos) {
         updateDadosDemograficos();
       } else {
@@ -629,7 +707,96 @@ class MunicipioController {
         });
     }
 
+    async function updateDadosGeograficos() {
+      const resDg = await Municipio.query()
+      .from("tedplan.dados_geograficos")
+      .where("id_municipio", id_municipio)
+      .where("id_dados_geograficos", id_dados_geograficos)
+      .fetch();
+      
+      if (resDg.rows.length === 0) {
+        return response.status(404).send({
+          message: "Dados geográficos não encontrados",
+        });
+      }
+      
+      const ogm = resDg.rows[0].toJSON();
+      
+      const ts = await Municipio.query()
+        .from("tedplan.dados_geograficos")
+        .where("id_municipio", id_municipio)
+        .where("id_dados_geograficos", id_dados_geograficos)
+        .update({
+        ogm0001: OGM0001 ? OGM0001 : ogm.ogm0001,
+        ogm0002: OGM0002 ? OGM0002 : ogm.ogm0002,
+        ogm0003: OGM0003 ? OGM0003 : ogm.ogm0003,
+        ogm0004: OGM0004 ? OGM0004 : ogm.ogm0004,
+        ogm0005: OGM0005 ? OGM0005 : ogm.ogm0005,
+        ogm0006: OGM0006 ? OGM0006 : ogm.ogm0006,
+        ogm0007: OGM0007 ? OGM0007 : ogm.ogm0007,
+        ogm0008: OGM0008 ? OGM0008 : ogm.ogm0008,
+        ogm0009: OGM0009 ? OGM0009 : ogm.ogm0009,
+        ogm0010: OGM0010 ? OGM0010 : ogm.ogm0010,
+        ogm0011: OGM0011 ? OGM0011 : ogm.ogm0011,
+        ogm0012: OGM0012 ? OGM0012 : ogm.ogm0012,
+        ogm0101: OGM0101 ? OGM0101 : ogm.ogm0101,
+        ogm0102: OGM0102 ? OGM0102 : ogm.ogm0102,
+        ogm0103: OGM0103 ? OGM0103 : ogm.ogm0103,
+        ogm0104: OGM0104 ? OGM0104 : ogm.ogm0104,
+        ogm0105: OGM0105 ? OGM0105 : ogm.ogm0105,
+        ogm0106: OGM0106 ? OGM0106 : ogm.ogm0106,
+        ogm0107: OGM0107 ? OGM0107 : ogm.ogm0107,
+        ogm0108: OGM0108 ? OGM0108 : ogm.ogm0108,
+        ogm0109: OGM0109 ? OGM0109 : ogm.ogm0109
+        });
+      
+    }
+    
+    async function addDadosGeograficos() {
+      const ts = await Municipio.query()
+        .from("tedplan.dados_geograficos")
+        .insert({
+          ogm0001: OGM0001,
+          ogm0002: OGM0002,
+          ogm0003: OGM0003,
+          ogm0004: OGM0004,
+          ogm0005: OGM0005,
+          ogm0006: OGM0006,
+          ogm0007: OGM0007,
+          ogm0008: OGM0008,
+          ogm0009: OGM0009,
+          ogm0010: OGM0010,
+          ogm0011: OGM0011,
+          ogm0012: OGM0012,
+          ogm0101: OGM0101,
+          ogm0102: OGM0102,
+          ogm0103: OGM0103,
+          ogm0104: OGM0104,
+          ogm0105: OGM0105,
+          ogm0106: OGM0106,
+          ogm0107: OGM0107,
+          ogm0108: OGM0108,
+          ogm0109: OGM0109,
+          id_municipio: id_municipio,
+        });
+    }
+
     async function updateDadosDemograficos() {
+
+      const resDd = await Municipio.query()
+        .from("tedplan.dados_demograficos")
+        .where("id_municipio", id_municipio)
+        .where("id_dados_demograficos", id_dados_demograficos)
+        .fetch();
+
+      if (resDd.rows.length === 0) {
+        response.status(404).send({
+          message: "Dados demograficos não encontrados",
+        });
+      }
+
+        const omg = resDd.rows[0].toJSON();
+        
       const ts = await Municipio.query()
         .from("tedplan.dados_demograficos")
         .where("id_municipio", id_municipio)
@@ -639,8 +806,21 @@ class MunicipioController {
           populacao_rural: dd_populacao_rural,
           populacao_total: dd_populacao_total,
           total_moradias: dd_total_moradias,
+          // Novos campos OGM
+          ogm4001: OGM4001 ? OGM4001 : omg.ogm4001,
+          ogm4002: OGM4002 ? OGM4002 : omg.ogm4002,
+          ogm4003: OGM4003 ? OGM4003 : omg.ogm4003,
+          ogm4004: OGM4004 ? OGM4004 : omg.ogm4004,
+          ogm4005: OGM4005 ? OGM4005 : omg.ogm4005,
+          ogm4006: OGM4006 ? OGM4006 : omg.ogm4006,
+          ogm4007: OGM4007 ? OGM4007 : omg.ogm4007,
+          ogm4008: OGM4008 ? OGM4008 : omg.ogm4008,
+          ogm4009: OGM4009 ? OGM4009 : omg.ogm4009
+         
         });
+      
     }
+    
     async function addDadosDemograficos() {
       const ts = await Municipio.query()
         .from("tedplan.dados_demograficos")
@@ -649,6 +829,16 @@ class MunicipioController {
           populacao_rural: dd_populacao_rural,
           populacao_total: dd_populacao_total,
           total_moradias: dd_total_moradias,
+          // Novos campos OGM
+          ogm4001: OGM4001,
+          ogm4002: OGM4002,
+          ogm4003: OGM4003,
+          ogm4004: OGM4004,
+          ogm4005: OGM4005,
+          ogm4006: OGM4006,
+          ogm4007: OGM4007,
+          ogm4008: OGM4008,
+          ogm4009: OGM4009,
           id_municipio: id_municipio,
         });
     }

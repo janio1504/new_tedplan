@@ -39,6 +39,7 @@ import { useMunicipio } from "../../contexts/MunicipioContext";
 const InputMask = require("react-input-mask");
 // import InputMask from "react-input-mask";
 import { onlyLettersAndCharacters, toTitleCase } from "@/util/util";
+import api from "@/services/api";
 interface MunicipioProps {
   municipio: Municipio;
 }
@@ -58,7 +59,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   const [activeForm, setActiveForm] = useState("dadosMunicipio");
   const { usuario, signOut } = useAuth();
   const [content, setContent] = useState("");
-  console.log(usuario?.id_permissao);
+  const [responsaveisSimisab, setResponsaveisSimisab] = useState<any[]>([]);
 
   const urbanPopulation = watch("dd_populacao_urbana");
   const ruralPopulation = watch("dd_populacao_rural");
@@ -96,6 +97,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         setValue(key as keyof Municipio, value);
       });
     }
+    getResponsaveisSimisab();
   }, [dadosMunicipio, setValue]);
 
   const handleNext = () => {
@@ -139,12 +141,28 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     }
   }
 
+  async function getResponsaveisSimisab() {
+    await api.get("get-responsaveis-simisab/"+usuario?.id_municipio)
+      .then((response) => {
+        setResponsaveisSimisab(response.data);        
+      })
+  }
+
   function handleOnChange(content) {
     setContent(content);
   }
 
-  async function handleSignOut() {
-    signOut();
+  async function getResSimisab(id) {
+   if(id){
+   let resSimisab = responsaveisSimisab.find(
+      (res) => res.id_usuario == id
+    );
+    if(resSimisab){
+      setValue("simisab_responsavel", resSimisab.nome);
+      setValue("simisab_telefone", resSimisab.telefone);
+      setValue("simisab_email", resSimisab.email);
+    }  
+  }
   }
 
   return (
@@ -191,7 +209,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         >
           Controle Social & Responsavel pelo SIMISAB
         </SidebarItem>
-
+        <SidebarItem
+          active={activeForm === "dadosGeograficos"}
+          onClick={() => setActiveForm("dadosGeograficos")}
+        >
+          Dados Geográficos
+        </SidebarItem>
         <SidebarItem
           active={activeForm === "dadosDemograficos"}
           onClick={() => setActiveForm("dadosDemograficos")}
@@ -2327,7 +2350,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
 
                 <Controller
-                  name="simisab_telefone"
+                  name="cs_telefone"
                   control={control}
                   rules={{ required: "O telefone é obrigatório" }}
                   render={({
@@ -2381,6 +2404,22 @@ export default function Cadastro({ municipio }: MunicipioProps) {
             <DivFormCadastro active={activeForm === "controleSocial"}>
               <DivTituloForm>Responsável Técnico do SIMISAB</DivTituloForm>
               <input {...register("id_responsavel_simisab")} type="hidden" />
+
+              <InputG>
+              <label>
+                  Usuarios Simisab
+              </label>
+              <select                
+                onChange={(e) => getResSimisab(e.target.value)}
+              > <option value="">Selecione um usuário para ser o responsavel Simisab</option>           
+                {responsaveisSimisab.map((resp) => (
+                  <option key={resp.id_usuario} value={resp.id_usuario}>
+                    {resp.nome}
+                  </option>
+                ))}
+              </select>
+              
+              </InputG>
               <InputG>
                 <label>
                   Nome<span> *</span>
@@ -2408,7 +2447,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </label>
 
                 <Controller
-                  name="cs_telefone"
+                  name="simisab_telefone"
                   control={control}
                   rules={{ required: "O telefone é obrigatório" }}
                   render={({
@@ -2460,6 +2499,491 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </SubmitButtonContainer>
             </DivFormCadastro>
 
+            <DivFormCadastro active={activeForm === "dadosGeograficos"}>
+              <DivTituloForm>Dados Geográficos</DivTituloForm>
+              <input
+                {...register("id_dados_geograficos")}
+                type="hidden"
+                name="id_dados_geograficos"
+              />
+              <table style={{marginBottom: "50px"}} >
+                <tbody>
+                  {/* GERAIS */}
+                  <tr>
+                    <td colSpan={4} style={{paddingTop: "25px", fontWeight: "bold"}}>Gerais</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Nome da mesorregião geográfica</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0001", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0001"
+                      />
+                      {errors.OGM0001 && (
+                        <span>{errors.OGM0001.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Nome da microrregião geográfica</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0002", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0002"
+                      />
+                      {errors.OGM0002 && (
+                        <span>{errors.OGM0002.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>O município pertence a uma Região Metropolitana (RM), Região Integrada de Desenvolvimento (RIDE), Aglomeração Urbana ou Microrregião legalmente instituída?</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <select style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0003", {
+                          required: "Campo obrigatório",
+                        })}
+                        name="OGM0003"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                      </select>
+                      {errors.OGM0003 && (
+                        <span>{errors.OGM0003.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Nome oficial (RM, RIDE, Aglomeração Urbana ou Microrregião)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0004", {
+                          required: watch("OGM0003") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0003") !== "Sim"}
+                        type="text"
+                        name="OGM0004"
+                      />
+                      {errors.OGM0004 && (
+                        <span>{errors.OGM0004.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Área territorial total</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0005", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0005"
+                        onKeyPress={(e) => {
+                          if (!/[0-9.]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0005 && (
+                        <span>{errors.OGM0005.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>km²</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Total de áreas urbanizadas</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0006", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0006"
+                        onKeyPress={(e) => {
+                          if (!/[0-9.]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0006 && (
+                        <span>{errors.OGM0006.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>km²</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de distritos em que se divide o município (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0007", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0007"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0007 && (
+                        <span>{errors.OGM0007.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>unidades</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de localidades urbanas existentes, inclusive à sede (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0008", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0008"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0008 && (
+                        <span>{errors.OGM0008.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>unidades</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de aglomerados rurais de características urbanas existentes (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0009", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0009"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0009 && (
+                        <span>{errors.OGM0009.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>unidades</td>
+                  </tr>
+
+                  {/* COTAS TOPOGRÁFICAS */}
+                  <tr>
+                    <td colSpan={4} style={{paddingTop: "25px", fontWeight: "bold"}}>Cotas topográficas, bacias hidrográficas e cursos d'água</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Cota altimétrica de referência</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0010", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0010"
+                        onKeyPress={(e) => {
+                          if (!/[0-9.]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0010 && (
+                        <span>{errors.OGM0010.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>m</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Cota altimétrica mínima</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0011", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0011"
+                        onKeyPress={(e) => {
+                          if (!/[0-9.]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0011 && (
+                        <span>{errors.OGM0011.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>m</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Cota altimétrica máxima</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0012", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM0012"
+                        onKeyPress={(e) => {
+                          if (!/[0-9.]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0012 && (
+                        <span>{errors.OGM0012.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>m</td>
+                  </tr>
+
+                  {/* COMUNIDADES ESPECIAIS */}
+                  <tr>
+                    <td colSpan={4} style={{paddingTop: "25px", fontWeight: "bold"}}>Comunidades especiais existentes no município</td>
+                  </tr>
+
+                  {/* ALDEIAS INDÍGENAS */}
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Existem Aldeias Indígenas no município?</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <select style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0101", {
+                          required: "Campo obrigatório",
+                        })}
+                        name="OGM0101"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                      </select>
+                      {errors.OGM0101 && (
+                        <span>{errors.OGM0101.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de moradias/habitações existente nas Aldeias Indígenas (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0102", {
+                          required: watch("OGM0101") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0101") !== "Sim"}
+                        type="text"
+                        name="OGM0102"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0102 && (
+                        <span>{errors.OGM0102.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>moradias</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>População permanente estimada nas Aldeias Indígenas (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0103", {
+                          required: watch("OGM0101") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0101") !== "Sim"}
+                        type="text"
+                        name="OGM0103"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0103 && (
+                        <span>{errors.OGM0103.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>habitantes</td>
+                  </tr>
+
+                  {/* COMUNIDADES QUILOMBOLAS */}
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Existem Comunidades Quilombolas no município?</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <select style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0104", {
+                          required: "Campo obrigatório",
+                        })}
+                        name="OGM0104"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                      </select>
+                      {errors.OGM0104 && (
+                        <span>{errors.OGM0104.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de moradias/habitações existente nas Comunidades Quilombolas (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0105", {
+                          required: watch("OGM0104") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0104") !== "Sim"}
+                        type="text"
+                        name="OGM0105"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0105 && (
+                        <span>{errors.OGM0105.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>moradias</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>População permanente estimada nas Comunidades Quilombolas (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0106", {
+                          required: watch("OGM0104") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0104") !== "Sim"}
+                        type="text"
+                        name="OGM0106"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0106 && (
+                        <span>{errors.OGM0106.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>habitantes</td>
+                  </tr>
+
+                  {/* COMUNIDADES EXTRATIVISTAS */}
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Existem Comunidades Extrativistas no município?</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <select style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0107", {
+                          required: "Campo obrigatório",
+                        })}
+                        name="OGM0107"
+                      >
+                        <option value="">Selecione</option>
+                        <option value="Sim">Sim</option>
+                        <option value="Não">Não</option>
+                      </select>
+                      {errors.OGM0107 && (
+                        <span>{errors.OGM0107.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de moradias/habitações existente nas Comunidades Extrativistas (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0108", {
+                          required: watch("OGM0107") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0107") !== "Sim"}
+                        type="text"
+                        name="OGM0108"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0108 && (
+                        <span>{errors.OGM0108.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>moradias</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>População permanente estimada nas Comunidades Extrativistas (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                      <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM0109", {
+                          required: watch("OGM0107") === "Sim" ? "Campo obrigatório" : false,
+                        })}
+                        disabled={watch("OGM0107") !== "Sim"}
+                        type="text"
+                        name="OGM0109"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      />
+                      {errors.OGM0109 && (
+                        <span>{errors.OGM0109.message}</span>
+                      )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>habitantes</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <SubmitButtonContainer>
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+            
             <DivFormCadastro active={activeForm === "dadosDemograficos"}>
               <DivTituloForm>Dados Demográficos</DivTituloForm>
               <input
@@ -2467,78 +2991,265 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 type="hidden"
                 name="id_dados_demograficos"
               />
-              <InputM>
-                <label>
-                  População Urbana<span> *</span>
-                </label>
-                <input
-                  {...register("dd_populacao_urbana", {
-                    required: "Campo obrigatório",
-                  })}
-                  type="text"
-                  name="dd_populacao_urbana"
-                  onKeyPress={(e) => {
-                    if (!/[0-9]/.test(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
-                ></input>
-              </InputM>
-              {errors.dd_populacao_urbana && (
-                <span>{errors.dd_populacao_urbana.message}</span>
-              )}
-              <InputM>
-                <label>
-                  População Rural<span> *</span>
-                </label>
-                <input
-                  {...register("dd_populacao_rural", {
-                    required: "Campo obrigatório",
-                  })}
-                  type="text"
-                  name="dd_populacao_rural"
-                  onKeyPress={(e) => {
-                    if (!/[0-9]/.test(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
-                ></input>
-              </InputM>
-              {errors.dd_populacao_rural && (
-                <span>{errors.dd_populacao_rural.message}</span>
-              )}
-              <InputM>
-                <label>
-                  População Total<span> *</span>
-                </label>
-                <input
-                  {...register("dd_populacao_total")}
-                  type="text"
-                  disabled={true}
-                  readOnly
-                ></input>
-              </InputM>
-              <InputM>
-                <label>
-                  Total de Moradias<span> *</span>
-                </label>
-                <input
-                  {...register("dd_total_moradias", {
-                    required: "Campo obrigatório",
-                  })}
-                  type="text"
-                  name="dd_total_moradias"
-                  onKeyPress={(e) => {
-                    if (!/[0-9]/.test(e.key)) {
-                      e.preventDefault();
-                    }
-                  }}
-                ></input>
-              </InputM>
-              {errors.dd_total_moradias && (
-                <span>{errors.dd_total_moradias.message}</span>
-              )}
+              <table style={{marginBottom: "50px"}} >
+                <tbody>
+                  <tr >
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>População Urbana<span> *</span></td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                      {...register("dd_populacao_urbana", {
+                        required: "Campo obrigatório",
+                      })}
+                      type="text"
+                      name="dd_populacao_urbana"
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    ></input>
+                     {errors.dd_populacao_urbana && (
+                        <span>{errors.dd_populacao_urbana.message}</span>
+                      )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}> População Rural<span> *</span></td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("dd_populacao_rural", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="dd_populacao_rural"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.dd_populacao_rural && (
+                          <span>{errors.dd_populacao_rural.message}</span>
+                        )}
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{paddingTop: "15px"}}> População Total<span> *</span></td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                      {...register("dd_populacao_total")}
+                      type="text"
+                      disabled={true}
+                      readOnly
+                    ></input>
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{paddingTop: "15px"}} >Total de Moradias<span> *</span></td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                          {...register("dd_total_moradias", {
+                            required: "Campo obrigatório",
+                          })}
+                          type="text"
+                          name="dd_total_moradias"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                      ></input>
+                        {errors.dd_total_moradias && (
+                          <span>{errors.dd_total_moradias.message}</span>
+                        )}
+                    </td>
+                    <td></td>
+                  </tr>
 
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>  Quantidade de estabelecimentos urbanos existente no município (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4001", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM4001"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.OGM4001 && (
+                          <span>{errors.OGM4001.message}</span>
+                        )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Unidades</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>   Quantidade de estabelecimentos rurais existente no município (previsão de coleta: a partir de 2025)</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4002", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM4002"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.OGM4002 && (
+                          <span>{errors.OGM4002.message}</span>
+                        )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Unidades</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>   Quantidade de estabelecimentos totais existente no município (previsão de coleta: a partir de 2025).</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4003")}
+                        type="text"
+                        name="OGM4003"
+                        disabled={true}
+                      ></input>
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Unidades</td>
+                  </tr>
+
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de domicílios urbanos existente no município.</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4004", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM4004"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.OGM4004 && (
+                          <span>{errors.OGM4004.message}</span>
+                        )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Domicílios</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de domicílios rurais existente no município.</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4005", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM4005"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.OGM4005 && (
+                          <span>{errors.OGM4005.message}</span>
+                        )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Domicílios</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Quantidade de domicílios totais existente no município.</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4006")}
+                        type="text"
+                        name="OGM4006"
+                        disabled={true}
+                      ></input>                     
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Domicílios</td>
+                  </tr>
+
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Extensão total de vias públicas urbanas com pavimento.</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4007", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM4007"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.OGM4007 && (
+                          <span>{errors.OGM4007.message}</span>
+                        )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Km</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}> Extensão total de vias públicas urbanas sem pavimento.</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4008", {
+                          required: "Campo obrigatório",
+                        })}
+                        type="text"
+                        name="OGM4008"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                       {errors.OGM4008 && (
+                          <span>{errors.OGM4008.message}</span>
+                        )}
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Km</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td style={{ paddingTop: "15px"}}>Extensão total de vias públicas urbanas (com e sem pavimento).</td>
+                    <td style={{ paddingTop: "0px", width: "150px"}}>
+                    <input style={{margin: "0px", width: "150px"}}
+                        {...register("OGM4009")}
+                        type="text"
+                        name="OGM4009"
+                       disabled={true}
+                      ></input>
+                    </td>
+                    <td style={{ paddingTop: "15px"}}>Km</td>
+                  </tr>
+                </tbody>
+              </table>
+
+             
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
                   <SubmitButton type="submit">Gravar</SubmitButton>
