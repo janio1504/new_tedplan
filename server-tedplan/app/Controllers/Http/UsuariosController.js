@@ -109,6 +109,43 @@ class UsuariosController {
 
   }
 
+  async getResponsaveisSimisab({ params }) {
+    
+    try {
+      const user = await Usuario.query()
+        .select(
+          "u.id_usuario",
+          "u.id_pessoa",
+          "p.nome",
+          "p.telefone",
+          "p.email"         
+        )
+        .from("tedplan.usuario as u")
+        .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
+        .innerJoin(
+          "tedplan.permissao_sistema as ps",
+          "u.id_usuario",
+          "ps.id_usuario"
+        )
+        .innerJoin(
+          "tedplan.permissoes as pss",
+          "ps.id_permissao",
+          "pss.id_permissao"
+        )
+        .where("u.id_municipio", params.id)
+        .where("pss.id_permissao", 3)
+        .fetch();
+
+
+      return user.toJSON();
+    } catch (error) {
+      console.log(error);
+
+    }
+
+
+  }
+
   async updatePermissoesUsuario({ request, response }) {
     try {
       const { id_usuario, id_sistema, ativo, id_permissao, id_municipio, senha } = request.all();

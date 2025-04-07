@@ -147,6 +147,8 @@ Route.post('codigo-snis', 'CodigoSnisController.create');
 Route.put('codigo-snis/:id', 'CodigoSnisController.update');
 Route.delete('codigo-snis/:id', 'CodigoSnisController.delete');
 
+Route.get("get-responsaveis-simisab/:id", "UsuariosController.getResponsaveisSimisab");
+
 // Rotas autenticadas ------------------------------- //
 Route.group(() => {
   Route.post("addPost", "PostsController.store");
