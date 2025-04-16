@@ -19,6 +19,7 @@ export type Municipio = {
   ts_cargo: string;
   ts_telefone: string;
   ts_email: string;
+  ts_funcao: string;
 
   //prestador do serviço de seneamento basico
   //abastecimento de agua
@@ -85,6 +86,7 @@ export type Municipio = {
   rf_telefone_comercial: string;
   rf_responsavel: string;
   rf_cargo: string;
+  rf_funcao: string;
   rf_telefone: string;
   rf_email: string;
   rf_descricao: string;
@@ -103,6 +105,11 @@ export type Municipio = {
   cs_setor_responsavel: string;
   cs_telefone: string;
   cs_email: string;
+
+  //Conselho Municipal de Saneamento
+  id_conselho_municipal: string;
+  possui_conselho: string;
+  descricao_outros: string;
 
   //Dados demográficos
   id_dados_demograficos: string;

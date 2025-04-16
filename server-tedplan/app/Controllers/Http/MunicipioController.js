@@ -15,6 +15,19 @@ class MunicipioController {
     try {
       const { id_municipio } = request.all();
 
+      if (!id_municipio) {
+        return response.status(400).json({
+          error: 'ID do município é obrigatório'
+        });
+      }
+
+      const municipioId = parseInt(id_municipio);
+      if (isNaN(municipioId)) {
+        return response.status(400).json({
+          error: 'ID do município inválido'
+        });
+      }
+
       const municipio = await Municipio.query()
         .select(
           "m.id_municipio",
@@ -26,6 +39,9 @@ class MunicipioController {
           "rfss.id_regulador_fiscalizador_ss",
           "id_controle_social_sms",
           "id_responsavel_simisab",
+          "id_conselho_municipal",
+          "cm.possui_conselho",
+          "cm.descricao_outros",
           "id_dados_demograficos",
 
           "m.nome as municipio_nome",
@@ -44,6 +60,7 @@ class MunicipioController {
           "tsms.telefone_comercial_tsms as ts_telefone_comercial",
           "tsms.nome_responsavel_tsms as ts_responsavel",
           "tsms.cargo_tsms as ts_cargo",
+          "tsms.funcao_tsms as ts_funcao",
           "tsms.telefone_tsms as ts_telefone",
           "tsms.email_tsms as ts_email",
 
@@ -103,6 +120,7 @@ class MunicipioController {
           "rfss.telefone_comercial as rf_telefone_comercial",
           "rfss.nome_responsavel as rf_responsavel",
           "rfss.cargo as rf_cargo",
+          "rfss.funcao as rf_funcao",
           "rfss.telefone as rf_telefone",
           "rfss.email as rf_email",
           "rfss.descricao as rf_descricao",
@@ -119,7 +137,7 @@ class MunicipioController {
           "dd.populacao_rural as dd_populacao_rural",
           "dd.populacao_total as dd_populacao_total",
           "dd.total_moradias as dd_total_moradias",
-          
+
           // Campos de dados demográficos completos
           "dd.ogm4001 as OGM4001",
           "dd.ogm4002 as OGM4002",
@@ -130,7 +148,7 @@ class MunicipioController {
           "dd.ogm4007 as OGM4007",
           "dd.ogm4008 as OGM4008",
           "dd.ogm4009 as OGM4009",
-          
+
           // Campos de dados geográficos completos
           "dg.id_dados_geograficos as id_dados_geograficos",
           "dg.ogm0001 as OGM0001",
@@ -196,6 +214,10 @@ class MunicipioController {
           "tedplan.responsavel_simisab as rs",
           "m.id_municipio",
           "rs.id_municipio"
+        ).leftJoin(
+          "tedplan.conselho_municipal as cm",
+          "m.id_municipio",
+          "cm.id_municipio"
         )
         .leftJoin(
           "tedplan.dados_demograficos as dd",
@@ -207,9 +229,15 @@ class MunicipioController {
           "m.id_municipio",
           "dg.id_municipio"
         )
-        .fetch();
+        .first();
 
-      return municipio;
+      if (!municipio) {
+        return response.status(404).json({
+          error: 'Dados do Município não encontrado'
+        });
+      }
+
+      return response.status(200).json(municipio);
     } catch (error) {
       console.log(error);
     }
@@ -236,6 +264,7 @@ class MunicipioController {
       ts_telefone_comercial,
       ts_responsavel,
       ts_cargo,
+      ts_funcao,
       ts_telefone,
       ts_email,
 
@@ -304,6 +333,7 @@ class MunicipioController {
       rf_telefone_comercial,
       rf_responsavel,
       rf_cargo,
+      rf_funcao,
       rf_telefone,
       rf_email,
       rf_descricao,
@@ -320,6 +350,11 @@ class MunicipioController {
       simisab_telefone,
       simisab_email,
 
+      //Conselho Municipal de Saneamento
+      id_conselho_municipal,
+      possui_conselho,
+      descricao_outros,
+
       //Dados demográficos
       id_dados_demograficos,
       dd_populacao_urbana,
@@ -327,7 +362,7 @@ class MunicipioController {
       dd_populacao_total,
       dd_total_moradias,
       dd_ano,
-      
+
       // Novos campos OGM
       OGM4001,
       OGM4002,
@@ -338,7 +373,7 @@ class MunicipioController {
       OGM4007,
       OGM4008,
       OGM4009,
-      
+
       // Dados geográficos
       id_dados_geograficos,
       OGM0001,
@@ -424,6 +459,12 @@ class MunicipioController {
         addControleSocial();
       }
 
+      if (id_conselho_municipal) {
+        updateConselhoMunicipal()
+      } else {
+        addConselhoMunicipal();
+      }
+
       if (id_responsavel_simisab) {
         updateResponsavelSimisab();
       } else {
@@ -435,7 +476,7 @@ class MunicipioController {
       } else {
         addDadosGeograficos();
       }
-      
+
       if (id_dados_demograficos) {
         updateDadosDemograficos();
       } else {
@@ -455,6 +496,7 @@ class MunicipioController {
           telefone_comercial_tsms: ts_telefone_comercial,
           nome_responsavel_tsms: ts_responsavel,
           cargo_tsms: ts_cargo,
+          funcao_tsms: ts_funcao,
           telefone_tsms: ts_telefone,
           email_tsms: ts_email,
         });
@@ -467,6 +509,7 @@ class MunicipioController {
           telefone_comercial_tsms: ts_telefone_comercial,
           nome_responsavel_tsms: ts_responsavel,
           cargo_tsms: ts_cargo,
+          funcao_tsms: ts_funcao,
           telefone_tsms: ts_telefone,
           email_tsms: ts_email,
           id_municipio: id_municipio,
@@ -643,6 +686,7 @@ class MunicipioController {
           telefone_comercial: rf_telefone_comercial,
           nome_responsavel: rf_responsavel,
           cargo: rf_cargo,
+          funcao: rf_funcao,
           telefone: rf_telefone,
           email: rf_email,
           descricao: rf_descricao,
@@ -656,6 +700,7 @@ class MunicipioController {
           telefone_comercial: rf_telefone_comercial,
           nome_responsavel: rf_responsavel,
           cargo: rf_cargo,
+          funcao: rf_funcao,
           telefone: rf_telefone,
           email: rf_email,
           descricao: rf_descricao,
@@ -707,51 +752,100 @@ class MunicipioController {
         });
     }
 
+
+
+
+    async function updateConselhoMunicipal() {
+      try {
+        if (!id_municipio || !id_conselho_municipal) {
+          throw new Error('Missing required IDs');
+        }
+
+        const ts = await Municipio.query()
+          .from("tedplan.conselho_municipal")
+          .where("id_municipio", id_municipio)
+          .where("id_conselho_municipal", id_conselho_municipal)
+          .update({
+            possui_conselho: possui_conselho,
+            descricao_outros: descricao_outros,
+            updated_at: new Date()
+          });
+
+        return ts;
+      } catch (error) {
+        console.error('Error updating conselho municipal:', error);
+        throw error;
+      }
+    }
+
+    async function addConselhoMunicipal() {
+      try {
+        if (!id_municipio) {
+          throw new Error('Missing municipio ID');
+        }
+
+        const ts = await Municipio.query()
+          .from("tedplan.conselho_municipal")
+          .insert({
+            possui_conselho: possui_conselho,
+            descricao_outros: descricao_outros,
+            id_municipio: id_municipio,
+            created_at: new Date(),
+            updated_at: new Date()
+          });
+
+        return ts;
+      } catch (error) {
+        console.error('Error adding conselho municipal:', error);
+        throw error;
+      }
+    }
+
     async function updateDadosGeograficos() {
       const resDg = await Municipio.query()
-      .from("tedplan.dados_geograficos")
-      .where("id_municipio", id_municipio)
-      .where("id_dados_geograficos", id_dados_geograficos)
-      .fetch();
-      
+        .from("tedplan.dados_geograficos")
+        .where("id_municipio", id_municipio)
+        .where("id_dados_geograficos", id_dados_geograficos)
+        .fetch();
+
       if (resDg.rows.length === 0) {
         return response.status(404).send({
           message: "Dados geográficos não encontrados",
         });
       }
-      
+
       const ogm = resDg.rows[0].toJSON();
-      
+
       const ts = await Municipio.query()
         .from("tedplan.dados_geograficos")
         .where("id_municipio", id_municipio)
         .where("id_dados_geograficos", id_dados_geograficos)
         .update({
-        ogm0001: OGM0001 ? OGM0001 : ogm.ogm0001,
-        ogm0002: OGM0002 ? OGM0002 : ogm.ogm0002,
-        ogm0003: OGM0003 ? OGM0003 : ogm.ogm0003,
-        ogm0004: OGM0004 ? OGM0004 : ogm.ogm0004,
-        ogm0005: OGM0005 ? OGM0005 : ogm.ogm0005,
-        ogm0006: OGM0006 ? OGM0006 : ogm.ogm0006,
-        ogm0007: OGM0007 ? OGM0007 : ogm.ogm0007,
-        ogm0008: OGM0008 ? OGM0008 : ogm.ogm0008,
-        ogm0009: OGM0009 ? OGM0009 : ogm.ogm0009,
-        ogm0010: OGM0010 ? OGM0010 : ogm.ogm0010,
-        ogm0011: OGM0011 ? OGM0011 : ogm.ogm0011,
-        ogm0012: OGM0012 ? OGM0012 : ogm.ogm0012,
-        ogm0101: OGM0101 ? OGM0101 : ogm.ogm0101,
-        ogm0102: OGM0102 ? OGM0102 : ogm.ogm0102,
-        ogm0103: OGM0103 ? OGM0103 : ogm.ogm0103,
-        ogm0104: OGM0104 ? OGM0104 : ogm.ogm0104,
-        ogm0105: OGM0105 ? OGM0105 : ogm.ogm0105,
-        ogm0106: OGM0106 ? OGM0106 : ogm.ogm0106,
-        ogm0107: OGM0107 ? OGM0107 : ogm.ogm0107,
-        ogm0108: OGM0108 ? OGM0108 : ogm.ogm0108,
-        ogm0109: OGM0109 ? OGM0109 : ogm.ogm0109
+          ogm0001: OGM0001 ? OGM0001 : ogm.ogm0001,
+          ogm0002: OGM0002 ? OGM0002 : ogm.ogm0002,
+          ogm0003: OGM0003 ? OGM0003 : ogm.ogm0003,
+          ogm0004: OGM0004 ? OGM0004 : ogm.ogm0004,
+          ogm0005: OGM0005 ? OGM0005 : ogm.ogm0005,
+          ogm0006: OGM0006 ? OGM0006 : ogm.ogm0006,
+          ogm0007: OGM0007 ? OGM0007 : ogm.ogm0007,
+          ogm0008: OGM0008 ? OGM0008 : ogm.ogm0008,
+          ogm0009: OGM0009 ? OGM0009 : ogm.ogm0009,
+          ogm0010: OGM0010 ? OGM0010 : ogm.ogm0010,
+          ogm0011: OGM0011 ? OGM0011 : ogm.ogm0011,
+          ogm0012: OGM0012 ? OGM0012 : ogm.ogm0012,
+          ogm0101: OGM0101 ? OGM0101 : ogm.ogm0101,
+          ogm0102: OGM0102 ? OGM0102 : ogm.ogm0102,
+          ogm0103: OGM0103 ? OGM0103 : ogm.ogm0103,
+          ogm0104: OGM0104 ? OGM0104 : ogm.ogm0104,
+          ogm0105: OGM0105 ? OGM0105 : ogm.ogm0105,
+          ogm0106: OGM0106 ? OGM0106 : ogm.ogm0106,
+          ogm0107: OGM0107 ? OGM0107 : ogm.ogm0107,
+          ogm0108: OGM0108 ? OGM0108 : ogm.ogm0108,
+          ogm0109: OGM0109 ? OGM0109 : ogm.ogm0109
         });
-      
+
     }
-    
+
     async function addDadosGeograficos() {
       const ts = await Municipio.query()
         .from("tedplan.dados_geograficos")
@@ -795,8 +889,8 @@ class MunicipioController {
         });
       }
 
-        const omg = resDd.rows[0].toJSON();
-        
+      const omg = resDd.rows[0].toJSON();
+
       const ts = await Municipio.query()
         .from("tedplan.dados_demograficos")
         .where("id_municipio", id_municipio)
@@ -816,11 +910,11 @@ class MunicipioController {
           ogm4007: OGM4007 ? OGM4007 : omg.ogm4007,
           ogm4008: OGM4008 ? OGM4008 : omg.ogm4008,
           ogm4009: OGM4009 ? OGM4009 : omg.ogm4009
-         
+
         });
-      
+
     }
-    
+
     async function addDadosDemograficos() {
       const ts = await Municipio.query()
         .from("tedplan.dados_demograficos")
