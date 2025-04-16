@@ -96,7 +96,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       const total = urban + rural;
 
       if (!isNaN(total)) {
-        setValue("", total.toString());
+        setValue("OGM4003", total.toString());
       }
     } catch (error) {
       console.error("Error calculating total population:", error);
