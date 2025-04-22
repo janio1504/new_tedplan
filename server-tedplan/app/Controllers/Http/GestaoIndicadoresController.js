@@ -6,6 +6,8 @@ const PoliticaMunicipal = use("App/Models/PoliticaMunicipal");
 const ParticipacaoControleSocial = use("App/Models/ParticipacaoControleSocial");
 const SaneamentoRural = use("App/Models/SaneamentoRural");
 const ComunidadesTradicionais = use("App/Models/ComunidadesTradicionais");
+const Cmsb = use("App/Models/ConselhoMunicipalSaneamentoBasico");
+const DataBase = use("App/Models/DatabaseTedplan");
 const Helpers = use("Helpers");
 const Fs = use("fs");
 const File = use("App/Models/File");
@@ -53,6 +55,7 @@ class GestaoIndicadoresController {
       } else {
         addComunidadesTradicionais();
       }
+
       async function addGa() {
         await GA.create({
           nome: nome_associacao,
@@ -222,6 +225,7 @@ class GestaoIndicadoresController {
   async addRepresentanteServicos({ request }) {
     try {
       const {
+        id_representante_servicos_ga,
         ga_nome_representante,
         ga_cargo,
         ga_telefone,
@@ -229,25 +233,29 @@ class GestaoIndicadoresController {
         id_municipio,
       } = request.all();
 
-      const rs = await RepresentanteServicos.create({
-        nome: ga_nome_representante,
-        cargo: ga_cargo,
-        telefone: ga_telefone,
-        email: ga_email,
-        id_municipio: id_municipio,
-      });
+      if (id_representante_servicos_ga) {
+        return await updateRepresentanteServicos(id_representante_servicos_ga);
+      } else {
+        const rs = await RepresentanteServicos.create({
+          nome: ga_nome_representante,
+          cargo: ga_cargo,
+          telefone: ga_telefone,
+          email: ga_email,
+          id_municipio: id_municipio,
+        });
 
-      return rs;
+        return rs;
+      }
     } catch (error) {
       console.log(error);
       return error;
     }
   }
 
-  async updateRepresentanteServicos() {
+  async updateRepresentanteServicos(id) {
     await RepresentanteServicos.query()
       .from("tedplan.representante_servicos_ga")
-      .where("id_municipio", id_municipio)
+      .where("id_representante_servicos_ga", id)
       .update({
         nome: ga_nome_representante,
         cargo: ga_cargo,
@@ -264,6 +272,259 @@ class GestaoIndicadoresController {
       .where("id_municipio", id_municipio)
       .fetch();
     return resGa;
+  }
+
+  async addConselhoMunicipal({ request, response }) {
+    try {
+      const { titulo, ano, id_municipio, operacao } = request.all();
+
+      if (request.file("arquivo")) {
+        const upload_file = request.file("arquivo", { size: "100mb" });
+        const fileName = `${Date.now()}.${upload_file.subtype}`;
+        await upload_file.move(Helpers.tmpPath("uploads"), {
+          name: fileName,
+        });
+        if (!upload_file.moved()) {
+          throw upload_file.error;
+        }
+
+        const file = await File.create({
+          file: fileName,
+          name: upload_file.clientName,
+          type: upload_file.type,
+          subtype: upload_file.subtype,
+        });
+        console.log(request.all());
+
+        await Cmsb.create({
+          titulo: titulo,
+          ano: ano,
+          id_municipio: id_municipio,
+          operacao: operacao,
+          id_arquivo: file.id,
+        });
+
+        return response.status(200).send({
+          message:
+            "Conselho Municipal de Saneamento Básico adicionado com sucesso",
+        });
+      }
+      return response.status(400).send({
+        message: "Erro ao adicionar o Conselho Municipal de Saneamento Básico",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async updateConselhoMunicipal({ request, response }) {
+    try {
+      const { id_conselho_municipal_saneamento_basico, titulo, ano, operacao } = request.all();
+      
+      const res = await Cmsb.query()
+        .from("tedplan.conselho_municipal_saneamento_basico")
+        .where("id_conselho_municipal_saneamento_basico", id_conselho_municipal_saneamento_basico)
+        .fetch();
+      const conselho = res.toJSON()[0];
+      if (!conselho) {
+        return response.status(404).send({
+          message: "Conselho Municipal de Saneamento Básico não encontrado",
+        });
+      }
+
+      await Cmsb.query()
+        .from("tedplan.conselho_municipal_saneamento_basico")
+        .where("id_conselho_municipal_saneamento_basico", id_conselho_municipal_saneamento_basico)
+        .update({
+          titulo: titulo ? titulo : conselho.titulo,
+          ano: ano ? ano : conselho.ano,
+          operacao: operacao ? operacao : conselho.operacao
+        });
+      return response.status(200).send({
+        message: "Conselho Municipal de Saneamento Básico atualizado com sucesso",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getConselhoMunicipal({ params }) {
+    const res = await DataBase.query()
+      .from("tedplan.conselho_municipal_saneamento_basico")
+      .where("id_conselho_municipal_saneamento_basico", params.id)
+      .fetch();
+    return res;
+  }
+
+  async getConselhosMunicipais({ params }) {
+    const res = await DataBase.query()
+      .from("tedplan.conselho_municipal_saneamento_basico")
+      .where("id_municipio", params.id)
+      .orderBy("id_conselho_municipal_saneamento_basico", "desc")
+      .fetch();
+    return res;
+  }
+
+
+
+  async destroyConselhoMunicipal({ params, response }) {
+    try {
+      const resConselho = await DataBase.query()
+        .from("tedplan.conselho_municipal_saneamento_basico")
+        .where("id_conselho_municipal_saneamento_basico", params.id)
+        .fetch();
+        const conselho = resConselho.toJSON()[0];
+        if(!conselho) {
+          return response.status(404).send({
+            message: "Conselho Municipal de Saneamento Básico não encontrado",
+          });
+        }
+      const id_arquivo = conselho.id_arquivo;
+      await DataBase.query()
+        .from("tedplan.conselho_municipal_saneamento_basico")
+        .where("id_conselho_municipal_saneamento_basico", params.id)
+        .delete();
+      
+      if (id_arquivo) {
+        const file = await File.findBy("id", id_arquivo);
+        if (file) {
+          Fs.unlinkSync(Helpers.tmpPath(`uploads/${file.file}`));
+          await file.delete();
+        }
+      }
+      return response.status(200).send({
+        message: "Conselho Municipal de Saneamento Básico removido com sucesso",
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async addPresidenciaConselhoMunicipal({ request, response }) {
+    try {
+      const {
+        nome_presidente,
+        setor_responsavel,
+        telefone_presidente,
+        email_presidente,
+        id_conselho_municipal_saneamento_basico,
+        integrantes,
+        id_municipio,
+      } = request.all();
+
+      const presidencia = await DataBase.query()
+        .from("tedplan.presidencia_conselho_municipal_saneamento_basico")
+        .where("id_municipio", id_municipio)
+        .insert({
+          nome_presidente: nome_presidente,
+          setor_responsavel: setor_responsavel,
+          telefone_presidente: telefone_presidente,
+          email_presidente: email_presidente,
+          id_conselho_municipal_saneamento_basico:
+            id_conselho_municipal_saneamento_basico,
+          integrantes: integrantes,
+          id_municipio: id_municipio,
+        });
+
+      return response.status(200).send({
+        message: "Presidência do Conselho Municipal adicionada com sucesso",
+        data: presidencia,
+      });
+    } catch (error) {
+      console.log(error);
+      return response.status(500).send({
+        message: "Erro ao adicionar a Presidência do Conselho Municipal",
+      });
+    }
+  }
+
+  async updatePresidenciaConselhoMunicipal({ request, response }) {
+    try {
+      const {
+        id_presidencia_conselho_municipal_saneamento_basico,
+        nome_presidente,
+        setor_responsavel,
+        telefone_presidente,
+        email_presidente,
+        id_conselho_municipal_saneamento_basico,
+        integrantes,
+        id_municipio,
+      } = request.all();
+
+      const res = await DataBase.query()
+        .from("tedplan.presidencia_conselho_municipal_saneamento_basico")
+        .where("id_presidencia_conselho_municipal_saneamento_basico", 
+          id_presidencia_conselho_municipal_saneamento_basico)
+        .fetch()
+      const presidencia = res[0];
+      if (!presidencia) {
+      await DataBase.query()
+        .from("tedplan.presidencia_conselho_municipal_saneamento_basico")
+        .where("id_presidencia_conselho_municipal_saneamento_basico", 
+          id_presidencia_conselho_municipal_saneamento_basico)
+        .update({
+          nome_presidente: nome_presidente ? nome_presidente : presidencia.nome_presidente,
+          setor_responsavel: setor_responsavel ? setor_responsavel : presidencia.setor_responsavel,
+          telefone_presidente: telefone_presidente
+            ? telefone_presidente
+            : presidencia.telefone_presidente,
+          email_presidente: email_presidente ? email_presidente : presidencia.email_presidente,
+          id_conselho_municipal_saneamento_basico:
+            id_conselho_municipal_saneamento_basico
+            ? id_conselho_municipal_saneamento_basico
+            : presidencia.id_conselho_municipal_saneamento_basico,
+          integrantes: integrantes ? integrantes : presidencia.integrantes,
+          id_municipio: id_municipio ? id_municipio : presidencia.id_municipio,
+        });
+       
+
+      return response.status(200).send({
+        message: "Presidência do Conselho Municipal atualizada com sucesso",
+      });
+    }
+      return response.status(404).send({
+        message: "Presidência do Conselho Municipal não encontrada",
+      });
+    } catch (error) {
+      console.log(error);
+      return response.status(500).send({
+        message: "Erro ao atualizar a Presidência do Conselho Municipal",
+      });
+    }
+  }
+
+  async getPresidenciaConselhoMunicipal({ params }) {
+    const res = await DataBase.query()
+      .from("tedplan.presidencia_conselho_municipal_saneamento_basico")
+      .where("id_presidencia_conselho_municipal_saneamento_basico", params.id)
+      .fetch();
+    return res;
+  }
+
+  async getAllPresidenciaConselhoMunicipal({ params }) {
+    const res = await DataBase.query()
+      .from("tedplan.presidencia_conselho_municipal_saneamento_basico")
+      .where("id_municipio", params.id)
+      .fetch();
+    return res;
+  }
+
+  async destroyPresidenciaConselhoMunicipal({ params, response }) {
+    try {
+       await DataBase.query()
+      .from("tedplan.presidencia_conselho_municipal_saneamento_basico")
+      .where("id_presidencia_conselho_municipal_saneamento_basico", params.id)
+      .delete();
+
+      return response.status(200).send({
+        message: "Presidência do Conselho Municipal removida com sucesso",
+      });
+    } catch (error) {
+      console.log(error);
+      return response.status(500).send({
+        message: "Erro ao remover a Presidência do Conselho Municipal",
+      });
+    }
   }
 
   async getPlanos({ request }) {
@@ -388,12 +649,14 @@ class GestaoIndicadoresController {
     }
   }
 
-  async destroyRepresentante({ request }){
+  async destroyRepresentante({ request }) {
     const { id } = request.all();
     try {
       const representante = await RepresentanteServicos.findBy(
-        "id_representante_servicos_ga", id)
-      await representante.delete()
+        "id_representante_servicos_ga",
+        id
+      );
+      await representante.delete();
     } catch (error) {
       console.log(error);
     }
