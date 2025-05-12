@@ -48,7 +48,11 @@ import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { FaFilePdf } from "react-icons/fa";
 import styled from "styled-components";
-import { onlyLettersAndCharacters, toTitleCase } from "@/util/util";
+import {
+  capitalizeFrasal,
+  onlyLettersAndCharacters,
+  toTitleCase,
+} from "@/util/util";
 const InputMask = require("react-input-mask");
 
 const ModalSubmitButton = styled.button`
@@ -650,8 +654,13 @@ export default function GestaoIndicadores({
                     <input
                       {...register("politica_titulo")}
                       defaultValue={dadosGestao?.politica_titulo}
-                      onChange={handleOnChange}
+                      onChange={(e) => {
+                        const value = capitalizeFrasal(e.target.value);
+                        setValue("politica_titulo", value);
+                      }}
                       type="text"
+                      //aceita apenas letras e caracteres especiais
+                      onKeyPress={onlyLettersAndCharacters}
                     ></input>
                   </InputG>
                 </td>
@@ -663,6 +672,12 @@ export default function GestaoIndicadores({
                       defaultValue={dadosGestao?.politica_ano}
                       onChange={handleOnChange}
                       type="text"
+                      //aceita apenas números
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     ></input>
                   </InputP>
                 </td>
@@ -806,13 +821,29 @@ export default function GestaoIndicadores({
                 <td>
                   <InputG>
                     <label>Titulo</label>
-                    <input {...register("pcs_titulo")} type="text"></input>
+                    <input
+                      {...register("pcs_titulo")}
+                      onChange={(e) => {
+                        const value = capitalizeFrasal(e.target.value);
+                        setValue("pcs_titulo", value);
+                      }}
+                      type="text"
+                      onKeyPress={onlyLettersAndCharacters}
+                    ></input>
                   </InputG>
                 </td>
                 <td>
                   <InputP>
                     <label>Ano</label>
-                    <input {...register("pcs_ano")} type="text"></input>
+                    <input
+                      {...register("pcs_ano")}
+                      type="text"
+                      onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    ></input>
                   </InputP>
                 </td>
                 <td>

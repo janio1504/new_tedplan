@@ -26,3 +26,16 @@ export const toTitleCase = (str: string) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 };
+
+export const capitalizeFrasal = (Frasal: string) => {
+  const lowerCaseWords = ["de", "da", "do", "das", "dos", "e"];
+
+  return Frasal.toLowerCase()
+    .split(" ")
+    .map((word) =>
+      lowerCaseWords.includes(word)
+        ? word
+        : word.charAt(0).toUpperCase() + word.slice(1)
+    )
+    .join(" ");
+};
