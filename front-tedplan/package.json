@@ -14,7 +14,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
     "@types/filesystem": "^0.0.32",
-    "@types/pdfmake": "^0.1.21",
+    "@types/pdfmake": "^0.2.11",
     "@uiw/react-md-editor": "^3.6.0",
     "axios": "^0.24.0",
     "base-64": "^1.0.0",

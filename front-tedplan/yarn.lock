@@ -576,10 +576,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/pdfmake@^0.1.21":
-  version "0.1.21"
-  resolved "https://registry.yarnpkg.com/@types/pdfmake/-/pdfmake-0.1.21.tgz#0bbcc05d47b3768c1c86b8a6a49dcdbc41a4b506"
-  integrity sha512-rDmJr/jzUZSg/AzWYAMVBS4z4weZKTOtrD6Jlt+hzZu87bkIe7WVA02+m+uGGopyTUazFoWYT6HXxwT68Nqfeg==
+"@types/pdfmake@^0.2.11":
+  version "0.2.11"
+  resolved "https://registry.yarnpkg.com/@types/pdfmake/-/pdfmake-0.2.11.tgz#ca5475efe44c966e88aed90040670f562ac1eebc"
+  integrity sha512-gglgMQhnG6C2kco13DJlvokqTxL+XKxHwCejElH8fSCNF9ZCkRK6Mzo011jQ0zuug+YlIgn6BpcpZrARyWdW3Q==
   dependencies:
     "@types/node" "*"
     "@types/pdfkit" "*"

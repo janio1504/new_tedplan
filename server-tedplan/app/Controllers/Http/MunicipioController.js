@@ -12,6 +12,7 @@ class MunicipioController {
   }
 
   async getMunicipio({ request, response }) {
+    
     try {
       const { id_municipio } = request.all();
 
@@ -39,9 +40,9 @@ class MunicipioController {
           "rfss.id_regulador_fiscalizador_ss",
           "id_controle_social_sms",
           "id_responsavel_simisab",
-          "id_conselho_municipal",
-          "cm.possui_conselho",
-          "cm.descricao_outros",
+          "id_conselho_municipal_saneamento_basico",
+          //"cm.possui_conselho",
+          //"cm.descricao_outros",
           "id_dados_demograficos",
 
           "m.nome as municipio_nome",
@@ -120,7 +121,7 @@ class MunicipioController {
           "rfss.telefone_comercial as rf_telefone_comercial",
           "rfss.nome_responsavel as rf_responsavel",
           "rfss.cargo as rf_cargo",
-          "rfss.funcao as rf_funcao",
+          //"rfss.funcao as rf_funcao",
           "rfss.telefone as rf_telefone",
           "rfss.email as rf_email",
           "rfss.descricao as rf_descricao",
@@ -215,7 +216,7 @@ class MunicipioController {
           "m.id_municipio",
           "rs.id_municipio"
         ).leftJoin(
-          "tedplan.conselho_municipal as cm",
+          "tedplan.conselho_municipal_saneamento_basico as cm",
           "m.id_municipio",
           "cm.id_municipio"
         )
