@@ -83,11 +83,11 @@ export function AuthProvider({ children }) {
         return error;
       });
 
-    const { "tedplan.token": token } = parseCookies();
+    // const { "tedplan.token": token } = parseCookies();
 
-    if (!token) {
-      Router.push("/login_indicadores");
-    }
+    // if (!token) {
+    //   Router.push("/login_indicadores");
+    // }
 
     const resUsuarioLogado = await api.get("getUsuario", {
       params: { id_usuario: data.id_usuario },
