@@ -1,12 +1,9 @@
-import { GetServerSideProps } from "next";
-import React, { useContext, useState } from "react";
+import { useState, useEffect } from "react";
 import { parseCookies } from "nookies";
-import { AuthContext } from "../contexts/AuthContext";
-import { getAPIClient } from "../services/axios";
-import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast, ToastContainer } from "react-nextjs-toast";
+import { useInfoIndicador } from "../contexts/InfoIndicadorContext";
 import {
   Container,
   NewButton,
@@ -24,27 +21,13 @@ import {
   CloseModalButton,
   ConteudoModal,
   TituloModal,
-  ImagemModal,
   TextoModal,
   SubmitButton,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
+import { InfoIndicador } from "../types/InfoIndicador";
 
-interface IIndicador {
-  id_indicador: string;
-  nome: string;
-  codigo: string;
-  metodo_calculo: string;
-  descricao: string;
-  finalidade: string;
-  limitacoes: string;
-}
-
-interface IndicadorProps {
-  indicadores: IIndicador[];
-}
-
-export default function ListarIndicadores({ indicadores }: IndicadorProps) {
+export default function ListarIndicadores() {
   const {
     register,
     handleSubmit,
@@ -53,20 +36,52 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     formState: { errors },
   } = useForm();
 
+  const {
+    indicadores,
+    loadInfoIndicadores,
+    updateInfoIndicador,
+    deleteInfoIndicador,
+    error,
+    clearError,
+  } = useInfoIndicador();
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModalConfirm, setModalConfirm] = useState(false);
-  const [indicadorModal, setIndicadorModal] = useState<IIndicador | null>(null);
+  const [indicadorModal, setIndicadorModal] = useState(null);
+  const [idImagem, setIdImagem] = useState(null);
+
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const { ["tedplan.token"]: token } = parseCookies();
+    if (!token) {
+      Router.push("/login");
+      return;
+    }
+
+    loadInfoIndicadores();
+  }, [loadInfoIndicadores]);
+
+  useEffect(() => {
+    if (error) {
+      toast.notify(error, {
+        type: "error",
+        duration: 7,
+      });
+      clearError();
+    }
+  }, [error, clearError]);
 
   function handleAddIndicador() {
     Router.push("/addInfoIndicador");
   }
 
-  async function handleShowModal(indicador: IIndicador) {
+  async function handleShowModal(indicador: InfoIndicador) {
     setIndicadorModal(indicador);
-    setValue("id_indicador", indicador.id_indicador);
-    setValue("nome", indicador.nome);
+    setValue("id_descricao_indicador", indicador.id_descricao_indicador);
+    setValue("nome_indicador", indicador.nome_indicador);
     setValue("codigo", indicador.codigo);
+    setValue("eixo", indicador.eixo);
     setValue("descricao", indicador.descricao);
     setValue("finalidade", indicador.finalidade);
     setValue("limitacoes", indicador.limitacoes);
@@ -79,8 +94,9 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     setPreviewImage(null);
   }
 
-  function handleOpenConfirm(indicador: IIndicador) {
-    setIndicadorModal(indicador);
+  function handleOpenConfirm({ id_descricao_indicador, id_imagem }) {
+    setIndicadorModal(id_descricao_indicador);
+    setIdImagem(id_imagem);
     setModalConfirm(true);
   }
 
@@ -99,60 +115,56 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     }
   };
 
-  async function handleRemoverIndicador(id_indicador: string) {
+  async function handleRemoverIndicador(id: number, id_imagem?: number) {
     try {
-      await api.delete("removerIndicador", { params: { id_indicador } });
+      await deleteInfoIndicador(id, id_imagem);
       toast.notify("Indicador removido com sucesso!", {
-        title: "Sucesso",
-        duration: 7,
         type: "success",
+        duration: 7,
       });
       setModalConfirm(false);
+      loadInfoIndicadores();
       Router.push("/listarInfoIndicador");
     } catch (error) {
-      toast.notify("Não foi possível remover o indicador!", {
-        title: "Erro",
-        duration: 7,
+      toast.notify("Erro ao remover indicador!", {
         type: "error",
+        duration: 7,
       });
     }
   }
 
-  async function handleUpdateIndicador(data: IIndicador) {
+  async function handleUpdateIndicador(data: Partial<InfoIndicador>) {
     const formData = new FormData();
     if (data.metodo_calculo?.[0]) {
-      formData.append("metodo_calculo", data.metodo_calculo[0]);
+      formData.append("imagem", data.metodo_calculo[0]);
     }
 
+    formData.append("nome_indicador", data.nome_indicador);
+    formData.append("codigo", data.codigo);
+    formData.append("eixo", data.eixo);
+    formData.append("descricao", data.descricao);
+    formData.append("finalidade", data.finalidade);
+    formData.append("limitacoes", data.limitacoes);
+
     try {
-      await api.post("updateIndicador", {
-        ...data,
-        metodo_calculo: data.metodo_calculo?.[0] ? formData : undefined,
-      });
-
+      await updateInfoIndicador(formData);
       toast.notify("Indicador atualizado com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
         type: "success",
+        duration: 7,
       });
-
-      setTimeout(() => {
-        setModalVisible(false);
-        Router.push("/listarInfoIndicador");
-      }, 2000);
+      handleCloseModal();
+      loadInfoIndicadores();
     } catch (error) {
       toast.notify("Erro ao atualizar indicador!", {
-        title: "Erro!",
-        duration: 7,
         type: "error",
+        duration: 7,
       });
     }
   }
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
-
+      <MenuSuperior usuarios={[]} />
       <DivCenter>
         <NewButton onClick={handleAddIndicador}>Adicionar Indicador</NewButton>
         <ListPost>
@@ -160,54 +172,65 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
             <tr>
               <th>Código</th>
               <th>Nome</th>
-              <th>Finalidade</th>
+              <th>Eixo</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             {indicadores.map((indicador) => (
-              <tr key={indicador.id_indicador}>
+              <tr key={indicador.id_descricao_indicador}>
                 <td>{indicador.codigo}</td>
-                <td>{indicador.nome}</td>
-                <td>{indicador.finalidade}</td>
+                <td>{indicador.nome_indicador}</td>
+                <td>{indicador.eixo}</td>
                 <td>
-                  <BotaoVisualizar onClick={() => handleShowModal(indicador)}>
-                    Visualizar
-                  </BotaoVisualizar>
-                  <BotaoEditar onClick={() => handleShowModal(indicador)}>
-                    Editar
-                  </BotaoEditar>
-                  <BotaoRemover onClick={() => handleOpenConfirm(indicador)}>
+                  <BotaoRemover
+                    onClick={() =>
+                      handleOpenConfirm({
+                        id_descricao_indicador:
+                          indicador.id_descricao_indicador,
+                        id_imagem: indicador.id_imagem,
+                      })
+                    }
+                  >
                     Remover
                   </BotaoRemover>
+                  <BotaoEditar
+                    onClick={() =>
+                      Router.push(
+                        `/addInfoIndicador?id=${indicador.id_descricao_indicador}`
+                      )
+                    }
+                  >
+                    Editar
+                  </BotaoEditar>
 
-                  {isModalConfirm &&
-                    indicadorModal?.id_indicador === indicador.id_indicador && (
-                      <ContainerModal>
-                        <Modal>
-                          <ConteudoModal>
-                            <TituloModal>
-                              <h3>
-                                <b>Confirmar exclusão</b>
-                              </h3>
-                            </TituloModal>
-                            <TextoModal>
-                              <p>Deseja realmente excluir este indicador?</p>
-                              <CancelButton onClick={handleCloseConfirm}>
-                                <b>Cancelar</b>
-                              </CancelButton>
-                              <ConfirmButton
-                                onClick={() =>
-                                  handleRemoverIndicador(indicador.id_indicador)
-                                }
-                              >
-                                <b>Confirmar</b>
-                              </ConfirmButton>
-                            </TextoModal>
-                          </ConteudoModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+                  {isModalConfirm && (
+                    <ContainerModal>
+                      <Modal>
+                        <ConteudoModal>
+                          <TituloModal>
+                            <h3>Confirmar exclusão</h3>
+                          </TituloModal>
+                          <TextoModal>
+                            <p>Deseja realmente excluir este indicador?</p>
+                            <CancelButton onClick={handleCloseConfirm}>
+                              Cancelar
+                            </CancelButton>
+                            <ConfirmButton
+                              onClick={() =>
+                                handleRemoverIndicador(
+                                  indicador.id_descricao_indicador,
+                                  indicador.id_imagem
+                                )
+                              }
+                            >
+                              Confirmar
+                            </ConfirmButton>
+                          </TextoModal>
+                        </ConteudoModal>
+                      </Modal>
+                    </ContainerModal>
+                  )}
                 </td>
               </tr>
             ))}
@@ -225,18 +248,39 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                   <SubmitButton type="submit">Atualizar</SubmitButton>
 
                   <ConteudoModal>
-                    <input type="hidden" {...register("id_indicador")} />
+                    <input
+                      type="hidden"
+                      {...register("id_descricao_indicador")}
+                    />
 
                     <label>Nome</label>
                     <input
-                      {...register("nome", { required: true })}
+                      {...register("nome_indicador", {
+                        required: "O campo Nome é obrigatório!",
+                      })}
                       type="text"
                       placeholder="Nome do indicador"
                     />
-                    {errors.nome && <span>O campo Nome é obrigatório!</span>}
+                    {errors.nome_indicador && (
+                      <span>{errors.nome_indicador.message}</span>
+                    )}
 
                     <label>Código</label>
                     <input {...register("codigo")} type="text" disabled />
+
+                    <label>Eixo</label>
+                    <select
+                      {...register("eixo", {
+                        required: "O eixo é obrigatório!",
+                      })}
+                    >
+                      <option value="">Selecione o eixo</option>
+                      <option value="agua">Água</option>
+                      <option value="esgoto">Esgoto</option>
+                      <option value="drenagem">Drenagem</option>
+                      <option value="residuos">Resíduos</option>
+                    </select>
+                    {errors.eixo && <span>{errors.eixo.message}</span>}
 
                     <label>Método de Cálculo</label>
                     <input
@@ -259,29 +303,35 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
 
                     <label>Descrição</label>
                     <textarea
-                      {...register("descricao", { required: true })}
+                      {...register("descricao", {
+                        required: "A descrição é obrigatória!",
+                      })}
                       rows={4}
                     />
                     {errors.descricao && (
-                      <span>A descrição é obrigatória!</span>
+                      <span>{errors.descricao.message}</span>
                     )}
 
                     <label>Finalidade</label>
-                    <input
-                      {...register("finalidade", { required: true })}
-                      type="text"
+                    <textarea
+                      {...register("finalidade", {
+                        required: "A finalidade é obrigatória!",
+                      })}
+                      rows={4}
                     />
                     {errors.finalidade && (
-                      <span>A finalidade é obrigatória!</span>
+                      <span>{errors.finalidade.message}</span>
                     )}
 
                     <label>Limitações</label>
                     <textarea
-                      {...register("limitacoes", { required: true })}
+                      {...register("limitacoes", {
+                        required: "As limitações são obrigatórias!",
+                      })}
                       rows={3}
                     />
                     {errors.limitacoes && (
-                      <span>As limitações são obrigatórias!</span>
+                      <span>{errors.limitacoes.message}</span>
                     )}
                   </ConteudoModal>
                 </TextoModal>
@@ -297,37 +347,3 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     </Container>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  try {
-    const apiClient = getAPIClient(ctx);
-    const { ["tedplan.token"]: token } = parseCookies(ctx);
-
-    if (!token) {
-      return {
-        redirect: {
-          destination: "/login",
-          permanent: false,
-        },
-      };
-    }
-
-    const response = await apiClient.get("/getIndicadores");
-    const indicadores = response.data;
-
-    return {
-      props: {
-        indicadores,
-      },
-    };
-  } catch (error) {
-    console.error("Error fetching indicadores:", error);
-
-    // Return empty array if API fails
-    return {
-      props: {
-        indicadores: [],
-      },
-    };
-  }
-};

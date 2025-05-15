@@ -209,9 +209,6 @@ export default function Postagens({ galerias }: GaleriaProps) {
   }
 
   async function handleRemoverImagem(id_imagem) {
-    console.log(id_imagem);
-    console.log(idGaleria);
-
     const resDelete = await api.delete("deleteImagem", {
       params: { id_imagem: id_imagem },
     });

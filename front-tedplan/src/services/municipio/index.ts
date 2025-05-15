@@ -8,7 +8,7 @@ export const getMunicipio = async (
   const response = await api.get("getMunicipio", {
     params: { id_municipio },
   });
-  return response.data[0];
+  return response.data;
 };
 
 export const updateMunicipio = async (

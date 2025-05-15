@@ -19,6 +19,7 @@ export type Municipio = {
   ts_cargo: string;
   ts_telefone: string;
   ts_email: string;
+  ts_funcao: string;
 
   //prestador do serviço de seneamento basico
   //abastecimento de agua
@@ -85,6 +86,7 @@ export type Municipio = {
   rf_telefone_comercial: string;
   rf_responsavel: string;
   rf_cargo: string;
+  rf_funcao: string;
   rf_telefone: string;
   rf_email: string;
   rf_descricao: string;
@@ -100,6 +102,14 @@ export type Municipio = {
   simisab_responsavel: string;
   simisab_telefone: string;
   simisab_email: string;
+  cs_setor_responsavel: string;
+  cs_telefone: string;
+  cs_email: string;
+
+  //Conselho Municipal de Saneamento
+  id_conselho_municipal: string;
+  possui_conselho: string;
+  descricao_outros: string;
 
   //Dados demográficos
   id_dados_demograficos: string;
@@ -107,4 +117,37 @@ export type Municipio = {
   dd_populacao_rural: string;
   dd_populacao_total: string;
   dd_total_moradias: string;
+  OGM4001: string;
+  OGM4002: string;
+  OGM4003: string;
+  OGM4004: string;
+  OGM4005: string;
+  OGM4006: string;
+  OGM4007: string;
+  OGM4008: string;
+  OGM4009: string;
+
+  // Dados Geográficos
+  id_dados_geograficos?: string;
+  OGM0001?: string; // Nome da mesorregião geográfica
+  OGM0002?: string; // Nome da microrregião geográfica
+  OGM0003?: string; // Pertence à Região Metropolitana
+  OGM0004?: string; // Nome oficial (RM, RIDE, etc)
+  OGM0005?: string; // Área territorial total
+  OGM0006?: string; // Total de áreas urbanizadas
+  OGM0007?: string; // Quantidade de distritos
+  OGM0008?: string; // Quantidade de localidades urbanas
+  OGM0009?: string; // Quantidade de aglomerados rurais
+  OGM0010?: string; // Cota altimétrica de referência
+  OGM0011?: string; // Cota altimétrica mínima
+  OGM0012?: string; // Cota altimétrica máxima
+  OGM0101?: string; // Existem Aldeias Indígenas
+  OGM0102?: string; // Quantidade de moradias nas Aldeias Indígenas
+  OGM0103?: string; // População nas Aldeias Indígenas
+  OGM0104?: string; // Existem Comunidades Quilombolas
+  OGM0105?: string; // Quantidade de moradias nas Comunidades Quilombolas
+  OGM0106?: string; // População nas Comunidades Quilombolas
+  OGM0107?: string; // Existem Comunidades Extrativistas
+  OGM0108?: string; // Quantidade de moradias nas Comunidades Extrativistas
+  OGM0109?: string; // População nas Comunidades Extrativistas
 };

@@ -16,7 +16,7 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 import { useToasts } from "react-toast-notifications";
-import { toast, ToastContainer } from 'react-nextjs-toast';
+import { toast, ToastContainer } from "react-nextjs-toast";
 import "suneditor/dist/css/suneditor.min.css";
 import { getData } from "./api/post";
 
@@ -43,9 +43,10 @@ import {
   ContainerModal,
   Modal,
   CloseModalButton,
-  ConteudoModal, FormModal, ColAcoesButton
+  ConteudoModal,
+  FormModal,
+  ColAcoesButton,
 } from "../styles/views";
-
 
 interface IArquivo {
   id_arquivo_ondrive: string;
@@ -88,13 +89,16 @@ export default function ArquivosOndrive({
   status,
   tipo_arquivo_ondrive,
 }: ArquivoProps) {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm()
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
   const [isModalVisible, setModalVisible] = useState(false);
   const [isModalUpdateVisible, setModalUpdateVisible] = useState(false);
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [imagem, setImagem] = useState<String | ArrayBuffer>(null);
-  
-
 
   async function handlebuscaFiltrada(data: IArquivo) {}
 
@@ -104,8 +108,6 @@ export default function ArquivosOndrive({
   }
 
   async function handleUpdateArquivo(data: IArquivo) {
-    console.log(data);
-
     return;
     const apiClient = getAPIClient();
 
@@ -125,20 +127,17 @@ export default function ArquivosOndrive({
     const resDelete = await api.delete("deletePost", {
       params: { id_arquivo_ondrive: id_arquivo_ondrive },
     });
-    toast.notify('Dados removidos com sucesso!',{
+    toast.notify("Dados removidos com sucesso!", {
       title: "Sucesso!",
       duration: 7,
       type: "success",
-    })  
+    });
     setModalConfirm(false);
     Router.push("/postagens");
   }
 
   function handleOpenModal() {
     setModalVisible(true);
-
-    console.log(isModalVisible);
-    
   }
 
   const setOptions = {
@@ -247,7 +246,6 @@ export default function ArquivosOndrive({
                       </CloseModalButton>
                       <FormModal onSubmit={handleSubmit(handleUpdateArquivo)}>
                         <ConteudoModal>
-                          
                           <input
                             type="hidden"
                             {...register("id_arquivo_ondrive")}
@@ -255,10 +253,10 @@ export default function ArquivosOndrive({
                           />
                           <p>Selecione um status para o documento</p>
 
-                          
                           <select
                             aria-invalid={errors.value ? "true" : "false"}
-                          {...register("id_status", {required: true})}>
+                            {...register("id_status", { required: true })}
+                          >
                             <option value="">Status</option>
                             {status.map((value) => (
                               <option
@@ -269,7 +267,9 @@ export default function ArquivosOndrive({
                               </option>
                             ))}
                           </select>
-                          {errors.id_status && errors.id_status.type && <span>Selecionar um status é obrigatório!</span>}
+                          {errors.id_status && errors.id_status.type && (
+                            <span>Selecionar um status é obrigatório!</span>
+                          )}
                         </ConteudoModal>
                         <SubmitButton type="submit">Gravar</SubmitButton>
                       </FormModal>
@@ -282,7 +282,9 @@ export default function ArquivosOndrive({
           <FooterLista></FooterLista>
         </DivFormConteudo>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer> </Footer>
+      <Footer>
+        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>{" "}
+      </Footer>
     </Container>
   );
 }

@@ -3,15 +3,15 @@ const Concessioraria = use('App/Models/Concessionaria')
 
 class ConcessionariaController {
 
-  async getConcessionarias({ request }){
+  async getConcessionarias({ request }) {
     const dados = request.all()
-    
+
     try {
       const res = await Concessioraria.query()
-      .from('tedplan.concessionarias')
-      .where('id_municipio', dados.id_municipio)
-      .where('ano', dados.ano)
-      .fetch()
+        .from('tedplan.concessionarias')
+        .where('id_municipio', dados.id_municipio)
+        .where('ano', dados.ano)
+        .fetch()
 
       return res
     } catch (error) {
@@ -20,29 +20,29 @@ class ConcessionariaController {
 
   }
 
-  async getConcessionaria({ params }){
-    
+  async getConcessionaria({ params }) {
+
     try {
       const res = await Concessioraria.query()
-      .from('tedplan.concessionarias')
-      .where('id_concessionaria', params.id)
-      .fetch()
+        .from('tedplan.concessionarias')
+        .where('id_concessionaria', params.id)
+        .fetch()
 
-    return res
+      return res
     } catch (error) {
       console.log(error);
     }
   }
 
-  async store({ request }){
+  async store({ request }) {
     const dados = request.all()
-    console.log(dados);
-    
+
+
     try {
-      if(!dados.id_concessionaria){
+      if (!dados.id_concessionaria) {
         const res = await Concessioraria.query()
-        .from('tedplan.concessionarias')
-        .insert({
+          .from('tedplan.concessionarias')
+          .insert({
             cnpj: dados.cnpj,
             razao_social: dados.razao_social,
             ano_inicio: dados.cnpj,
@@ -63,18 +63,18 @@ class ConcessionariaController {
             varricao_logradouros_publicos: dados.varricao_logradouros_publicos,
             id_municipio: dados.id_municipio,
             ano: dados.ano,
-        })
-      }else{
+          })
+      } else {
         const res = await Concessioraria.query()
-        .from('tedplan.concessionarias')
-        .where('id_concessionaria', dados.id_concessionaria)
-        .fetch()
+          .from('tedplan.concessionarias')
+          .where('id_concessionaria', dados.id_concessionaria)
+          .fetch()
 
         const rc = res.toJSON()[0]
 
         await Concessioraria.query()
-        .from('tedplan.concessionarias')
-        .update({
+          .from('tedplan.concessionarias')
+          .update({
             cnpj: dados.cnpj ? dados.cnpj : rc.cnpj,
             razao_social: dados.razao_social ? dados.razao_social : rc.razao_social,
             ano_inicio: dados.ano_inicio ? dados.ano_inicio : rc.ano_inicio,
@@ -89,7 +89,7 @@ class ConcessionariaController {
             operacao_incinerador: dados.operacao_incinerador ? dados.operacao_incinerador : rc.operacao_incinerador,
 
             operacao_outras_unidades_processamento: dados.operacao_outras_unidades_processamento ?
-             dados.operacao_outras_unidades_processamento : rc.operacao_outras_unidades_processamento,
+              dados.operacao_outras_unidades_processamento : rc.operacao_outras_unidades_processamento,
 
             operacao_unidade_compostagem: dados.operacao_unidade_compostagem ? dados.operacao_unidade_compostagem : rc.operacao_unidade_compostagem,
             operacao_triagem: dados.operacao_triagem ? dados.operacao_triagem : rc.operacao_triagem,
@@ -98,7 +98,7 @@ class ConcessionariaController {
             varricao_logradouros_publicos: dados.varricao_logradouros_publicos ? dados.varricao_logradouros_publicos : rc.varricao_logradouros_publicos,
             id_municipio: dados.id_municipio ? dados.id_municipio : rc.id_municipio,
             ano: dados.ano ? dados.ano : rc.ano,
-        })
+          })
       }
 
     } catch (error) {

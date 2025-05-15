@@ -91,8 +91,6 @@ export default function Postagens({ normas }: NormasProps) {
   const [idImagem, setIdImagem] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
 
-  console.log(normas);
-
   useEffect(() => {}, [0]);
 
   async function handleShowModal(id_imagem, id_norma) {
@@ -221,7 +219,6 @@ export default function Postagens({ normas }: NormasProps) {
   }
 
   async function handleUpdateImagem(data: INorma) {
-    console.log(data);
     const apiClient = getAPIClient();
     const formData = new FormData();
 

@@ -34,7 +34,6 @@ import {
 } from "../styles/dashboard";
 
 import { useForm } from "react-hook-form";
-import { log } from "console";
 
 type IPublicacao = {
   id_publicacao: string;
@@ -285,24 +284,9 @@ export default function Publicacoes({
                           `/addPublicacao?id=${publicacao.id_publicacao}`
                         )
                       }
-                      // onClick={() =>
-                      //   handleShowUpdateModal({
-                      //     id_publicacao: publicacao.id_publicacao,
-                      //     id_imagem: publicacao.id_imagem,
-                      //   })
-                      // }
                     >
                       Editar
                     </BotaoEditar>
-                    {/* <BotaoVisualizar
-                      onClick={() =>
-                        handleShowModal({
-                          id_publicacao: publicacao.id_publicacao,
-                        })
-                      }
-                    >
-                      Editar Imagem
-                    </BotaoVisualizar> */}
                   </td>
                 </tr>
               </tbody>

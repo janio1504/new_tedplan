@@ -3,7 +3,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 
 export function prestacaoServicos(dados: any, concessionarias: any, financeiro: any,
     dadosAgua: any, dadosEsgoto: any, dadosDrenagem: any, dadosResiduosColeta: any){
-    pdfMake.vfs = pdfFonts.pdfMake.vfs 
+    pdfMake.vfs = pdfFonts.vfs
     
     if(dados?.length == 0){
         alert("Não existem dados gerais cadastrados para gerar o relatório!")
@@ -12,7 +12,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
     if(concessionarias?.length == 0){
         alert("Não existem dados de concessionarias cadastrados para gerar o relatório!")
     }
-    if(financeiro.length == 0){
+    if(financeiro?.length == 0){
         alert("Não existem dados financeiros cadastrados para gerar o relatório!")
     }
     if(dadosAgua?.length == 0){
@@ -68,7 +68,7 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
             ]
         },
         layout: 'headerLineOnly'
-       },
+        },
        {text: 'Drenagem de Águas Pluviais', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
        {
         table: {
@@ -305,456 +305,456 @@ export function prestacaoServicos(dados: any, concessionarias: any, financeiro: 
 
 
 
-       {text: 'Informações Financeiras', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-       {text: 'Água e Esgoto Sanitário', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {text: 'Informações Financeiras', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {text: 'Água e Esgoto Sanitário', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                ['FN002', 'Receita operacional direta de Água', financeiro?.fn002],
-                ['FN003', 'Receita operacional direta de Esgoto', financeiro?.fn003],
-                ['FN007', 'Receita operacional direta de Água exportada (Bruta ou Tratada)', financeiro?.fn007],
-                ['FN038', 'Receita operacional direta - Esgoto bruto importado', financeiro?.fn038],
-                ['FN001', 'Receita operacional direta de Total', financeiro?.fn001],
-                ['FN004', 'Receita operacional indireta', financeiro?.fn004],
-                ['FN005', 'Receita operacional Total (Direta + Indireta)', financeiro?.fn005], 
-                ['FN006', 'Arrecadação total operacional indireta', financeiro?.fn006],
-                ['FN008', 'Créditos de contas a receber', financeiro?.fn008],
-                ['FN010', 'Despesa com pessoal próprio', financeiro?.fn010],
-                ['FN011', 'Despesa com produtos químicos', financeiro?.fn011],
-                ['FN013', 'Despesa com energia elétrica', financeiro?.aes_fn013],
-                ['FN014', 'Despesa com serviços de terceiros', financeiro?.fn014],
-                ['FN020', 'Despesa com água importada (Bruta ou tratada)', financeiro?.aes_fn020], 
-                ['FN039', 'Despesa com esgoto exportado', financeiro?.fn039],
-                ['FN021', 'Despesas fiscais ou tributarias computadas na dex', financeiro?.aes_fn021],
-                ['FN027', 'Outras despesas de exploração', financeiro?.fn027],
-                ['FN015', 'Despesas de exploração (DEX)', financeiro?.aes_fn015],
-                ['FN035', 'Despesas com juros e encargos do serviço da divida', financeiro?.fn035],
-                ['FN036', 'Despesas com variações monetárias e cambiais das dividas', financeiro?.fn036],
-                ['FN016', 'Despesas com juros e encargos do serviço da divida', financeiro?.fn016], 
-                ['FN019', 'Despesas com depreciação, amortização do ativo deferido', financeiro?.aes_fn019],
-                ['FN022', 'Despesas fiscais ou tributarias não computadas na dex', financeiro?.aes_fn022],
-                ['FN028', 'Outras depesas com os servicos', financeiro?.fn028],
-                ['FN017', 'Despesas totais com os serviços (DTS)', financeiro?.aes_fn017],
-                ['FN034', 'Despesa com amortização do serviço da dívida', financeiro?.fn034],
-                ['FN037', 'Despesas totais com o serviço da dívida', financeiro?.fn037],                 
-                ['FN018','Despesas capitalizáveis realizadas pelo prestador de serviços',financeiro?.fn018],
-                ['FN023','Investimentos realizados em abastecimento de água pelo prestador de serviços',financeiro?.fn023],
-                ['FN024','Despesa com água importada (Bruta ou Tratada)',financeiro?.fn024],
-                ['FN025','Outros investimentos realizados pelo prestador de serviços',financeiro?.fn025],
-                ['FN030','Investimento com recursos próprios realizado pelo prestador de serviços',financeiro?.fn030],
-                ['FN031','nvestimento com recursos onerosos realizado pelo prestador de serviços',financeiro?.fn031],
-                ['FN032','Investimento com recursos não onerosos realizado pelo prestador de serviços',financeiro?.fn032],
-                ['FN033','Investimentos totais realizados pelo prestador de serviços',financeiro?.fn033],
-                ['FN041','Despesas capitalizáveis realizadas pelo munícipio',financeiro?.fn041],
-                ['FN042','Investimentos realizados em abastecimento de água pelo munícipio',financeiro?.fn042],
-                ['FN043','Investimentos realizados em esgotamento sanitário pelo munícipio',financeiro?.fn043],
-                ['FN044','Outros investimentos realizados pelo munícipio',financeiro?.fn044],
-                ['FN045','Investimento com recursos próprios realizado pelo munícipio',financeiro?.fn045],
-                ['FN046','Investimento com recursos onerosos realizado pelo munícipio',financeiro?.fn046],
-                ['FN047','Investimento com recursos não onerosos realizado pelo munícipio',financeiro?.fn047],
-                ['FN048','Investimentos totais realizados pelo munícipio',financeiro?.fn048],
-                ['FN051','Despesas capitalizáveis realizadas pelo estado',financeiro?.fn051],
-                ['FN052','Investimentos realizados em abastecimento de água pelo estado',financeiro?.fn052],
-                ['FN053','Investimentos realizados em esgotamento sanitário pelo estado',financeiro?.fn053],
-                ['FN054','Outros investimentos realizados pelo estado',financeiro?.fn054],
-                ['FN055','Investimento com recursos próprios realizado pelo estado',financeiro?.fn055],
-                ['FN056','Investimento com recursos onerosos realizado pelo estado',financeiro?.fn056],
-                ['FN057','Investimento com recursos não onerosos realizado pelo estado',financeiro?.fn057],
-                ['FN058','Investimentos totais realizados pelo estado',financeiro?.fn048],
-                ['FN098','Campo de justificativa',financeiro?.fn098],
-                ['FN099','Observações',financeiro?.fn099],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //             ['FN002', 'Receita operacional direta de Água', financeiro?.fn002],
+    //             ['FN003', 'Receita operacional direta de Esgoto', financeiro?.fn003],
+    //             ['FN007', 'Receita operacional direta de Água exportada (Bruta ou Tratada)', financeiro?.fn007],
+    //             ['FN038', 'Receita operacional direta - Esgoto bruto importado', financeiro?.fn038],
+    //             ['FN001', 'Receita operacional direta de Total', financeiro?.fn001],
+    //             ['FN004', 'Receita operacional indireta', financeiro?.fn004],
+    //             ['FN005', 'Receita operacional Total (Direta + Indireta)', financeiro?.fn005], 
+    //             ['FN006', 'Arrecadação total operacional indireta', financeiro?.fn006],
+    //             ['FN008', 'Créditos de contas a receber', financeiro?.fn008],
+    //             ['FN010', 'Despesa com pessoal próprio', financeiro?.fn010],
+    //             ['FN011', 'Despesa com produtos químicos', financeiro?.fn011],
+    //             ['FN013', 'Despesa com energia elétrica', financeiro?.aes_fn013],
+    //             ['FN014', 'Despesa com serviços de terceiros', financeiro?.fn014],
+    //             ['FN020', 'Despesa com água importada (Bruta ou tratada)', financeiro?.aes_fn020], 
+    //             ['FN039', 'Despesa com esgoto exportado', financeiro?.fn039],
+    //             ['FN021', 'Despesas fiscais ou tributarias computadas na dex', financeiro?.aes_fn021],
+    //             ['FN027', 'Outras despesas de exploração', financeiro?.fn027],
+    //             ['FN015', 'Despesas de exploração (DEX)', financeiro?.aes_fn015],
+    //             ['FN035', 'Despesas com juros e encargos do serviço da divida', financeiro?.fn035],
+    //             ['FN036', 'Despesas com variações monetárias e cambiais das dividas', financeiro?.fn036],
+    //             ['FN016', 'Despesas com juros e encargos do serviço da divida', financeiro?.fn016], 
+    //             ['FN019', 'Despesas com depreciação, amortização do ativo deferido', financeiro?.aes_fn019],
+    //             ['FN022', 'Despesas fiscais ou tributarias não computadas na dex', financeiro?.aes_fn022],
+    //             ['FN028', 'Outras depesas com os servicos', financeiro?.fn028],
+    //             ['FN017', 'Despesas totais com os serviços (DTS)', financeiro?.aes_fn017],
+    //             ['FN034', 'Despesa com amortização do serviço da dívida', financeiro?.fn034],
+    //             ['FN037', 'Despesas totais com o serviço da dívida', financeiro?.fn037],                 
+    //             ['FN018','Despesas capitalizáveis realizadas pelo prestador de serviços',financeiro?.fn018],
+    //             ['FN023','Investimentos realizados em abastecimento de água pelo prestador de serviços',financeiro?.fn023],
+    //             ['FN024','Despesa com água importada (Bruta ou Tratada)',financeiro?.fn024],
+    //             ['FN025','Outros investimentos realizados pelo prestador de serviços',financeiro?.fn025],
+    //             ['FN030','Investimento com recursos próprios realizado pelo prestador de serviços',financeiro?.fn030],
+    //             ['FN031','nvestimento com recursos onerosos realizado pelo prestador de serviços',financeiro?.fn031],
+    //             ['FN032','Investimento com recursos não onerosos realizado pelo prestador de serviços',financeiro?.fn032],
+    //             ['FN033','Investimentos totais realizados pelo prestador de serviços',financeiro?.fn033],
+    //             ['FN041','Despesas capitalizáveis realizadas pelo munícipio',financeiro?.fn041],
+    //             ['FN042','Investimentos realizados em abastecimento de água pelo munícipio',financeiro?.fn042],
+    //             ['FN043','Investimentos realizados em esgotamento sanitário pelo munícipio',financeiro?.fn043],
+    //             ['FN044','Outros investimentos realizados pelo munícipio',financeiro?.fn044],
+    //             ['FN045','Investimento com recursos próprios realizado pelo munícipio',financeiro?.fn045],
+    //             ['FN046','Investimento com recursos onerosos realizado pelo munícipio',financeiro?.fn046],
+    //             ['FN047','Investimento com recursos não onerosos realizado pelo munícipio',financeiro?.fn047],
+    //             ['FN048','Investimentos totais realizados pelo munícipio',financeiro?.fn048],
+    //             ['FN051','Despesas capitalizáveis realizadas pelo estado',financeiro?.fn051],
+    //             ['FN052','Investimentos realizados em abastecimento de água pelo estado',financeiro?.fn052],
+    //             ['FN053','Investimentos realizados em esgotamento sanitário pelo estado',financeiro?.fn053],
+    //             ['FN054','Outros investimentos realizados pelo estado',financeiro?.fn054],
+    //             ['FN055','Investimento com recursos próprios realizado pelo estado',financeiro?.fn055],
+    //             ['FN056','Investimento com recursos onerosos realizado pelo estado',financeiro?.fn056],
+    //             ['FN057','Investimento com recursos não onerosos realizado pelo estado',financeiro?.fn057],
+    //             ['FN058','Investimentos totais realizados pelo estado',financeiro?.fn048],
+    //             ['FN098','Campo de justificativa',financeiro?.fn098],
+    //             ['FN099','Observações',financeiro?.fn099],
                 
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
        
-       {text: 'Drenagem e Águas Pluviais', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {text: 'Drenagem e Águas Pluviais', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                ['CB001', 'Existe alguma forma de cobrança pelos serviços de drenagem e manejo das APU', financeiro?.cb001],
-                ['CB002', 'Qual é a forma de cobrança adotada?', financeiro?.cb002],
-                ['CB002A', 'Especifique qual é a forma de cobrança adotada', financeiro?.cb002a],
-                ['CB003', 'Quantidade total de imóveis urbanos tributados pelos serviços de drenagem das APU', financeiro?.cb003],
-                ['CB004', 'Valor cobrado pelos serviços de Drenagem e Manejo das APU por ímovel urbano', financeiro?.cb004],
-                ['CB999', 'Observações, esclarecimentos ou sugestões', financeiro?.cb999],
-                ['FN003', 'Receita total (Saúde, Educação, Pagamento de pessoal, etc...)', financeiro?.fn003],
-                ['FN004', 'Fontes de recursos para custeio dos serviços de drenagem e manejo de APU', financeiro?.fn004],
-                ['FN004A', 'Especifique qual é a outra fonte de recursos para custeio dos serviços', financeiro?.fn004a],
-                ['FN005', 'Receita operacional total dos serviços de drenagem e manejo de APU', financeiro?.fn005],
-                ['FN008', 'Receita não operacional total dos serviços de drenagem e manejo de APU', financeiro?.fn008],
-                ['FN009', 'Receita total serviços de drenagem e manejo de APU', financeiro?.fn009],
-                ['FN012', 'Despesa total do município (Saúde, Educação, pagamento de pessoal, etc...)', financeiro?.fn012],
-                ['FN013', 'Despesas de Exploração(DEX) diretas ou de custeio total dos serviços de Drenagem e Manejo de APU', financeiro?.fn013],
-                ['FN015', 'Despesa total com serviço da dívida para os serviços de drenagem e Manejo de APU', financeiro?.fn015],
-                ['FN016', 'Despesa total com serviços de Drenagem e Manejo de APU', financeiro?.fn016],
-                ['FN024', 'Investimento com recursos próprios em Drenagem e Manejo das APU contratados pelo município no ano de referência', financeiro?.fn024],
-                ['FN018', 'Investimento com recursos onerosos em Drenagem e Manejo das APU contratados pelo município no ano de referência', financeiro?.fn018],
-                ['FN020', 'Investimento com recursos não onerosos em Drenagem e Manejo das APU contratados pelo município no ano de referência', financeiro?.fn020],
-                ['FN022', 'Investimento total em Drenagem das APU contratado pelo município no ano de referência', financeiro?.fn022],
-                ['FN017', 'Desembolsos de investimentos com recursos próprios em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn017],
-                ['FN019', 'Desembolsos de investimentos com recursos onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn019],
-                ['FN021', 'Desembolsos de investimentos com recursos não onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn021],
-                ['FN023', 'Desembolsos total de investimentos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn023],
-                ['FN999', 'Observações, esclarecimentos ou sugestões', financeiro?.drenagem_fn999],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //             ['CB001', 'Existe alguma forma de cobrança pelos serviços de drenagem e manejo das APU', financeiro?.cb001],
+    //             ['CB002', 'Qual é a forma de cobrança adotada?', financeiro?.cb002],
+    //             ['CB002A', 'Especifique qual é a forma de cobrança adotada', financeiro?.cb002a],
+    //             ['CB003', 'Quantidade total de imóveis urbanos tributados pelos serviços de drenagem das APU', financeiro?.cb003],
+    //             ['CB004', 'Valor cobrado pelos serviços de Drenagem e Manejo das APU por ímovel urbano', financeiro?.cb004],
+    //             ['CB999', 'Observações, esclarecimentos ou sugestões', financeiro?.cb999],
+    //             ['FN003', 'Receita total (Saúde, Educação, Pagamento de pessoal, etc...)', financeiro?.fn003],
+    //             ['FN004', 'Fontes de recursos para custeio dos serviços de drenagem e manejo de APU', financeiro?.fn004],
+    //             ['FN004A', 'Especifique qual é a outra fonte de recursos para custeio dos serviços', financeiro?.fn004a],
+    //             ['FN005', 'Receita operacional total dos serviços de drenagem e manejo de APU', financeiro?.fn005],
+    //             ['FN008', 'Receita não operacional total dos serviços de drenagem e manejo de APU', financeiro?.fn008],
+    //             ['FN009', 'Receita total serviços de drenagem e manejo de APU', financeiro?.fn009],
+    //             ['FN012', 'Despesa total do município (Saúde, Educação, pagamento de pessoal, etc...)', financeiro?.fn012],
+    //             ['FN013', 'Despesas de Exploração(DEX) diretas ou de custeio total dos serviços de Drenagem e Manejo de APU', financeiro?.fn013],
+    //             ['FN015', 'Despesa total com serviço da dívida para os serviços de drenagem e Manejo de APU', financeiro?.fn015],
+    //             ['FN016', 'Despesa total com serviços de Drenagem e Manejo de APU', financeiro?.fn016],
+    //             ['FN024', 'Investimento com recursos próprios em Drenagem e Manejo das APU contratados pelo município no ano de referência', financeiro?.fn024],
+    //             ['FN018', 'Investimento com recursos onerosos em Drenagem e Manejo das APU contratados pelo município no ano de referência', financeiro?.fn018],
+    //             ['FN020', 'Investimento com recursos não onerosos em Drenagem e Manejo das APU contratados pelo município no ano de referência', financeiro?.fn020],
+    //             ['FN022', 'Investimento total em Drenagem das APU contratado pelo município no ano de referência', financeiro?.fn022],
+    //             ['FN017', 'Desembolsos de investimentos com recursos próprios em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn017],
+    //             ['FN019', 'Desembolsos de investimentos com recursos onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn019],
+    //             ['FN021', 'Desembolsos de investimentos com recursos não onerosos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn021],
+    //             ['FN023', 'Desembolsos total de investimentos em Drenagem e Manejo das APU realizados pelo Município no ano de referência', financeiro?.fn023],
+    //             ['FN999', 'Observações, esclarecimentos ou sugestões', financeiro?.drenagem_fn999],
 
            
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
 
-       {text: 'Resíduos Sólidos', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {text: 'Resíduos Sólidos', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                ['FN201', 'A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?', financeiro?.fn201],
-                ['FN202', 'Principal forma adotada', financeiro?.fn202],
-                ['FN203', 'Descrição da outra forma adotada', financeiro?.fn203],
-                ['FN204', 'Unidade adotada para a cobrança (No caso de tarifa)', financeiro?.fn204],
-                ['FN205', 'A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?', financeiro?.fn205],
-                ['FN206', 'Despesa dos agentes públicos com o serviço de coleta de RDO e RPU', financeiro?.fn201],
-                ['FN207', 'Despesa com agentes privados para execução do serviço de coleta de RDO e RPU', financeiro?.fn207],
-                ['FN208', 'Despesa com o serviço de coleta de RDO e RPU', financeiro?.fn208],
-                ['FN209', 'Despesa com agentes públicos com a coleta RSS', financeiro?.fn209],
-                ['FN210', 'Despesa com empresas contratadas para coleta RSS', financeiro?.fn210],
-                ['FN211', 'Despesa total com a coleta RSS', financeiro?.fn211],
-                ['FN212', 'Despesa dos agentes públicos com o serviço de varrição', financeiro?.fn212],
-                ['FN213', 'Despesa com empresas contratadas para o serviço de varrição', financeiro?.fn213],
-                ['FN214', 'Despesa total com serviço de varrição', financeiro?.fn214],
-                ['FN215', 'Despesas com agentes públicos executores dos demais serviços quando não especificado sem campo próprio', financeiro?.fn215],
-                ['FN216', 'Despesas com agentes privados executores dos demais serviços quando não especificado sem campo próprio', financeiro?.fn216],
-                ['FN217', 'Despesas total com todos os agentes executores dos demais serviços quando não especificado sem campo próprio', financeiro?.fn217],
-                ['FN218', 'Despesa dos agentes públicos executores de serviços de manejo de RSU', financeiro?.fn218],
-                ['FN219', 'Despesa dos agentes privados executores de serviços de manejo de RSU', financeiro?.fn219],
-                ['FN220', 'Despesa total com os serviços de manejo de RSU', financeiro?.fn220],
-                ['FN223', 'Despesa corrente da prefeitura durante o ano com todos os serviços do município (Saúde, educação, pagamento de pessoal, etc...)', financeiro?.fn223],
-                ['FN221', 'Receita orçada com a cobrança de taxas e tarifas referentes á getão e manejo de RSU', financeiro?.fn221],
-                ['FN222', 'Receita arrecadada com taxas e tarifas referentes á gestão e manejo de RSU', financeiro?.fn222],
-                ['FN224', 'A prefeitura recebeu algum recurso federal para aplicação no setor de manejo de RSU?', financeiro?.fn224],
-                ['FN225', 'Valor repassado', financeiro?.fn225],
-                ['FN226', 'Tipo de recurso', financeiro?.fn226],
-                ['FN227', 'Em que foi aplicado o recurso?', financeiro?.fn227],
-                ['FN999', 'Observações, esclarecimentos ou sugestões	', financeiro?.residuos_fn999],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //             ['FN201', 'A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?', financeiro?.fn201],
+    //             ['FN202', 'Principal forma adotada', financeiro?.fn202],
+    //             ['FN203', 'Descrição da outra forma adotada', financeiro?.fn203],
+    //             ['FN204', 'Unidade adotada para a cobrança (No caso de tarifa)', financeiro?.fn204],
+    //             ['FN205', 'A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?', financeiro?.fn205],
+    //             ['FN206', 'Despesa dos agentes públicos com o serviço de coleta de RDO e RPU', financeiro?.fn201],
+    //             ['FN207', 'Despesa com agentes privados para execução do serviço de coleta de RDO e RPU', financeiro?.fn207],
+    //             ['FN208', 'Despesa com o serviço de coleta de RDO e RPU', financeiro?.fn208],
+    //             ['FN209', 'Despesa com agentes públicos com a coleta RSS', financeiro?.fn209],
+    //             ['FN210', 'Despesa com empresas contratadas para coleta RSS', financeiro?.fn210],
+    //             ['FN211', 'Despesa total com a coleta RSS', financeiro?.fn211],
+    //             ['FN212', 'Despesa dos agentes públicos com o serviço de varrição', financeiro?.fn212],
+    //             ['FN213', 'Despesa com empresas contratadas para o serviço de varrição', financeiro?.fn213],
+    //             ['FN214', 'Despesa total com serviço de varrição', financeiro?.fn214],
+    //             ['FN215', 'Despesas com agentes públicos executores dos demais serviços quando não especificado sem campo próprio', financeiro?.fn215],
+    //             ['FN216', 'Despesas com agentes privados executores dos demais serviços quando não especificado sem campo próprio', financeiro?.fn216],
+    //             ['FN217', 'Despesas total com todos os agentes executores dos demais serviços quando não especificado sem campo próprio', financeiro?.fn217],
+    //             ['FN218', 'Despesa dos agentes públicos executores de serviços de manejo de RSU', financeiro?.fn218],
+    //             ['FN219', 'Despesa dos agentes privados executores de serviços de manejo de RSU', financeiro?.fn219],
+    //             ['FN220', 'Despesa total com os serviços de manejo de RSU', financeiro?.fn220],
+    //             ['FN223', 'Despesa corrente da prefeitura durante o ano com todos os serviços do município (Saúde, educação, pagamento de pessoal, etc...)', financeiro?.fn223],
+    //             ['FN221', 'Receita orçada com a cobrança de taxas e tarifas referentes á getão e manejo de RSU', financeiro?.fn221],
+    //             ['FN222', 'Receita arrecadada com taxas e tarifas referentes á gestão e manejo de RSU', financeiro?.fn222],
+    //             ['FN224', 'A prefeitura recebeu algum recurso federal para aplicação no setor de manejo de RSU?', financeiro?.fn224],
+    //             ['FN225', 'Valor repassado', financeiro?.fn225],
+    //             ['FN226', 'Tipo de recurso', financeiro?.fn226],
+    //             ['FN227', 'Em que foi aplicado o recurso?', financeiro?.fn227],
+    //             ['FN999', 'Observações, esclarecimentos ou sugestões	', financeiro?.residuos_fn999],
 
               
            
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
-       {text: 'Água', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {text: 'Água', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                ['AG021', 'Quantidade de ligações totais de água', dadosAgua?.ag021],
-                ['AG002','Quantidade de ligações ativas de água',dadosAgua?.ag002],
-                ['AG004','Quantidade de ligações ativas de água micromedidas',dadosAgua?.ag004],
-                ['AG003','Quantidade de economias ativas de água',dadosAgua?.ag003],
-                ['AG014','Quantidade de economias ativas de água micromedidas',dadosAgua?.ag014],
-                ['AG013','Quantidade de economias residenciais ativas de água',dadosAgua?.ag013],
-                ['AG022','Quantidade de economias residenciais ativas de água micromedidas',dadosAgua?.ag022],
-                ['AG006','Volume de água produzido',dadosAgua?.ag006],
-                ['AG024','Volume de água de serviço',dadosAgua?.ag024],
-                ['AG016','Volume de água bruta importado',dadosAgua?.ag016],
-                ['AG018','Volume de água tratada importado',dadosAgua?.ag018],
-                ['AG017','Volume de água bruta exportado',dadosAgua?.ag017],
-                ['AG019','Volume de água tratada exportado',dadosAgua?.ag019],
-                ['AG007','Volume de água tratada em ETA(s)',dadosAgua?.ag007],
-                ['AG015','Volume de água de água tratada por simples desinfecção',dadosAgua?.ag015],
-                ['AG027','Volume de água fluoretada',dadosAgua?.ag027],
-                ['AG012','Volume de água macromedida',dadosAgua?.ag012],
-                ['AG008','Volume de água micromedida',dadosAgua?.ag008],
-                ['AG010','Volume de água consumido',dadosAgua?.ag010],
-                ['AG011','Volume de água faturado',dadosAgua?.ag011],
-                ['AG020','Volume micromedido nas economias residenciais de água',dadosAgua?.ag020],
-                ['AG005','Extenção da rede de água',dadosAgua?.ag005],
-                ['AG028','Consumo total de energia elétrica nos sistemas de água',dadosAgua?.ag028],
-                ['AG098','Campo de justificativa',dadosAgua?.ag098],
-                ['AG099','Observações',dadosAgua?.ag099],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //             ['AG021', 'Quantidade de ligações totais de água', dadosAgua?.ag021],
+    //             ['AG002','Quantidade de ligações ativas de água',dadosAgua?.ag002],
+    //             ['AG004','Quantidade de ligações ativas de água micromedidas',dadosAgua?.ag004],
+    //             ['AG003','Quantidade de economias ativas de água',dadosAgua?.ag003],
+    //             ['AG014','Quantidade de economias ativas de água micromedidas',dadosAgua?.ag014],
+    //             ['AG013','Quantidade de economias residenciais ativas de água',dadosAgua?.ag013],
+    //             ['AG022','Quantidade de economias residenciais ativas de água micromedidas',dadosAgua?.ag022],
+    //             ['AG006','Volume de água produzido',dadosAgua?.ag006],
+    //             ['AG024','Volume de água de serviço',dadosAgua?.ag024],
+    //             ['AG016','Volume de água bruta importado',dadosAgua?.ag016],
+    //             ['AG018','Volume de água tratada importado',dadosAgua?.ag018],
+    //             ['AG017','Volume de água bruta exportado',dadosAgua?.ag017],
+    //             ['AG019','Volume de água tratada exportado',dadosAgua?.ag019],
+    //             ['AG007','Volume de água tratada em ETA(s)',dadosAgua?.ag007],
+    //             ['AG015','Volume de água de água tratada por simples desinfecção',dadosAgua?.ag015],
+    //             ['AG027','Volume de água fluoretada',dadosAgua?.ag027],
+    //             ['AG012','Volume de água macromedida',dadosAgua?.ag012],
+    //             ['AG008','Volume de água micromedida',dadosAgua?.ag008],
+    //             ['AG010','Volume de água consumido',dadosAgua?.ag010],
+    //             ['AG011','Volume de água faturado',dadosAgua?.ag011],
+    //             ['AG020','Volume micromedido nas economias residenciais de água',dadosAgua?.ag020],
+    //             ['AG005','Extenção da rede de água',dadosAgua?.ag005],
+    //             ['AG028','Consumo total de energia elétrica nos sistemas de água',dadosAgua?.ag028],
+    //             ['AG098','Campo de justificativa',dadosAgua?.ag098],
+    //             ['AG099','Observações',dadosAgua?.ag099],
 
                 
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
-       {text: 'Esgoto', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {text: 'Esgoto', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
        
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                ['ES009', 'Quantidade de ligações totais de esgoto', dadosEsgoto?.es009 ],
-                ['ES002', 'Quantidade de ligações ativas de esgoto', dadosEsgoto?.es002 ],
-                ['ES003', 'Quantidade de economias ativas de esgoto', dadosEsgoto?.es003 ],
-                ['ES008', 'Quantidade de economias residenciais ativas de esgoto', dadosEsgoto?.es008 ],
-                ['ES005', 'Volume de esgoto coletado', dadosEsgoto?.es005 ],
-                ['ES006', 'Volume de esgoto tratado', dadosEsgoto?.es006 ],
-                ['ES007', 'Volume de esgoto faturado', dadosEsgoto?.es007 ],
-                ['ES012', 'Volume de esgoto bruto exportado', dadosEsgoto?.es012 ],
-                ['ES015', 'Volume de esgoto bruto tratado nas instalações do importador', dadosEsgoto?.es015 ],
-                ['ES004', 'Extenção da rede', dadosEsgoto?.es004 ],
-                ['ES028', 'Consumo total de energia elétrica nos sistemas de água', dadosEsgoto?.es028 ],
-                ['ES098', 'Campo de justificativa', dadosEsgoto?.es098 ],
-                ['ES099', 'Observações', dadosEsgoto?.es099 ],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //             ['ES009', 'Quantidade de ligações totais de esgoto', dadosEsgoto?.es009 ],
+    //             ['ES002', 'Quantidade de ligações ativas de esgoto', dadosEsgoto?.es002 ],
+    //             ['ES003', 'Quantidade de economias ativas de esgoto', dadosEsgoto?.es003 ],
+    //             ['ES008', 'Quantidade de economias residenciais ativas de esgoto', dadosEsgoto?.es008 ],
+    //             ['ES005', 'Volume de esgoto coletado', dadosEsgoto?.es005 ],
+    //             ['ES006', 'Volume de esgoto tratado', dadosEsgoto?.es006 ],
+    //             ['ES007', 'Volume de esgoto faturado', dadosEsgoto?.es007 ],
+    //             ['ES012', 'Volume de esgoto bruto exportado', dadosEsgoto?.es012 ],
+    //             ['ES015', 'Volume de esgoto bruto tratado nas instalações do importador', dadosEsgoto?.es015 ],
+    //             ['ES004', 'Extenção da rede', dadosEsgoto?.es004 ],
+    //             ['ES028', 'Consumo total de energia elétrica nos sistemas de água', dadosEsgoto?.es028 ],
+    //             ['ES098', 'Campo de justificativa', dadosEsgoto?.es098 ],
+    //             ['ES099', 'Observações', dadosEsgoto?.es099 ],
 
                
                
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
       
-        {text: 'Drenagem e Águas Pluviais', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-        {
-         table: {
-             headerRows: 1,
-             body: [
+    //     {text: 'Drenagem e Águas Pluviais', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //     {
+    //      table: {
+    //          headerRows: 1,
+    //          body: [
 
-                 [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                 ['IE017', 'Extensão total das vias públicas urbanas', dadosDrenagem?.ie017 ],
-                 ['IE018', 'Extensão total das vias públicas urbanas implantadas', dadosDrenagem?.ie018 ],
-                 ['IE019', 'Extensão total das vias públicas com pavimento e meio-fio(ou semelhante)', dadosDrenagem?.ie019 ],
-                 ['IE020', 'Extensão total das vias públicas com pavimento e meio-fio(ou semelhante) implantadas no ano de referência', dadosDrenagem?.ie020 ],
-                 ['IE021', 'Quantidade de bocas de lobo existentes', dadosDrenagem?.ie021 ],
-                 ['IE022', 'Quantidade de bocas de leão ou de bocas de lobo múltiplas(duas ou mais bocas de lobo conjugadas) existentes', dadosDrenagem?.ie022 ],
-                 ['IE023', 'Quantidade de poços de visita (PV) existentes', dadosDrenagem?.ie023 ],
-                 ['IE024', 'Extensão total das vias públicas urbanas com redes de águas pluviais subterrâneos', dadosDrenagem?.ie024 ],
-                 ['IE025', 'Extensão total das vias públicas urbanas com redes de águas pluviais subterrâneos implantados no ano de referência', dadosDrenagem?.ie025 ],
-                 ['IE026', 'Existem vias públicas urbanas com canais artificiais abertos?', dadosDrenagem?.ie026 ],
-                 ['IE027', 'Existem vias públicas urbanas com soluções de drenagem natural (faixas ou valas de infiltração)?', dadosDrenagem?.ie027 ],
-                 ['IE028', 'Extensão total das vias públicas urbanas com soluções de drenagem natural (faixas ou valas de infiltração)', dadosDrenagem?.ie028 ],
-                 ['IE029', 'Existem estenções elevatórias de águas pluviais na rede de drenagem?', dadosDrenagem?.ie029 ],
-                 ['IE032', 'Extensão total dos Cursos d’água naturais perenes', dadosDrenagem?.ie032 ],
-                 ['IE040', 'Extensão total dos Cursos d’água naturais perenes copm outro tipo de intervenção', dadosDrenagem?.ie040 ],
-                 ['IE033', 'Extensão total dos Cursos d’água naturais perenes com diques', dadosDrenagem?.ie033 ],
-                 ['IE034', 'Extensão total dos Cursos d’água naturais perenes canalizados abertos', dadosDrenagem?.ie034 ],
-                 ['IE035', 'Extensão total dos Cursos d’água naturais perenes canalizados fechados', dadosDrenagem?.ie035 ],
-                 ['IE036', 'Extensão total dos Cursos d’água naturais perenes com retificação', dadosDrenagem?.ie036 ],
-                 ['IE037', 'Extensão total dos Cursos d’água naturais perenes com desenrocamento ou rebaixamento do leito', dadosDrenagem?.ie037 ],
-                 ['IE041', 'Existe serviço de drenagem ou desassoreamento dos Cursos d’água naturais perenes?', dadosDrenagem?.ie041 ],
-                 ['IE044', 'Extensão total de parques lineares ao longo de Cursos d’água perenes', dadosDrenagem?.ie044 ],
-                 ['IE050', 'Existem algum tipo de tratamento das águas pluviais?', dadosDrenagem?.ie050 ],
-                 ['IE050A', 'Especifique qual é o outro tipo de tratamento das águas pluviais', dadosDrenagem?.ie050a ],
-                 ['IE999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem?.ie999 ],
-                 ['RI023', 'Numero de enxurradas na área urbana do município', dadosDrenagem?.ri023 ],
-                 ['RI025', 'Numero de alagementos na área urbana do município', dadosDrenagem?.ri025 ],
-                 ['RI027', 'Numero de inundações na área urbana do município', dadosDrenagem?.ri027 ],
-                 ['RI029', 'Numero de pessoas desabrigadas ou desalojadas, na área urbana do município', dadosDrenagem?.ri029 ],
-                 ['RI031', 'Numero de óbitos, na área urbana do município', dadosDrenagem?.ri031 ],
-                 ['RI032', 'Numero de imóveis urbanos atingidos', dadosDrenagem?.ri032 ],
-                 ['RI042', 'Houve alojamento ou reassentamento de população residente em área de risco hidrológico, durante ou após eventos hidrológicos impactantes', dadosDrenagem?.ri042 ],
-                 ['RI043', 'Quantidade de pessoas tranferidas para habitações provisórias durante ou após os eventos hidrológicos impactantes', dadosDrenagem?.ri043 ],
-                 ['RI044', 'Quantidade de pessoas realocadas para habitações permanentes durante ou após os eventos hidrológicos impactantes', dadosDrenagem?.ri044 ],
-                 ['RI045', 'Houve atuação (federal, estadual ou municipal) para reassentamento da população e/ou para recuperação de imóveis urbanos afetados por eventos hidrológicos impactantes?', dadosDrenagem?.ri045 ],
-                 ['RI999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem?.ri999 ],
+    //              [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //              ['IE017', 'Extensão total das vias públicas urbanas', dadosDrenagem?.ie017 ],
+    //              ['IE018', 'Extensão total das vias públicas urbanas implantadas', dadosDrenagem?.ie018 ],
+    //              ['IE019', 'Extensão total das vias públicas com pavimento e meio-fio(ou semelhante)', dadosDrenagem?.ie019 ],
+    //              ['IE020', 'Extensão total das vias públicas com pavimento e meio-fio(ou semelhante) implantadas no ano de referência', dadosDrenagem?.ie020 ],
+    //              ['IE021', 'Quantidade de bocas de lobo existentes', dadosDrenagem?.ie021 ],
+    //              ['IE022', 'Quantidade de bocas de leão ou de bocas de lobo múltiplas(duas ou mais bocas de lobo conjugadas) existentes', dadosDrenagem?.ie022 ],
+    //              ['IE023', 'Quantidade de poços de visita (PV) existentes', dadosDrenagem?.ie023 ],
+    //              ['IE024', 'Extensão total das vias públicas urbanas com redes de águas pluviais subterrâneos', dadosDrenagem?.ie024 ],
+    //              ['IE025', 'Extensão total das vias públicas urbanas com redes de águas pluviais subterrâneos implantados no ano de referência', dadosDrenagem?.ie025 ],
+    //              ['IE026', 'Existem vias públicas urbanas com canais artificiais abertos?', dadosDrenagem?.ie026 ],
+    //              ['IE027', 'Existem vias públicas urbanas com soluções de drenagem natural (faixas ou valas de infiltração)?', dadosDrenagem?.ie027 ],
+    //              ['IE028', 'Extensão total das vias públicas urbanas com soluções de drenagem natural (faixas ou valas de infiltração)', dadosDrenagem?.ie028 ],
+    //              ['IE029', 'Existem estenções elevatórias de águas pluviais na rede de drenagem?', dadosDrenagem?.ie029 ],
+    //              ['IE032', 'Extensão total dos Cursos d’água naturais perenes', dadosDrenagem?.ie032 ],
+    //              ['IE040', 'Extensão total dos Cursos d’água naturais perenes copm outro tipo de intervenção', dadosDrenagem?.ie040 ],
+    //              ['IE033', 'Extensão total dos Cursos d’água naturais perenes com diques', dadosDrenagem?.ie033 ],
+    //              ['IE034', 'Extensão total dos Cursos d’água naturais perenes canalizados abertos', dadosDrenagem?.ie034 ],
+    //              ['IE035', 'Extensão total dos Cursos d’água naturais perenes canalizados fechados', dadosDrenagem?.ie035 ],
+    //              ['IE036', 'Extensão total dos Cursos d’água naturais perenes com retificação', dadosDrenagem?.ie036 ],
+    //              ['IE037', 'Extensão total dos Cursos d’água naturais perenes com desenrocamento ou rebaixamento do leito', dadosDrenagem?.ie037 ],
+    //              ['IE041', 'Existe serviço de drenagem ou desassoreamento dos Cursos d’água naturais perenes?', dadosDrenagem?.ie041 ],
+    //              ['IE044', 'Extensão total de parques lineares ao longo de Cursos d’água perenes', dadosDrenagem?.ie044 ],
+    //              ['IE050', 'Existem algum tipo de tratamento das águas pluviais?', dadosDrenagem?.ie050 ],
+    //              ['IE050A', 'Especifique qual é o outro tipo de tratamento das águas pluviais', dadosDrenagem?.ie050a ],
+    //              ['IE999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem?.ie999 ],
+    //              ['RI023', 'Numero de enxurradas na área urbana do município', dadosDrenagem?.ri023 ],
+    //              ['RI025', 'Numero de alagementos na área urbana do município', dadosDrenagem?.ri025 ],
+    //              ['RI027', 'Numero de inundações na área urbana do município', dadosDrenagem?.ri027 ],
+    //              ['RI029', 'Numero de pessoas desabrigadas ou desalojadas, na área urbana do município', dadosDrenagem?.ri029 ],
+    //              ['RI031', 'Numero de óbitos, na área urbana do município', dadosDrenagem?.ri031 ],
+    //              ['RI032', 'Numero de imóveis urbanos atingidos', dadosDrenagem?.ri032 ],
+    //              ['RI042', 'Houve alojamento ou reassentamento de população residente em área de risco hidrológico, durante ou após eventos hidrológicos impactantes', dadosDrenagem?.ri042 ],
+    //              ['RI043', 'Quantidade de pessoas tranferidas para habitações provisórias durante ou após os eventos hidrológicos impactantes', dadosDrenagem?.ri043 ],
+    //              ['RI044', 'Quantidade de pessoas realocadas para habitações permanentes durante ou após os eventos hidrológicos impactantes', dadosDrenagem?.ri044 ],
+    //              ['RI045', 'Houve atuação (federal, estadual ou municipal) para reassentamento da população e/ou para recuperação de imóveis urbanos afetados por eventos hidrológicos impactantes?', dadosDrenagem?.ri045 ],
+    //              ['RI999', 'Observações, esclarecimentos ou sugestões', dadosDrenagem?.ri999 ],
 
                  
                 
                  
-             ]
-         },
-         layout: 'headerLineOnly'
-        },
+    //          ]
+    //      },
+    //      layout: 'headerLineOnly'
+    //     },
 
-        {text: 'Resíduos Sólidos Coleta', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //     {text: 'Resíduos Sólidos Coleta', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
-                ['TB001', 'Coletores e Motoristas de agentes PÚBLICOS, alocados na coleta', dadosResiduosColeta?.tb001],
-                ['TB003', 'Agentes PÚBLICOS envolvidos na varrição', dadosResiduosColeta?.tb003],
-                ['TB005', 'Agentes PÚBLICOS envolvidos com a capina e roçada', dadosResiduosColeta?.tb005],
-                ['TB007', 'Agentes PÚBLICOS alocados nas unidades de manejo, tratamento ou disposição final', dadosResiduosColeta?.tb007],
-                ['TB009', 'Agentes PÚBLICOS envolvidos nos demais serviços quando não especificados acima', dadosResiduosColeta?.tb009],
-                ['TB011', 'Agentes PÚBLICOS alocados na Gerencia ou Administração (Planejamento ou Fiscalização)', dadosResiduosColeta?.tb011],
-                ['TB013', 'Total de Agentes PÚBLICOS envolvidos', dadosResiduosColeta?.tb013],
-                ['TB002', 'Coletores e Motoristas de agentes PRIVADOS, alocados na coleta', dadosResiduosColeta?.tb002],
-                ['TB004', 'Agentes PRIVADOS envolvidos na varrição', dadosResiduosColeta?.tb004],
-                ['TB006', 'Agentes PRIVADOS envolvidos com a capina e roçada', dadosResiduosColeta?.tb006],
-                ['TB008', 'Agentes PRIVADOS alocados nas unidades de manejo, tratamento ou disposição final', dadosResiduosColeta?.tb008],
-                ['TB010', 'Agentes PRIVADOS envolvidos nos demais serviços quando não especificados acima', dadosResiduosColeta?.tb010],
-                ['TB012', 'Agentes PRIVADOS alocados na Gerencia ou Administração (Planejamento ou Fiscalização)', dadosResiduosColeta?.tb012],
-                ['TB014', 'Total de Agentes PRIVADOS envolvidos', dadosResiduosColeta?.tb014],
-                ['TB015', 'Total de trabalhadores envolvidos nos servicos de Manejo de RSU', dadosResiduosColeta?.tb015],
-                ['TB016', 'Existem frentes de trabalho temporário?', dadosResiduosColeta?.tb016],
-                ['TB017', 'Quantidades de trabalhadores Frente !', dadosResiduosColeta?.tb017],
-                ['TB020', 'Duração de frente 1', dadosResiduosColeta?.tb020],
-                ['TB023', 'Atuam em mais de um tipo de serviço, Frente 1?', dadosResiduosColeta?.tb023],
-                ['TB026', 'Tipo de serviço predominate de Frente 1', dadosResiduosColeta?.tb026],
-                ['TB018', 'Quantidade de trabalhadores Frente 2', dadosResiduosColeta?.tb018],
-                ['TB021', 'Duração de Frente 2', dadosResiduosColeta?.tb021],
-                ['TB024', 'Atuam em mais de um tipo de serviço, Frente 2?', dadosResiduosColeta?.tb024],
-                ['TB027', 'Tipo de serviço predominante da Frente 2', dadosResiduosColeta?.tb027],
-                ['TB019', 'Quantidade de trabalhadores Frente 3', dadosResiduosColeta?.tb019],
-                ['TB022', 'Duração de Frente 3', dadosResiduosColeta?.tb022],
-                ['TB025', 'Atuam em mais de um tipo de serviços, Frente 3?', dadosResiduosColeta?.tb025],
-                ['TB028', 'Tipo de serviços predominante da Frente 3', dadosResiduosColeta?.tb028],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: dados?.ano}],
+    //             ['TB001', 'Coletores e Motoristas de agentes PÚBLICOS, alocados na coleta', dadosResiduosColeta?.tb001],
+    //             ['TB003', 'Agentes PÚBLICOS envolvidos na varrição', dadosResiduosColeta?.tb003],
+    //             ['TB005', 'Agentes PÚBLICOS envolvidos com a capina e roçada', dadosResiduosColeta?.tb005],
+    //             ['TB007', 'Agentes PÚBLICOS alocados nas unidades de manejo, tratamento ou disposição final', dadosResiduosColeta?.tb007],
+    //             ['TB009', 'Agentes PÚBLICOS envolvidos nos demais serviços quando não especificados acima', dadosResiduosColeta?.tb009],
+    //             ['TB011', 'Agentes PÚBLICOS alocados na Gerencia ou Administração (Planejamento ou Fiscalização)', dadosResiduosColeta?.tb011],
+    //             ['TB013', 'Total de Agentes PÚBLICOS envolvidos', dadosResiduosColeta?.tb013],
+    //             ['TB002', 'Coletores e Motoristas de agentes PRIVADOS, alocados na coleta', dadosResiduosColeta?.tb002],
+    //             ['TB004', 'Agentes PRIVADOS envolvidos na varrição', dadosResiduosColeta?.tb004],
+    //             ['TB006', 'Agentes PRIVADOS envolvidos com a capina e roçada', dadosResiduosColeta?.tb006],
+    //             ['TB008', 'Agentes PRIVADOS alocados nas unidades de manejo, tratamento ou disposição final', dadosResiduosColeta?.tb008],
+    //             ['TB010', 'Agentes PRIVADOS envolvidos nos demais serviços quando não especificados acima', dadosResiduosColeta?.tb010],
+    //             ['TB012', 'Agentes PRIVADOS alocados na Gerencia ou Administração (Planejamento ou Fiscalização)', dadosResiduosColeta?.tb012],
+    //             ['TB014', 'Total de Agentes PRIVADOS envolvidos', dadosResiduosColeta?.tb014],
+    //             ['TB015', 'Total de trabalhadores envolvidos nos servicos de Manejo de RSU', dadosResiduosColeta?.tb015],
+    //             ['TB016', 'Existem frentes de trabalho temporário?', dadosResiduosColeta?.tb016],
+    //             ['TB017', 'Quantidades de trabalhadores Frente !', dadosResiduosColeta?.tb017],
+    //             ['TB020', 'Duração de frente 1', dadosResiduosColeta?.tb020],
+    //             ['TB023', 'Atuam em mais de um tipo de serviço, Frente 1?', dadosResiduosColeta?.tb023],
+    //             ['TB026', 'Tipo de serviço predominate de Frente 1', dadosResiduosColeta?.tb026],
+    //             ['TB018', 'Quantidade de trabalhadores Frente 2', dadosResiduosColeta?.tb018],
+    //             ['TB021', 'Duração de Frente 2', dadosResiduosColeta?.tb021],
+    //             ['TB024', 'Atuam em mais de um tipo de serviço, Frente 2?', dadosResiduosColeta?.tb024],
+    //             ['TB027', 'Tipo de serviço predominante da Frente 2', dadosResiduosColeta?.tb027],
+    //             ['TB019', 'Quantidade de trabalhadores Frente 3', dadosResiduosColeta?.tb019],
+    //             ['TB022', 'Duração de Frente 3', dadosResiduosColeta?.tb022],
+    //             ['TB025', 'Atuam em mais de um tipo de serviços, Frente 3?', dadosResiduosColeta?.tb025],
+    //             ['TB028', 'Tipo de serviços predominante da Frente 3', dadosResiduosColeta?.tb028],
 
                            
                 
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
-       {text: 'Frota de coleta domiciliar e pública', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},      
-       {
-        table: {
-            headerRows: 1,
-            body: [
-                [{text: 'Tipo de veiculos(Quant?.)'},{text: ''},{text: 'Prefeitura SLU'},{text: ''},{text: ''}, {text: 'Empr?. Contratada'},{text: ''}],
-                [' ', '0 a 5 anos', '5 a 10 anos','Maior que 10 anos','0 a 5 anos','5 a 10 anos','Maior que 10 anos' ],
-                [' ', 'CO054', 'CO055','CO056','CO057','CO058','CO059' ],
-                ['Caminhão compactador', dadosResiduosColeta?.co054, dadosResiduosColeta?.co055
-                ,dadosResiduosColeta?.co056,dadosResiduosColeta?.co057,dadosResiduosColeta?.co058,dadosResiduosColeta?.co059 ],
-                [' ', 'CO063', 'CO064','CO065','CO066','CO067','CO068' ],
-                ['Caminhão basculante, baú ou carroceria', dadosResiduosColeta?.co063, dadosResiduosColeta?.co064
-                ,dadosResiduosColeta?.co065,dadosResiduosColeta?.co066,dadosResiduosColeta?.co067,dadosResiduosColeta?.co068 ],
-                [' ', 'CO072', 'CO073','CO074','CO075','CO076','CO077' ],
-                ['Caminhão poliguindastes (brook)', dadosResiduosColeta?.co072, dadosResiduosColeta?.co073
-                ,dadosResiduosColeta?.co074,dadosResiduosColeta?.co075,dadosResiduosColeta?.co076,dadosResiduosColeta?.co077 ],
-                [' ', 'CO071', 'CO082','CO083','CO084','CO085','CO086' ],
-                ['Trator agrícola com reboque', dadosResiduosColeta?.co071, dadosResiduosColeta?.co082
-                ,dadosResiduosColeta?.co083,dadosResiduosColeta?.co084,dadosResiduosColeta?.co085,dadosResiduosColeta?.co086 ],
-                [' ', 'CO090', 'CO091','CO092','CO093','CO094','CO095' ],
-                ['Tração animal', dadosResiduosColeta?.co090, dadosResiduosColeta?.co091
-                ,dadosResiduosColeta?.co092,dadosResiduosColeta?.co093,dadosResiduosColeta?.co094,dadosResiduosColeta?.co095 ],
-                [' ', 'CO155', 'CO156','CO157','CO158','CO159','CO160' ],
-                ['Tração animal', dadosResiduosColeta?.co155, dadosResiduosColeta?.co156
-                ,dadosResiduosColeta?.co157,dadosResiduosColeta?.co158,dadosResiduosColeta?.co159,dadosResiduosColeta?.co160 ],
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //    {text: 'Frota de coleta domiciliar e pública', bold: true,fontSize: 14, margin: [0, 10, 15, 0]},      
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
+    //             [{text: 'Tipo de veiculos(Quant?.)'},{text: ''},{text: 'Prefeitura SLU'},{text: ''},{text: ''}, {text: 'Empr?. Contratada'},{text: ''}],
+    //             [' ', '0 a 5 anos', '5 a 10 anos','Maior que 10 anos','0 a 5 anos','5 a 10 anos','Maior que 10 anos' ],
+    //             [' ', 'CO054', 'CO055','CO056','CO057','CO058','CO059' ],
+    //             ['Caminhão compactador', dadosResiduosColeta?.co054, dadosResiduosColeta?.co055
+    //             ,dadosResiduosColeta?.co056,dadosResiduosColeta?.co057,dadosResiduosColeta?.co058,dadosResiduosColeta?.co059 ],
+    //             [' ', 'CO063', 'CO064','CO065','CO066','CO067','CO068' ],
+    //             ['Caminhão basculante, baú ou carroceria', dadosResiduosColeta?.co063, dadosResiduosColeta?.co064
+    //             ,dadosResiduosColeta?.co065,dadosResiduosColeta?.co066,dadosResiduosColeta?.co067,dadosResiduosColeta?.co068 ],
+    //             [' ', 'CO072', 'CO073','CO074','CO075','CO076','CO077' ],
+    //             ['Caminhão poliguindastes (brook)', dadosResiduosColeta?.co072, dadosResiduosColeta?.co073
+    //             ,dadosResiduosColeta?.co074,dadosResiduosColeta?.co075,dadosResiduosColeta?.co076,dadosResiduosColeta?.co077 ],
+    //             [' ', 'CO071', 'CO082','CO083','CO084','CO085','CO086' ],
+    //             ['Trator agrícola com reboque', dadosResiduosColeta?.co071, dadosResiduosColeta?.co082
+    //             ,dadosResiduosColeta?.co083,dadosResiduosColeta?.co084,dadosResiduosColeta?.co085,dadosResiduosColeta?.co086 ],
+    //             [' ', 'CO090', 'CO091','CO092','CO093','CO094','CO095' ],
+    //             ['Tração animal', dadosResiduosColeta?.co090, dadosResiduosColeta?.co091
+    //             ,dadosResiduosColeta?.co092,dadosResiduosColeta?.co093,dadosResiduosColeta?.co094,dadosResiduosColeta?.co095 ],
+    //             [' ', 'CO155', 'CO156','CO157','CO158','CO159','CO160' ],
+    //             ['Tração animal', dadosResiduosColeta?.co155, dadosResiduosColeta?.co156
+    //             ,dadosResiduosColeta?.co157,dadosResiduosColeta?.co158,dadosResiduosColeta?.co159,dadosResiduosColeta?.co160 ],
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
             
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
                 
-                ['CO163','Outros veículos', dadosResiduosColeta?.co163],
+    //             ['CO163','Outros veículos', dadosResiduosColeta?.co163],
                
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
        
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
-                ['CO154', 'Os residuos provenientes da varrição ou limpeza de logradouros públicos são recolhidos junto com os residuos domiciliares?', dadosResiduosColeta?.co154 ],
-                ['CO012', 'Valor contratado (preço unitário) do serviço de RDO e RPU diurna', dadosResiduosColeta?.co012 ],
-                ['CO146', 'Valor contratual (preço unitário) do serviço de transporte de RDO e RPU até a unidade de destinação final', dadosResiduosColeta?.co146 ],
-                ['CO148', 'No preço acima está incluido o transporte de RDO e RPU coletados até a destinação final?', dadosResiduosColeta?.co148 ],
-                ['CO149', 'A distancia média do centro de massa à unidade de destinação final é superior a 15 km?', dadosResiduosColeta?.co149 ],
-                ['CO150', 'Especifique a distancia do centro de massa à unidade de destinação final superior a 15km', dadosResiduosColeta?.co150 ],
-                ['CO151', 'A distancia média de transporte à unidade de destinação final é superior a 15km?', dadosResiduosColeta?.co151 ],
-                ['CO152', 'Especifique a distancia de transporte à unidade de destinação final superior a 15km', dadosResiduosColeta?.co152 ],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
+    //             ['CO154', 'Os residuos provenientes da varrição ou limpeza de logradouros públicos são recolhidos junto com os residuos domiciliares?', dadosResiduosColeta?.co154 ],
+    //             ['CO012', 'Valor contratado (preço unitário) do serviço de RDO e RPU diurna', dadosResiduosColeta?.co012 ],
+    //             ['CO146', 'Valor contratual (preço unitário) do serviço de transporte de RDO e RPU até a unidade de destinação final', dadosResiduosColeta?.co146 ],
+    //             ['CO148', 'No preço acima está incluido o transporte de RDO e RPU coletados até a destinação final?', dadosResiduosColeta?.co148 ],
+    //             ['CO149', 'A distancia média do centro de massa à unidade de destinação final é superior a 15 km?', dadosResiduosColeta?.co149 ],
+    //             ['CO150', 'Especifique a distancia do centro de massa à unidade de destinação final superior a 15km', dadosResiduosColeta?.co150 ],
+    //             ['CO151', 'A distancia média de transporte à unidade de destinação final é superior a 15km?', dadosResiduosColeta?.co151 ],
+    //             ['CO152', 'Especifique a distancia de transporte à unidade de destinação final superior a 15km', dadosResiduosColeta?.co152 ],
 
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
-       {
-        table: {
-            headerRows: 1,
-            body: [
-                [{text: 'Tipo de resíduos (Quantidade em toneladas)'},{text: 'Prefeitura ou SLU'}
-                ,{text: 'Empresas ou autônomos contratados'},{text: 'Assoc. ou Coop. de Catadores c/ coleta seletiva'}
-                ,{text: 'Outros (inclusive proprios gerad. exceto catadores)'}, {text: 'Total'}],                
-                [' ', 'CO108', 'CO109','CS048','CO140','CO111' ],
-                ['Domiciliar e Comercial', dadosResiduosColeta?.co108, dadosResiduosColeta?.co109
-                ,dadosResiduosColeta?.cs048,dadosResiduosColeta?.co140,dadosResiduosColeta?.co111 ],
-                [' ', 'CO112', 'CO113',' ','CO141','CO115' ],
-                ['Público(Limpeza de logradouros)', dadosResiduosColeta?.co112, dadosResiduosColeta?.co113
-                ,' ',dadosResiduosColeta?.co141,dadosResiduosColeta?.co115 ],
-                [' ', 'CO116', 'CO117','CS048','CO142','CO119' ],
-                ['Total', dadosResiduosColeta?.co116, dadosResiduosColeta?.co117
-                ,dadosResiduosColeta?.cs048,dadosResiduosColeta?.co142,dadosResiduosColeta?.co117 ],
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
+    //             [{text: 'Tipo de resíduos (Quantidade em toneladas)'},{text: 'Prefeitura ou SLU'}
+    //             ,{text: 'Empresas ou autônomos contratados'},{text: 'Assoc. ou Coop. de Catadores c/ coleta seletiva'}
+    //             ,{text: 'Outros (inclusive proprios gerad. exceto catadores)'}, {text: 'Total'}],                
+    //             [' ', 'CO108', 'CO109','CS048','CO140','CO111' ],
+    //             ['Domiciliar e Comercial', dadosResiduosColeta?.co108, dadosResiduosColeta?.co109
+    //             ,dadosResiduosColeta?.cs048,dadosResiduosColeta?.co140,dadosResiduosColeta?.co111 ],
+    //             [' ', 'CO112', 'CO113',' ','CO141','CO115' ],
+    //             ['Público(Limpeza de logradouros)', dadosResiduosColeta?.co112, dadosResiduosColeta?.co113
+    //             ,' ',dadosResiduosColeta?.co141,dadosResiduosColeta?.co115 ],
+    //             [' ', 'CO116', 'CO117','CS048','CO142','CO119' ],
+    //             ['Total', dadosResiduosColeta?.co116, dadosResiduosColeta?.co117
+    //             ,dadosResiduosColeta?.cs048,dadosResiduosColeta?.co142,dadosResiduosColeta?.co117 ],
               
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
 
-       {
-        table: {
-            headerRows: 1,
-            body: [
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [
 
-                [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
-                ['CO021', 'É utilizada balança para pesagem rotineira dos residuos sólidos coletados?', dadosResiduosColeta?.co021 ],
-                ['CO019', 'Os resíduos sólidos DOMICILIARES coletados são enviados para outro município?', dadosResiduosColeta?.co019 ],
+    //             [{text: 'Código SNIS'},{text: 'Descrição'}, {text: ''}],
+    //             ['CO021', 'É utilizada balança para pesagem rotineira dos residuos sólidos coletados?', dadosResiduosColeta?.co021 ],
+    //             ['CO019', 'Os resíduos sólidos DOMICILIARES coletados são enviados para outro município?', dadosResiduosColeta?.co019 ],
 
-                ['CO020', 'Município(s) de destino de RDO e RPU exportado', '' ],
+    //             ['CO020', 'Município(s) de destino de RDO e RPU exportado', '' ],
                
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
-       {
-        table: {
-            headerRows: 1,
-            body: [   
-                [{text: 'Municípios'}],            
-                [concessionarias?.map((value: { razao_social: string; cnpj: string; ano_inicio: string; duracao: string; vigente: string; capina_e_rocada: string; coleta_res_construcao_civil: string; coleta_res_domiciliar: string; coleta_res_servicos_saude: string; coleta_res_publico: string; operacao_aterro_sanitario: string; operacao_incinerador: string; operacao_outras_unidades_processamento: string; operacao_unidade_compostagem: string; operacao_triagem: string; outros: string; tipo_desconhecido: string; varricao_logradouros_publicos: string })=>(                    
-                    [                                                 
-                        ['Razão Social Concessionária: '+ value?.razao_social],
-                        ['CNPJ: '+ value?.cnpj],
-                        ['Ano de inicio: '+ value?.ano_inicio],
-                        ['Duração(em anos): '+ value?.duracao],
-                        ['Vigente?: '+ value?.vigente],
-                        ['Capina e roçada: '+ value?.capina_e_rocada],
-                        ['Coleta de res. contrucão civil: '+ value?.coleta_res_construcao_civil],
-                        ['Coleta de res. Domiciliar: '+ value?.coleta_res_domiciliar],
-                        ['Coleta de res. dos Serviços da Saúde:'+ value?.coleta_res_servicos_saude],
-                        ['Coleta de res. Público:'+ value?.coleta_res_publico],
-                        ['Operação de aterro sanitário:'+ value?.operacao_aterro_sanitario],
-                        ['Operação de incinerador:'+ value?.operacao_incinerador],
-                        ['Operação de outras unidades de processamento:'+ value?.operacao_outras_unidades_processamento],
-                        ['Operação de unidade de compostagem:'+ value?.operacao_unidade_compostagem],
-                        ['Operação de triagem:'+ value?.operacao_triagem],
-                        ['Outros:'+ value?.outros],
-                        ['Tipo desconhecido:'+ value?.tipo_desconhecido],
-                        ['Varrição de logradouros públicos:'+ value?.varricao_logradouros_publicos],
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
+    //    {
+    //     table: {
+    //         headerRows: 1,
+    //         body: [   
+    //             [{text: 'Municípios'}],            
+    //             [concessionarias?.map((value: { razao_social: string; cnpj: string; ano_inicio: string; duracao: string; vigente: string; capina_e_rocada: string; coleta_res_construcao_civil: string; coleta_res_domiciliar: string; coleta_res_servicos_saude: string; coleta_res_publico: string; operacao_aterro_sanitario: string; operacao_incinerador: string; operacao_outras_unidades_processamento: string; operacao_unidade_compostagem: string; operacao_triagem: string; outros: string; tipo_desconhecido: string; varricao_logradouros_publicos: string })=>(                    
+    //                 [                                                 
+    //                     ['Razão Social Concessionária: '+ value?.razao_social],
+    //                     ['CNPJ: '+ value?.cnpj],
+    //                     ['Ano de inicio: '+ value?.ano_inicio],
+    //                     ['Duração(em anos): '+ value?.duracao],
+    //                     ['Vigente?: '+ value?.vigente],
+    //                     ['Capina e roçada: '+ value?.capina_e_rocada],
+    //                     ['Coleta de res. contrucão civil: '+ value?.coleta_res_construcao_civil],
+    //                     ['Coleta de res. Domiciliar: '+ value?.coleta_res_domiciliar],
+    //                     ['Coleta de res. dos Serviços da Saúde:'+ value?.coleta_res_servicos_saude],
+    //                     ['Coleta de res. Público:'+ value?.coleta_res_publico],
+    //                     ['Operação de aterro sanitário:'+ value?.operacao_aterro_sanitario],
+    //                     ['Operação de incinerador:'+ value?.operacao_incinerador],
+    //                     ['Operação de outras unidades de processamento:'+ value?.operacao_outras_unidades_processamento],
+    //                     ['Operação de unidade de compostagem:'+ value?.operacao_unidade_compostagem],
+    //                     ['Operação de triagem:'+ value?.operacao_triagem],
+    //                     ['Outros:'+ value?.outros],
+    //                     ['Tipo desconhecido:'+ value?.tipo_desconhecido],
+    //                     ['Varrição de logradouros públicos:'+ value?.varricao_logradouros_publicos],
 
 
-                        ['-----------------------------------------------------------------------------------------------------------']
-                    ]
-                ))]
-            ]
-        },
-        layout: 'headerLineOnly'
-       },
+    //                     ['-----------------------------------------------------------------------------------------------------------']
+    //                 ]
+    //             ))]
+    //         ]
+    //     },
+    //     layout: 'headerLineOnly'
+    //    },
        
     ]
    

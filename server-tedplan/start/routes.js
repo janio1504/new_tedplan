@@ -47,6 +47,18 @@ Route.get(
   "GestaoIndicadoresController.getRepresentantesServicos"
 );
 
+Route.get("get-all-presidencia-conselho-municipal/:id", "GestaoIndicadoresController.getAllPresidenciaConselhoMunicipal");
+Route.post("create-presidencia-conselho-municipal", "GestaoIndicadoresController.addPresidenciaConselhoMunicipal");
+Route.put("update-presidencia-conselho-municipal", "GestaoIndicadoresController.updatePresidenciaConselhoMunicipal");
+Route.delete("delete-presidencia-conselho-municipal/:id", "GestaoIndicadoresController.destroyPresidenciaConselhoMunicipal");
+Route.get("get-presidencia-conselho-municipal/:id", "GestaoIndicadoresController.getPresidenciaConselhoMunicipal");
+
+Route.get("get-conselhos-municipais/:id", "GestaoIndicadoresController.getConselhosMunicipais");
+Route.post("create-conselho-municipal", "GestaoIndicadoresController.addConselhoMunicipal");
+Route.put("update-conselho-municipal", "GestaoIndicadoresController.updateConselhoMunicipal");
+Route.delete("delete-conselho-municipal/:id", "GestaoIndicadoresController.destroyConselhoMunicipal");
+Route.get("get-conselho-municipal/:id", "GestaoIndicadoresController.getConselhoMunicipal");
+
 Route.delete("remover-representante", "GestaoIndicadoresController.destroyRepresentante");
 Route.delete("remover-politica", "GestaoIndicadoresController.destroyPolitica");
 Route.delete("remover-plano", "GestaoIndicadoresController.destroyPlano");
@@ -146,6 +158,8 @@ Route.get('codigo-snis/:id', 'CodigoSnisController.getById');
 Route.post('codigo-snis', 'CodigoSnisController.create');
 Route.put('codigo-snis/:id', 'CodigoSnisController.update');
 Route.delete('codigo-snis/:id', 'CodigoSnisController.delete');
+
+Route.get("get-responsaveis-simisab/:id", "UsuariosController.getResponsaveisSimisab");
 
 // Rotas autenticadas ------------------------------- //
 Route.group(() => {

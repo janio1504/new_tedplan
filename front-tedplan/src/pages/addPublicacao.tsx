@@ -1,7 +1,6 @@
 import { GetServerSideProps } from "next";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { AuthContext } from "../contexts/AuthContext";
 import { toast, ToastContainer } from "react-nextjs-toast";
 
 import {
@@ -62,7 +61,6 @@ export default function AddPublicacao({
   municipios,
   tipoPublicacao,
   eixos,
-  categorias,
 }: MunicipiosProps) {
   const {
     register,
