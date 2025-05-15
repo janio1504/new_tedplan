@@ -94,7 +94,14 @@ export default function AddManual() {
 
           <label>Data de cadastro</label>
           <InputData>
-            <InputMask {...register("data_cadastro")} mask="99/99/9999" />
+            <InputMask 
+             mask="99/99/9999"
+              {...register("data_cadastro")}
+              render={(ref, props) => (
+                <input ref={ref} {...props} />
+              )}
+     
+            />
           </InputData>
 
           <label>manual</label>
