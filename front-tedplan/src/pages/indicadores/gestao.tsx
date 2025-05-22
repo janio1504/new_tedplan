@@ -5,6 +5,7 @@ import {
   Container,
   DivCenter,
   DivForm,
+  Sidebar,
   DivTituloForm,
   DivInput,
   Form,
@@ -12,6 +13,7 @@ import {
   InputM,
   InputG,
   SubmitButton,
+  SubmitButtonContainer,
   DivEixo,
   TextArea,
   DivTextArea,
@@ -53,6 +55,8 @@ import {
   onlyLettersAndCharacters,
   toTitleCase,
 } from "@/util/util";
+import { DivFormCadastro, MainContent, SidebarItem } from "@/styles/esgoto-indicadores";
+
 const InputMask = require("react-input-mask");
 
 const ModalSubmitButton = styled.button`
@@ -86,6 +90,7 @@ const ModalSubmitButton = styled.button`
     cursor: not-allowed;
   }
 `;
+
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -126,6 +131,14 @@ interface IRepresentantes {
   telefone: string;
   nome: string;
 }
+
+// interface IConselho {
+//   id_conselho_municipal_saneamento_basico: number;
+//   titulo: string;
+//   ano: string;
+//   id_arquivo: string;
+//   id_municipio: Number;
+// }
 
 interface IPoliticas {
   id_politica_municipal: string;
@@ -172,6 +185,8 @@ export default function GestaoIndicadores({
 
   const [showModal, setShowModal] = useState(false);
   const [listParticipacoes, setListParticipacoes] = useState(null);
+  const [ShowModalPresidente, setShowModalPresidente] = useState(false);
+  const [activeForm, setActiveForm] = useState("gestaoAssociada");
   const [content, setContent] = useState("");
   const [listPoliticas, setPoliticas] = useState(null);
   const [listPlanos, setPlanos] = useState(null);
@@ -315,9 +330,16 @@ export default function GestaoIndicadores({
   function handleShowModal() {
     setShowModal(true);
   }
-  function handleCloseModal() {
+   function handleCloseModal() {
     setShowModal(false);
   }
+  function handleShowModalPresidente() {
+    setShowModalPresidente(true);
+  }
+  function handleCloseModalPresidente() {
+    setShowModalPresidente(false);
+  }
+ 
 
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
@@ -555,10 +577,50 @@ export default function GestaoIndicadores({
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
+      <Sidebar>
+        <SidebarItem active={activeForm === "gestaoAssociada"}
+        onClick={() => setActiveForm("gestaoAssociada")}
+        >
+          Gestão Associada
+        </SidebarItem>
+        <SidebarItem active={activeForm === "politicaSaneamento"}
+        onClick={() => setActiveForm("politicaSaneamento")}
+        >
+          Política Municipal de Saneamento
+        </SidebarItem>
+        <SidebarItem active={activeForm === "planoSaneamento"}
+        onClick={() => setActiveForm("planoSaneamento")}
+        >
+          Plano Municipal de Saneamento
+        </SidebarItem>
+        <SidebarItem active={activeForm === "conselhoSaneamento"}
+        onClick={() => setActiveForm("conselhoSaneamento")}
+        >
+          Conselho Municipal de Saneamento Básico
+        </SidebarItem>
+        <SidebarItem active={activeForm === "participacaoSocial"}
+        onClick={() => setActiveForm("participacaoSocial")}
+        >
+          Participação e controle social
+        </SidebarItem>
+        <SidebarItem active={activeForm === "saneamentoRural"}
+        onClick={() => setActiveForm("saneamentoRural")}
+        >
+          Saneamento Rural
+        </SidebarItem>
+        <SidebarItem active={activeForm === "comunidadesTradicionais"}
+        onClick={() => setActiveForm("comunidadesTradicionais")}
+        >
+          Comunidades Tradicionais
+        </SidebarItem>
+      </Sidebar>
+
+    <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
+          <DivFormCadastro active={activeForm === "gestaoAssociada"}>
             <DivTituloForm>Gestão Associada</DivTituloForm>
+            
             <table>
               <tr>
                 <td>
@@ -641,8 +703,18 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
-          <DivForm>
+
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "politicaSaneamento"}>
             <DivTituloForm>
               Política Municipal de Saneamento Básico
             </DivTituloForm>
@@ -741,8 +813,19 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
-          <DivForm>
+
+          
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "planoSaneamento"}>
             <DivTituloForm>Plano Municipal de Saneamento Básico</DivTituloForm>
             <table>
               <tr>
@@ -768,7 +851,6 @@ export default function GestaoIndicadores({
             </table>
 
             <DivEixo>Atualizações</DivEixo>
-
             <Tabela>
               <table cellSpacing={0}>
                 <tbody>
@@ -812,9 +894,58 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+          </DivFormCadastro>
 
-          <DivForm>
+          <DivFormCadastro active={activeForm === "conselhoSaneamento"}> 
+            <DivTituloForm>
+              Conselho Municipal de Saneamento Básico
+            </DivTituloForm>
+            <table>
+              <tr>
+                <td>
+                  <InputG>
+                    <label>Município</label>
+                    <input 
+                    {...register("nome_municipio")}
+                    defaultValue={"teste"}
+                    type="text"></input>
+                  </InputG>
+                </td>
+                <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input type="text"></input>
+                    </InputP>
+                </td>
+                <td>
+                  <InputM>
+                    <label>Arquivo</label>
+                    <input type="file"></input>
+                  </InputM>
+                </td>
+              </tr>
+            </table>
+
+            <DivEixo>
+              Presidente{" "}
+              <span
+                onClick={() => {
+                  handleShowModalPresidente();
+                }}
+              >
+                Adicionar
+              </span>{" "}
+            </DivEixo>
+           
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "participacaoSocial"}>
             <DivTituloForm>Participação e Controle Social</DivTituloForm>
             <table>
               <tr>
@@ -904,8 +1035,18 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
-          <DivForm>
+
+          {/* </DivFormCadastro>
+          <DivForm> */}
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+          </DivFormCadastro>
+
+          <DivFormCadastro active = {activeForm === "saneamentoRural"}>
             <DivTituloForm>Saneamento Rural</DivTituloForm>
             <DivTextArea>
               <label>Breve Descrição</label>
@@ -919,9 +1060,17 @@ export default function GestaoIndicadores({
                 onChange={handleOnChange}
               ></textarea>
             </DivTextArea>
-          </DivForm>
-          <DivForm>
-            <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-15px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "comunidadesTradicionais"}>
+          <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
 
             <DivTextArea>
               <label>Nome das Comunidades Beneficiadas</label>
@@ -948,12 +1097,95 @@ export default function GestaoIndicadores({
                 onChange={handleOnChange}
               ></textarea>
             </DivTextArea>
-          </DivForm>
+
+        
           {usuario?.id_permissao !== 4 && (
             <SubmitButton type="submit">Gravar</SubmitButton>
           )}
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-15px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+
+          </DivFormCadastro>
+          
         </Form>
 
+        {ShowModalPresidente && (
+          <ContainerModal>
+            <Modal>
+              <Form>
+                <CloseModalButton
+                  onClick={() => {
+                    handleCloseModalPresidente();
+                  }}
+                >
+                  X
+                </CloseModalButton>
+                <SubmitButtonModal style={
+                  {'marginTop': '490px'}
+                } type="submit">Gravar</SubmitButtonModal>
+
+                <ConteudoModal>
+                  <InputG>
+                    <label>
+                      Nome<span> *</span>
+                    </label>
+                    <input
+                      // {...register("ga_nome_representante")}
+                      // defaultValue={dadosGestao?.ga_nome_representante}
+                      // onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  <InputP>
+                    <label>
+                      Telefone<span> *</span>
+                    </label>
+                    <input type="text"></input>
+                  </InputP>
+                  <InputP>
+                    <label>
+                     Email<span> *</span>
+                    </label>
+                    <input
+                      // {...register("ga_telefone")}
+                      // defaultValue={dadosGestao?.ga_telefone}
+                      // onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  <InputM>
+                    <label>
+                      Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      // {...register("ga_email")}
+                      // defaultValue={dadosGestao?.ga_email}
+                      // onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputM>
+                  <InputG>
+                    <label>
+                     Integrantes<span> *</span>
+                    </label>
+                    <input
+                      // {...register("ga_nome_representante")}
+                      // defaultValue={dadosGestao?.ga_nome_representante}
+                      // onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputG>
+                </ConteudoModal>
+              </Form>
+            </Modal>
+          </ContainerModal>
+        )}
+        
         {showModal && (
           <ContainerModal>
             <Modal>
@@ -963,7 +1195,7 @@ export default function GestaoIndicadores({
                     handleCloseModal();
                   }}
                 >
-                  Fechar
+                  X
                 </CloseModalButton>
 
                 <ConteudoModal>
@@ -1059,6 +1291,7 @@ export default function GestaoIndicadores({
           </ContainerModal>
         )}
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }

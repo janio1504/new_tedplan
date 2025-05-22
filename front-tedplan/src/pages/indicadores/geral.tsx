@@ -19,7 +19,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -29,11 +28,14 @@ import {
   DivBorder,
   LabelCenter,
   DivChekbox,
+  DivFormConteudo,
   CheckBox,
   DivTituloEixoDrenagem,
 } from "../../styles/financeiro";
+import { Sidebar } from "@/styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
+import { LineSideBar } from "@/styles/drenagem-indicadores";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -53,12 +55,14 @@ import {
   TabelaModal,
   ModalForm,
 } from "../../styles/esgoto-indicadores";
+import { DivFormCadastro, MainContent, SidebarItem} from "@/styles/esgoto-indicadores";
 import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
+import { Main } from "next/document";
 
 interface IMunicipio {
   id_municipio: string;
@@ -88,6 +92,7 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [concessionarias, setConcessionarias] = useState(null);
   const [modalAddConssionaria, setModalAddConssionaria] = useState(false);
   const [anoSelected, setAnoSelected] = useState(null);
+  const [activeForm, setActiveForm] = useState("municipiosAtendidos");
 
 
 
@@ -183,6 +188,7 @@ export default function Geral({ municipio }: MunicipioProps) {
     getConcessionaria(id)
     setModalAddConssionaria(true);
   }
+
   async function handleCadastro(data) {
 
     if(usuario?.id_permissao === 4){
@@ -273,18 +279,133 @@ export default function Geral({ municipio }: MunicipioProps) {
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <LineSideBar style={{'textAlign': 'start'}}>
+          Água e esgoto sanitário
+        </LineSideBar>
+        <SidebarItem
+        active={activeForm === "municipiosAtendidos"}
+        onClick = {() => setActiveForm("municipiosAtendidos")}>
+          Municípios Atendidos
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "sedesAtendidas"}
+        onClick = {() => setActiveForm("sedesAtendidas")}>
+          Sedes e localidades Atendidas
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "populacoesAtendidas"}
+        onClick = {() => setActiveForm("populacoesAtendidas")}>
+          Populações Atendidas
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "populacaoExistente"}
+        onClick = {() => setActiveForm("populacaoExistente")}>
+          População Existente
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "empregados"}
+        onClick = {() => setActiveForm("empregados")}>
+          Empregados
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "observacoes"}
+        onClick = {() => setActiveForm("observacoes")}>
+          Observações, Esclarecimentos ou Sugestões
+        </SidebarItem>
+
+        <LineSideBar style={{'textAlign': 'start'}}>
+          Drenagem e Águas Pluviais
+        </LineSideBar>
+        <SidebarItem
+        active={activeForm === "geografiaUrbanismo"}
+        onClick = {() => setActiveForm("geografiaUrbanismo")}>
+          Geografia e Urbanismo
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "dadosHidrograficos"}
+        onClick = {() => setActiveForm("dadosHidrograficos")}>
+          Dados Hidrográficos
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "empregados1"}
+        onClick = {() => setActiveForm("empregados1")}>
+          Empregados
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "infraestrutura"}
+        onClick = {() => setActiveForm("infraestrutura")}>
+          Infraestrutura
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "operacional"}
+        onClick = {() => setActiveForm("operacional")}>
+          Operacional
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "gestaoDeRisco"}
+        onClick = {() => setActiveForm("gestaoDeRisco")}>
+          Gestão de Risco
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "observacoes1"}
+        onClick = {() => setActiveForm("observacoes1")}>
+          Observações, Esclarecimentos ou Sugestões
+        </SidebarItem>
+        <LineSideBar style={{'textAlign': 'start'}}>
+          Resíduos Sólidos
+        </LineSideBar>
+        <SidebarItem
+        active={activeForm === "infoGerais"}
+        onClick = {() => setActiveForm("infoGerais")}>
+          Informações Gerais
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "concessionarias"}
+        onClick = {() => setActiveForm("concessionarias")}>
+          Concessionárias
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "populacaoAtendida1"}
+        onClick = {() => setActiveForm("populacaoAtendida1")}>
+          População Atendida
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "valorContratual"}
+        onClick = {() => setActiveForm("valorContratual")}>
+          Valor Contratual
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "Observacoes3"}
+        onClick = {() => setActiveForm("observacoes3")}>
+          Observações, Esclarecimentos ou Sugestões
+        </SidebarItem>
+
+        
+        
+      </Sidebar>
+      <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>
             <DivTituloForm>Geral</DivTituloForm>
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'municipiosAtendidos'
+                || activeForm === 'sedesAtendidas' || activeForm === 'populacoesAtendidas'
+                || activeForm === 'populacaoExistente' || activeForm === 'empregados' 
+                || activeForm === 'observacoes' || activeForm === 'geografiaUrbanismo'
+                || activeForm === 'dadosHidrograficos' || activeForm === 'empregados1'
+                || activeForm === 'infraestrutura' || activeForm === 'operacional'   
+                || activeForm === 'gestaoDeRisco' || activeForm === 'observacoes1'
+                || activeForm === 'infoGerais' || activeForm === 'concessionarias'
+                || activeForm === 'populacaoAtendida1' || activeForm === 'valorContratual'
+                || activeForm === 'observacoes3'}>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
                 <label>Selecione o ano desejado:</label>
                 <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
-                  <option >Selecionar</option>
+                  <option value="" disabled >Selecionar</option>
                   <option value="2025">2025</option>
                   <option value="2024">2024</option>
                   <option value="2023">2023</option>
@@ -298,7 +419,8 @@ export default function Geral({ municipio }: MunicipioProps) {
             </DivFormEixo>
 
             <DivFormEixo>
-              <DivFormConteudo>
+
+              <DivFormConteudo active={activeForm === 'municipiosAtendidos'}>
                 <DivTitulo>
                   <DivTituloConteudo>Municípios atendidos</DivTituloConteudo>
                 </DivTitulo>
@@ -335,7 +457,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'sedesAtendidas'}>
                 <DivTitulo>
                   <DivTituloConteudo>Sedes e localidades atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -426,7 +548,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'populacoesAtendidas'}>
                 <DivTitulo>
                   <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -480,7 +602,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'populacaoExistente'}>
                 <DivTitulo>
                   <DivTituloConteudo>População existente</DivTituloConteudo>
                 </DivTitulo>
@@ -534,7 +656,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'empregados'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -562,7 +684,7 @@ export default function Geral({ municipio }: MunicipioProps) {
               </DivFormConteudo>
 
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'observacoes'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações, esclarecimentos ou sugestões</DivTituloConteudo>
                 </DivTitulo>
@@ -589,10 +711,10 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
             
               </DivFormConteudo>
-            </DivFormEixo>
+            
 
-            <DivFormEixo>
-              <DivFormConteudo>
+            
+              <DivFormConteudo active={activeForm === 'geografiaUrbanismo'}>
                 <DivTitulo>
                   <DivTituloConteudo>Geografia e urbanismo</DivTituloConteudo>
                 </DivTitulo>
@@ -658,7 +780,7 @@ export default function Geral({ municipio }: MunicipioProps) {
               </DivFormConteudo>
 
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'dadosHidrograficos'}>
                 <DivTitulo>
                   <DivTituloConteudo>Dados hidrográficos</DivTituloConteudo>
                 </DivTitulo>
@@ -700,7 +822,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'empregados1'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -746,7 +868,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'infraestrutura'}>
                 <DivTitulo>
                   <DivTituloConteudo>Infraestrutura</DivTituloConteudo>
                 </DivTitulo>
@@ -833,7 +955,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'operacional'}>
                 <DivTitulo>
                   <DivTituloConteudo>Operacional</DivTituloConteudo>
                 </DivTitulo>
@@ -884,7 +1006,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'gestaoDeRisco'}>
                 <DivTitulo>
                   <DivTituloConteudo>Gestão de risco</DivTituloConteudo>
                 </DivTitulo>
@@ -1116,7 +1238,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'observacoes1'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
@@ -1142,13 +1264,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-
-            </DivFormEixo>
-
-
-            <DivFormEixo>
-              
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'infoGerais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Informações gerais</DivTituloConteudo>
                 </DivTitulo>
@@ -1185,7 +1301,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "concessionarias"}>
                 <DivTitulo>
                   <DivTituloConteudo>Concesionárias</DivTituloConteudo>
                 </DivTitulo>
@@ -1221,6 +1337,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+                
                 <Tabela>
                   <table cellSpacing={0} >
                   <tbody >
@@ -1269,9 +1386,10 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tbody>
                   </table>
                   </Tabela>
+                  
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'populacaoAtendida1'}>
                 <DivTitulo>
                   <DivTituloConteudo>População atendida</DivTituloConteudo>
                 </DivTitulo>
@@ -1361,7 +1479,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'valorContratual'}>
                 <DivTitulo>
                   <DivTituloConteudo>Valor contratual</DivTituloConteudo>
                 </DivTitulo>
@@ -1399,7 +1517,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'observacoes3'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
@@ -1424,8 +1542,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-
-            </DivFormEixo>
+              </DivFormEixo>
+            
 
 
           </DivForm>
@@ -1440,14 +1558,14 @@ export default function Geral({ municipio }: MunicipioProps) {
             <DivFormResiduo>
               <DivTituloFormResiduo>Edição de cadastro de Concessionária</DivTituloFormResiduo>
               <Form onSubmit={handleSubmit(handleCadastroConcessionaria)}>
-                <CloseModalButton
+                <CloseModalButton style={{'top': '11px'}}
                   onClick={() => {
                     handleCloseModalAddConcesionaria();
                   }}
                 >
-                  Fechar
+                  X
                 </CloseModalButton>
-                <DivFormConteudo>
+                <DivFormConteudo style={{'marginLeft': '-20px' }} active={activeForm === "concessionarias"}>
                   <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>
                   <TabelaModal>
                     <table>
@@ -1591,13 +1709,19 @@ export default function Geral({ municipio }: MunicipioProps) {
                       </tbody>
                     </table>
                   </TabelaModal>
+                
                 </DivFormConteudo>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                <SubmitButton
+                style={{'position' : 'relative', 'left': '-35px','top': '35px'}}
+                type="submit">Gravar</SubmitButton>
               </Form>
             </DivFormResiduo>
           </ModalForm>
+       
         </ContainerModal>
+        
       )}
+      </MainContent>
     </Container>
   );
 }

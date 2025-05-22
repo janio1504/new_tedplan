@@ -244,25 +244,25 @@ export const DivFormEixo = styled.div`
   width: 97%;
   min-width: 1000px;
   padding: 10px 8px 10px 15px;
-
   margin-top: 30px;
   color: #667778;
 
   margin-left: 5px;
 `;
 
-export const DivFormConteudo = styled.div`
+export const DivFormConteudo = styled.div<{ active?: boolean }>` 
+  display: ${(props) => (props.active ? "block" : "none")};
   float: left;
   width: 97%;
   max-width: 1320;
   min-width: 1090px;
   padding: 10px 10px 10px 15px;
 
-  margin-top: 30px;
   color: #667778;
   table {
     width: 100%;
     margin-bottom: 20px;
+    
   }
   th {
     padding: 0 10px 0 0px;
@@ -605,10 +605,12 @@ export const DivSeparadora = styled.div`
 `;
 
 export const DivTituloFormResiduo = styled.div`
-  width: auto;
-  padding: 10px;
-  margin: -11px -13px 0 -11px;
-  background-color: #0085bd;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  margin: -25px 0 10px -25px;
+  background-color: #0085bd;  
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   font-weight: bolder;
@@ -664,7 +666,6 @@ export const DivTituloEixoDrenagem = styled.div`
 `;
 
 export const DivTituloConteudo = styled.div`
-  display: flex;
   padding: 10px 40px;
   width: auto;
   max-width: 100%;
@@ -685,7 +686,7 @@ export const SubmitButton = styled.button`
   padding: 10px 15px;
   margin: 30px 10px;
   color: #fff;
-  border: 0px;
+  border: 0;
   background: #0085bd;
   border-radius: 5px;
   flex-direction: row;
@@ -697,7 +698,6 @@ export const SubmitButton = styled.button`
   justify-content: center;
   align-items: center;
   float: right;
-  svg {
     margin-right: 8px;
   }
 `;

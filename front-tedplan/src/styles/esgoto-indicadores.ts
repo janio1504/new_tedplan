@@ -174,8 +174,8 @@ export const UsuarioLogado = styled.div`
 export const DivCenter = styled.div`
   max-width: 75%;
   width: 100%;
+  padding: 20px;
   height: 100%;
-
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -455,7 +455,7 @@ export const DivTituloForm = styled.div`
 export const Tabela = styled.div`
   width: 100%;
   margin-bottom: 30px;
-  overflow: hidden;
+  // overflow: hidden;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -877,6 +877,8 @@ export const ContainerModal = styled.div`
   padding: 20px;
   z-index: 1000;
   animation: ${fadeIn} 0.3s ease;
+
+
 `;
 
 export const Modal = styled.div`
@@ -894,10 +896,12 @@ export const Modal = styled.div`
 export const ModalForm = styled(Modal)`
   margin-top: 40px;
   max-height: 90vh;
+
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -947,6 +951,7 @@ export const ConteudoModal = styled.div`
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  
 
   input,
   select,

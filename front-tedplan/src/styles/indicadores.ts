@@ -456,18 +456,32 @@ export const DivForm = styled.div`
 `;
 
 export const DivTituloForm = styled.div`
-  width: 100%;
-  padding: 15px 10px;
-  color: #fff;
-  margin: -11px -10px 0 -11px;
-  background-color: #0085bd;
-  border-top-right-radius: 12px;
-  border-top-left-radius: 12px;
-  font-weight: bolder;
+  // width: 95%;
+  // padding: 15px 10px;
+  // color: #fff;
+  // margin: -11px -10px 0 -11px;
+  // background-color: #0085bd;
+  // border-top-right-radius: 12px;
+  // border-top-left-radius: 12px;
+  // font-weight: bolder;
+
+  width: calc(100% + 3.8rem);
+    padding: 0.95rem 1.9rem;
+    background-color: #0085bd;
+    color: white;
+    font-weight: bold;
+    font-size: 1.19rem;
+    margin: 0 -1.9rem 1.9rem;
+    border-radius: 7.6px 7.6px 0 0;
+    box-sizing: border-box;
 `;
 
+
 export const Tabela = styled.div`
+
+  display: flex;
   width: 100%;
+  height: 100%;
   margin-bottom: 30px;
   overflow: hidden;
   border-radius: 12px;
@@ -476,13 +490,17 @@ export const Tabela = styled.div`
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
 
   table {
-    width: 100%;
-
+    
+    flex: 1;
+    margin-top: -15px;
     border-collapse: separate;
     border-spacing: 0;
     min-width: 600px;
 
+
     th {
+      
+      flex: 1;
       background: #0085bd;
       color: #fff;
       padding: 16px 20px;
@@ -544,6 +562,7 @@ export const Tabela = styled.div`
     }
 
     tr {
+
       transition: all 0.2s ease;
 
       &:hover td {
@@ -710,10 +729,13 @@ export const SubmitButton = styled.button`
 `;
 
 export const SubmitButtonModal = styled.button`
+
   padding: 10px 15px;
-  margin: 10px 10px;
+  margin-top: 390px;
+  margin-right: -30px;  
   color: #fff;
-  border: 0px;
+  position: relative;
+  border: 10px;
   background: #008080;
   border-radius: 5px;
   flex-direction: row;
@@ -721,11 +743,11 @@ export const SubmitButtonModal = styled.button`
   width: auto;
   display: flex;
   justify-content: center;
-  align-items: center;
-  float: left;
+  align-items: flex;
+  float: right;
   font-weight: bolder;
   svg {
-    margin-right: 0px;
+    margin-right: 10px;
   }
 `;
 
@@ -889,6 +911,7 @@ export const ContainerModal = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  border: 1px solid black;
   overflow-y: auto;
   padding: 20px;
   z-index: 1000;
@@ -936,6 +959,7 @@ export const ModalForm = styled(Modal)`
 
 export const ModalFormUnidade = styled(ModalForm)`
   padding: 0;
+  
 
   .modal-header {
     background: #1caecc;
@@ -956,10 +980,12 @@ export const ModalFormUnidade = styled(ModalForm)`
 `;
 
 export const ConteudoModal = styled.div`
+
   width: 100%;
   color: #4a5568;
   font-size: 15px;
   padding: 24px;
+  margin-left: -5px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -1050,13 +1076,15 @@ export const TabelaModal = styled.div`
 
 export const CloseModalButton = styled.button`
   position: absolute;
-  top: 16px;
-  right: 16px;
+  top: 10px;
+  right: -25px;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
   background: #fff;
-  border: 2px solid #e2e8f0;
+
+  border-radius: 50%;
+  // border: 2px solid #e2e8f0;
+  border:none;
   color: #4a5568;
   font-size: 18px;
   display: flex;
@@ -1064,7 +1092,7 @@ export const CloseModalButton = styled.button`
   justify-content: center;
   cursor: pointer;
   z-index: 1100;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   padding: 0;
 
@@ -1261,6 +1289,7 @@ export const Sidebar = styled.div`
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  border-bottom: none;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -1499,6 +1528,7 @@ export const FormCadastro = styled.form`
 export const SubmitButtonContainer = styled.div`
   position: absolute;
 
+
   bottom: 0;
   right: 0;
   padding: 10px;
@@ -1529,7 +1559,7 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   width: 95%;
   max-width: 1140px;
   z-index: 1;
-  margin: 19px auto;
+  margin: 0px auto;
   position: relative;
   color: #333;
   overflow: hidden;
