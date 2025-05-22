@@ -252,15 +252,28 @@ export default function GestaoIndicadores({
       "norma_associacao",
       data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
     );
+
+    // formData.append(
+    //   "norma_associacao",
+    //   data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
+    // );
+
     formData.append("pcs_ano", data.pcs_ano);
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
     formData.append("pcs_titulo", data.pcs_titulo);
+
     formData.append("plano_ano", data.plano_ano);
     formData.append("plano_arquivo", data.plano_arquivo[0]);
     formData.append("plano_titulo", data.plano_titulo);
+
     formData.append("politica_ano", data.politica_ano);
     formData.append("politica_arquivo", data.politica_arquivo[0]);
     formData.append("politica_titulo", data.politica_titulo);
+
+    // formData.append("conselho_ano", data.conselho_ano);
+    // formData.append("conselho_arquivo", data.conselho_arquivo[0]);
+    // formData.append("conselho_titulo", data.conselho_titulo);
+
     formData.append(
       "sr_descricao",
       data.sr_descricao ? data.sr_descricao : dadosGestao?.sr_descricao
@@ -316,7 +329,7 @@ export default function GestaoIndicadores({
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
       {
-        params: { id_municipio: dadosMunicipio.id_municipio },
+        params: {id_municipio: dadosMunicipio.id_municipio },
       }
     );
     const participacoes = await resParticipacao.data;
@@ -910,10 +923,11 @@ export default function GestaoIndicadores({
               <tr>
                 <td>
                   <InputG>
-                    <label>Município</label>
+                    <label>Título</label>
                     <input 
-                    {...register("nome_municipio")}
-                    defaultValue={"teste"}
+                    {...register("conselho_titulo")}
+                    defaultValue={"Teste"}
+                    // onChange={"teste"}
                     type="text"></input>
                   </InputG>
                 </td>
@@ -941,6 +955,13 @@ export default function GestaoIndicadores({
               >
                 Adicionar
               </span>{" "}
+
+              <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px",
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
             </DivEixo>
            
           </DivFormCadastro>
