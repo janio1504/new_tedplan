@@ -274,8 +274,14 @@ class GestaoIndicadoresController {
     return resGa;
   }
 
+
+  // Ver requisições com "console.log(request.all()) 
+  // return" 
+
   async addConselhoMunicipal({ request, response }) {
     try {
+      console.log(request.all())
+      return
       const { titulo, ano, id_municipio, operacao } = request.all();
 
       if (request.file("arquivo")) {

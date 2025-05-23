@@ -173,6 +173,7 @@ export default function GestaoIndicadores({
   const [dadosMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const [dadosGestao, setGestao] = useState<IGestao | any>(gestao);
   const [representantes, setRepresentantes] = useState(null);
+  const [conselho, setConselho] = useState(null);
   const [isClient, setIsClient] = useState(false);
   const {
     register,
@@ -201,6 +202,7 @@ export default function GestaoIndicadores({
     getParticipacoes();
     getRepresentantes();
     getGestao();
+    // getConselho();
   }, []);
 
   async function getMunicipio() {
@@ -213,8 +215,102 @@ export default function GestaoIndicadores({
         setMunicipio(res[0]);
       });
   }
+  async function getPoliticas() {
+    const resPoliticas = await api.get("getPoliticas", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const politicas = await resPoliticas.data;
+    if (politicas) {
+      const resPoliticas = await Promise.all(
+        politicas.map(async (p) => {
+          const file = await api
+            .get("getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => {
+              return URL.createObjectURL(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const pf = {
+            ...p,
+            file,
+          };
+          return pf;
+        })
+      );
+      setPoliticas(resPoliticas);
+    }
+  }
+  async function getPlanos() {
+    const resPlanos = await api.get("getPlanos", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const planos = await resPlanos.data;
+    if (planos) {
+      const resPlanos = await Promise.all(
+        planos.map(async (p) => {
+          const file = await api
+            .get("getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => {
+              return URL.createObjectURL(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const pf = {
+            ...p,
+            file,
+          };
+          return pf;
+        })
+      );
+      setPlanos(resPlanos);
+    }
+  }
+  async function getParticipacoes() {
+    const resParticipacao = await api.get("getParticipacaoControleSocial", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const participacoes = await resParticipacao.data;
+    if (participacoes) {
+      const resParticipacoes = await Promise.all(
+        participacoes.map(async (p) => {
+          const file = await api
+            .get("/getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => {
+              return URL.createObjectURL(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const pf = {
+            ...p,
+            file,
+          };
+          return pf;
+        })
+      );
+      setListParticipacoes(resParticipacoes);
+    }
+  }
+  async function getRepresentantes() {
+    const resRepresentantes = await api.get("getRepresentantesServicos", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const representantes = await resRepresentantes.data;
 
-  async function getGestao() {
+    setRepresentantes(representantes);
+  }
+     async function getGestao() {
     const resGestao = await api.get("/getGestao", {
       params: { id_municipio: usuario.id_municipio },
     });
@@ -252,11 +348,6 @@ export default function GestaoIndicadores({
       "norma_associacao",
       data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
     );
-
-    // formData.append(
-    //   "norma_associacao",
-    //   data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
-    // );
 
     formData.append("pcs_ano", data.pcs_ano);
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
@@ -329,13 +420,12 @@ export default function GestaoIndicadores({
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
       {
-        params: {id_municipio: dadosMunicipio.id_municipio },
+        params: {id_municipio: dadosMunicipio?.id_municipio },
       }
     );
     const participacoes = await resParticipacao.data;
     setListParticipacoes(participacoes);
   }
-
   async function handleSignOut() {
     signOut();
   }
@@ -353,7 +443,6 @@ export default function GestaoIndicadores({
     setShowModalPresidente(false);
   }
  
-
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
       toast.notify("Não existe Município, entre novamente no sistema! ", {
@@ -483,111 +572,12 @@ export default function GestaoIndicadores({
     getRepresentantes();
   }
 
-  async function getPoliticas() {
-    const resPoliticas = await api.get("getPoliticas", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
-    const politicas = await resPoliticas.data;
-    if (politicas) {
-      const resPoliticas = await Promise.all(
-        politicas.map(async (p) => {
-          const file = await api
-            .get("getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setPoliticas(resPoliticas);
-    }
-  }
-
-  async function getPlanos() {
-    const resPlanos = await api.get("getPlanos", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
-    const planos = await resPlanos.data;
-    if (planos) {
-      const resPlanos = await Promise.all(
-        planos.map(async (p) => {
-          const file = await api
-            .get("getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setPlanos(resPlanos);
-    }
-  }
-
-  async function getParticipacoes() {
-    const resParticipacao = await api.get("getParticipacaoControleSocial", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
-    const participacoes = await resParticipacao.data;
-    if (participacoes) {
-      const resParticipacoes = await Promise.all(
-        participacoes.map(async (p) => {
-          const file = await api
-            .get("/getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setListParticipacoes(resParticipacoes);
-    }
-  }
-
-  async function getRepresentantes() {
-    const resRepresentantes = await api.get("getRepresentantesServicos", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
-    const representantes = await resRepresentantes.data;
-
-    setRepresentantes(representantes);
-  }
-
   return (
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
-        municipio={dadosMunicipio?.municipio_nome}
+        municipio={[]}
       ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <Sidebar>
@@ -927,25 +917,29 @@ export default function GestaoIndicadores({
                     <input 
                     {...register("conselho_titulo")}
                     defaultValue={"Teste"}
-                    // onChange={"teste"}
+                    // onChange={"conselho_titulo"}
                     type="text"></input>
                   </InputG>
                 </td>
                 <td>
                     <InputP>
                       <label>Ano</label>
-                      <input type="text"></input>
+                      <input 
+                      {...register("conselho_ano")}
+                      defaultValue={"22"}
+                      type="text"></input>
                     </InputP>
                 </td>
                 <td>
                   <InputM>
                     <label>Arquivo</label>
-                    <input type="file"></input>
+                    <input
+                    {...register("conselho_arquivo")}
+                    type="file"></input>
                   </InputM>
                 </td>
               </tr>
             </table>
-
             <DivEixo>
               Presidente{" "}
               <span
@@ -955,14 +949,60 @@ export default function GestaoIndicadores({
               >
                 Adicionar
               </span>{" "}
+            </DivEixo>
 
-              <SubmitButtonContainer style={{
+            <Tabela>
+              <table cellSpacing={0}>
+                <tbody>
+                  {conselho && (
+                    <tr>
+                      <th>ID</th>
+                      <th>Presidente</th>
+                      <th>Município</th>
+                      <th>Telefone</th>
+                      <th>email</th>
+                      <th>Setor Responsável</th>
+                    </tr>
+                  )}
+
+                  {conselho?.map((conselho, index) => (
+                    <tr role="row" key={index}>
+                      <td>{conselho.id_representante_servicos_ga}</td>
+                      <td>
+                        <InputM>{conselho.presidente}</InputM>
+                      </td>
+                      <td>{conselho.municipio}</td>
+                      <td>{conselho.telefone}</td>
+                      <td>{conselho.email}</td>
+                      <td>
+                        <Actions>
+                          <Image
+                            // onClick={() =>
+                            //   handleRemoverRepresentante({
+                            //     id: representante.id_representante_servicos_ga,
+                            //   })
+                            // }
+                            src={Excluir}
+                            alt="Excluir"
+                            width={25}
+                            height={25}
+                          />
+                        </Actions>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Tabela>
+
+
+            <SubmitButtonContainer style={{
               bottom: "-50px",
               right: "-10px",
             }}>
               {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
             </SubmitButtonContainer>
-            </DivEixo>
+            
            
           </DivFormCadastro>
 
@@ -1120,9 +1160,7 @@ export default function GestaoIndicadores({
             </DivTextArea>
 
         
-          {usuario?.id_permissao !== 4 && (
-            <SubmitButton type="submit">Gravar</SubmitButton>
-          )}
+          
 
             <SubmitButtonContainer style={{
               bottom: "-50px",
