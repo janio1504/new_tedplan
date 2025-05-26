@@ -26,6 +26,7 @@ import Cadastro from "../../img/icone_cadastro.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { useMunicipio } from "@/contexts/MunicipioContext";
 import { get } from "http";
+import { log } from "console";
 
 interface IMunicipio {
   id_municipio: string;
@@ -158,15 +159,15 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   async function getDadosResiduosColeta() {  
     const id_municipio = usuario?.id_municipio
     const ano = new Date().getFullYear(); // Pega o ano atual 
-    const res = await api
-      .post("get-ps-residuos-coleta-por-ano", {id_municipio: id_municipio, ano: ano})
+    
+    const res = await api.post("get-ps-residuos-coleta-por-ano", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
         return response.data;
       })
       .catch((error) => {
         console.log(error);
-      });
-      setDadosResiduosColeta(res.data)
+      });      
+      setDadosResiduosColeta(res[0])
   }
 
 
