@@ -132,7 +132,7 @@ class PsResiduosColetaController {
     .where("ano", "is not", null)
     .fetch()
     
-    return null
+    return rs
   }
 
   async store({ response, request }){
