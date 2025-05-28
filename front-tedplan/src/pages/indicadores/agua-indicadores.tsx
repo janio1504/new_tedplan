@@ -181,6 +181,7 @@ export default function Agua() {
       </Sidebar>
       <MainContent>
         <DivCenter>
+          
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm style={{ borderColor: "#12B2D5" }}>
               <DivTituloForm>Água</DivTituloForm>
@@ -210,6 +211,7 @@ export default function Agua() {
                   </select>
                 </DivFormConteudo>
               </DivFormEixo>
+
               <DivFormEixo>
                 <DivFormConteudo active={activeForm === "ligacoes"}>
                   <DivTitulo>

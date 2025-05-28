@@ -5,6 +5,7 @@ import {
   Container,
   DivCenter,
   DivForm,
+  Sidebar,
   DivTituloForm,
   DivInput,
   Form,
@@ -12,6 +13,7 @@ import {
   InputM,
   InputG,
   SubmitButton,
+  SubmitButtonContainer,
   DivEixo,
   TextArea,
   DivTextArea,
@@ -26,6 +28,7 @@ import {
   Tabela,
   Actions,
 } from "../../styles/indicadores";
+import Editar from "../../img/editar.png";
 import HeadIndicadores from "../../components/headIndicadores";
 import Image from "next/image";
 import "suneditor/dist/css/suneditor.min.css";
@@ -53,6 +56,8 @@ import {
   onlyLettersAndCharacters,
   toTitleCase,
 } from "@/util/util";
+import { DivFormCadastro, MainContent, SidebarItem } from "@/styles/esgoto-indicadores";
+
 const InputMask = require("react-input-mask");
 
 const ModalSubmitButton = styled.button`
@@ -86,6 +91,7 @@ const ModalSubmitButton = styled.button`
     cursor: not-allowed;
   }
 `;
+
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -127,6 +133,24 @@ interface IRepresentantes {
   nome: string;
 }
 
+interface IConselho {
+  id_conselho_municipal_saneamento_basico: number;
+  titulo: string;
+  ano: string;
+  id_arquivo: string;
+  id_municipio: Number;
+}
+
+interface IPresidencia {
+  id_presidencia_conselho_municipal_saneamento_basico: string;
+  nome_presidente: string;
+  telefone_presidente: string;
+  email_presidente: string;
+  setor_responsavel: string;
+  integrantes: string;
+  id_municipio: string;
+}
+
 interface IPoliticas {
   id_politica_municipal: string;
   titulo: string;
@@ -157,10 +181,13 @@ export default function GestaoIndicadores({
   gestao,
 }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
-  const [dadosMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
+  const [dadosMunicipio, setDadosMunicipio] = useState(null);
   const [dadosGestao, setGestao] = useState<IGestao | any>(gestao);
   const [representantes, setRepresentantes] = useState(null);
-  const [isClient, setIsClient] = useState(false);
+  const [conselho, setConselho] = useState(null);
+  const [presidentesConselho, setPresidentesConselho] = useState([]);
+  const [isClient, setIsClient] = useState(null);
+  const [updatePresidente, setUpdatePresidente] = useState(null); 
   const {
     register,
     handleSubmit,
@@ -172,31 +199,137 @@ export default function GestaoIndicadores({
 
   const [showModal, setShowModal] = useState(false);
   const [listParticipacoes, setListParticipacoes] = useState(null);
+  const [ShowModalPresidente, setShowModalPresidente] = useState(false);
+  const [activeForm, setActiveForm] = useState("gestaoAssociada");
   const [content, setContent] = useState("");
   const [listPoliticas, setPoliticas] = useState(null);
   const [listPlanos, setPlanos] = useState(null);
+  const [updateRepresentantes, setUpdateRepresentantes] = useState(null);
   const editor = useRef(null);
   let txtArea = useRef();
 
   useEffect(() => {
-    setIsClient(true);
-    getMunicipio();
-    getPoliticas();
-    getPlanos();
-    getParticipacoes();
-    getRepresentantes();
-    getGestao();
-  }, []);
+    if (usuario?.id_municipio) {
+      getMunicipio();
+      getPresidentesConselho();
+      setIsClient(true);
+      getPoliticas();
+      getPlanos();
+      getParticipacoes();
+      getRepresentantes();
+      getGestao();
+      }
+  }, [usuario]);
+
+  
 
   async function getMunicipio() {
-    const res = await api
-      .get("getMunicipio", {
-        params: { id_municipio: usuario.id_municipio },
-      })
-      .then((response) => {
-        const res = response.data;
-        setMunicipio(res[0]);
-      });
+      const res = await api
+        .get("getMunicipio", {
+          params: { id_municipio: usuario.id_municipio },
+        })
+        .then((response) => {
+          setDadosMunicipio(response.data[0]);
+        });
+    }
+
+  async function getPoliticas() {
+    const resPoliticas = await api.get("getPoliticas", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const politicas = await resPoliticas.data;
+    if (politicas) {
+      const resPoliticas = await Promise.all(
+        politicas.map(async (p) => {
+          const file = await api
+            .get("getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => {
+              return URL.createObjectURL(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const pf = {
+            ...p,
+            file,
+          };
+          return pf;
+        })
+      );
+      setPoliticas(resPoliticas);
+    }
+  }
+
+  async function getPlanos() {
+    const resPlanos = await api.get("getPlanos", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const planos = await resPlanos.data;
+    if (planos) {
+      const resPlanos = await Promise.all(
+        planos.map(async (p) => {
+          const file = await api
+            .get("getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => {
+              return URL.createObjectURL(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const pf = {
+            ...p,
+            file,
+          };
+          return pf;
+        })
+      );
+      setPlanos(resPlanos);
+    }
+  }
+
+  async function getParticipacoes() {
+    const resParticipacao = await api.get("getParticipacaoControleSocial", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const participacoes = await resParticipacao.data;
+    if (participacoes) {
+      const resParticipacoes = await Promise.all(
+        participacoes.map(async (p) => {
+          const file = await api
+            .get("/getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => {
+              return URL.createObjectURL(response.data);
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+          const pf = {
+            ...p,
+            file,
+          };
+          return pf;
+        })
+      );
+      setListParticipacoes(resParticipacoes);
+    }
+  }
+
+  async function getRepresentantes() {
+    const resRepresentantes = await api.get("getRepresentantesServicos", {
+      params: { id_municipio: usuario?.id_municipio },
+    });
+    const representantes = await resRepresentantes.data;
+
+    setRepresentantes(representantes);
   }
 
   async function getGestao() {
@@ -205,6 +338,79 @@ export default function GestaoIndicadores({
     });
 
     setGestao(resGestao.data[0]);
+  }
+
+  async function getPresidentesConselho() {
+    if (!usuario?.id_municipio) return;
+    try {
+      const resPresidentes = await api.get(
+        `get-all-presidencia-conselho-municipal/${usuario.id_municipio}`
+      );
+      setConselho(resPresidentes.data);
+    } catch (error) {
+      toast.notify("Erro ao buscar presidentes do conselho!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      setConselho([]);
+    }
+  }
+
+  async function handleAddPresidente(data) {
+    if (!usuario.id_municipio) {
+      toast.notify("Não existe Município, entre novamente no sistema! ", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      signOut();
+    }
+
+    const id = await api
+      .post("create-presidencia-conselho-municipal", {
+        nome_presidente: data.nome_presidente,
+        setor_responsavel: data.setor_responsavel,
+        telefone_presidente: data.telefone_presidente,
+        email_presidente: data.email_presidente,
+        integrantes: data.integrantes,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+          toast.notify("Presidência do Conselho Municipal adicionada com sucesso", {
+            title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        setShowModalPresidente(false);
+        return response;
+      })
+      .catch((error) => {
+        toast.notify("Erro ao adicionar a Presidência do Conselho Municipal", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getPresidentesConselho();
+  }
+  
+  async function handleRemoverPresidente({id}) {
+    try {
+      await api.delete(`delete-presidencia-conselho-municipal/${id}`);
+      toast.notify("Presidente removido com sucesso!", {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      });
+      getPresidentesConselho(); // Atualiza a lista após remoção
+    } catch (error) {
+      toast.notify("Não foi possível remover o presidente!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+    }
   }
 
   async function handleCadastro(data) {
@@ -237,15 +443,23 @@ export default function GestaoIndicadores({
       "norma_associacao",
       data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
     );
+
     formData.append("pcs_ano", data.pcs_ano);
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
     formData.append("pcs_titulo", data.pcs_titulo);
+
     formData.append("plano_ano", data.plano_ano);
     formData.append("plano_arquivo", data.plano_arquivo[0]);
     formData.append("plano_titulo", data.plano_titulo);
+
     formData.append("politica_ano", data.politica_ano);
     formData.append("politica_arquivo", data.politica_arquivo[0]);
     formData.append("politica_titulo", data.politica_titulo);
+
+    // formData.append("conselho_ano", data.conselho_ano);
+    // formData.append("conselho_arquivo", data.conselho_arquivo[0]);
+    // formData.append("conselho_titulo", data.conselho_titulo);
+
     formData.append(
       "sr_descricao",
       data.sr_descricao ? data.sr_descricao : dadosGestao?.sr_descricao
@@ -301,13 +515,12 @@ export default function GestaoIndicadores({
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
       {
-        params: { id_municipio: dadosMunicipio.id_municipio },
+        params: {id_municipio: dadosMunicipio?.id_municipio },
       }
     );
     const participacoes = await resParticipacao.data;
     setListParticipacoes(participacoes);
   }
-
   async function handleSignOut() {
     signOut();
   }
@@ -315,10 +528,16 @@ export default function GestaoIndicadores({
   function handleShowModal() {
     setShowModal(true);
   }
-  function handleCloseModal() {
+   function handleCloseModal() {
     setShowModal(false);
   }
-
+  function handleShowModalPresidente() {
+    setShowModalPresidente(true);
+  }
+  function handleCloseModalPresidente() {
+    setShowModalPresidente(false);
+  }
+ 
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
       toast.notify("Não existe Município, entre novamente no sistema! ", {
@@ -448,103 +667,112 @@ export default function GestaoIndicadores({
     getRepresentantes();
   }
 
-  async function getPoliticas() {
-    const resPoliticas = await api.get("getPoliticas", {
-      params: { id_municipio: usuario?.id_municipio },
+ async function updateRepresentantesServicos(data) {
+  if (!usuario.id_municipio || !data.id_representante_servicos_ga) {
+    toast.notify("Dados insuficientes para atualizar!", {
+      title: "Erro!",
+      duration: 7,
+      type: "error",
     });
-    const politicas = await resPoliticas.data;
-    if (politicas) {
-      const resPoliticas = await Promise.all(
-        politicas.map(async (p) => {
-          const file = await api
-            .get("getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setPoliticas(resPoliticas);
-    }
+    return;
   }
 
-  async function getPlanos() {
-    const resPlanos = await api.get("getPlanos", {
-      params: { id_municipio: usuario?.id_municipio },
+  await api
+    .put("updateRepresentanteServicos", {
+      id_representante_servicos_ga: data.id_representante_servicos_ga,
+      ga_nome_representante: data.ga_nome_representante,
+      ga_cargo: data.ga_cargo,
+      ga_telefone: data.ga_telefone,
+      ga_email: data.ga_email,
+      id_municipio: usuario.id_municipio,
+    })
+    .then((response) => {
+      toast.notify("Representante atualizado com sucesso!", {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      });
+      getRepresentantes(); // <-- Atualiza a lista após editar
+      setShowModal(false);
+      setUpdateRepresentantes(null);
+    })
+    .catch((error) => {
+      toast.notify("Não foi possível atualizar o representante!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
     });
-    const planos = await resPlanos.data;
-    if (planos) {
-      const resPlanos = await Promise.all(
-        planos.map(async (p) => {
-          const file = await api
-            .get("getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setPlanos(resPlanos);
-    }
+}
+
+  async function handleEditarRepresentante(representante) {
+    setUpdateRepresentantes(representante);
+    setShowModal(true);
+
+    // Preenche os campos do formulário com os dados do representante
+    setValue("id_representante_servicos_ga", representante.id_representante_servicos_ga);
+    setValue("ga_nome_representante", representante.nome);
+    setValue("ga_cargo", representante.cargo);
+    setValue("ga_telefone", representante.telefone);
+    setValue("ga_email", representante.email);
   }
 
-  async function getParticipacoes() {
-    const resParticipacao = await api.get("getParticipacaoControleSocial", {
-      params: { id_municipio: usuario?.id_municipio },
+  async function updatePresidenteConselho(data) {
+  
+    console.log("Dados do presidente:", data);
+    if (!usuario.id_municipio || !data.id_presidencia_conselho_municipal_saneamento_basico) {
+    toast.notify("Dados insuficientes para atualizar!", {
+      title: "Erro!",
+      duration: 7,
+      type: "error",
     });
-    const participacoes = await resParticipacao.data;
-    if (participacoes) {
-      const resParticipacoes = await Promise.all(
-        participacoes.map(async (p) => {
-          const file = await api
-            .get("/getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setListParticipacoes(resParticipacoes);
-    }
+    return;
   }
 
-  async function getRepresentantes() {
-    const resRepresentantes = await api.get("getRepresentantesServicos", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
-    const representantes = await resRepresentantes.data;
+  await api
+    .put("update-presidencia-conselho-municipal", {
+      id_presidencia_conselho_municipal_saneamento_basico: data.id_presidencia_conselho_municipal_saneamento_basico,
+      nome_presidente: data.nome_presidente,
+      telefone_presidente: data.telefone_presidente,
+      email_presidente: data.email_presidente,
+      setor_responsavel: data.setor_responsavel,
+      integrantes: data.integrantes,
+      id_municipio: usuario.id_municipio,
+    })
+    .then((response) => {
+      toast.notify("Presidente atualizado com sucesso!", {
+        title: "Sucesso!",
+        duration: 7,
+        type: "success",
+      });
+      getPresidentesConselho(); // Atualiza a lista
+      setShowModalPresidente(false);
+      setUpdatePresidente(null);
+    })
+    .catch((error) => {
+    console.log("Erro ao atualizar presidente:", error.response?.data || error);
+    toast.notify("Não foi possível atualizar o presidente!", {
+    title: "Erro!",
+    duration: 7,
+    type: "error",
+  });
+});
+  }
 
-    setRepresentantes(representantes);
+  async function handleEditarPresidente(presidente) {
+  setUpdatePresidente(presidente);
+  setShowModalPresidente(true);
+
+  setValue("id_presidencia_conselho_municipal_saneamento_basico", presidente.id_presidencia_conselho_municipal_saneamento_basico);
+  setValue("nome_presidente", presidente.nome_presidente);
+  setValue("telefone_presidente", presidente.telefone_presidente);
+  setValue("email_presidente", presidente.email_presidente);
+  setValue("setor_responsavel", presidente.setor_responsavel);
+  setValue("integrantes", presidente.integrantes);
+  }
+
+    if (!usuario?.id_municipio) {
+    return null;
   }
 
   return (
@@ -552,13 +780,53 @@ export default function GestaoIndicadores({
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
-        municipio={dadosMunicipio?.municipio_nome}
+        municipio={[]}
       ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
+      <Sidebar>
+        <SidebarItem active={activeForm === "gestaoAssociada"}
+        onClick={() => setActiveForm("gestaoAssociada")}
+        >
+          Gestão Associada
+        </SidebarItem>
+        <SidebarItem active={activeForm === "politicaSaneamento"}
+        onClick={() => setActiveForm("politicaSaneamento")}
+        >
+          Política Municipal de Saneamento
+        </SidebarItem>
+        <SidebarItem active={activeForm === "planoSaneamento"}
+        onClick={() => setActiveForm("planoSaneamento")}
+        >
+          Plano Municipal de Saneamento
+        </SidebarItem>
+        <SidebarItem active={activeForm === "conselhoSaneamento"}
+        onClick={() => setActiveForm("conselhoSaneamento")}
+        >
+          Conselho Municipal de Saneamento Básico
+        </SidebarItem>
+        <SidebarItem active={activeForm === "participacaoSocial"}
+        onClick={() => setActiveForm("participacaoSocial")}
+        >
+          Participação e controle social
+        </SidebarItem>
+        <SidebarItem active={activeForm === "saneamentoRural"}
+        onClick={() => setActiveForm("saneamentoRural")}
+        >
+          Saneamento Rural
+        </SidebarItem>
+        <SidebarItem active={activeForm === "comunidadesTradicionais"}
+        onClick={() => setActiveForm("comunidadesTradicionais")}
+        >
+          Comunidades Tradicionais
+        </SidebarItem>
+      </Sidebar>
+
+    <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
+          <DivFormCadastro active={activeForm === "gestaoAssociada"}>
             <DivTituloForm>Gestão Associada</DivTituloForm>
+            
             <table>
               <tr>
                 <td>
@@ -621,8 +889,20 @@ export default function GestaoIndicadores({
                       <td>{representante.cargo}</td>
                       <td>{representante.telefone}</td>
                       <td>{representante.email}</td>
-                      <td>
+                      <td  style={{ justifyContent: "center"}}>
                         <Actions>
+                          <Image
+                            title="Editar"
+                            onClick={() =>
+                              handleEditarRepresentante(representante)
+                            }
+
+                            src={Editar}
+                            alt="Editar"
+                            width={25}
+                            height={25}
+                          />
+                        
                           <Image
                             onClick={() =>
                               handleRemoverRepresentante({
@@ -635,14 +915,25 @@ export default function GestaoIndicadores({
                             height={25}
                           />
                         </Actions>
+                        
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
-          <DivForm>
+
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "politicaSaneamento"}>
             <DivTituloForm>
               Política Municipal de Saneamento Básico
             </DivTituloForm>
@@ -741,8 +1032,19 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
-          <DivForm>
+
+          
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "planoSaneamento"}>
             <DivTituloForm>Plano Municipal de Saneamento Básico</DivTituloForm>
             <table>
               <tr>
@@ -768,7 +1070,6 @@ export default function GestaoIndicadores({
             </table>
 
             <DivEixo>Atualizações</DivEixo>
-
             <Tabela>
               <table cellSpacing={0}>
                 <tbody>
@@ -812,9 +1113,136 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+          </DivFormCadastro>
 
-          <DivForm>
+
+
+          <DivFormCadastro active={activeForm === "conselhoSaneamento"}> 
+            <DivTituloForm>
+              Conselho Municipal de Saneamento Básico
+            </DivTituloForm>
+            <table>
+              <tr>
+                <td>
+                  <InputG>
+                    <label>Título</label>
+                    <input 
+                    {...register("conselho_titulo")}
+                    defaultValue={"Teste"}
+                    // onChange={"conselho_titulo"}
+                    type="text"></input>
+                  </InputG>
+                </td>
+                <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input 
+                      {...register("conselho_ano")}
+                      defaultValue={"22"}
+                      type="text"></input>
+                    </InputP>
+                </td>
+                <td>
+                  <InputM>
+                    <label>Arquivo</label>
+                    <input
+                    {...register("conselho_arquivo")}
+                    type="file"></input>
+                  </InputM>
+                </td>
+              </tr>
+            </table>
+            <DivEixo>
+              Presidente{" "}
+              <span
+                onClick={() => {
+                  handleShowModalPresidente();
+                }}
+              >
+                Adicionar
+              </span>{" "}
+            </DivEixo>
+
+            <Tabela style={{'overflow': 'scroll'}}>
+              <table cellSpacing={0}>
+                <tbody>
+                  {conselho && (
+                    <tr>
+                      <th>ID</th>
+                      <th>Presidente</th>
+                      <th>Telefone</th>
+                      <th>email</th>
+                      <th>Setor Responsável</th>
+                      <th>Integrantes</th>
+                      <th>Município</th>
+                      <th>Ações</th>
+                    </tr>
+                  )}
+
+                  {conselho?.map((presidente, index) => (
+                    <tr role="row" key={index}>
+                      <td>{presidente.id_presidencia_conselho_municipal_saneamento_basico}</td>
+                      <td>
+                        <InputM>{presidente.nome_presidente}</InputM>
+                      </td>
+                        
+                      <td style={{whiteSpace: 'nowrap'}} >
+                        {presidente.telefone_presidente}</td>
+                      <td>{presidente.email_presidente}</td>
+                      <td>{presidente.setor_responsavel}</td>
+                      <td
+                      style={{
+                            whiteSpace: 'nowrap'}}>
+                      {presidente.integrantes}</td>
+                      <td>{presidente.id_municipio}</td>
+                      <td>
+                        <Actions>
+                          <Image
+                            title="Editar"
+                            onClick={() => handleEditarPresidente(presidente)}
+                            src={Editar}
+                            alt="Editar"
+                            width={25}
+                            height={25}
+                          />
+                          
+                          <Image
+                            onClick={() =>
+                              handleRemoverPresidente(
+                                {id:presidente.id_presidencia_conselho_municipal_saneamento_basico,}
+                              )
+                            }
+                            src={Excluir}
+                            alt="Excluir"
+                            width={25}
+                            height={25}
+                          />
+                        </Actions>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Tabela>
+
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px",
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+            
+           
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "participacaoSocial"}>
             <DivTituloForm>Participação e Controle Social</DivTituloForm>
             <table>
               <tr>
@@ -904,8 +1332,18 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </Tabela>
-          </DivForm>
-          <DivForm>
+
+          {/* </DivFormCadastro>
+          <DivForm> */}
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-10px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+          </DivFormCadastro>
+
+          <DivFormCadastro active = {activeForm === "saneamentoRural"}>
             <DivTituloForm>Saneamento Rural</DivTituloForm>
             <DivTextArea>
               <label>Breve Descrição</label>
@@ -919,9 +1357,17 @@ export default function GestaoIndicadores({
                 onChange={handleOnChange}
               ></textarea>
             </DivTextArea>
-          </DivForm>
-          <DivForm>
-            <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-15px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "comunidadesTradicionais"}>
+          <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
 
             <DivTextArea>
               <label>Nome das Comunidades Beneficiadas</label>
@@ -948,22 +1394,135 @@ export default function GestaoIndicadores({
                 onChange={handleOnChange}
               ></textarea>
             </DivTextArea>
-          </DivForm>
-          {usuario?.id_permissao !== 4 && (
-            <SubmitButton type="submit">Gravar</SubmitButton>
-          )}
+
+        
+          
+
+            <SubmitButtonContainer style={{
+              bottom: "-50px",
+              right: "-15px"
+            }}>
+              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            </SubmitButtonContainer>
+
+          </DivFormCadastro>
+          
         </Form>
 
+        {ShowModalPresidente && (
+          <ContainerModal>
+            <Modal>
+              <Form onSubmit={handleSubmit(updatePresidente ? updatePresidenteConselho : handleAddPresidente)}>
+                <CloseModalButton
+                  onClick={() => {
+                    handleCloseModalPresidente();
+                  }}
+                >
+                  X
+                </CloseModalButton>
+                <ConteudoModal>
+                  <InputG>
+                    <label>
+                      Nome<span> *</span>
+                    </label>
+                    <input
+                      {...register("nome_presidente", {
+                        required: "O nome é obrigatório",
+                      })}
+                      onKeyPress={onlyLettersAndCharacters}
+                      style={{ textTransform: "capitalize" }}
+                      onChange={(e) => {
+                        const value = toTitleCase(e.target.value);
+                        setValue("nome_presidente", value);
+                      }}
+                      type="text"
+                    ></input>
+                  </InputG>
+                   {errors.nome_presidente && <span>{errors.nome_presidente.message}</span>}
+                  <InputP>
+                    <label>
+                      Telefone<span> *</span>
+                    </label>
+                    <Controller
+                      name="telefone_presidente"
+                      control={control}
+                      rules={{ required: "O telefone é obrigatório" }}
+                      render={({ field: { onChange, value }, fieldState: { error } }) => (
+                        <>
+                          <InputMask
+                            mask="(99) 99999-9999"
+                            maskChar={null}
+                            value={value}
+                            onChange={e => onChange(e.target.value)}
+                          >
+                            {(inputProps) => (
+                              <input {...inputProps} type="text" />
+                            )}
+                          </InputMask>
+                          {error && <span>{error.message}</span>}
+                        </>
+                      )}
+                    />
+                  </InputP>
+                  {errors.telefone_presidente && <span>{errors.telefone_presidente.message}</span>}
+                  <InputP>
+                    <label>
+                     Email<span> *</span>
+                    </label>
+                    <input
+                      {...register("email_presidente", {required: "O email é obrigatório"})}
+                      // defaultValue={dadosGestao?.ga_telefone}
+                      onChange={handleOnChange}
+                      type="text"
+                    ></input>
+                  </InputP>
+                  {errors.email_presidente && <span>{errors.email_presidente.message}</span>}
+                  <InputM>
+                    <label>
+                      Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("setor_responsavel", {required: "O setor é obrigatório"})}
+                      onKeyPress={onlyLettersAndCharacters}
+                      style={{ textTransform: "capitalize" }}
+                      onChange={(e) => {
+                        const value = toTitleCase(e.target.value);
+                        setValue("setor_responsavel", value)}}
+                      type="text"
+                    ></input>
+                  </InputM>
+                  {errors.setor_responsavel && <span>{errors.setor_responsavel.message}</span>}
+                  <InputG>
+                    <label>
+                     Integrantes<span> *</span>
+                    </label>
+                    <input
+                      {...register("integrantes", {required: "Os integrantes são obrigatórios"})}
+                      style={{ textTransform: "capitalize" }}
+                      onChange={(e) => {
+                        const value = toTitleCase(e.target.value);
+                        setValue("integrantes", value);}}
+                      type="text"
+                    ></input>
+                  </InputG>
+                  {errors.integrantes && <span>{errors.integrantes.message}</span>}
+                  <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                </ConteudoModal>
+              </Form>
+            </Modal>
+          </ContainerModal>
+        )}
+        
         {showModal && (
           <ContainerModal>
             <Modal>
-              <Form onSubmit={handleSubmit(handleAddRepresentante)}>
+              <Form onSubmit={handleSubmit(updateRepresentantes? updateRepresentantesServicos : handleAddRepresentante)}>
                 <CloseModalButton
                   onClick={() => {
                     handleCloseModal();
                   }}
                 >
-                  Fechar
+                  X
                 </CloseModalButton>
 
                 <ConteudoModal>
@@ -1059,6 +1618,7 @@ export default function GestaoIndicadores({
           </ContainerModal>
         )}
       </DivCenter>
+      </MainContent>
     </Container>
   );
 }
