@@ -478,17 +478,16 @@ export const DivTituloForm = styled.div`
 
 
 export const Tabela = styled.div`
-
+  
   display: flex;
   width: 100%;
+  overflow: visible;
   height: 100%;
   margin-bottom: 30px;
-  overflow: hidden;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
   table {
     
     flex: 1;
@@ -498,8 +497,7 @@ export const Tabela = styled.div`
     min-width: 600px;
 
 
-    th {
-      
+    th { 
       flex: 1;
       background: #0085bd;
       color: #fff;
@@ -523,6 +521,7 @@ export const Tabela = styled.div`
     }
 
     td {
+      wite-sapace: nowrap;
       padding: 16px 20px;
       color: #4a5568;
       border-bottom: 1px solid #e2e8f0;
@@ -571,6 +570,8 @@ export const Tabela = styled.div`
 
       &:last-child td {
         border-bottom: none;
+
+      
       }
     }
   }

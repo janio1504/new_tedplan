@@ -1269,6 +1269,7 @@ export const MainContent = styled.div`
   margin-left: 270px;
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
+  z-index: -1000;
 `;
 
 export const SidebarItem = styled.div<{ active?: boolean }>`
