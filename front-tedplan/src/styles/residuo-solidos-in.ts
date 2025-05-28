@@ -1286,7 +1286,8 @@ export const Sidebar = styled.div`
 
 export const MainContent = styled.div`
   margin-left: 270px;
-  padding: 1.25rem;
+  margin-top: -40px;
+  padding: 20px;
   min-height: calc(100vh - 160px);
 `;
 

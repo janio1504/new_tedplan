@@ -19,7 +19,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -29,11 +28,14 @@ import {
   DivBorder,
   LabelCenter,
   DivChekbox,
+  DivFormConteudo,
   CheckBox,
   DivTituloEixoDrenagem,
 } from "../../styles/financeiro";
+import { Sidebar } from "@/styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
+import { LineSideBar } from "@/styles/drenagem-indicadores";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -53,12 +55,14 @@ import {
   TabelaModal,
   ModalForm,
 } from "../../styles/esgoto-indicadores";
+import { DivFormCadastro, MainContent, SidebarItem} from "@/styles/esgoto-indicadores";
 import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
 import { toast, ToastContainer } from 'react-nextjs-toast'
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
+import { Main } from "next/document";
 
 interface IMunicipio {
   id_municipio: string;
@@ -88,13 +92,16 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [concessionarias, setConcessionarias] = useState(null);
   const [modalAddConssionaria, setModalAddConssionaria] = useState(false);
   const [anoSelected, setAnoSelected] = useState(null);
+  const [activeForm, setActiveForm] = useState("municipiosAtendidos");
 
 
 
 
   useEffect(() => {
+    if (usuario?.id_municipio){
     getMunicipio()
-  }, []);
+  }
+  }, [usuario]);
 
   async function getMunicipio() {
     const res = await api
@@ -183,6 +190,7 @@ export default function Geral({ municipio }: MunicipioProps) {
     getConcessionaria(id)
     setModalAddConssionaria(true);
   }
+
   async function handleCadastro(data) {
 
     if(usuario?.id_permissao === 4){
@@ -267,24 +275,145 @@ export default function Geral({ municipio }: MunicipioProps) {
     
   }
 
+  const onlyAllowNumber = (e) =>{
+    if (!/[0-9]/.test(e.key)){
+      e.preventDefault();
+    };
+  }
+
   return (
     <Container>
       <ToastContainer></ToastContainer>
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <Sidebar>
+        <LineSideBar style={{'textAlign': 'start'}}>
+          Água e esgoto sanitário
+        </LineSideBar>
+        <SidebarItem
+        active={activeForm === "municipiosAtendidos"}
+        onClick = {() => setActiveForm("municipiosAtendidos")}>
+          Municípios Atendidos
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "sedesAtendidas"}
+        onClick = {() => setActiveForm("sedesAtendidas")}>
+          Sedes e localidades Atendidas
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "populacoesAtendidas"}
+        onClick = {() => setActiveForm("populacoesAtendidas")}>
+          Populações Atendidas
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "populacaoExistente"}
+        onClick = {() => setActiveForm("populacaoExistente")}>
+          População Existente
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "empregados"}
+        onClick = {() => setActiveForm("empregados")}>
+          Empregados
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "observacoes"}
+        onClick = {() => setActiveForm("observacoes")}>
+          Observações, Esclarecimentos ou Sugestões
+        </SidebarItem>
+
+        <LineSideBar style={{'textAlign': 'start'}}>
+          Drenagem e Águas Pluviais
+        </LineSideBar>
+        <SidebarItem
+        active={activeForm === "geografiaUrbanismo"}
+        onClick = {() => setActiveForm("geografiaUrbanismo")}>
+          Geografia e Urbanismo
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "dadosHidrograficos"}
+        onClick = {() => setActiveForm("dadosHidrograficos")}>
+          Dados Hidrográficos
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "empregados1"}
+        onClick = {() => setActiveForm("empregados1")}>
+          Empregados
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "infraestrutura"}
+        onClick = {() => setActiveForm("infraestrutura")}>
+          Infraestrutura
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "operacional"}
+        onClick = {() => setActiveForm("operacional")}>
+          Operacional
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "gestaoDeRisco"}
+        onClick = {() => setActiveForm("gestaoDeRisco")}>
+          Gestão de Risco
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "observacoes1"}
+        onClick = {() => setActiveForm("observacoes1")}>
+          Observações, Esclarecimentos ou Sugestões
+        </SidebarItem>
+        <LineSideBar style={{'textAlign': 'start'}}>
+          Resíduos Sólidos
+        </LineSideBar>
+        <SidebarItem
+        active={activeForm === "infoGerais"}
+        onClick = {() => setActiveForm("infoGerais")}>
+          Informações Gerais
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "concessionarias"}
+        onClick = {() => setActiveForm("concessionarias")}>
+          Concessionárias
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "populacaoAtendida1"}
+        onClick = {() => setActiveForm("populacaoAtendida1")}>
+          População Atendida
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "valorContratual"}
+        onClick = {() => setActiveForm("valorContratual")}>
+          Valor Contratual
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "Observacoes3"}
+        onClick = {() => setActiveForm("observacoes3")}>
+          Observações, Esclarecimentos ou Sugestões
+        </SidebarItem>
+
+        
+        
+      </Sidebar>
+      <MainContent>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>
             <DivTituloForm>Geral</DivTituloForm>
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'municipiosAtendidos'
+                || activeForm === 'sedesAtendidas' || activeForm === 'populacoesAtendidas'
+                || activeForm === 'populacaoExistente' || activeForm === 'empregados' 
+                || activeForm === 'observacoes' || activeForm === 'geografiaUrbanismo'
+                || activeForm === 'dadosHidrograficos' || activeForm === 'empregados1'
+                || activeForm === 'infraestrutura' || activeForm === 'operacional'   
+                || activeForm === 'gestaoDeRisco' || activeForm === 'observacoes1'
+                || activeForm === 'infoGerais' || activeForm === 'concessionarias'
+                || activeForm === 'populacaoAtendida1' || activeForm === 'valorContratual'
+                || activeForm === 'observacoes3'}>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
                 <label>Selecione o ano desejado:</label>
                 <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
-                  <option >Selecionar</option>
+                  <option value="" disabled >Selecionar</option>
                   <option value="2025">2025</option>
                   <option value="2024">2024</option>
                   <option value="2023">2023</option>
@@ -298,7 +427,8 @@ export default function Geral({ municipio }: MunicipioProps) {
             </DivFormEixo>
 
             <DivFormEixo>
-              <DivFormConteudo>
+
+              <DivFormConteudo active={activeForm === 'municipiosAtendidos'}>
                 <DivTitulo>
                   <DivTituloConteudo>Municípios atendidos</DivTituloConteudo>
                 </DivTitulo>
@@ -319,8 +449,10 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE05A')}
                         defaultValue={dadosGeral?.ge05a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Municipios</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
+                      <td>municípios</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE05B</InputSNIS></td>
@@ -328,14 +460,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE05B')}
                         defaultValue={dadosGeral?.ge05b}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Municipios</td>
+                        type="text"
+                         onKeyPress={onlyAllowNumber}
+                         ></input></InputP></td>
+                      <td>municípios</td>
                     </tr>
                   </tbody>
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'sedesAtendidas'}>
                 <DivTitulo>
                   <DivTituloConteudo>Sedes e localidades atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -356,7 +490,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE008AE')}
                         defaultValue={dadosGeral?.ge008ae}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Sede</td>
                     </tr>
                     <tr>
@@ -365,7 +501,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE009')}
                         defaultValue={dadosGeral?.ge009}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Sede</td>
                     </tr>
                     <tr>
@@ -374,7 +512,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE010AE')}
                         defaultValue={dadosGeral?.ge010ae}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Localidades</td>
                     </tr>
                     <tr>
@@ -383,7 +523,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE011AE')}
                         defaultValue={dadosGeral?.ge011ae}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Localidades</td>
                     </tr>
                     <tr>
@@ -426,7 +568,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'populacoesAtendidas'}>
                 <DivTitulo>
                   <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -446,7 +588,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('AG026')}
                         defaultValue={dadosGeral?.ag026}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -455,7 +599,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('AG001')}
                         defaultValue={dadosGeral?.ag001}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -464,7 +610,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('ES026')}
                         defaultValue={dadosGeral?.es026}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -473,14 +621,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('ES001')}
                         defaultValue={dadosGeral?.es001}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                   </tbody>
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'populacaoExistente'}>
                 <DivTitulo>
                   <DivTituloConteudo>População existente</DivTituloConteudo>
                 </DivTitulo>
@@ -500,7 +650,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GD06A')}
                         defaultValue={dadosGeral?.gd06a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -509,7 +661,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GD06B')}
                         defaultValue={dadosGeral?.gd06b}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -518,7 +672,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GD12A')}
                         defaultValue={dadosGeral?.gd12a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -527,14 +683,16 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GD12B')}
                         defaultValue={dadosGeral?.gd12a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                   </tbody>
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'empregados'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -554,7 +712,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('FN026')}
                         defaultValue={dadosGeral?.fn026}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Empregados</td>
                     </tr>
                   </tbody>
@@ -562,7 +722,7 @@ export default function Geral({ municipio }: MunicipioProps) {
               </DivFormConteudo>
 
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'observacoes'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações, esclarecimentos ou sugestões</DivTituloConteudo>
                 </DivTitulo>
@@ -589,10 +749,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
             
               </DivFormConteudo>
-            </DivFormEixo>
 
-            <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'geografiaUrbanismo'}>
                 <DivTitulo>
                   <DivTituloConteudo>Geografia e urbanismo</DivTituloConteudo>
                 </DivTitulo>
@@ -607,11 +765,13 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>                  
                     <tr>
                       <td><InputSNIS>GE001</InputSNIS></td>
-                      <td>Área territorial total do município (Fonte IBGE) </td>
+                      <td>Área territorial total do município (Fonte: IBGE) </td>
                       <td><InputP><input {...register('GE001')}
                         defaultValue={dadosGeral?.ge001}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>km²</td>
                     </tr>
                     <tr>
@@ -620,7 +780,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE002')}
                         defaultValue={dadosGeral?.ge002}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>km²</td>
                     </tr>
                     <tr>
@@ -629,21 +791,25 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE007')}
                         defaultValue={dadosGeral?.ge007}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Imóveis</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE008</InputSNIS></td>
-                      <td>Quantidade total de domicilios urbanos existentes no município </td>
+                      <td>Quantidade total de domicílios urbanos existentes no município </td>
                       <td><InputP><input {...register('GE008DA')}
                         defaultValue={dadosGeral?.ge008da}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Domicílios</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE016</InputSNIS></td>
-                      <td>Município Crítico (Fonte: CPRM) </td>
+                      <td>Município crítico em sanemento básico (Fonte: CPRM) </td>
                       <td><InputP><select {...register('GE016')}
                         defaultValue={dadosGeral?.ge016}
                         onChange={handleOnChange} >
@@ -658,7 +824,7 @@ export default function Geral({ municipio }: MunicipioProps) {
               </DivFormConteudo>
 
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'dadosHidrograficos'}>
                 <DivTitulo>
                   <DivTituloConteudo>Dados hidrográficos</DivTituloConteudo>
                 </DivTitulo>
@@ -672,14 +838,14 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td><InputSNIS>GE010</InputSNIS></td>
-                      <td>Região Hidrográfica em que se encontra o município (Fonte:ANA)</td>
+                      <td>Região hidrográfica em que se encontra o município (Fonte: ANA)</td>
                       <td><InputP><input {...register('GE010')}
                         defaultValue={dadosGeral?.ge010}
                         onChange={handleOnChange}></input></InputP></td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE011</InputSNIS></td>
-                      <td>Nome da(s) bacia(s) hidrografica(s) a que pertence o município (Fonte: ANA) </td>
+                      <td>Nome da(s) bacia(s) hidrográfica(s) a que pertence o município (Fonte: ANA) </td>
                       <td>
                         <input {...register('GE011')} type="text"
                           defaultValue={dadosGeral?.ge011}
@@ -688,7 +854,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td><InputSNIS>GE012</InputSNIS></td>
-                      <td>Existe Comitê de Bacia ou Sob-bacia Hidrográfica organizada?</td>
+                      <td>Existe comitê de bacia ou sub-bacia hidrográfica organizada?</td>
                       <td><InputP><select {...register('GE012')} >
                         <option value="">{dadosGeral?.ge012 ? dadosGeral?.ge012 : 'Opções'}</option>
                         <option value="Sim">Sim</option>
@@ -700,7 +866,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'empregados1'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -746,7 +912,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'infraestrutura'}>
                 <DivTitulo>
                   <DivTituloConteudo>Infraestrutura</DivTituloConteudo>
                 </DivTitulo>
@@ -814,7 +980,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ie016}
                         onChange={handleOnChange}
                       >
-                        <option value="Unitário(misto com esgotamento sanitário)">Unitário(misto com esgotamento sanitário)</option>
+                        <option value="Unitário(misto com esgotamento sanitário)">Unitário (misto com esgotamento sanitário)</option>
                         <option value="Exclusivo para drenagem">Exclusivo para drenagem</option>
                         <option value="Não existe">Não existe</option>
                         <option value="Outro">Outro</option>
@@ -833,7 +999,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'operacional'}>
                 <DivTitulo>
                   <DivTituloConteudo>Operacional</DivTituloConteudo>
                 </DivTitulo>
@@ -884,7 +1050,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'gestaoDeRisco'}>
                 <DivTitulo>
                   <DivTituloConteudo>Gestão de risco</DivTituloConteudo>
                 </DivTitulo>
@@ -907,7 +1073,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                             defaultChecked={dadosGeral?.ri001_1}
                             type="checkbox"
                             name="RI001_1" />
-                            <span>Não há instituições relacionadas com à gestão de riscos ou respostas a desastres</span></CheckBox>
+                            <span>Não há instituições relacionadas com a gestão de riscos ou respostas a desastres</span></CheckBox>
                           <CheckBox><input {...register('RI001_2')}
                             defaultChecked={dadosGeral?.ri001_2}
                             type="checkbox" />
@@ -945,7 +1111,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                           <CheckBox><input {...register('RI002_3')}
                             defaultChecked={dadosGeral?.ri002_3}
                             type="checkbox" />
-                            <span>Retificações de cursos de água naturais</span></CheckBox>
+                            <span>Retificações de cursos d'água naturais</span></CheckBox>
                         </DivChekbox>
                       </td>
 
@@ -961,7 +1127,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                     <tr>
                       <td><InputSNIS>RI003</InputSNIS></td>
-                      <td>Instrumento de controle e monitoramento hidrlólicos existentes</td>
+                      <td>Instrumento de controle e monitoramento hidrológicos existentes</td>
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI003_1')}
@@ -990,21 +1156,21 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                     <tr>
                       <td><InputSNIS>RI004</InputSNIS></td>
-                      <td>Dados hidrolólicos monitorados e metodologia de monitoramento</td>
+                      <td>Dados hidrológicos monitorados e metodologia de monitoramento</td>
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI004_1')}
                             defaultChecked={dadosGeral?.ri004_1}
                             type="checkbox" />
-                            <span>Quantidade chuva por registro auto..</span></CheckBox>
+                            <span>Quantidade de chuva por registro auto..</span></CheckBox>
                           <CheckBox><input {...register('RI004_2')}
                             defaultChecked={dadosGeral?.ri004_2}
                             type="checkbox" />
-                            <span>Quantidade chuva por frequência diária</span></CheckBox>
+                            <span>Quantidade de chuva por frequência diária</span></CheckBox>
                           <CheckBox><input {...register('RI004_3')}
                             defaultChecked={dadosGeral?.ri004_3}
                             type="checkbox" />
-                            <span>Quantidade chuva por frequência hora..</span></CheckBox>
+                            <span>Quantidade de chuva por frequência hora..</span></CheckBox>
                         </DivChekbox>
                       </td>
                     </tr>
@@ -1019,7 +1185,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                     <tr>
                       <td><InputSNIS>RI005</InputSNIS></td>
-                      <td>Existem sistemas de alerta de riscos hidrológicos(alagamentos, enxurradas, inundaçoẽs)? </td>
+                      <td>Existem sistemas de alerta de riscos hidrológicos (alagamentos, enxurradas, inundaçoẽs)? </td>
                       <td><InputP><select {...register('RI005')}
                         defaultValue={dadosGeral?.ri005}
                         onChange={handleOnChange}
@@ -1045,7 +1211,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td><InputSNIS>RI009</InputSNIS></td>
-                      <td>Existe mapeamento de áreas de risco de inundações dos cursos de água urbana? </td>
+                      <td>Existe mapeamento de áreas de risco de inundações dos cursos d'água urbana? </td>
                       <td><InputP><select {...register('RI009')}
                         defaultValue={dadosGeral?.ri009}
                         onChange={handleOnChange}
@@ -1064,7 +1230,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       >
                         <option > {(dadosGeral?.ri010 == 1) ? "Integral" : "Parcial"}  </option>
                         <option value="1">Integral </option>
-                        <option value="0">Parcial</option>
+                        {/* <option value="0">Parcial</option> */}
                       </select></InputP></td>
                     </tr>
                     <tr>
@@ -1096,7 +1262,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                           {...register('RI012')}
                           defaultValue={dadosGeral?.ri012}
                           onChange={handleOnChange}
-                          type="text">
+                          type="text"
+                          onKeyPress={onlyAllowNumber}
+                          >
                         </input>
                       </td>
 
@@ -1108,7 +1276,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td colSpan={4}><input {...register('RI013')}
                         defaultValue={dadosGeral?.ri013}
                         onChange={handleOnChange}
-                        type="text"></input></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></td>
                       <td>Domicílios</td>
                     </tr>
 
@@ -1116,7 +1286,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'observacoes1'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
@@ -1142,13 +1312,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-
-            </DivFormEixo>
-
-
-            <DivFormEixo>
-              
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'infoGerais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Informações gerais</DivTituloConteudo>
                 </DivTitulo>
@@ -1185,7 +1349,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === "concessionarias"}>
                 <DivTitulo>
                   <DivTituloConteudo>Concesionárias</DivTituloConteudo>
                 </DivTitulo>
@@ -1221,6 +1385,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+                
                 <Tabela>
                   <table cellSpacing={0} >
                   <tbody >
@@ -1269,9 +1434,10 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tbody>
                   </table>
                   </Tabela>
+                  
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'populacaoAtendida1'}>
                 <DivTitulo>
                   <DivTituloConteudo>População atendida</DivTituloConteudo>
                 </DivTitulo>
@@ -1291,8 +1457,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO164')}
                         defaultValue={dadosGeral?.co164}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO050</InputSNIS></td>
@@ -1300,8 +1467,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO050')}
                         defaultValue={dadosGeral?.co050}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO165</InputSNIS></td>
@@ -1309,8 +1477,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO165')}
                         defaultValue={dadosGeral?.co165}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO147</InputSNIS></td>
@@ -1318,8 +1487,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO147')}
                         defaultValue={dadosGeral?.co147}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO134</InputSNIS></td>
@@ -1327,7 +1497,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO134')}
                         defaultValue={dadosGeral?.co134}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>%</td>
                     </tr>
                     <tr>
@@ -1336,16 +1507,18 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO135')}
                         defaultValue={dadosGeral?.co135}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>%</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO136</InputSNIS></td>
-                      <td>Percentual da população atendida com frequência de 1 veze por semana </td>
+                      <td>Percentual da população atendida com frequência de 1 vezes por semana </td>
                       <td><InputP><input {...register('CO136')}
                         defaultValue={dadosGeral?.co136}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>%</td>
                     </tr>
                     <tr>
@@ -1354,14 +1527,15 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CS050')}
                         defaultValue={dadosGeral?.cs050}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>%</td>
                     </tr>
                   </tbody>
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'valorContratual'}>
                 <DivTitulo>
                   <DivTituloConteudo>Valor contratual</DivTituloConteudo>
                 </DivTitulo>
@@ -1378,19 +1552,21 @@ export default function Geral({ municipio }: MunicipioProps) {
                   
                     <tr>
                       <td><InputSNIS>CO162</InputSNIS></td>
-                      <td>Valor contratual (Preço unitario) do serviço de aterramento de RDO e RDU</td>
+                      <td>Valor contratual (Preço unitário) do serviço de aterramento de RDO e RDU</td>
                       <td><InputP><input {...register('CO162')}
                         defaultValue={dadosGeral?.co162}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>R$/Toneladas</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO178</InputSNIS></td>
-                      <td>Valor contratual (Preço unitario) do serviço de coleta e transporte e destinação final de RDO e RPU</td>
+                      <td>Valor contratual (Preço unitário) do serviço de coleta e transporte e destinação final de RDO e RPU</td>
                       <td><InputP><input {...register('CO178')}
                         defaultValue={dadosGeral?.co178}
                         onChange={handleOnChange}
+                        onKeyPress={onlyAllowNumber}
                       ></input></InputP></td>
                       <td>R$/Toneladas</td>
                     </tr>
@@ -1399,7 +1575,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'observacoes3'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
@@ -1424,8 +1600,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                 </table>
               </DivFormConteudo>
 
-
-            </DivFormEixo>
+              </DivFormEixo>
+            
 
 
           </DivForm>
@@ -1440,14 +1616,14 @@ export default function Geral({ municipio }: MunicipioProps) {
             <DivFormResiduo>
               <DivTituloFormResiduo>Edição de cadastro de Concessionária</DivTituloFormResiduo>
               <Form onSubmit={handleSubmit(handleCadastroConcessionaria)}>
-                <CloseModalButton
+                <CloseModalButton style={{'top': '11px'}}
                   onClick={() => {
                     handleCloseModalAddConcesionaria();
                   }}
                 >
-                  Fechar
+                  X
                 </CloseModalButton>
-                <DivFormConteudo>
+                <DivFormConteudo style={{'marginLeft': '-20px' }} active={activeForm === "concessionarias"}>
                   <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>
                   <TabelaModal>
                     <table>
@@ -1591,13 +1767,19 @@ export default function Geral({ municipio }: MunicipioProps) {
                       </tbody>
                     </table>
                   </TabelaModal>
+                
                 </DivFormConteudo>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                <SubmitButton
+                style={{'position' : 'relative', 'left': '-35px','top': '35px'}}
+                type="submit">Gravar</SubmitButton>
               </Form>
             </DivFormResiduo>
           </ModalForm>
+       
         </ContainerModal>
+        
       )}
+      </MainContent>
     </Container>
   );
 }
