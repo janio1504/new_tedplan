@@ -40,6 +40,28 @@ export const DivLogout = styled.aside`
   margin: 30px;
 `;
 
+export const ButtonAdicionarPresidente = styled.button`
+  padding: 10px 15px;
+  color: #fff;
+  border: 0px;
+  background: #0085bd;
+  border-radius: 5px;
+  flex-direction: row;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &:disabled{
+  background: #ccc;
+  cursor: not-allowed;
+  color: #666;
+  }
+`
+
 export const IconeColeta = styled.div`
   display: flex;
   align-items: center;
@@ -476,12 +498,46 @@ export const DivTituloForm = styled.div`
     box-sizing: border-box;
 `;
 
+export const Tooltip = styled.span`
+  position: absolute;
+  display: flex;
+
+  &:hover span {
+    visibility: visible;
+    opacity: 1;
+  }
+    
+`;
+
+export const TooltipText = styled.span`
+  visibility: hidden;
+  width: 300px;
+  background-color: #fff;
+  color: #333 !important;
+  text-align: justify;
+  border-radius: 6px;
+  font-weight: normal !important;
+  padding: 8px 12px; 
+  position: absolute;
+  z-index: 1;
+  top: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 16px;
+
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  
+`;
 
 export const Tabela = styled.div`
   
   display: flex;
   width: 100%;
-  overflow: visible;
+  overflow: auto;
   height: 100%;
   margin-bottom: 30px;
   border-radius: 12px;
@@ -912,7 +968,6 @@ export const ContainerModal = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  border: 1px solid black;
   overflow-y: auto;
   padding: 20px;
   z-index: 1000;
@@ -1537,7 +1592,7 @@ export const SubmitButtonContainer = styled.div`
 `;
 
 export const DivTextArea = styled.div`
-  float: left;
+  // float: left;
   flex-direction: column;
   display: flex;
 `;
