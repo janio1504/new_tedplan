@@ -56,7 +56,11 @@ import {
   onlyLettersAndCharacters,
   toTitleCase,
 } from "@/util/util";
-import { DivFormCadastro, MainContent, SidebarItem } from "@/styles/esgoto-indicadores";
+import {
+  DivFormCadastro,
+  MainContent,
+  SidebarItem,
+} from "@/styles/esgoto-indicadores";
 
 const InputMask = require("react-input-mask");
 
@@ -187,7 +191,7 @@ export default function GestaoIndicadores({
   const [conselho, setConselho] = useState(null);
   const [presidentesConselho, setPresidentesConselho] = useState([]);
   const [isClient, setIsClient] = useState(null);
-  const [updatePresidente, setUpdatePresidente] = useState(null); 
+  const [updatePresidente, setUpdatePresidente] = useState(null);
   const {
     register,
     handleSubmit,
@@ -218,20 +222,18 @@ export default function GestaoIndicadores({
       getParticipacoes();
       getRepresentantes();
       getGestao();
-      }
+    }
   }, [usuario]);
 
-  
-
   async function getMunicipio() {
-      const res = await api
-        .get("getMunicipio", {
-          params: { id_municipio: usuario.id_municipio },
-        })
-        .then((response) => {
-          setDadosMunicipio(response.data[0]);
-        });
-    }
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        setDadosMunicipio(response.data[0]);
+      });
+  }
 
   async function getPoliticas() {
     const resPoliticas = await api.get("getPoliticas", {
@@ -377,11 +379,14 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-          toast.notify("Presidência do Conselho Municipal adicionada com sucesso", {
+        toast.notify(
+          "Presidência do Conselho Municipal adicionada com sucesso",
+          {
             title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+            duration: 7,
+            type: "success",
+          }
+        );
         setShowModalPresidente(false);
         return response;
       })
@@ -394,8 +399,8 @@ export default function GestaoIndicadores({
       });
     getPresidentesConselho();
   }
-  
-  async function handleRemoverPresidente({id}) {
+
+  async function handleRemoverPresidente({ id }) {
     try {
       await api.delete(`delete-presidencia-conselho-municipal/${id}`);
       toast.notify("Presidente removido com sucesso!", {
@@ -515,7 +520,7 @@ export default function GestaoIndicadores({
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
       {
-        params: {id_municipio: dadosMunicipio?.id_municipio },
+        params: { id_municipio: dadosMunicipio?.id_municipio },
       }
     );
     const participacoes = await resParticipacao.data;
@@ -528,7 +533,7 @@ export default function GestaoIndicadores({
   function handleShowModal() {
     setShowModal(true);
   }
-   function handleCloseModal() {
+  function handleCloseModal() {
     setShowModal(false);
   }
   function handleShowModalPresidente() {
@@ -537,7 +542,7 @@ export default function GestaoIndicadores({
   function handleCloseModalPresidente() {
     setShowModalPresidente(false);
   }
- 
+
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
       toast.notify("Não existe Município, entre novamente no sistema! ", {
@@ -575,6 +580,13 @@ export default function GestaoIndicadores({
     getRepresentantes();
   }
 
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Sets the content of the component.
+   *
+   * @param {string} content The new content.
+   */
+  /*******  112199f0-4cb9-446e-8f0a-8ee030697671  *******/
   function handleOnChange(content) {
     setContent(content);
   }
@@ -667,50 +679,53 @@ export default function GestaoIndicadores({
     getRepresentantes();
   }
 
- async function updateRepresentantesServicos(data) {
-  if (!usuario.id_municipio || !data.id_representante_servicos_ga) {
-    toast.notify("Dados insuficientes para atualizar!", {
-      title: "Erro!",
-      duration: 7,
-      type: "error",
-    });
-    return;
-  }
-
-  await api
-    .put("updateRepresentanteServicos", {
-      id_representante_servicos_ga: data.id_representante_servicos_ga,
-      ga_nome_representante: data.ga_nome_representante,
-      ga_cargo: data.ga_cargo,
-      ga_telefone: data.ga_telefone,
-      ga_email: data.ga_email,
-      id_municipio: usuario.id_municipio,
-    })
-    .then((response) => {
-      toast.notify("Representante atualizado com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
-      getRepresentantes(); // <-- Atualiza a lista após editar
-      setShowModal(false);
-      setUpdateRepresentantes(null);
-    })
-    .catch((error) => {
-      toast.notify("Não foi possível atualizar o representante!", {
+  async function updateRepresentantesServicos(data) {
+    if (!usuario.id_municipio || !data.id_representante_servicos_ga) {
+      toast.notify("Dados insuficientes para atualizar!", {
         title: "Erro!",
         duration: 7,
         type: "error",
       });
-    });
-}
+      return;
+    }
+
+    await api
+      .put("updateRepresentanteServicos", {
+        id_representante_servicos_ga: data.id_representante_servicos_ga,
+        ga_nome_representante: data.ga_nome_representante,
+        ga_cargo: data.ga_cargo,
+        ga_telefone: data.ga_telefone,
+        ga_email: data.ga_email,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Representante atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getRepresentantes(); // <-- Atualiza a lista após editar
+        setShowModal(false);
+        setUpdateRepresentantes(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar o representante!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
 
   async function handleEditarRepresentante(representante) {
     setUpdateRepresentantes(representante);
     setShowModal(true);
 
     // Preenche os campos do formulário com os dados do representante
-    setValue("id_representante_servicos_ga", representante.id_representante_servicos_ga);
+    setValue(
+      "id_representante_servicos_ga",
+      representante.id_representante_servicos_ga
+    );
     setValue("ga_nome_representante", representante.nome);
     setValue("ga_cargo", representante.cargo);
     setValue("ga_telefone", representante.telefone);
@@ -718,60 +733,69 @@ export default function GestaoIndicadores({
   }
 
   async function updatePresidenteConselho(data) {
-  
     console.log("Dados do presidente:", data);
-    if (!usuario.id_municipio || !data.id_presidencia_conselho_municipal_saneamento_basico) {
-    toast.notify("Dados insuficientes para atualizar!", {
-      title: "Erro!",
-      duration: 7,
-      type: "error",
-    });
-    return;
-  }
-
-  await api
-    .put("update-presidencia-conselho-municipal", {
-      id_presidencia_conselho_municipal_saneamento_basico: data.id_presidencia_conselho_municipal_saneamento_basico,
-      nome_presidente: data.nome_presidente,
-      telefone_presidente: data.telefone_presidente,
-      email_presidente: data.email_presidente,
-      setor_responsavel: data.setor_responsavel,
-      integrantes: data.integrantes,
-      id_municipio: usuario.id_municipio,
-    })
-    .then((response) => {
-      toast.notify("Presidente atualizado com sucesso!", {
-        title: "Sucesso!",
+    if (
+      !usuario.id_municipio ||
+      !data.id_presidencia_conselho_municipal_saneamento_basico
+    ) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
         duration: 7,
-        type: "success",
+        type: "error",
       });
-      getPresidentesConselho(); // Atualiza a lista
-      setShowModalPresidente(false);
-      setUpdatePresidente(null);
-    })
-    .catch((error) => {
-    console.log("Erro ao atualizar presidente:", error.response?.data || error);
-    toast.notify("Não foi possível atualizar o presidente!", {
-    title: "Erro!",
-    duration: 7,
-    type: "error",
-  });
-});
+      return;
+    }
+
+    await api
+      .put("update-presidencia-conselho-municipal", {
+        id_presidencia_conselho_municipal_saneamento_basico:
+          data.id_presidencia_conselho_municipal_saneamento_basico,
+        nome_presidente: data.nome_presidente,
+        telefone_presidente: data.telefone_presidente,
+        email_presidente: data.email_presidente,
+        setor_responsavel: data.setor_responsavel,
+        integrantes: data.integrantes,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Presidente atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getPresidentesConselho(); // Atualiza a lista
+        setShowModalPresidente(false);
+        setUpdatePresidente(null);
+      })
+      .catch((error) => {
+        console.log(
+          "Erro ao atualizar presidente:",
+          error.response?.data || error
+        );
+        toast.notify("Não foi possível atualizar o presidente!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
   }
 
   async function handleEditarPresidente(presidente) {
-  setUpdatePresidente(presidente);
-  setShowModalPresidente(true);
+    setUpdatePresidente(presidente);
+    setShowModalPresidente(true);
 
-  setValue("id_presidencia_conselho_municipal_saneamento_basico", presidente.id_presidencia_conselho_municipal_saneamento_basico);
-  setValue("nome_presidente", presidente.nome_presidente);
-  setValue("telefone_presidente", presidente.telefone_presidente);
-  setValue("email_presidente", presidente.email_presidente);
-  setValue("setor_responsavel", presidente.setor_responsavel);
-  setValue("integrantes", presidente.integrantes);
+    setValue(
+      "id_presidencia_conselho_municipal_saneamento_basico",
+      presidente.id_presidencia_conselho_municipal_saneamento_basico
+    );
+    setValue("nome_presidente", presidente.nome_presidente);
+    setValue("telefone_presidente", presidente.telefone_presidente);
+    setValue("email_presidente", presidente.email_presidente);
+    setValue("setor_responsavel", presidente.setor_responsavel);
+    setValue("integrantes", presidente.integrantes);
   }
 
-    if (!usuario?.id_municipio) {
+  if (!usuario?.id_municipio) {
     return null;
   }
 
@@ -779,845 +803,910 @@ export default function GestaoIndicadores({
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal
-        municipio={[]}
-      ></MenuHorizontal>
+      <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <Sidebar>
-        <SidebarItem active={activeForm === "gestaoAssociada"}
-        onClick={() => setActiveForm("gestaoAssociada")}
+        <SidebarItem
+          active={activeForm === "gestaoAssociada"}
+          onClick={() => setActiveForm("gestaoAssociada")}
         >
           Gestão Associada
         </SidebarItem>
-        <SidebarItem active={activeForm === "politicaSaneamento"}
-        onClick={() => setActiveForm("politicaSaneamento")}
+        <SidebarItem
+          active={activeForm === "politicaSaneamento"}
+          onClick={() => setActiveForm("politicaSaneamento")}
         >
           Política Municipal de Saneamento
         </SidebarItem>
-        <SidebarItem active={activeForm === "planoSaneamento"}
-        onClick={() => setActiveForm("planoSaneamento")}
+        <SidebarItem
+          active={activeForm === "planoSaneamento"}
+          onClick={() => setActiveForm("planoSaneamento")}
         >
           Plano Municipal de Saneamento
         </SidebarItem>
-        <SidebarItem active={activeForm === "conselhoSaneamento"}
-        onClick={() => setActiveForm("conselhoSaneamento")}
+        <SidebarItem
+          active={activeForm === "conselhoSaneamento"}
+          onClick={() => setActiveForm("conselhoSaneamento")}
         >
           Conselho Municipal de Saneamento Básico
         </SidebarItem>
-        <SidebarItem active={activeForm === "participacaoSocial"}
-        onClick={() => setActiveForm("participacaoSocial")}
+        <SidebarItem
+          active={activeForm === "participacaoSocial"}
+          onClick={() => setActiveForm("participacaoSocial")}
         >
           Participação e controle social
         </SidebarItem>
-        <SidebarItem active={activeForm === "saneamentoRural"}
-        onClick={() => setActiveForm("saneamentoRural")}
+        <SidebarItem
+          active={activeForm === "saneamentoRural"}
+          onClick={() => setActiveForm("saneamentoRural")}
         >
           Saneamento Rural
         </SidebarItem>
-        <SidebarItem active={activeForm === "comunidadesTradicionais"}
-        onClick={() => setActiveForm("comunidadesTradicionais")}
+        <SidebarItem
+          active={activeForm === "comunidadesTradicionais"}
+          onClick={() => setActiveForm("comunidadesTradicionais")}
         >
           Comunidades Tradicionais
         </SidebarItem>
       </Sidebar>
 
-    <MainContent>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivFormCadastro active={activeForm === "gestaoAssociada"}>
-            <DivTituloForm>Gestão Associada</DivTituloForm>
-            
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Nome da associação</label>
-                    <input
-                      {...register("nome_associacao")}
-                      defaultValue={dadosGestao?.ga_nome}
-                      onChange={handleOnChange}
-                      type="text"
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputG>
-                    <label>
-                      Norma da associação<span> *</span>
-                    </label>
-                    <input
-                      {...register("norma_associacao")}
-                      defaultValue={dadosGestao?.ga_norma}
-                      onChange={handleOnChange}
-                      type="text"
-                    ></input>
-                  </InputG>
-                </td>
-              </tr>
-            </table>
-            <DivEixo>
-              Representantes{" "}
-              <span
-                onClick={() => {
-                  handleShowModal();
+      <MainContent>
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <DivFormCadastro active={activeForm === "gestaoAssociada"}>
+              <DivTituloForm>Gestão Associada</DivTituloForm>
+
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Nome da associação</label>
+                      <input
+                        {...register("nome_associacao")}
+                        defaultValue={dadosGestao?.ga_nome}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputG>
+                      <label>
+                        Norma da associação<span> *</span>
+                      </label>
+                      <input
+                        {...register("norma_associacao")}
+                        defaultValue={dadosGestao?.ga_norma}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                </tr>
+              </table>
+              <DivEixo>
+                Representantes{" "}
+                <span
+                  onClick={() => {
+                    handleShowModal();
+                  }}
+                >
+                  Adicionar
+                </span>{" "}
+              </DivEixo>
+
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {representantes && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Cargo</th>
+                        <th>Telefone</th>
+                        <th>email</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+
+                    {representantes?.map((representante, index) => (
+                      <tr role="row" key={index}>
+                        <td>{representante.id_representante_servicos_ga}</td>
+                        <td>
+                          <InputM>{representante.nome}</InputM>
+                        </td>
+                        <td>{representante.cargo}</td>
+                        <td>{representante.telefone}</td>
+                        <td>{representante.email}</td>
+                        <td style={{ justifyContent: "center" }}>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() =>
+                                handleEditarRepresentante(representante)
+                              }
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                            />
+
+                            <Image
+                              onClick={() =>
+                                handleRemoverRepresentante({
+                                  id: representante.id_representante_servicos_ga,
+                                })
+                              }
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
                 }}
               >
-                Adicionar
-              </span>{" "}
-            </DivEixo>
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
 
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {representantes && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Cargo</th>
-                      <th>Telefone</th>
-                      <th>email</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {representantes?.map((representante, index) => (
-                    <tr role="row" key={index}>
-                      <td>{representante.id_representante_servicos_ga}</td>
-                      <td>
-                        <InputM>{representante.nome}</InputM>
-                      </td>
-                      <td>{representante.cargo}</td>
-                      <td>{representante.telefone}</td>
-                      <td>{representante.email}</td>
-                      <td  style={{ justifyContent: "center"}}>
-                        <Actions>
-                          <Image
-                            title="Editar"
-                            onClick={() =>
-                              handleEditarRepresentante(representante)
-                            }
-
-                            src={Editar}
-                            alt="Editar"
-                            width={25}
-                            height={25}
-                          />
-                        
-                          <Image
-                            onClick={() =>
-                              handleRemoverRepresentante({
-                                id: representante.id_representante_servicos_ga,
-                              })
-                            }
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                          />
-                        </Actions>
-                        
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
-
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-
-          </DivFormCadastro>
-
-          <DivFormCadastro active={activeForm === "politicaSaneamento"}>
-            <DivTituloForm>
-              Política Municipal de Saneamento Básico
-            </DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Título</label>
-                    <input
-                      {...register("politica_titulo")}
-                      defaultValue={dadosGestao?.politica_titulo}
-                      onChange={(e) => {
-                        const value = capitalizeFrasal(e.target.value);
-                        setValue("politica_titulo", value);
-                      }}
-                      type="text"
-                      //aceita apenas letras e caracteres especiais
-                      onKeyPress={onlyLettersAndCharacters}
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputP>
-                    <label>Ano</label>
-                    <input
-                      {...register("politica_ano")}
-                      defaultValue={dadosGestao?.politica_ano}
-                      onChange={handleOnChange}
-                      type="text"
-                      //aceita apenas números
-                      onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                    ></input>
-                  </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input
-                      {...register("politica_arquivo")}
-                      type="file"
-                    ></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
-
-            <DivEixo>Atualizações</DivEixo>
-
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {listPoliticas && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-                  {listPoliticas?.map((politica, index) => (
-                    <tr key={index}>
-                      <td>{politica.id_politica_municipal}</td>
-                      <td>
-                        <InputG>{politica.titulo}</InputG>
-                      </td>
-                      <td>{politica.ano}</td>
-                      <td>
-                        <Actions>
-                          <a
-                            href={politica.file}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() => {
-                              handleRemoverPolitica({
-                                id: politica.id_politica_municipal,
-                                id_arquivo: politica.id_arquivo,
-                              });
-                            }}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
-
-          
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-
-          </DivFormCadastro>
-
-          <DivFormCadastro active={activeForm === "planoSaneamento"}>
-            <DivTituloForm>Plano Municipal de Saneamento Básico</DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Título</label>
-                    <input {...register("plano_titulo")} type="text"></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputP>
-                    <label>Ano</label>
-                    <input {...register("plano_ano")} type="text"></input>
-                  </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input {...register("plano_arquivo")} type="file"></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
-
-            <DivEixo>Atualizações</DivEixo>
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {listPlanos && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {listPlanos?.map((plano, index) => (
-                    <tr key={index}>
-                      <td>{plano.id_plano_municipal}</td>
-                      <td>
-                        <InputG>{plano.titulo}</InputG>
-                      </td>
-                      <td>{plano.ano}</td>
-                      <td>
-                        <Actions>
-                          <a href={plano.file} rel="noreferrer" target="_blank">
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() => {
-                              handleRemoverPlano({
-                                id: plano.id_plano_municipal,
-                                id_arquivo: plano.id_arquivo,
-                              });
-                            }}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-          </DivFormCadastro>
-
-
-
-          <DivFormCadastro active={activeForm === "conselhoSaneamento"}> 
-            <DivTituloForm>
-              Conselho Municipal de Saneamento Básico
-            </DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Título</label>
-                    <input 
-                    {...register("conselho_titulo")}
-                    defaultValue={"Teste"}
-                    // onChange={"conselho_titulo"}
-                    type="text"></input>
-                  </InputG>
-                </td>
-                <td>
+            <DivFormCadastro active={activeForm === "politicaSaneamento"}>
+              <DivTituloForm>
+                Política Municipal de Saneamento Básico
+              </DivTituloForm>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Título</label>
+                      <input
+                        {...register("politica_titulo")}
+                        defaultValue={dadosGestao?.politica_titulo}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("politica_titulo", value);
+                        }}
+                        type="text"
+                        //aceita apenas letras e caracteres especiais
+                        onKeyPress={onlyLettersAndCharacters}
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
                     <InputP>
                       <label>Ano</label>
-                      <input 
-                      {...register("conselho_ano")}
-                      defaultValue={"22"}
-                      type="text"></input>
+                      <input
+                        {...register("politica_ano")}
+                        defaultValue={dadosGestao?.politica_ano}
+                        onChange={handleOnChange}
+                        type="text"
+                        //aceita apenas números
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
                     </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input
-                    {...register("conselho_arquivo")}
-                    type="file"></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
-            <DivEixo>
-              Presidente{" "}
-              <span
-                onClick={() => {
-                  handleShowModalPresidente();
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input
+                        {...register("politica_arquivo")}
+                        type="file"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </table>
+
+              <DivEixo>Atualizações</DivEixo>
+
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {listPoliticas && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+                    {listPoliticas?.map((politica, index) => (
+                      <tr key={index}>
+                        <td>{politica.id_politica_municipal}</td>
+                        <td>
+                          <InputG>{politica.titulo}</InputG>
+                        </td>
+                        <td>{politica.ano}</td>
+                        <td>
+                          <Actions>
+                            <a
+                              href={politica.file}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              <FaFilePdf></FaFilePdf>
+                            </a>
+                            <Image
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              onClick={() => {
+                                handleRemoverPolitica({
+                                  id: politica.id_politica_municipal,
+                                  id_arquivo: politica.id_arquivo,
+                                });
+                              }}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
                 }}
               >
-                Adicionar
-              </span>{" "}
-            </DivEixo>
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
 
-            <Tabela style={{'overflow': 'scroll'}}>
-              <table cellSpacing={0}>
-                <tbody>
-                  {conselho && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Presidente</th>
-                      <th>Telefone</th>
-                      <th>email</th>
-                      <th>Setor Responsável</th>
-                      <th>Integrantes</th>
-                      <th>Município</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {conselho?.map((presidente, index) => (
-                    <tr role="row" key={index}>
-                      <td>{presidente.id_presidencia_conselho_municipal_saneamento_basico}</td>
-                      <td>
-                        <InputM>{presidente.nome_presidente}</InputM>
-                      </td>
-                        
-                      <td style={{whiteSpace: 'nowrap'}} >
-                        {presidente.telefone_presidente}</td>
-                      <td>{presidente.email_presidente}</td>
-                      <td>{presidente.setor_responsavel}</td>
-                      <td
-                      style={{
-                            whiteSpace: 'nowrap'}}>
-                      {presidente.integrantes}</td>
-                      <td>{presidente.id_municipio}</td>
-                      <td>
-                        <Actions>
-                          <Image
-                            title="Editar"
-                            onClick={() => handleEditarPresidente(presidente)}
-                            src={Editar}
-                            alt="Editar"
-                            width={25}
-                            height={25}
-                          />
-                          
-                          <Image
-                            onClick={() =>
-                              handleRemoverPresidente(
-                                {id:presidente.id_presidencia_conselho_municipal_saneamento_basico,}
-                              )
-                            }
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+            <DivFormCadastro active={activeForm === "planoSaneamento"}>
+              <DivTituloForm>
+                Plano Municipal de Saneamento Básico
+              </DivTituloForm>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Título</label>
+                      <input {...register("plano_titulo")} type="text"></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input {...register("plano_ano")} type="text"></input>
+                    </InputP>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input {...register("plano_arquivo")} type="file"></input>
+                    </InputM>
+                  </td>
+                </tr>
               </table>
-            </Tabela>
 
+              <DivEixo>Atualizações</DivEixo>
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {listPlanos && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
 
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px",
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-            
-           
-          </DivFormCadastro>
+                    {listPlanos?.map((plano, index) => (
+                      <tr key={index}>
+                        <td>{plano.id_plano_municipal}</td>
+                        <td>
+                          <InputG>{plano.titulo}</InputG>
+                        </td>
+                        <td>{plano.ano}</td>
+                        <td>
+                          <Actions>
+                            <a
+                              href={plano.file}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              <FaFilePdf></FaFilePdf>
+                            </a>
+                            <Image
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              onClick={() => {
+                                handleRemoverPlano({
+                                  id: plano.id_plano_municipal,
+                                  id_arquivo: plano.id_arquivo,
+                                });
+                              }}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
 
-          <DivFormCadastro active={activeForm === "participacaoSocial"}>
-            <DivTituloForm>Participação e Controle Social</DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Titulo</label>
-                    <input
-                      {...register("pcs_titulo")}
-                      onChange={(e) => {
-                        const value = capitalizeFrasal(e.target.value);
-                        setValue("pcs_titulo", value);
-                      }}
-                      type="text"
-                      onKeyPress={onlyLettersAndCharacters}
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputP>
-                    <label>Ano</label>
-                    <input
-                      {...register("pcs_ano")}
-                      type="text"
-                      onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                    ></input>
-                  </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input {...register("pcs_arquivo")} type="file"></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
-
-            <DivEixo>Atualizações</DivEixo>
-
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {listParticipacoes && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {listParticipacoes?.map((participacao, index) => (
-                    <tr key={index}>
-                      <td>{participacao.id_participacao_controle_social}</td>
-                      <td>
-                        <InputG>{participacao.titulo}</InputG>
-                      </td>
-                      <td>{participacao.ano}</td>
-                      <td>
-                        <Actions>
-                          <a
-                            href={participacao.file}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() =>
-                              handleRemoverParticipacao({
-                                id: participacao.id_participacao_controle_social,
-                                id_arquivo: participacao.id_arquivo,
-                              })
-                            }
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+            <DivFormCadastro active={activeForm === "conselhoSaneamento"}>
+              <DivTituloForm>
+                Conselho Municipal de Saneamento Básico
+              </DivTituloForm>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Título</label>
+                      <input
+                        {...register("conselho_titulo")}
+                        defaultValue={"Teste"}
+                        // onChange={"conselho_titulo"}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input
+                        {...register("conselho_ano")}
+                        defaultValue={"22"}
+                        type="text"
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input
+                        {...register("conselho_arquivo")}
+                        type="file"
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
               </table>
-            </Tabela>
-
-          {/* </DivFormCadastro>
-          <DivForm> */}
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-          </DivFormCadastro>
-
-          <DivFormCadastro active = {activeForm === "saneamentoRural"}>
-            <DivTituloForm>Saneamento Rural</DivTituloForm>
-            <DivTextArea>
-              <label>Breve Descrição</label>
-
-              <textarea
-                ref={txtArea}
-                {...register("sr_descricao")}
-                defaultValue={
-                  dadosGestao?.sr_descricao ? dadosGestao?.sr_descricao : ""
-                }
-                onChange={handleOnChange}
-              ></textarea>
-            </DivTextArea>
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-15px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-          </DivFormCadastro>
-
-          <DivFormCadastro active={activeForm === "comunidadesTradicionais"}>
-          <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
-
-            <DivTextArea>
-              <label>Nome das Comunidades Beneficiadas</label>
-
-              <textarea
-                ref={txtArea}
-                {...register("ct_nomes_comunidades")}
-                defaultValue={
-                  dadosGestao?.nomes_comunidades_beneficiadas
-                    ? dadosGestao?.nomes_comunidades_beneficiadas
-                    : ""
-                }
-                onChange={handleOnChange}
-              ></textarea>
-
-              <label>Breve Descrição</label>
-
-              <textarea
-                ref={txtArea}
-                {...register("ct_descricao")}
-                defaultValue={
-                  dadosGestao?.ct_descricao ? dadosGestao?.ct_descricao : ""
-                }
-                onChange={handleOnChange}
-              ></textarea>
-            </DivTextArea>
-
-        
-          
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-15px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-
-          </DivFormCadastro>
-          
-        </Form>
-
-        {ShowModalPresidente && (
-          <ContainerModal>
-            <Modal>
-              <Form onSubmit={handleSubmit(updatePresidente ? updatePresidenteConselho : handleAddPresidente)}>
-                <CloseModalButton
+              <DivEixo>
+                Presidente{" "}
+                <span
                   onClick={() => {
-                    handleCloseModalPresidente();
+                    handleShowModalPresidente();
                   }}
                 >
-                  X
-                </CloseModalButton>
-                <ConteudoModal>
-                  <InputG>
-                    <label>
-                      Nome<span> *</span>
-                    </label>
-                    <input
-                      {...register("nome_presidente", {
-                        required: "O nome é obrigatório",
-                      })}
-                      onKeyPress={onlyLettersAndCharacters}
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("nome_presidente", value);
-                      }}
-                      type="text"
-                    ></input>
-                  </InputG>
-                   {errors.nome_presidente && <span>{errors.nome_presidente.message}</span>}
-                  <InputP>
-                    <label>
-                      Telefone<span> *</span>
-                    </label>
-                    <Controller
-                      name="telefone_presidente"
-                      control={control}
-                      rules={{ required: "O telefone é obrigatório" }}
-                      render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <>
-                          <InputMask
-                            mask="(99) 99999-9999"
-                            maskChar={null}
-                            value={value}
-                            onChange={e => onChange(e.target.value)}
-                          >
-                            {(inputProps) => (
-                              <input {...inputProps} type="text" />
-                            )}
-                          </InputMask>
-                          {error && <span>{error.message}</span>}
-                        </>
-                      )}
-                    />
-                  </InputP>
-                  {errors.telefone_presidente && <span>{errors.telefone_presidente.message}</span>}
-                  <InputP>
-                    <label>
-                     Email<span> *</span>
-                    </label>
-                    <input
-                      {...register("email_presidente", {required: "O email é obrigatório"})}
-                      // defaultValue={dadosGestao?.ga_telefone}
-                      onChange={handleOnChange}
-                      type="text"
-                    ></input>
-                  </InputP>
-                  {errors.email_presidente && <span>{errors.email_presidente.message}</span>}
-                  <InputM>
-                    <label>
-                      Setor Responsável<span> *</span>
-                    </label>
-                    <input
-                      {...register("setor_responsavel", {required: "O setor é obrigatório"})}
-                      onKeyPress={onlyLettersAndCharacters}
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("setor_responsavel", value)}}
-                      type="text"
-                    ></input>
-                  </InputM>
-                  {errors.setor_responsavel && <span>{errors.setor_responsavel.message}</span>}
-                  <InputG>
-                    <label>
-                     Integrantes<span> *</span>
-                    </label>
-                    <input
-                      {...register("integrantes", {required: "Os integrantes são obrigatórios"})}
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("integrantes", value);}}
-                      type="text"
-                    ></input>
-                  </InputG>
-                  {errors.integrantes && <span>{errors.integrantes.message}</span>}
-                  <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
-                </ConteudoModal>
-              </Form>
-            </Modal>
-          </ContainerModal>
-        )}
-        
-        {showModal && (
-          <ContainerModal>
-            <Modal>
-              <Form onSubmit={handleSubmit(updateRepresentantes? updateRepresentantesServicos : handleAddRepresentante)}>
-                <CloseModalButton
-                  onClick={() => {
-                    handleCloseModal();
-                  }}
-                >
-                  X
-                </CloseModalButton>
+                  Adicionar
+                </span>{" "}
+              </DivEixo>
 
-                <ConteudoModal>
-                  <InputG>
-                    <label>
-                      Nome<span> *</span>
-                    </label>
-                    <input
-                      {...register("ga_nome_representante", {
-                        required: "O nome é obrigatório",
-                      })}
-                      onKeyPress={onlyLettersAndCharacters}
-                      type="text"
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("ga_nome_representante", value);
-                      }}
-                    ></input>
-                  </InputG>
-                  {errors.ga_nome_representante && (
-                    <span>{errors.ga_nome_representante.message}</span>
-                  )}
-                  <InputP>
-                    <label>
-                      Cargo<span> *</span>
-                    </label>
-                    <input
-                      {...register("ga_cargo", {
-                        required: "O cargo é obrigatório",
-                      })}
-                      onKeyPress={onlyLettersAndCharacters}
-                      type="text"
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("ga_cargo", value);
-                      }}
-                    ></input>
-                  </InputP>
-                  {errors.ga_cargo && <span>{errors.ga_cargo.message}</span>}
+              <Tabela style={{ overflow: "scroll" }}>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {conselho && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Presidente</th>
+                        <th>Telefone</th>
+                        <th>email</th>
+                        <th>Setor Responsável</th>
+                        <th>Integrantes</th>
+                        <th>Município</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
 
-                  <InputP>
-                    <label>
-                      Telefone<span> *</span>
-                    </label>
-                    <Controller
-                      name="ga_telefone"
-                      control={control}
-                      rules={{ required: "O telefone é obrigatório" }}
-                      render={({
-                        field: { onChange, value },
-                        fieldState: { error },
-                      }) => (
-                        <>
-                          <InputMask
-                            mask="(99) 99999-9999"
-                            maskChar={null}
-                            value={value}
-                            onChange={(e) => {
-                              const justNumbers = e.target.value.replace(
-                                /\D/g,
-                                ""
-                              );
-                              if (justNumbers.length <= 11) {
-                                onChange(justNumbers);
+                    {conselho?.map((presidente, index) => (
+                      <tr role="row" key={index}>
+                        <td>
+                          {
+                            presidente.id_presidencia_conselho_municipal_saneamento_basico
+                          }
+                        </td>
+                        <td>
+                          <InputM>{presidente.nome_presidente}</InputM>
+                        </td>
+
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {presidente.telefone_presidente}
+                        </td>
+                        <td>{presidente.email_presidente}</td>
+                        <td>{presidente.setor_responsavel}</td>
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {presidente.integrantes}
+                        </td>
+                        <td>{presidente.id_municipio}</td>
+                        <td>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() => handleEditarPresidente(presidente)}
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                            />
+
+                            <Image
+                              onClick={() =>
+                                handleRemoverPresidente({
+                                  id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
+                                })
                               }
-                            }}
-                          >
-                            {(inputProps) => (
-                              <input {...inputProps} type="text" />
-                            )}
-                          </InputMask>
-                          {error && <span>{error.message}</span>}
-                        </>
-                      )}
-                    />
-                  </InputP>
-                  <InputM>
-                    <label>
-                      Email<span> *</span>
-                    </label>
-                    <input
-                      {...register("ga_email")}
-                      defaultValue={dadosGestao?.ga_email}
-                      onChange={handleOnChange}
-                      type="text"
-                    ></input>
-                  </InputM>
-                  <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
-                </ConteudoModal>
-              </Form>
-            </Modal>
-          </ContainerModal>
-        )}
-      </DivCenter>
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "participacaoSocial"}>
+              <DivTituloForm>Participação e Controle Social</DivTituloForm>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Titulo</label>
+                      <input
+                        {...register("pcs_titulo")}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("pcs_titulo", value);
+                        }}
+                        type="text"
+                        onKeyPress={onlyLettersAndCharacters}
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input
+                        {...register("pcs_ano")}
+                        type="text"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input {...register("pcs_arquivo")} type="file"></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </table>
+
+              <DivEixo>Atualizações</DivEixo>
+
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {listParticipacoes && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+
+                    {listParticipacoes?.map((participacao, index) => (
+                      <tr key={index}>
+                        <td>{participacao.id_participacao_controle_social}</td>
+                        <td>
+                          <InputG>{participacao.titulo}</InputG>
+                        </td>
+                        <td>{participacao.ano}</td>
+                        <td>
+                          <Actions>
+                            <a
+                              href={participacao.file}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              <FaFilePdf></FaFilePdf>
+                            </a>
+                            <Image
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              onClick={() =>
+                                handleRemoverParticipacao({
+                                  id: participacao.id_participacao_controle_social,
+                                  id_arquivo: participacao.id_arquivo,
+                                })
+                              }
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              {/* </DivFormCadastro>
+          <DivForm> */}
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "saneamentoRural"}>
+              <DivTituloForm>Saneamento Rural</DivTituloForm>
+              <DivTextArea>
+                <label>Breve Descrição</label>
+
+                <textarea
+                  ref={txtArea}
+                  {...register("sr_descricao")}
+                  defaultValue={
+                    dadosGestao?.sr_descricao ? dadosGestao?.sr_descricao : ""
+                  }
+                  onChange={handleOnChange}
+                ></textarea>
+              </DivTextArea>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-15px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "comunidadesTradicionais"}>
+              <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
+
+              <DivTextArea>
+                <label>Nome das Comunidades Beneficiadas</label>
+
+                <textarea
+                  ref={txtArea}
+                  {...register("ct_nomes_comunidades")}
+                  defaultValue={
+                    dadosGestao?.nomes_comunidades_beneficiadas
+                      ? dadosGestao?.nomes_comunidades_beneficiadas
+                      : ""
+                  }
+                  onChange={handleOnChange}
+                ></textarea>
+
+                <label>Breve Descrição</label>
+
+                <textarea
+                  ref={txtArea}
+                  {...register("ct_descricao")}
+                  defaultValue={
+                    dadosGestao?.ct_descricao ? dadosGestao?.ct_descricao : ""
+                  }
+                  onChange={handleOnChange}
+                ></textarea>
+              </DivTextArea>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-15px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+          </Form>
+
+          {ShowModalPresidente && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updatePresidente
+                      ? updatePresidenteConselho
+                      : handleAddPresidente
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      handleCloseModalPresidente();
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Nome<span> *</span>
+                      </label>
+                      <input
+                        {...register("nome_presidente", {
+                          required: "O nome é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        style={{ textTransform: "capitalize" }}
+                        onChange={(e) => {
+                          const value = toTitleCase(e.target.value);
+                          setValue("nome_presidente", value);
+                        }}
+                        type="text"
+                      ></input>
+                    </InputG>
+                    {errors.nome_presidente && (
+                      <span>{errors.nome_presidente.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <Controller
+                        name="telefone_presidente"
+                        control={control}
+                        rules={{ required: "O telefone é obrigatório" }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <InputMask
+                              mask="(99) 99999-9999"
+                              maskChar={null}
+                              value={value}
+                              onChange={(e) => onChange(e.target.value)}
+                            >
+                              {(inputProps) => (
+                                <input {...inputProps} type="text" />
+                              )}
+                            </InputMask>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
+                    </InputP>
+                    {errors.telefone_presidente && (
+                      <span>{errors.telefone_presidente.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("email_presidente", {
+                          required: "O email é obrigatório",
+                        })}
+                        // defaultValue={dadosGestao?.ga_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                    {errors.email_presidente && (
+                      <span>{errors.email_presidente.message}</span>
+                    )}
+                    <InputM>
+                      <label>
+                        Setor Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("setor_responsavel", {
+                          required: "O setor é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        style={{ textTransform: "capitalize" }}
+                        onChange={(e) => {
+                          const value = toTitleCase(e.target.value);
+                          setValue("setor_responsavel", value);
+                        }}
+                        type="text"
+                      ></input>
+                    </InputM>
+                    {errors.setor_responsavel && (
+                      <span>{errors.setor_responsavel.message}</span>
+                    )}
+                    <InputG>
+                      <label>
+                        Integrantes<span> *</span>
+                      </label>
+                      <input
+                        {...register("integrantes", {
+                          required: "Os integrantes são obrigatórios",
+                        })}
+                        style={{ textTransform: "capitalize" }}
+                        onChange={(e) => {
+                          const value = toTitleCase(e.target.value);
+                          setValue("integrantes", value);
+                        }}
+                        type="text"
+                      ></input>
+                    </InputG>
+                    {errors.integrantes && (
+                      <span>{errors.integrantes.message}</span>
+                    )}
+                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+
+          {showModal && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updateRepresentantes
+                      ? updateRepresentantesServicos
+                      : handleAddRepresentante
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      handleCloseModal();
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Nome<span> *</span>
+                      </label>
+                      <input
+                        {...register("ga_nome_representante", {
+                          required: "O nome é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("ga_nome_representante", value);
+                        }}
+                      ></input>
+                    </InputG>
+                    {errors.ga_nome_representante && (
+                      <span>{errors.ga_nome_representante.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("ga_cargo", {
+                          required: "O cargo é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("ga_cargo", value);
+                        }}
+                      ></input>
+                    </InputP>
+                    {errors.ga_cargo && <span>{errors.ga_cargo.message}</span>}
+
+                    <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <Controller
+                        name="ga_telefone"
+                        control={control}
+                        rules={{ required: "O telefone é obrigatório" }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <InputMask
+                              mask="(99) 99999-9999"
+                              maskChar={null}
+                              value={value}
+                              onChange={(e) => {
+                                const justNumbers = e.target.value.replace(
+                                  /\D/g,
+                                  ""
+                                );
+                                if (justNumbers.length <= 11) {
+                                  onChange(justNumbers);
+                                }
+                              }}
+                            >
+                              {(inputProps) => (
+                                <input {...inputProps} type="text" />
+                              )}
+                            </InputMask>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
+                    </InputP>
+                    <InputM>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("ga_email")}
+                        defaultValue={dadosGestao?.ga_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+        </DivCenter>
       </MainContent>
     </Container>
   );
