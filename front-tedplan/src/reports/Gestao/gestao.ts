@@ -1,6 +1,8 @@
 import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 
+const PATH_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/pdf/'
+
 export function gestaoPDF(gestao: any, listParticipacoes: any, listPlanos: any, listPoliticas: any, representantes: any){
     pdfMake.vfs = pdfFonts.vfs
     
@@ -20,11 +22,11 @@ export function gestaoPDF(gestao: any, listParticipacoes: any, listPlanos: any, 
             headerRows: 1,
             body: [
                 [{text: 'Descrição'},{text: 'Valor'}],
-                ['Nome da associação ', gestao[0].ga_nome],
-                ['Norma da associação ', gestao[0].ga_norma],
-                ['Saneamento Rural ', gestao[0].sr_descricao],
-                ['Comunidades Tradicionais ', gestao[0].nomes_comunidades_beneficiadas],                
-                ['Breve descrição ', gestao[0].ct_descricao],
+                ['Nome da associação: ', gestao[0].ga_nome],
+                ['Norma da associação: ', gestao[0].ga_norma],
+                ['Saneamento Rural: ', gestao[0].sr_descricao],
+                ['Comunidades Tradicionais: ', gestao[0].nomes_comunidades_beneficiadas],                
+                ['Breve descrição: ', gestao[0].ct_descricao],
             ]
         },
         layout: 'headerLineOnly'
@@ -55,10 +57,10 @@ export function gestaoPDF(gestao: any, listParticipacoes: any, listPlanos: any, 
             headerRows: 1,
             body: [
                 [{text: 'Descrição'}],
-                [listPoliticas?.map((politica: {titulo: string, id_arquivo: number}) =>(
+                [listPoliticas?.map((politica: {titulo: string, id_arquivo: number, ano: string}) =>(
                     [
-                        ['titulo:  ' + politica.titulo],
-                        ['URL:  ' +' http://localhost:3000/pdf/'+ politica.id_arquivo],
+                        ['titulo:  ' + politica.titulo,'Ano:  ' + politica.ano],
+                        ['URL:  ' +PATH_URL+'/pdf/'+ politica.id_arquivo],
                         ['-----------------------------------------------------------------------------------------------------------']
                     ]
                 ))],
@@ -73,10 +75,10 @@ export function gestaoPDF(gestao: any, listParticipacoes: any, listPlanos: any, 
             headerRows: 1,
             body: [
                 [{text: 'Descrição'}],
-                [listPlanos?.map((plano: {titulo: string, id_arquivo: number}) =>(
+                [listPlanos?.map((plano: {titulo: string, id_arquivo: number, ano: string}) =>(
                     [
-                        ['titulo:  ' + plano.titulo],
-                        ['URL:  ' +' http://localhost:3000/pdf/'+ plano.id_arquivo],
+                        ['Titulo:  ' + plano.titulo,'Ano:  ' + plano.ano],
+                        ['URL:  ' +PATH_URL+'/pdf/'+plano.id_arquivo],
                         ['-----------------------------------------------------------------------------------------------------------']
                     ]
                 ))],
@@ -91,10 +93,10 @@ export function gestaoPDF(gestao: any, listParticipacoes: any, listPlanos: any, 
             headerRows: 1,
             body: [
                 [{text: 'Descrição'}],
-                [listParticipacoes?.map((participacao: {titulo: string, id_arquivo: number}) =>(
+                [listParticipacoes?.map((participacao: {titulo: string, id_arquivo: number, ano: string}) =>(
                     [
-                        ['titulo:  ' + participacao.titulo],
-                        ['URL:  ' +' http://localhost:3000/pdf/'+ participacao.id_arquivo],
+                        ['titulo:  ' + participacao.titulo,'Ano:  ' + participacao.ano],
+                        ['URL:  ' +PATH_URL+'/pdf/'+ participacao.id_arquivo,''],
                         ['-----------------------------------------------------------------------------------------------------------']
                     ]
                 ))],

@@ -35,3 +35,10 @@ export async function recoverUserInformation(id) {
 
   return data;
 }
+
+export async function permissionByYear(id) {
+  const api = getAPIClient();
+  const permissaoEdito = await api.get("/get-editor-simisab-por-ano/"+id);
+  
+  return permissaoEdito?.data[0];
+}

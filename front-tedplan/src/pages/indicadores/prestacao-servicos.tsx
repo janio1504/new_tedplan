@@ -68,15 +68,14 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
   
   useEffect(() => {
-    getMunicipio()  
-  
+    getMunicipio()     
   }, [municipio]);
 
   async function getMunicipio(){
     const res = await api.get("getMunicipio", {
       params: { id_municipio: usuario.id_municipio },
     }).then(response =>{
-      setMunicipio(response.data[0])
+      setMunicipio(response.data)
       return response.data;
     })
  
@@ -219,34 +218,3 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   );
 }
 
-// export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-//   ctx
-// ) => {
-//   const apiClient = getAPIClient(ctx);
-//   const { ["tedplan.token"]: token } = parseCookies(ctx);
-//   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
-//   if (!token) {
-//     return {
-//       redirect: {
-//         destination: "/login_indicadores",
-//         permanent: false,
-//       },
-//     };
-//   }
-
-//   const resUsuario = await apiClient.get("getUsuario", {
-//     params: { id_usuario: id_usuario },
-//   });
-//   const usuario = await resUsuario.data;
-
-//   const res = await apiClient.get("getMunicipio", {
-//     params: { id_municipio: usuario[0].id_municipio },
-//   });
-//   const municipio = await res.data;
-
-//   return {
-//     props: {
-//       municipio,
-//     },
-//   };
-// };

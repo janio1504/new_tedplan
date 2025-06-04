@@ -50,6 +50,7 @@ import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import { MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
+import { bold } from "@uiw/react-md-editor/lib/commands";
 
 interface IMunicipio {
   id_municipio: string;
@@ -62,7 +63,8 @@ interface MunicipioProps {
 }
 
 export default function Agua() {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, signOut, anoEditorSimisab, permission, isEditor } =
+    useContext(AuthContext);
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio>(null);
   const [anoSelected, setAnoSelected] = useState(null);
   const {
@@ -76,9 +78,17 @@ export default function Agua() {
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("ligacoes");
 
+  
+
   useEffect(() => {
     getMunicipio();
-  }, []);
+    if (anoEditorSimisab) {
+      getDadosAgua(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [anoEditorSimisab]);
+
+  
 
   async function getMunicipio() {
     const res = await api
@@ -86,7 +96,7 @@ export default function Agua() {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data[0]);
+        setDadosMunicipio(response.data);        
       });
   }
 
@@ -95,8 +105,8 @@ export default function Agua() {
   }
 
   async function handleCadastro(data) {
-    if(usuario?.id_permissao === 4){
-      return
+    if (usuario?.id_permissao === 4) {
+      return;
     }
 
     data.id_agua = dadosAgua?.id_agua;
@@ -105,7 +115,7 @@ export default function Agua() {
 
     const resCad = await api
       .post("create-agua", data)
-      .then((response) => {    
+      .then((response) => {
         toast.notify("Dados gravados com sucesso!", {
           title: "Sucesso!",
           duration: 7,
@@ -198,17 +208,34 @@ export default function Agua() {
                   <DivTitulo>
                     <DivTituloConteudo>Ano</DivTituloConteudo>
                   </DivTitulo>
-                  <label>Selecione o ano desejado:</label>
-                  <select
-                    name="ano"
-                    id="ano"
-                    onChange={(e) => seletcAno(e.target.value)}
-                  >
-                    <option>Selecionar</option>
-                    {anosSelect().map((ano) => (
-                      <option value={ano}>{ano}</option>
-                    ))}
-                  </select>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </DivFormConteudo>
               </DivFormEixo>
 
@@ -620,7 +647,8 @@ export default function Agua() {
                         <td>AG098</td>
                         <td>Campo de justificativa</td>
                         <td>
-                          <textarea style={{width: "500px"}}
+                          <textarea
+                            style={{ width: "500px" }}
                             {...register("AG098")}
                             defaultValue={dadosAgua?.ag098}
                             onChange={handleOnChange}
@@ -631,7 +659,8 @@ export default function Agua() {
                         <td>AG099</td>
                         <td>Observações</td>
                         <td>
-                          <textarea style={{width: "500px"}}
+                          <textarea
+                            style={{ width: "500px" }}
                             {...register("AG099")}
                             defaultValue={dadosAgua?.ag099}
                             onChange={handleOnChange}
@@ -640,12 +669,13 @@ export default function Agua() {
                       </tr>
                     </tbody>
                   </table>
-            
                 </DivFormConteudo>
+                {isEditor && <SubmitButton type="submit">Gravar</SubmitButton>}
               </DivFormEixo>
+              
             </DivForm>
 
-            {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+            
           </Form>
         </DivCenter>
       </MainContent>

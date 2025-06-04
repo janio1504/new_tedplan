@@ -23,6 +23,8 @@ Route.get("getMunicipio", "MunicipioController.getMunicipio");
 Route.post("addMunicipio", "MunicipioController.store");
 Route.get("getEscalas", "EscalaController.index");
 
+Route.get("pdf/:id", "FileController.getPdf");
+
 Route.get("getFile", "FileController.showFile");
 Route.get("getImagem", "FileController.showImagem");
 Route.get("getImagens", "FileController.show");
@@ -99,6 +101,7 @@ Route.post("list-unidades-processamento", "PsResiduosUnidadeController.getUnidad
 Route.post("list-unidades-processamento-por-tipo", "PsResiduosUnidadeController.getUnidadesProcessamento");
 Route.post("get-unidade-processamento", "PsResiduosUnidadeController.getUnidadeProcessamento");
 Route.post("get-dados-unidade-processamento", "PsResiduosUnidadeController.getDadosUnidadeProcessamento");
+Route.post("get-residuos-unidades-processamento", "PsResiduosUnidadeController.getResiduosUnidadesProcessamento");
 Route.delete("detete-unidade-processamento/:id", "PsResiduosUnidadeController.destroy");
 
 Route.post("create-geral", "GeralController.store");
@@ -140,6 +143,7 @@ Route.post("get-ps-financeiro", "PsFinanceiroController.getDadosFinanceiros");
 Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinanceirosPorAno");
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
+Route.get("get-editor-simisab-por-ano/:id", "UsuariosController.getEditorSimisabPorAno");
 
 Route.post("create-descricao-indicador", "IndicadorController.createDescricaoIndicador");
 Route.get("get-indicador/:id", "IndicadorController.getIndicador");
