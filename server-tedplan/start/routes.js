@@ -145,6 +145,8 @@ Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinancei
 Route.get("getUsuario", "UsuariosController.getUsuario");
 Route.get("get-editor-simisab-por-ano/:id", "UsuariosController.getEditorSimisabPorAno");
 
+Route.post("create-editor-simisab-por-ano", "UsuariosController.createEditorSimisabPorAno");
+
 Route.post("create-descricao-indicador", "IndicadorController.createDescricaoIndicador");
 Route.get("get-indicador/:id", "IndicadorController.getIndicador");
 Route.post("get-indicador-por-codigo", "IndicadorController.getIndicadorPorCodigo");

@@ -41,8 +41,16 @@ class UsuariosController {
 
   async store({ request }) {
     try {
-      const { nome, email, telefone, login, senha, id_sistema, id_municipio, id_permissao } =
-        request.all();
+      const {
+        nome,
+        email,
+        telefone,
+        login,
+        senha,
+        id_sistema,
+        id_municipio,
+        id_permissao,
+      } = request.all();
 
       const idPessoa = await Pessoa.query()
         .returning("id_pessoa")
@@ -59,8 +67,13 @@ class UsuariosController {
           id_municipio: id_municipio,
         });
 
-      await Usuario.query().table("tedplan.permissao_sistema")
-        .insert({ id_sistema: id_sistema, id_usuario: idUsuario[0], id_permissao: id_permissao });
+      await Usuario.query()
+        .table("tedplan.permissao_sistema")
+        .insert({
+          id_sistema: id_sistema,
+          id_usuario: idUsuario[0],
+          id_permissao: id_permissao,
+        });
 
       return idUsuario[0];
     } catch (error) {
@@ -99,18 +112,13 @@ class UsuariosController {
         .where("u.id_usuario", id_usuario)
         .fetch();
 
-
       return user.toJSON();
     } catch (error) {
       console.log(error);
-
     }
-
-
   }
 
   async getResponsaveisSimisab({ params }) {
-    
     try {
       const user = await Usuario.query()
         .select(
@@ -118,7 +126,7 @@ class UsuariosController {
           "u.id_pessoa",
           "p.nome",
           "p.telefone",
-          "p.email"         
+          "p.email"
         )
         .from("tedplan.usuario as u")
         .innerJoin("tedplan.pessoa as p", "u.id_pessoa", "p.id_pessoa")
@@ -136,14 +144,10 @@ class UsuariosController {
         .where("pss.id_permissao", 3)
         .fetch();
 
-
       return user.toJSON();
     } catch (error) {
       console.log(error);
-
     }
-
-
   }
 
   async getEditorSimisabPorAno({ params }) {
@@ -162,10 +166,54 @@ class UsuariosController {
     }
   }
 
+  async createEditorSimisabPorAno({ request, response }) {
+    const { id_usuario, ano, ativo, id_editor_simisab } = request.all();
+    try {
+      if (id_editor_simisab) {
+        const editorSimisab = await Usuario.query()
+          .select("*")
+          .from("tedplan.editor_simisab_por_ano as e")
+          .where("id_editor_simisab", id_editor_simisab)
+          .where("ano", ano)
+          .fetch();
+
+        if (editorSimisab.toJSON().length > 0) { 
+          await Usuario.query()
+            .from("tedplan.editor_simisab_por_ano")
+            .where("id_editor_simisab", id_editor_simisab)
+            .update({ ativo: ativo });
+
+          return response.status(200).send({
+            message: "Editor atualizado com sucesso!",
+          });
+        }
+      }
+
+      const editor = await Usuario.query()
+        .returning("id_editor_simisab")
+        .table("tedplan.editor_simisab_por_ano")
+        .insert({
+          id_usuario: id_usuario,
+          ano: ano,
+          ativo: ativo,
+        });
+      return editor;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
 
   async updatePermissoesUsuario({ request, response }) {
     try {
-      const { id_usuario, id_sistema, ativo, id_permissao, id_municipio, senha } = request.all();
+      const {
+        id_usuario,
+        id_sistema,
+        ativo,
+        id_permissao,
+        id_municipio,
+        senha,
+      } = request.all();
 
       if (ativo) {
         await Usuario.query()
@@ -182,7 +230,8 @@ class UsuariosController {
       }
 
       if (id_permissao) {
-        await Usuario.query().from("tedplan.permissao_sistema")
+        await Usuario.query()
+          .from("tedplan.permissao_sistema")
           .where("id_usuario", id_usuario)
           .update({ id_permissao: id_permissao, id_sistema: id_sistema });
       }
@@ -205,7 +254,9 @@ class UsuariosController {
           .update({ senha: md5(senha) });
       }
 
-      return response().status(200).send('As permissões do usuário foram atualizadas!');
+      return response()
+        .status(200)
+        .send("As permissões do usuário foram atualizadas!");
     } catch (error) {
       console.log(error);
 
@@ -235,9 +286,7 @@ class UsuariosController {
   }
 
   async getPermissoes() {
-    const sistema = await Usuario.query()
-      .from("tedplan.permissoes")
-      .fetch();
+    const sistema = await Usuario.query().from("tedplan.permissoes").fetch();
     return sistema;
   }
 
