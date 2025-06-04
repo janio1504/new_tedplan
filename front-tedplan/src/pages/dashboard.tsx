@@ -31,7 +31,7 @@ export default function DashboardIndicadores() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { signOut, setMunicipioUser, usuario } = useContext(AuthContext);
+  const { signOut, setMunicipioUser, usuario, permission } = useContext(AuthContext);
   const [municipios, setMunicipios] = useState<any>(null);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export default function DashboardIndicadores() {
       <HeadPublico></HeadPublico>
       <BodyDashboard>
         <Sidebar />
-        {usuario?.id_permissao == 1 || usuario?.id_permissao == 4 ?
+        {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ?
         <DivMunicipios>          
           <Form onSubmit={handleSubmit(handleSetMunicipio)}>
             <label>Municipios</label>

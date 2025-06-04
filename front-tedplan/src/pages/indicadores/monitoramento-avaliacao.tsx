@@ -60,6 +60,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [dadosEsgoto, setDadosEsgoto] = useState(null);
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [dadosResiduosColeta, setDadosResiduosColeta] = useState(null);
+  const [residuosUnidadesProcessamento, setResiduosUnidadesProcessamento] = useState(null);
+  const [residuosRecebidos, setResiduosRecebidos] = useState(null);
   const [unidadesRsc, setDadosUnidadesRsc] = useState(null);
   const [unidadesRss, setDadosUnidadesRss] = useState(null);
   const [associacoes, setAssociacoes] = useState(null);
@@ -82,6 +84,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     getDadosEsgoto()
     getDadosDrenagem()
     getDadosResiduosColeta()
+    getResiduosUnidadesProcessamento();
+    getResiduosRecebidos();
 
     getPoliticas();
     getPlanos();
@@ -168,6 +172,27 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
         console.log(error);
       });      
       setDadosResiduosColeta(res[0])
+  }
+    async function getResiduosUnidadesProcessamento() {  
+    const id_municipio = usuario?.id_municipio
+    const ano = new Date().getFullYear(); // Pega o ano atual 
+    
+    const res = await api.post("get-residuos-unidades-processamento", {id_municipio: id_municipio, ano: ano})
+      .then((response) => {        
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });      
+      setResiduosUnidadesProcessamento(res)
+  }
+
+   async function getResiduosRecebidos() {    
+    const res = await api
+      .post("list-residuos-recebidos", { ano: new Date().getFullYear() })
+      .then((response) => {
+        setResiduosRecebidos(response.data);
+      });
   }
 
 
@@ -336,7 +361,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
           </TituloRelatorios>
           <Image src={PrestacaoServicos} alt='Prestação de Serviços' />
           <BaixarRelatorio onClick={()=>prestacaoServicos(dadosGeral,
-             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem, dadosResiduosColeta)}>Baixar</BaixarRelatorio>
+             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem, dadosResiduosColeta,
+              residuosUnidadesProcessamento, residuosRecebidos)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         
         </DivRelatorios>

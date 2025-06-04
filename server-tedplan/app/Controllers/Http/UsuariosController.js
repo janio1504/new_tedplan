@@ -146,6 +146,23 @@ class UsuariosController {
 
   }
 
+  async getEditorSimisabPorAno({ params }) {
+    try {
+      const editor = await Usuario.query()
+        .select("*")
+        .from("tedplan.editor_simisab_por_ano as e")
+        .where("e.id_usuario", params.id)
+        .whereNotNull("e.ano")
+        .where("e.ativo", true)
+        .fetch();
+      return editor.toJSON();
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  }
+
+
   async updatePermissoesUsuario({ request, response }) {
     try {
       const { id_usuario, id_sistema, ativo, id_permissao, id_municipio, senha } = request.all();

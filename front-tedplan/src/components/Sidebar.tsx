@@ -92,7 +92,7 @@ const SubmenuItem = styled(MenuItem)`
 `;
 
 const Sidebar = () => {
-  const { signOut, usuario } = useContext(AuthContext);
+  const { signOut, usuario, permission } = useContext(AuthContext);
   const [isCadastroOpen, setIsCadastroOpen] = useState(false);
 
   function handleAddIndicador() {
@@ -126,7 +126,7 @@ const Sidebar = () => {
   return (
     <SidebarContainer>
       <MenuTitle>{usuario?.permissao_usuario}</MenuTitle>
-      {usuario?.id_permissao == 1 ? (
+      {permission.adminGeral || permission.adminTedPlan || permission.editorTedPlan ? (
         <>
           <MenuItemWithSubmenu
             onClick={() => setIsCadastroOpen(!isCadastroOpen)}
@@ -145,15 +145,19 @@ const Sidebar = () => {
             <SubmenuItem onClick={handleAddIndicador}>
               Informações de Indicador
             </SubmenuItem>
-          </SubmenuContainer>
-          <MenuItem onClick={handleUsuarios}>
-            <FaUsers /> Lista de Usuários
-          </MenuItem>
+          </SubmenuContainer>       
         </>
       ) : (
         ""
       )}
-      {usuario?.id_permissao == 2 || usuario?.id_permissao == 1 ? (
+      {permission.adminGeral ? (        
+          <MenuItem onClick={handleUsuarios}>
+            <FaUsers /> Lista de Usuários
+          </MenuItem>        
+      ) : (
+        ""
+      )}
+      {permission.adminGeral || permission.adminTedPlan ? (
         <>
           <MenuItem onClick={handlePublicacoes}>
             <FaAddressBook /> Publicações
@@ -168,7 +172,7 @@ const Sidebar = () => {
       ) : (
         ""
       )}
-      {usuario?.id_permissao == 3 && usuario?.id_sistema == 1 ? (
+      {permission.editorSimisab ? (
         <MenuItem onClick={handleSimisab}>
           <FaSignInAlt /> SIMISAB
         </MenuItem>

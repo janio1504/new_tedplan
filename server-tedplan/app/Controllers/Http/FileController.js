@@ -6,6 +6,24 @@ const Helpers = use("Helpers");
 const CustomException = use("App/Exceptions/CustomException");
 const Fs = use("fs");
 class FileController {
+  async getPdf({ params, response }) {
+    try {
+      const { id } = params;
+      if (id) {
+        const file = await File.findOrFail(id);
+        if (file.type === "application/pdf") {
+          return response.download(Helpers.tmpPath(`uploads/${file.file}`));
+        }
+        return response.status(400).send({
+          message: "O arquivo não é um PDF.",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+      return new CustomException().handle(error, { response });
+    }
+  }
+  
   async showFile({ request, response }) {
     try {
       const { id } = request.all();

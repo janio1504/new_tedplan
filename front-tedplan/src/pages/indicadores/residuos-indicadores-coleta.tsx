@@ -185,6 +185,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     setModalAssCatadores(true);
   }
 
+  function handleSetStep(step) {
+    alert("Atenção! Você está saindo do passo atual, os dados não salvos serão perdidos.");
+    setCurrentStep(step);
+  }
+
   async function handleCadastroCAC(data) {
     if(usuario?.id_permissao === 4){
       return
@@ -705,6 +710,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 0}
                     completed={currentStep > 0}
+                    onClick={()=>setCurrentStep(0)}
                   >
                     1
                   </ModalStepButton>
@@ -715,6 +721,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 1}
                     completed={currentStep > 1}
+                    onClick={()=>setCurrentStep(1)}
                   >
                     2
                   </ModalStepButton>
@@ -725,6 +732,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 2}
                     completed={currentStep > 2}
+                    onClick={()=>setCurrentStep(2)}
                   >
                     3
                   </ModalStepButton>
@@ -735,6 +743,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 3}
                     completed={currentStep > 3}
+                    onClick={()=>setCurrentStep(3)}
                   >
                     4
                   </ModalStepButton>
@@ -744,6 +753,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 4}
                     completed={currentStep > 4}
+                    onClick={()=>setCurrentStep(4)}
                   >
                     5
                   </ModalStepButton>
@@ -754,6 +764,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 5}
                     completed={currentStep > 5}
+                    onClick={()=>setCurrentStep(5)}
                   >
                     6
                   </ModalStepButton>
@@ -763,6 +774,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 6}
                     completed={currentStep > 6}
+                    onClick={()=>setCurrentStep(6)}
                   >
                     7
                   </ModalStepButton>
@@ -772,6 +784,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 7}
                     completed={currentStep > 7}
+                    onClick={()=>setCurrentStep(7)}
                   >
                     8
                   </ModalStepButton>
@@ -781,6 +794,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 8}
                     completed={currentStep > 8}
+                    onClick={()=>setCurrentStep(8)}
                   >
                     9
                   </ModalStepButton>
@@ -790,6 +804,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 9}
                     completed={currentStep > 9}
+                    onClick={()=>setCurrentStep(9)}
                   >
                     10
                   </ModalStepButton>
@@ -799,6 +814,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 10}
                     completed={currentStep > 10}
+                    onClick={()=>setCurrentStep(10)}
                   >
                     11
                   </ModalStepButton>
@@ -808,6 +824,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 11}
                     completed={currentStep > 11}
+                    onClick={()=>setCurrentStep(11)}
                   >
                     12
                   </ModalStepButton>
