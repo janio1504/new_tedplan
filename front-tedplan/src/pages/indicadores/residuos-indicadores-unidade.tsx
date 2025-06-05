@@ -513,6 +513,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         <input style={{ width: 220 }}
                           aria-invalid={errors.value ? "true" : "false"}
                           {...register("cnpj")}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                         ></input>
                         {errors.cnpj && errors.cnpj.type && (
                           <span style={{ color: "red" }}>

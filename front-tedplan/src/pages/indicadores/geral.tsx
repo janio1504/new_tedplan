@@ -55,6 +55,7 @@ import {
   TabelaModal,
   ModalForm,
 } from "../../styles/esgoto-indicadores";
+import { Tooltip, TooltipText } from "@/styles/indicadores";
 import { DivFormCadastro, MainContent, SidebarItem} from "@/styles/esgoto-indicadores";
 import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
 import { toast, ToastContainer } from 'react-nextjs-toast'
@@ -63,6 +64,7 @@ import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Main } from "next/document";
+import ajuda from "../../img/ajuda.png";
 
 interface IMunicipio {
   id_municipio: string;
@@ -708,7 +710,26 @@ export default function Geral({ municipio }: MunicipioProps) {
                   
                     <tr>
                       <td><InputSNIS>FN026</InputSNIS></td>
-                      <td>Quantidade de empregados próprios</td>
+                      <td>
+                        Quantidade de empregados próprios
+                        <Actions style={{ marginLeft: '2px', verticalAlign: 'middle', width: '30px', height: '30px',
+                          display: 'inline-flex', alignItems: 'center',
+                          justifyContent: 'center' }}>
+                          <Tooltip>
+                            <Image
+                              src={ajuda}
+                              alt="Ajuda"
+                              width={15}
+                              height={15}
+                              style={{ cursor: "pointer" }}
+                            />
+                            <TooltipText>
+                              Insira informações sobre as comunidades tradicionais, como por exemplo:
+                              condições da infraestrutura e serviços de saneamento nessas comunidades.
+                            </TooltipText>
+                          </Tooltip>
+                        </Actions>
+                      </td>
                       <td><InputP><input {...register('FN026')}
                         defaultValue={dadosGeral?.fn026}
                         onChange={handleOnChange}

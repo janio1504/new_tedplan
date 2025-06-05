@@ -235,6 +235,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag021}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                      }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -248,6 +253,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag002}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                        }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -263,6 +273,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag004}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -276,6 +291,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag003}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>economia</td>
@@ -291,6 +311,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag014}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>economia</td>
@@ -306,6 +331,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag013}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>economia</td>
@@ -322,6 +352,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag022}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>economia</td>
@@ -351,6 +386,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag006}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -364,6 +404,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag024}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -377,6 +422,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag016}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -390,6 +440,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag018}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -403,6 +458,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag017}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -416,6 +476,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag019}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -429,6 +494,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag007}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -437,7 +507,7 @@ export default function Agua() {
                         <td>AG015</td>
                         <td>
                           {" "}
-                          Volume de água de água tratada por simples desinfecção
+                          Volume de água tratada por simples desinfecção
                         </td>
                         <td>
                           <input
@@ -445,6 +515,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag015}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -458,6 +533,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag027}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -471,6 +551,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag012}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -484,6 +569,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag008}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -497,6 +587,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag010}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -510,6 +605,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag011}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -525,6 +625,11 @@ export default function Agua() {
                             defaultValue={dadosAgua?.ag020}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>1.000m³/ano</td>
@@ -558,6 +663,11 @@ export default function Agua() {
                       defaultValue={dadosAgua?.ag005}
                       onChange={handleOnChange}
                       type="text"
+                      onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                     ></input>
                   </InputP>
                   <InputSNIS>
@@ -595,6 +705,11 @@ export default function Agua() {
                       defaultValue={dadosAgua?.ag028}
                       onChange={handleOnChange}
                       type="text"
+                      onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                     ></input>
                   </InputP>
                   <InputSNIS>

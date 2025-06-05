@@ -300,6 +300,59 @@ export const DivFormConteudo = styled.div<{ active?: boolean }>`
     }
   }
 `;
+
+
+// Mesma DIV de cima porém sem o atributo hidden
+
+export const DivFormContent = styled.div` 
+  float: left;
+  width: 97%;
+  max-width: 1320;
+  min-width: 1090px;
+  padding: 10px 10px 10px 15px;
+
+  color: #667778;
+  table {
+    width: 100%;
+    margin-bottom: 20px;
+    
+  }
+  th {
+    padding: 0 10px 0 0px;
+    span {
+      text-align: center;
+      color: blue;
+    }
+    p {
+      padding: 10px;
+      background: #2dd9d0;
+      color: #008080;
+      font-weight: bolder;
+      border-radius: 5px;
+      cursor: pointer;
+      width: auto;
+      width: 70px;
+    }
+    button {
+      border: none;
+      background: #2dd9d0;
+      color: #008080;
+      padding: 10px;
+      text-align: center;
+      font-weight: bolder;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
+  td {
+  }
+  select {
+    font-size: 14px;
+    option {
+      font-size: 16px;
+    }
+  }
+`;
 export const DivForm = styled.div`
   display: flex;
   flex-direction: column;

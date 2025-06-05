@@ -21,6 +21,7 @@ import {
   DivSeparadora,
   InputSNIS,
   InputXL,
+  DivFormContent
 } from "../../styles/financeiro";
 
 import {
@@ -171,7 +172,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
           <DivForm>
             <DivTituloForm>Balanço</DivTituloForm>
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormContent>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
@@ -186,10 +187,10 @@ export default function Balanco({ municipio }: MunicipioProps) {
                     <option value={ano}>{ano}</option>
                   ))}
                 </select>
-              </DivFormConteudo>
+              </DivFormContent>
             </DivFormEixo>
             <DivFormEixo>
-            <DivFormConteudo>
+            <DivFormContent>
               <DivTitulo>
                 <DivTituloConteudo>Água e Esgoto Sanitário</DivTituloConteudo>
               </DivTitulo>
@@ -215,6 +216,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl002}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -234,6 +240,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl001}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -253,6 +264,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl010}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -272,6 +288,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl005}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -291,6 +312,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl003}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -310,6 +336,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl008}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -329,6 +360,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl006}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -348,6 +384,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl007}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -367,6 +408,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl009}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -386,6 +432,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl012}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -405,6 +456,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl004}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -424,6 +480,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           defaultValue={dadosBalanco?.bl011}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         ></input>
                       </InputP>
                     </td>
@@ -446,13 +507,18 @@ export default function Balanco({ municipio }: MunicipioProps) {
                           {...register("BL099")}
                           defaultValue={dadosBalanco?.bl099}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         />
                       </InputG>
                     </td>
                   </tr>
                 </tbody>
               </table>
-            </DivFormConteudo>
+            </DivFormContent>
             </DivFormEixo>
           </DivForm>
 
