@@ -105,7 +105,7 @@ export default function Agua() {
   }
 
   async function handleCadastro(data) {
-    if (usuario?.id_permissao === 4) {
+    if (!permission.revisorTedPlan) {
       return;
     }
 

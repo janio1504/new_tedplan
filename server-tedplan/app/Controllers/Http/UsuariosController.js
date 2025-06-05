@@ -175,29 +175,35 @@ class UsuariosController {
           .from("tedplan.editor_simisab_por_ano as e")
           .where("id_editor_simisab", id_editor_simisab)
           .where("ano", ano)
+          .orderBy("id_editor_simisab", "desc")
+          .limit(1)
           .fetch();
 
         if (editorSimisab.toJSON().length > 0) { 
           await Usuario.query()
             .from("tedplan.editor_simisab_por_ano")
             .where("id_editor_simisab", id_editor_simisab)
-            .update({ ativo: ativo });
+            .update({ ativo: ativo, ano: ano });
 
           return response.status(200).send({
             message: "Editor atualizado com sucesso!",
           });
         }
-      }
+      }else{
+          const editor = await Usuario.query()
+            .returning("id_editor_simisab")
+            .table("tedplan.editor_simisab_por_ano")
+            .insert({
+              id_usuario: id_usuario,
+              ano: ano,
+              ativo: ativo,
+            });
 
-      const editor = await Usuario.query()
-        .returning("id_editor_simisab")
-        .table("tedplan.editor_simisab_por_ano")
-        .insert({
-          id_usuario: id_usuario,
-          ano: ano,
-          ativo: ativo,
-        });
-      return editor;
+            return response.status(200).send({
+            message: "Editor cadastrado com sucesso!",
+          });
+        }
+
     } catch (error) {
       console.log(error);
       return error;
