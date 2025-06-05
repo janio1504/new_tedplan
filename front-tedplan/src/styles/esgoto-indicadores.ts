@@ -79,6 +79,96 @@ export const IconeColeta = styled.div`
   }
 `;
 
+export const Table = styled.table`
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  height: 100%;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+
+  table {
+    
+    flex: 1;
+    border-spacing: 0;
+    min-width: 600px;
+
+    th { 
+      flex: 1;
+      color: #667778;;
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+
+    td {
+      wite-sapace: nowrap;
+      padding: 16px 20px;
+      color: #4a5568;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 15px;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+
+      &:first-child {
+        padding-left: 24px;
+        font-weight: 500;
+      }
+
+      &:last-child {
+        padding-right: 24px;
+      }
+
+      &.status {
+        font-weight: 500;
+
+        &.active {
+          color: #059669;
+        }
+
+        &.inactive {
+          color: #dc2626;
+        }
+
+        &.pending {
+          color: #d97706;
+        }
+      }
+
+      &.numeric {
+        font-family: "IBM Plex Mono", monospace;
+        text-align: right;
+      }
+    }
+
+    tr {
+
+      transition: all 0.2s ease;
+
+      &:hover td {
+        background: #f8fafc;
+      }
+
+      &:last-child td {
+        border-bottom: none;
+
+      
+      }
+    }
+  }
+
+
+
+`
+
 export const Logout = styled.button`
   width: 80px;
   height: 30px;

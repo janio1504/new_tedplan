@@ -38,6 +38,7 @@ import {
   StepperWrapper,
   StepperContainer,
   StepperButton,
+  Table,
 } from "../../styles/esgoto-indicadores";
 
 import HeadIndicadores from "../../components/headIndicadores";
@@ -54,7 +55,7 @@ import MenuHorizontal from "../../components/MenuHorizontal";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { MainContent } from "../../styles/indicadores";
+import { MainContent} from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
 
 interface IMunicipio {
@@ -256,6 +257,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                             defaultValue={dadosEsgoto?.es009}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -270,6 +276,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                             defaultValue={dadosEsgoto?.es002}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -284,6 +295,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                             defaultValue={dadosEsgoto?.es003}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -300,6 +316,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                             defaultValue={dadosEsgoto?.es008}
                             onChange={handleOnChange}
                             type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -313,6 +334,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                 <DivTitulo>
                   <DivTituloConteudo>Volumes</DivTituloConteudo>
                 </DivTitulo>
+                <div style={{ display: "flex", flexDirection: "column"}}>
                 <table>
                   <tbody>
                     <tr>
@@ -330,6 +352,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es005}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>1.000m³/ano</td>
@@ -343,6 +370,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es006}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>1.000m³/ano</td>
@@ -356,6 +388,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es007}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>1.000m³/ano</td>
@@ -369,6 +406,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es012}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>1.000m³/ano</td>
@@ -385,18 +427,25 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es015}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>1.000m³/ano</td>
                     </tr>
                   </tbody>
                 </table>
+                </div>
               </DivFormConteudo>
              
               <DivFormConteudo active={activeForm === "extencao"}>
                 <DivTitulo>
                   <DivTituloConteudo>Extenção da rede</DivTituloConteudo>
                 </DivTitulo>
+                <div style={{ display: "flex", flexDirection: "column"}}>
                 <table>
                   <tbody>
                     <tr>
@@ -414,12 +463,18 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es004}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>KM</td>
                     </tr>
                   </tbody>
                 </table>
+                </div>
               </DivFormConteudo>
               
               <DivFormConteudo active={activeForm === "consumo"}>
@@ -428,6 +483,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                     Consumo de energia elétrica
                   </DivTituloConteudo>
                 </DivTitulo>
+                <div style={{ display: "flex", flexDirection: "column"}}>
                 <table>
                   <tbody>
                     <tr>
@@ -445,12 +501,18 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                           defaultValue={dadosEsgoto?.es028}
                           onChange={handleOnChange}
                           type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                            }}
                         ></input>
                       </td>
                       <td>1.000kWh/ano</td>
                     </tr>
                   </tbody>
                 </table>
+                </div>
                
               </DivFormConteudo>
              

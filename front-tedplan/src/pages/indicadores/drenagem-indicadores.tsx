@@ -264,6 +264,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE017")}
                         defaultValue={dadosDrenagem?.ie017}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                         type="text"></input>
                     </td>
                     <td>km</td>
@@ -275,6 +280,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE018")}
                           defaultValue={dadosDrenagem?.ie018}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                           type="text"></input>
                     </td>
                     <td>km</td>
@@ -287,7 +297,13 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                     <input {...register("IE019")}
                         defaultValue={dadosDrenagem?.ie019}
                         onChange={handleOnChange}
-                        type="text"></input>
+                        type="text"
+                        onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                        ></input>
                     </td>
                     <td>km</td>
                   </tr>
@@ -299,6 +315,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE020")}
                           defaultValue={dadosDrenagem?.ie020}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                           type="text"></input>
                     </td>
                     <td>km</td>
@@ -310,6 +331,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE021")}
                             defaultValue={dadosDrenagem?.ie021}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                             type="text"></input>
                     </td>
                     <td>unidades</td>
@@ -322,6 +348,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE022")}
                             defaultValue={dadosDrenagem?.ie022}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                             type="text">                              
                         </input>
                     </td>
@@ -334,6 +365,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE023")}
                             defaultValue={dadosDrenagem?.ie023}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                             type="text">                              
                         </input>
                     </td>
@@ -347,6 +383,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE024")}
                             defaultValue={dadosDrenagem?.ie024}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                             type="text">                              
                         </input>
                     </td>
@@ -360,6 +401,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE025")}
                             defaultValue={dadosDrenagem?.ie025}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                             type="text">                              
                         </input>
                     </td>
@@ -402,14 +448,20 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE028")}
                             defaultValue={dadosDrenagem?.ie028}
                             onChange={handleOnChange}
-                            type="text">                              
+                            type="text"
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
+                            >                  
                         </input>
                     </td>
                     <td>km</td>
                   </tr>
                   <tr>
                     <td>IE029</td>
-                    <td>Existem estenções elevatórias de águas pluviais na rede de drenagem?</td>
+                    <td>Existem extensões elevatórias de águas pluviais na rede de drenagem?</td>
                     <td>
                         <select {...register('IE029')}
                             onChange={handleOnChange}
@@ -448,6 +500,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE032")}
                         defaultValue={dadosDrenagem?.ie032}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                         type="text"></input>
                     </td>
                     <td>km</td>
@@ -460,6 +517,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE040")}
                           defaultValue={dadosDrenagem?.ie040}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>km</td>
@@ -471,6 +533,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE033")}
                           defaultValue={dadosDrenagem?.ie033}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>km</td>
@@ -483,6 +550,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE034")}
                         defaultValue={dadosDrenagem?.ie034}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                         type="text"></input>
                     </td>
                     <td>km</td>
@@ -495,6 +567,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE035")}
                           defaultValue={dadosDrenagem?.ie035}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>km</td>
@@ -507,6 +584,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("IE036")}
                         defaultValue={dadosDrenagem?.ie036}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                         type="text"></input>
                     </td>
                     <td>km</td>
@@ -519,6 +601,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE037")}
                           defaultValue={dadosDrenagem?.ie037}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>km</td>
@@ -531,6 +618,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <select {...register("IE041")}
                         defaultValue={dadosDrenagem?.ie041}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                             >
                         <option>Sim</option>
                         <option>Não</option>
@@ -546,13 +638,18 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("IE044")}
                           defaultValue={dadosDrenagem?.ie044}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>km</td>
                   </tr>
                   <tr>
                     <td>IE050</td>
-                    <td>Existem algum tipo de tratamento das águas pluviais?</td>
+                    <td>Existe algum tipo de tratamento das águas pluviais?</td>
                     <td>
                         <select {...register("IE050")}>
                           <option></option>
@@ -631,67 +728,97 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td>RI023</td>
-                    <td>Numero de enxurradas na área urbana do município</td>
+                    <td>Número de enxurradas na área urbana do município</td>
                     <td>
                       <input {...register("RI023")}
                         defaultValue={dadosDrenagem?.ri023}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                         type="text"></input>
                     </td>
                     <td>enxurradas</td>
                   </tr>
                   <tr>
                     <td>RI025</td>
-                    <td>Numero de alagementos na área urbana do município</td>
+                    <td>Número de alagementos na área urbana do município</td>
                     <td>
                         <input {...register("RI025")}
                             defaultValue={dadosDrenagem?.ri025}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                             type="text"></input>
                     </td>
                     <td>alagamentos</td>
                   </tr>
                   <tr>
                     <td>RI027</td>
-                    <td>Numero de inundações na área urbana do município</td>
+                    <td>Número de inundações na área urbana do município</td>
                     <td>
                         <input {...register("RI027")}
                             defaultValue={dadosDrenagem?.ri027}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                             type="text"></input>
                     </td>
                     <td>inundações</td>
                   </tr>
                   <tr>
                     <td>RI029</td>
-                    <td>Numero de pessoas desabrigadas ou desalojadas, na área urbana
+                    <td>Número de pessoas desabrigadas ou desalojadas, na área urbana
                     do município</td>
                     <td>
                         <input {...register("RI029")}
                             defaultValue={dadosDrenagem?.ri029}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                             type="text"></input>
                     </td>
                     <td>pessoas</td>
                   </tr>
                   <tr>
                     <td>RI031</td>
-                    <td>Numero de óbitos, na área urbana do município</td>
+                    <td>Número de óbitos, na área urbana do município</td>
                     <td>
                         <input {...register("RI031")}
                             defaultValue={dadosDrenagem?.ri031}
                             onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                             type="text"></input>
                     </td>
                     <td>óbitos</td>
                   </tr>
                   <tr>
                     <td>RI032</td>
-                    <td>Numero de imóveis urbanos atingidos</td>
+                    <td>Número de imóveis urbanos atingidos</td>
                     <td>                       
                       <input {...register("RI032")}
                         defaultValue={dadosDrenagem?.ri032}
                         onChange={handleOnChange}
+                        onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                         type="text"></input>
                     </td>
                     <td>imóveis</td>
@@ -721,6 +848,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <input {...register("RI043")}
                           defaultValue={dadosDrenagem?.ri043}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>pessoas</td>
@@ -733,6 +865,11 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                         <input {...register("RI044")}
                           defaultValue={dadosDrenagem?.ri044}
                           onChange={handleOnChange}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                              }
+                            }}
                           type="text"></input>
                     </td>
                     <td>pessoas</td>

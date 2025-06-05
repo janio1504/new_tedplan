@@ -244,7 +244,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                 <DivFormEixo>
                 <DivFormConteudo active={activeForm === "tarifa"}>
                   <DivTitulo>
-                    <DivTituloConteudo>Tarifa minima</DivTituloConteudo>
+                    <DivTituloConteudo>Tarifa mínima</DivTituloConteudo>
                   </DivTitulo>
                   <table>
                   <tbody>
@@ -286,7 +286,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                         </td>
                         <td>
                           Há cobrança diferenciada de tarifa mínima para
-                          economias residencias micromedidas e não micromedidas?{" "}
+                          economias residenciais micromedidas e não micromedidas?{" "}
                         </td>
                         <td>
                           <InputP>
@@ -309,7 +309,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                           <InputSNIS>TR005</InputSNIS>
                         </td>
                         <td>
-                          Quantas economias residencias MICROMEDIDAS são
+                          Quantas economias residenciais MICROMEDIDAS são
                           comtempladas com a tarifa mínima?{" "}
                         </td>
                         <td>
@@ -319,6 +319,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr005}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -340,6 +345,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr003}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -360,6 +370,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr006}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -370,7 +385,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                           <InputSNIS>TR009</InputSNIS>
                         </td>
                         <td>
-                          Qual a quantidade de economias residencias NÃO
+                          Qual a quantidade de economias residenciais NÃO
                           MICROMEDIDAS contempladas com a tarifa mínima?{" "}
                         </td>
                         <td>
@@ -380,6 +395,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr009}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -401,6 +421,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr007}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -412,7 +437,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                         </td>
                         <td>
                           Qual o valor da tarifa mínima praticada para as
-                          economias residencias NÃO MICROMEDIDAS?{" "}
+                          economias residenciais NÃO MICROMEDIDAS?{" "}
                         </td>
                         <td>
                           <InputP>
@@ -421,6 +446,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr010}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -431,7 +461,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                           <InputSNIS>TR013</InputSNIS>
                         </td>
                         <td>
-                          Quantas economias residencias são contempladas com a
+                          Quantas economias residenciais são contempladas com a
                           tarifa mínima?{" "}
                         </td>
                         <td>
@@ -441,6 +471,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr013}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -462,6 +497,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr011}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -473,7 +513,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                         </td>
                         <td>
                           Qual o valor da tarifa mínima praticada para as
-                          economias residencias?{" "}
+                          economias residenciais?{" "}
                         </td>
                         <td>
                           <InputP>
@@ -482,6 +522,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr014}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -562,7 +607,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                           <InputSNIS>TR017</InputSNIS>
                         </td>
                         <td>
-                          Qual o tipo, numero e ano da tarifa social adotada?{" "}
+                          Qual o tipo, número e ano da tarifa social adotada?{" "}
                         </td>
                         <td colSpan={2}>
                          
@@ -570,6 +615,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               {...register("TR017")}
                               defaultValue={dadosTarifa?.tr017}
                               onChange={handleOnChange}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                          
                         </td>
@@ -638,6 +688,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr020}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -660,6 +715,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr021}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -671,7 +731,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                         </td>
                         <td>
                           <InputG>
-                            O domicílio deve apresentar característas
+                            O domicílio deve apresentar características
                             construtivas determinadas (material, número de
                             cômodos ou metragem, por exemplo)
                           </InputG>
@@ -724,7 +784,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                         <td>
                           <InputG>
                             O domicílio deve estar localizado em determinados
-                            locais caracteriticos como de baixa renda?
+                            locais característicos como de baixa renda?
                           </InputG>
                         </td>
                         <td>
@@ -929,6 +989,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr032}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -949,6 +1014,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr033}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -969,6 +1039,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                               defaultValue={dadosTarifa?.tr034}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
