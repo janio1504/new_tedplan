@@ -461,6 +461,7 @@ export default function GestaoIndicadores({
         email_presidente: data.email_presidente,
         integrantes: data.integrantes,
         id_municipio: usuario.id_municipio,
+        id_conselho_municipal_saneamento_basico: data.id_conselho_municipal_saneamento_basico || null,
       })
       .then((response) => {
           toast.notify("Presidência do Conselho Municipal adicionada com sucesso", {
@@ -1366,7 +1367,8 @@ async function handleSignOut() {
         {activeForm === "conselhoSaneamento" && (
         <Form onSubmit={handleSubmitConselho(handleAddConselhoMunicipal)}>  
           <DivFormCadastro active
-          style={{maxWidth: "1045px"}}> 
+          // style={{maxWidth: "1045px"}}
+          > 
             <DivTituloForm>
               Conselho Municipal de Saneamento Básico
             </DivTituloForm>
@@ -1420,7 +1422,7 @@ async function handleSignOut() {
               </ButtonAdicionarPresidente>
             </DivEixo>
 
-            <Tabela>
+            <Tabela style={{overflow: 'auto'}}>
               <table cellSpacing={0}>
                 <tbody>
                   {conselho && (
@@ -1431,7 +1433,7 @@ async function handleSignOut() {
                       <th>email</th>
                       <th>Setor Responsável</th>
                       <th>Integrantes</th>
-                      <th>Município</th>
+                      {/* <th>Município</th> */}
                       <th>Ações</th>
                     </tr>
                   )}
@@ -1451,7 +1453,7 @@ async function handleSignOut() {
                       style={{
                             whiteSpace: 'nowrap'}}>
                       {presidente.integrantes}</td>
-                      <td>{presidente.id_municipio}</td>
+                      {/* <td>{presidente.id_municipio}</td> */}
                       <td>
                         <Actions>
                           {/* <Image
@@ -1484,7 +1486,6 @@ async function handleSignOut() {
 
             <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
               Atualizações
-             
             </DivEixo>
             <Tabela>
             <table cellSpacing={0}>
@@ -1771,6 +1772,16 @@ async function handleSignOut() {
                   <DivTituloForm
                   style={{marginTop: "-25px", width: "1370px", marginLeft: "-25px"}}>Adicionar presidente do conselho
                   </DivTituloForm>
+
+                  {conselhoMunicipal && conselhoMunicipal.length === 1 && (
+                    <input
+                      type="hidden"
+                      {...register("id_conselho_municipal_saneamento_basico")}
+                      value={conselhoMunicipal[0].id_conselho_municipal_saneamento_basico}
+                      readOnly
+                    />
+                  )}
+
                   <InputP>
                   <input
                       type="hidden"

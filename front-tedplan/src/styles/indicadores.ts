@@ -537,7 +537,7 @@ export const Tabela = styled.div`
   
   display: flex;
   width: 100%;
-  overflow: auto;
+  overflow: hidden;
   height: 100%;
   margin-bottom: 30px;
   border-radius: 12px;

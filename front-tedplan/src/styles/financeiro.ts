@@ -671,9 +671,8 @@ export const DivTituloConteudo = styled.div`
   max-width: 100%;
   margin: -30px 10px 0 0px;
   border-bottom: 2px solid #0085bd;
-  //border-radius: 5px;
   font-weight: bolder;
-  text-align: center;
+  text-align: start;
   color: #4a5568;
 `;
 
