@@ -1411,60 +1411,13 @@ async function handleSignOut() {
             </table>
 
             <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
-              Atualizações
-              <ButtonAdicionarPresidente
+              Presidente{" "}
+               <ButtonAdicionarPresidente
                onClick={handleShowModalPresidente}
                disabled={!conselhoMunicipal || conselhoMunicipal.length === 0}
                >
                 Adicionar Presidente
               </ButtonAdicionarPresidente>
-            </DivEixo>
-            <Tabela>
-            <table cellSpacing={0}>
-                <tbody>
-                  {conselhoMunicipal && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Título</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {conselhoMunicipal?.map((conselho, index) => (
-                    <tr key={index}>
-                      <td>{conselho.id_conselho_municipal_saneamento_basico}</td>
-                      <td>
-                        <InputG>{conselho.titulo}</InputG>
-                      </td>
-                      <td>{conselho.ano}</td>
-                      <td>
-                        <Actions>
-                          <a href={conselho.file} rel="noreferrer" target="_blank">
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() => {
-                              handleRemoverConselho({
-                                id: conselho.id_conselho_municipal_saneamento_basico,
-                              });
-                            }}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-             </Tabela>
-
-
-            <DivEixo>
-              Presidente{" "}
             </DivEixo>
 
             <Tabela>
@@ -1528,6 +1481,56 @@ async function handleSignOut() {
                 </tbody>
               </table>
             </Tabela>
+
+            <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
+              Atualizações
+             
+            </DivEixo>
+            <Tabela>
+            <table cellSpacing={0}>
+                <tbody>
+                  {conselhoMunicipal && (
+                    <tr>
+                      <th>ID</th>
+                      <th>Título</th>
+                      <th>Ano</th>
+                      <th>Ações</th>
+                    </tr>
+                  )}
+
+                  {conselhoMunicipal?.map((conselho, index) => (
+                    <tr key={index}>
+                      <td>{conselho.id_conselho_municipal_saneamento_basico}</td>
+                      <td>
+                        <InputG>{conselho.titulo}</InputG>
+                      </td>
+                      <td>{conselho.ano}</td>
+                      <td>
+                        <Actions>
+                          <a href={conselho.file} rel="noreferrer" target="_blank">
+                            <FaFilePdf></FaFilePdf>
+                          </a>
+                          <Image
+                            src={Excluir}
+                            alt="Excluir"
+                            width={25}
+                            height={25}
+                            onClick={() => {
+                              handleRemoverConselho({
+                                id: conselho.id_conselho_municipal_saneamento_basico,
+                              });
+                            }}
+                          />
+                        </Actions>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+             </Tabela>
+
+
+            
           
 
             <SubmitButtonContainer style={{
