@@ -806,6 +806,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN002")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn002}
                             onChange={handleOnChange}
@@ -819,6 +824,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN003")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
                             defaultValue={dadosFinanceiros?.aes_fn003}
                             onChange={handleOnChange}
                           ></input>
@@ -834,6 +845,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN007")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn007}
                             onChange={handleOnChange}
@@ -849,6 +865,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN038")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn038}
                             onChange={handleOnChange}
@@ -863,6 +884,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <input
                             {...register("FN001")}
                             disabled={true}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn001}
                             onChange={handleOnChange}
@@ -876,6 +902,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN004")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn004}
                             onChange={handleOnChange}
@@ -890,6 +921,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <input
                             {...register("AES_FN005")}
                             disabled={true}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn005}
                             onChange={handleOnChange}
@@ -921,6 +957,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN006")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn006}
                             onChange={handleOnChange}
@@ -934,6 +975,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN008")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn008}
                             onChange={handleOnChange}
@@ -949,13 +995,43 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <DivTitulo>
                     <DivTituloConteudo>Despesas</DivTituloConteudo>
                   </DivTitulo>
-                  <table>
+                  <table style={{ width: "100%", borderCollapse: "collapse" }}>
                     <tbody>
                       <tr>
-                        <th>Código SNIS</th>
-                        <th>Descrição</th>
-                        <th></th>
-                        <th></th>
+                        <th
+                          style={{
+                            width: "80px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Código SNIS
+                        </th>
+                        <th
+                          style={{
+                            width: "40%",
+                            textAlign: "left",
+                          }}
+                        >
+                          Descrição
+                        </th>
+                        <th
+                          style={{
+                            width: "150px",
+                            padding: "8px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Valor
+                        </th>
+                        <th
+                          style={{
+                            width: "80px",
+                            padding: "8px",
+                            textAlign: "left",
+                          }}
+                        >
+                          Unidade
+                        </th>
                       </tr>
                       <tr>
                         <td>FN010</td>
@@ -963,6 +1039,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN010")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn010}
                             onChange={handleOnChange}
@@ -976,6 +1057,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN011")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn011}
                             onChange={handleOnChange}
@@ -989,6 +1075,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN013")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn013}
                             onChange={handleOnChange}
@@ -1002,6 +1093,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN014")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn014}
                             onChange={handleOnChange}
@@ -1015,6 +1111,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN020")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn020}
                             onChange={handleOnChange}
@@ -1028,6 +1129,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN039")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn039}
                             onChange={handleOnChange}
@@ -1043,6 +1149,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN021")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn021}
                             onChange={handleOnChange}
@@ -1056,6 +1167,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN027")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn027}
                             onChange={handleOnChange}
@@ -1070,6 +1186,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <input
                             {...register("AES_FN015")}
                             disabled={true}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn015}
                             onChange={handleOnChange}
@@ -1080,11 +1201,16 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       <tr>
                         <td>FN035</td>
                         <td>
-                          DDespesas com juros e encargos do serviço da divida
+                          Despesas com juros e encargos do serviço da dívida
                         </td>
                         <td>
                           <input
                             {...register("FN035")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn035}
                             onChange={handleOnChange}
@@ -1101,6 +1227,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN036")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn036}
                             onChange={handleOnChange}
@@ -1111,11 +1242,16 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       <tr>
                         <td>FN016</td>
                         <td>
-                          Despesas com juros e encargos do serviço da divida
+                          Despesas com juros e encargos do serviço da dívida
                         </td>
                         <td>
                           <input
                             type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             disabled={true}
                             defaultValue={dadosFinanceiros?.aes_fn016}
                             onChange={handleOnChange}
@@ -1132,6 +1268,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN019")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn019}
                             onChange={handleOnChange}
@@ -1147,6 +1288,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN022")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn022}
                             onChange={handleOnChange}
@@ -1156,10 +1302,15 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       </tr>
                       <tr>
                         <td>FN028</td>
-                        <td>Outras depesas com os servicos</td>
+                        <td>Outras depesas com os serviços</td>
                         <td>
                           <input
                             {...register("FN028")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn028}
                             onChange={handleOnChange}
@@ -1173,6 +1324,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN017")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.aes_fn017}
@@ -1187,6 +1343,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN034")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn034}
                             onChange={handleOnChange}
@@ -1200,6 +1361,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN037")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn037}
@@ -1237,6 +1403,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           {" "}
                           <input
                             {...register("AES_FN018")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn018}
                             onChange={handleOnChange}
@@ -1254,6 +1425,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN023")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn023}
                             onChange={handleOnChange}
@@ -1267,6 +1443,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("AES_FN024")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.aes_fn024}
                             onChange={handleOnChange}
@@ -1283,6 +1464,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN025")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn025}
                             onChange={handleOnChange}
@@ -1299,6 +1485,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN030")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn030}
                             onChange={handleOnChange}
@@ -1315,6 +1506,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN031")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn031}
                             onChange={handleOnChange}
@@ -1331,6 +1527,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN032")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn032}
                             onChange={handleOnChange}
@@ -1347,6 +1548,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN033")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn033}
@@ -1383,6 +1589,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN041")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn041}
                             onChange={handleOnChange}
@@ -1399,6 +1610,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN042")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn042}
                             onChange={handleOnChange}
@@ -1415,6 +1631,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN043")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn043}
                             onChange={handleOnChange}
@@ -1428,6 +1649,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN044")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn044}
                             onChange={handleOnChange}
@@ -1444,6 +1670,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN045")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn045}
                             onChange={handleOnChange}
@@ -1460,6 +1691,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN046")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn046}
                             onChange={handleOnChange}
@@ -1476,6 +1712,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN047")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn047}
                             onChange={handleOnChange}
@@ -1489,6 +1730,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN048")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn048}
@@ -1521,6 +1767,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN051")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn051}
                             onChange={handleOnChange}
@@ -1537,6 +1788,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN052")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn052}
                             onChange={handleOnChange}
@@ -1553,6 +1809,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN053")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn053}
                             onChange={handleOnChange}
@@ -1566,6 +1827,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN054")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn054}
                             onChange={handleOnChange}
@@ -1582,6 +1848,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN055")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn055}
                             onChange={handleOnChange}
@@ -1598,6 +1869,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN056")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn056}
                             onChange={handleOnChange}
@@ -1614,6 +1890,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN057")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn057}
                             onChange={handleOnChange}
@@ -1627,6 +1908,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN058")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn058}
@@ -1751,6 +2037,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("CB003")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.cb003}
                             onChange={handleOnChange}
@@ -1767,6 +2058,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("CB004")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.cb004}
                             onChange={handleOnChange}
@@ -1812,6 +2108,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN003")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn003}
                             onChange={handleOnChange}
@@ -1871,6 +2172,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN005")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn005}
                             onChange={handleOnChange}
@@ -1887,6 +2193,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN008")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn008}
                             onChange={handleOnChange}
@@ -1902,6 +2213,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN009")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn009}
@@ -1935,6 +2251,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN012")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn012}
                             onChange={handleOnChange}
@@ -1951,6 +2272,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN013")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn013}
                             onChange={handleOnChange}
@@ -1967,6 +2293,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN015")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn015}
                             onChange={handleOnChange}
@@ -1982,6 +2313,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN016")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.dap_fn016}
@@ -2022,6 +2358,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <InputP>
                             <input
                               {...register("FN024")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn024}
                               onChange={handleOnChange}
@@ -2041,6 +2382,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <InputP>
                             <input
                               {...register("FN018")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn018}
                               onChange={handleOnChange}
@@ -2060,6 +2406,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <InputP>
                             <input
                               {...register("FN020")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn020}
                               onChange={handleOnChange}
@@ -2078,6 +2429,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <InputP>
                             <input
                               {...register("FN022")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn022}
                               onChange={handleOnChange}
@@ -2090,13 +2446,18 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>FN017</td>
                         <td>
                           Desembolsos de investimentos com recursos próprios em
-                          Drenagem e Manejo das APU realizados pelo Município no
+                          Drenagem e Manejo das APU realizados pelo município no
                           ano de referência
                         </td>
                         <td>
                           <InputP>
                             <input
                               {...register("FN017")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn017}
                               onChange={handleOnChange}
@@ -2109,13 +2470,18 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>FN019</td>
                         <td>
                           Desembolsos de investimentos com recursos onerosos em
-                          Drenagem e Manejo das APU realizados pelo Município no
+                          Drenagem e Manejo das APU realizados pelo município no
                           ano de referência
                         </td>
                         <td>
                           <InputP>
                             <input
                               {...register("FN019")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn019}
                               onChange={handleOnChange}
@@ -2128,13 +2494,18 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>FN021</td>
                         <td>
                           Desembolsos de investimentos com recursos não onerosos
-                          em Drenagem e Manejo das APU realizados pelo Município
+                          em Drenagem e Manejo das APU realizados pelo município
                           no ano de referência
                         </td>
                         <td>
                           <InputP>
                             <input
                               {...register("FN021")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn021}
                               onChange={handleOnChange}
@@ -2147,13 +2518,18 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>FN023</td>
                         <td>
                           Desembolsos total de investimentos em Drenagem e
-                          Manejo das APU realizados pelo Município no ano de
+                          Manejo das APU realizados pelo município no ano de
                           referência
                         </td>
                         <td>
                           <InputP>
                             <input
                               {...register("FN023")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn023}
                               disabled
@@ -2311,6 +2687,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN206")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn206}
                             onChange={handleOnChange}
@@ -2327,6 +2708,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN207")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn207}
                             onChange={handleOnChange}
@@ -2340,6 +2726,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN208")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn208}
                             onChange={handleOnChange}
@@ -2353,6 +2744,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN209")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn209}
                             onChange={handleOnChange}
@@ -2368,6 +2764,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN210")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn210}
                             onChange={handleOnChange}
@@ -2381,6 +2782,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN211")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn211}
                             onChange={handleOnChange}
@@ -2396,6 +2802,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN212")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn212}
                             onChange={handleOnChange}
@@ -2412,9 +2823,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN213")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                              }
+                            }}
                             type="text"
-                            defaultValue={dadosFinanceiros?.fn213}
-                            onChange={handleOnChange}
                           ></input>
                         </td>
                         <td>R$/ano</td>
@@ -2425,6 +2838,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN214")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn214}
                             onChange={handleOnChange}
@@ -2441,6 +2859,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN215")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn215}
                             onChange={handleOnChange}
@@ -2457,6 +2880,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN216")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn216}
                             onChange={handleOnChange}
@@ -2474,6 +2902,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN217")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn217}
                             onChange={handleOnChange}
@@ -2490,6 +2923,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN218")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn218}
                             onChange={handleOnChange}
@@ -2506,6 +2944,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN219")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn219}
                             onChange={handleOnChange}
@@ -2519,6 +2962,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN220")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn220}
                             onChange={handleOnChange}
@@ -2536,6 +2984,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN223")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn223}
                             onChange={handleOnChange}
@@ -2563,11 +3016,16 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>FN221</td>
                         <td>
                           Receita orçada com a cobrança de taxas e tarifas
-                          referentes á getão e manejo de RSU
+                          referentes à getão e manejo de RSU
                         </td>
                         <td>
                           <input
                             {...register("FN221")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn221}
                             onChange={handleOnChange}
@@ -2584,6 +3042,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                         <td>
                           <input
                             {...register("FN222")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn222}
                             onChange={handleOnChange}
@@ -2636,6 +3099,11 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                           <InputP>
                             <input
                               {...register("FN225")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                               defaultValue={dadosFinanceiros?.fn225}
                               onChange={handleOnChange}
@@ -2704,16 +3172,13 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       </tr>
                     </tbody>
                   </table>
-
-                  <table></table>
                 </DivFormConteudo>
-                 {anoSelected && isEditor && (
-              <SubmitButton type="submit">Gravar</SubmitButton>
-            )}
               </DivFormEixo>
             </DivForm>
 
-           
+            {anoSelected && usuario?.id_permissao !== 4 && (
+              <SubmitButton type="submit">Gravar</SubmitButton>
+            )}
           </Form>
         </DivCenter>
       </MainContent>
