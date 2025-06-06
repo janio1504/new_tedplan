@@ -78,8 +78,6 @@ export default function Agua() {
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("ligacoes");
 
-  
-
   useEffect(() => {
     getMunicipio();
     if (anoEditorSimisab) {
@@ -88,15 +86,13 @@ export default function Agua() {
     }
   }, [anoEditorSimisab]);
 
-  
-
   async function getMunicipio() {
     const res = await api
       .get("getMunicipio", {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data);        
+        setDadosMunicipio(response.data);
       });
   }
 
@@ -105,7 +101,12 @@ export default function Agua() {
   }
 
   async function handleCadastro(data) {
-    if (!permission.revisorTedPlan) {
+    if (!isEditor) {
+      toast.notify("Você não tem permissão para editar!", {
+        title: "Atenção!",
+        duration: 7,
+        type: "error",
+      });
       return;
     }
 
@@ -191,7 +192,6 @@ export default function Agua() {
       </Sidebar>
       <MainContent>
         <DivCenter>
-          
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm style={{ borderColor: "#12B2D5" }}>
               <DivTituloForm>Água</DivTituloForm>
@@ -263,10 +263,10 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                      }}
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -281,10 +281,10 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                        }}
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                           ></input>
                         </td>
                         <td>ligação</td>
@@ -301,9 +301,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -319,9 +319,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -339,9 +339,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -359,9 +359,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -380,9 +380,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -414,9 +414,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -432,9 +432,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -450,9 +450,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -468,9 +468,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -486,9 +486,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -504,9 +504,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -522,9 +522,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -532,10 +532,7 @@ export default function Agua() {
                       </tr>
                       <tr>
                         <td>AG015</td>
-                        <td>
-                          {" "}
-                          Volume de água tratada por simples desinfecção
-                        </td>
+                        <td> Volume de água tratada por simples desinfecção</td>
                         <td>
                           <input
                             {...register("AG015")}
@@ -543,9 +540,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -561,9 +558,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -579,9 +576,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -597,9 +594,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -615,9 +612,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -633,9 +630,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -653,9 +650,9 @@ export default function Agua() {
                             onChange={handleOnChange}
                             type="text"
                             onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
                             }}
                           ></input>
                         </td>
@@ -691,10 +688,10 @@ export default function Agua() {
                       onChange={handleOnChange}
                       type="text"
                       onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     ></input>
                   </InputP>
                   <InputSNIS>
@@ -733,10 +730,10 @@ export default function Agua() {
                       onChange={handleOnChange}
                       type="text"
                       onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
+                        if (!/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     ></input>
                   </InputP>
                   <InputSNIS>
@@ -787,10 +784,7 @@ export default function Agua() {
                 </DivFormConteudo>
                 {isEditor && <SubmitButton type="submit">Gravar</SubmitButton>}
               </DivFormEixo>
-              
             </DivForm>
-
-            
           </Form>
         </DivCenter>
       </MainContent>
