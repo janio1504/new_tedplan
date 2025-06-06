@@ -63,7 +63,7 @@ import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
-import { Main } from "next/document";
+import { anosSelect } from "../../util/util";
 import ajuda from "../../img/ajuda.png";
 
 interface IMunicipio {
@@ -77,7 +77,7 @@ interface MunicipioProps {
 }
 
 export default function Geral({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, anoEditorSimisab } = useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
@@ -95,6 +95,7 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [modalAddConssionaria, setModalAddConssionaria] = useState(false);
   const [anoSelected, setAnoSelected] = useState(null);
   const [activeForm, setActiveForm] = useState("municipiosAtendidos");
+  
 
 
 
@@ -103,7 +104,11 @@ export default function Geral({ municipio }: MunicipioProps) {
     if (usuario?.id_municipio){
     getMunicipio()
   }
-  }, [usuario]);
+  if (anoEditorSimisab) {
+      getDadosGerais(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [usuario, anoEditorSimisab]);
 
   async function getMunicipio() {
     const res = await api
@@ -111,7 +116,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data[0]);
+        setDadosMunicipio(response.data);
       });
   }
 
@@ -195,7 +200,12 @@ export default function Geral({ municipio }: MunicipioProps) {
 
   async function handleCadastro(data) {
 
-    if(usuario?.id_permissao === 4){
+    if(!isEditor){
+       toast.notify("Você não tem permissão para editar!", {
+               title: "Atenção!",
+               duration: 7,
+               type: "error",
+             });
       return
     }
 
@@ -413,18 +423,34 @@ export default function Geral({ municipio }: MunicipioProps) {
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
-                <label>Selecione o ano desejado:</label>
-                <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
-                  <option value="" disabled >Selecionar</option>
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                  <option value="2021">2021</option>
-                  <option value="2020">2020</option>
-                  <option value="2019">2019</option>                  
-                  
-                </select>
+                {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                {!anoEditorSimisab && (
+                                    <>
+                                      <label>Selecione o ano desejado:</label>
+                                      <select
+                                        name="ano"
+                                        id="ano"
+                                        onChange={(e) => seletcAno(e.target.value)}
+                                      >
+                                        <option>Selecionar</option>
+                                        {anosSelect().map((ano) => (
+                                          <option value={ano}>{ano}</option>
+                                        ))}
+                                      </select>
+                                    </>
+                                  )}
               </DivFormConteudo>
             </DivFormEixo>
 
@@ -1620,14 +1646,11 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tbody>
                 </table>
               </DivFormConteudo>
-
+              {isEditor &&  <SubmitButton type="submit">Gravar</SubmitButton>}
               </DivFormEixo>
-            
-
-
           </DivForm>
 
-          {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
+          
         </Form>
       </DivCenter>
 

@@ -21,11 +21,11 @@ import {
   DivSeparadora,
   InputSNIS,
   InputXL,
-  DivFormContent
+  DivFormContent,
 } from "../../styles/financeiro";
 
 import {
-  DivCenter,  
+  DivCenter,
   DivForm,
   DivFormCadastro,
   DivTituloForm,
@@ -66,7 +66,7 @@ interface MunicipioProps {
 }
 
 export default function Balanco({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, anoEditorSimisab } = useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
@@ -80,9 +80,12 @@ export default function Balanco({ municipio }: MunicipioProps) {
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio>(null);
 
   useEffect(() => {
-    getMunicipio()
+    getMunicipio();
+    if (anoEditorSimisab) {
+      getDadosBalanco(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
   }, [municipio]);
- 
 
   function handleOnChange(content) {
     setContent(content);
@@ -94,15 +97,19 @@ export default function Balanco({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        const res = response.data;       
+        const res = response.data;
         setDadosMunicipio(res[0]);
       });
   }
 
   async function handleCadastro(data) {
-
-    if(usuario?.id_permissao === 4){
-      return
+    if (!isEditor) {
+      toast.notify("Você não tem permissão para editar!", {
+        title: "Atenção!",
+        duration: 7,
+        type: "error",
+      });
+      return;
     }
 
     data.id_balanco = dadosBalanco?.id_balanco;
@@ -138,22 +145,6 @@ export default function Balanco({ municipio }: MunicipioProps) {
     setDadosBalanco(res[0]);
   }
 
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
-
   const [anoSelected, setAnoSelected] = useState(null);
 
   function seletcAno(ano: any) {
@@ -165,7 +156,9 @@ export default function Balanco({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
@@ -176,353 +169,371 @@ export default function Balanco({ municipio }: MunicipioProps) {
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
-                <label>Selecione o ano desejado:</label>
-                <select
-                  name="ano"
-                  id="ano"
-                  onChange={(e) => seletcAno(e.target.value)}
-                >
-                  <option>Selecionar</option>
-                  {anosSelect().map((ano) => (
-                    <option value={ano}>{ano}</option>
-                  ))}
-                </select>
+                {anoEditorSimisab ? (
+                  <div
+                    style={{
+                      marginLeft: 40,
+                      fontSize: 18,
+                      fontWeight: "bolder",
+                    }}
+                  >
+                    {anoEditorSimisab}
+                  </div>
+                ) : (
+                  ""
+                )}
+                {!anoEditorSimisab && (
+                  <>
+                    <label>Selecione o ano desejado:</label>
+                    <select
+                      name="ano"
+                      id="ano"
+                      onChange={(e) => seletcAno(e.target.value)}
+                    >
+                      <option>Selecionar</option>
+                      {anosSelect().map((ano) => (
+                        <option value={ano}>{ano}</option>
+                      ))}
+                    </select>
+                  </>
+                )}
               </DivFormContent>
             </DivFormEixo>
             <DivFormEixo>
-            <DivFormContent>
-              <DivTitulo>
-                <DivTituloConteudo>Água e Esgoto Sanitário</DivTituloConteudo>
-              </DivTitulo>
+              <DivFormContent>
+                <DivTitulo>
+                  <DivTituloConteudo>Água e Esgoto Sanitário</DivTituloConteudo>
+                </DivTitulo>
 
-              <table>
-              <tbody>
-                  <tr>
-                    <th>Código SNIS</th>
-                    <th>Descrição</th>
-                    <th>Ano {anoSelected}</th>
-                  </tr>              
-                  <tr>
-                    <td>
-                      <InputSNIS>BL002</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Ativo total</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL002")}
-                          defaultValue={dadosBalanco?.bl002}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL001</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Ativo circulante</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL001")}
-                          defaultValue={dadosBalanco?.bl001}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL010</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Realizável a longo prazo</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL010")}
-                          defaultValue={dadosBalanco?.bl010}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL005</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Passivo circulante</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL005")}
-                          defaultValue={dadosBalanco?.bl005}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL003</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Exigível a longo prazo</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL003")}
-                          defaultValue={dadosBalanco?.bl003}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL008</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Resultado de exercícios futuros</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL008")}
-                          defaultValue={dadosBalanco?.bl008}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL006</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Patrimônio líquido</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL006")}
-                          defaultValue={dadosBalanco?.bl006}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL007</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Receita operacional</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL007")}
-                          defaultValue={dadosBalanco?.bl007}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL009</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Resultado operacional com depreciação</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL009")}
-                          defaultValue={dadosBalanco?.bl009}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL012</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Resultado operacional sem depreciação</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL012")}
-                          defaultValue={dadosBalanco?.bl012}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL004</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Lucro líquido com depreciação</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL004")}
-                          defaultValue={dadosBalanco?.bl004}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL011</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Lucro líquido sem depreciação</InputG>
-                    </td>
-                    <td>
-                      <InputP>
-                        <input
-                          {...register("BL011")}
-                          defaultValue={dadosBalanco?.bl011}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        ></input>
-                      </InputP>
-                    </td>
-                    <td>1000 R$/ano</td>
-                  </tr>
-                </tbody>
-              </table>
-              <table>
-                <tbody>
-                  <tr>
-                    <td>
-                      <InputSNIS>BL099</InputSNIS>
-                    </td>
-                    <td>
-                      <InputG>Observação, esclarecimentos ou sugestões</InputG>
-                    </td>
-                    <td>
-                      <InputG>
-                        <textarea
-                          {...register("BL099")}
-                          defaultValue={dadosBalanco?.bl099}
-                          onChange={handleOnChange}
-                          onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                        />
-                      </InputG>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </DivFormContent>
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>Código SNIS</th>
+                      <th>Descrição</th>
+                      <th>Ano {anoSelected}</th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL002</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Ativo total</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL002")}
+                            defaultValue={dadosBalanco?.bl002}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL001</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Ativo circulante</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL001")}
+                            defaultValue={dadosBalanco?.bl001}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL010</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Realizável a longo prazo</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL010")}
+                            defaultValue={dadosBalanco?.bl010}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL005</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Passivo circulante</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL005")}
+                            defaultValue={dadosBalanco?.bl005}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL003</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Exigível a longo prazo</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL003")}
+                            defaultValue={dadosBalanco?.bl003}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL008</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Resultado de exercícios futuros</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL008")}
+                            defaultValue={dadosBalanco?.bl008}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL006</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Patrimônio líquido</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL006")}
+                            defaultValue={dadosBalanco?.bl006}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL007</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Receita operacional</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL007")}
+                            defaultValue={dadosBalanco?.bl007}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL009</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Resultado operacional com depreciação</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL009")}
+                            defaultValue={dadosBalanco?.bl009}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL012</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Resultado operacional sem depreciação</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL012")}
+                            defaultValue={dadosBalanco?.bl012}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL004</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Lucro líquido com depreciação</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL004")}
+                            defaultValue={dadosBalanco?.bl004}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL011</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>Lucro líquido sem depreciação</InputG>
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...register("BL011")}
+                            defaultValue={dadosBalanco?.bl011}
+                            onChange={handleOnChange}
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </InputP>
+                      </td>
+                      <td>1000 R$/ano</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <InputSNIS>BL099</InputSNIS>
+                      </td>
+                      <td>
+                        <InputG>
+                          Observação, esclarecimentos ou sugestões
+                        </InputG>
+                      </td>
+                      <td>
+                        <InputG>
+                          <textarea
+                            {...register("BL099")}
+                            defaultValue={dadosBalanco?.bl099}
+                            onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        </InputG>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </DivFormContent>
+              {isEditor && <SubmitButton type="submit">Gravar</SubmitButton>}
             </DivFormEixo>
           </DivForm>
-
-          <SubmitButton type="submit">Gravar</SubmitButton>
         </Form>
       </DivCenter>
     </Container>

@@ -174,6 +174,8 @@ class PsResiduosUnidadeController {
 
   async createDadosUnidadeProcessamento({ request }){
     const dados = request.all()
+    console.log(dados);
+   
     try {
       if(!dados.id_residuos_unidade_processamento){
         const res = await PsFinanceiro.query()

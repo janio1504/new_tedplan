@@ -55,7 +55,7 @@ import MenuHorizontal from "../../components/MenuHorizontal";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { MainContent} from "../../styles/indicadores";
+import { MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
 
 interface IMunicipio {
@@ -69,7 +69,8 @@ interface MunicipioProps {
 }
 
 export default function Esgoto({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, isAuthenticated, anoEditorSimisab, permission } =
+    useContext(AuthContext);
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(
     municipio
   );
@@ -87,7 +88,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
   useEffect(() => {
     getMunicipio();
-  }, [municipio]);
+    if (anoEditorSimisab) {
+      getDadosEsgoto(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [municipio, anoEditorSimisab]);
 
   async function getMunicipio() {
     const res = await api
@@ -95,15 +100,18 @@ export default function Esgoto({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        const res = response.data;
-        setDadosMunicipio(res[0]);
+        setDadosMunicipio(response.data);
       });
   }
 
   async function handleCadastro(data) {
-
-    if(usuario?.id_permissao === 4){
-      return
+    if (!isEditor) {
+      toast.notify("Você não tem permissão para editar!", {
+        title: "Atenção!",
+        duration: 7,
+        type: "error",
+      });
+      return;
     }
 
     data.id_esgoto = dadosEsgoto?.id_esgoto;
@@ -221,308 +229,328 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <DivTitulo>
                     <DivTituloConteudo>Ano</DivTituloConteudo>
                   </DivTitulo>
-                  <label>Selecione o ano desejado:</label>
-                  <select
-                    name="ano"
-                    id="ano"
-                    onChange={(e) => seletcAno(e.target.value)}
-                  >
-                    <option>Selecionar</option>
-                    {anosSelect().map((ano) => (
-                      <option value={ano}>{ano}</option>
-                    ))}
-                  </select>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </DivFormConteudo>
               </DivFormEixo>
               <DivFormEixo>
-              <DivFormConteudo active={activeForm === "ligacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
-                </DivTitulo>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <DivFormConteudo active={activeForm === "ligacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <th>Ano: {anoSelected}</th>
+                          <th></th>
+                        </tr>
+                        <tr>
+                          <td>ES009</td>
+                          <td>Quantidade de ligações totais de esgoto</td>
+                          <td>
+                            <input
+                              {...register("ES009")}
+                              defaultValue={dadosEsgoto?.es009}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+
+                        <tr>
+                          <td>ES002</td>
+                          <td>Quantidade de ligações ativas de esgoto</td>
+                          <td>
+                            <input
+                              {...register("ES002")}
+                              defaultValue={dadosEsgoto?.es002}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+
+                        <tr>
+                          <td>ES003</td>
+                          <td>Quantidade de economias ativas de esgoto</td>
+                          <td>
+                            <input
+                              {...register("ES003")}
+                              defaultValue={dadosEsgoto?.es003}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+
+                        <tr>
+                          <td>ES008</td>
+                          <td>
+                            Quantidade de economias residenciais ativas de
+                            esgoto
+                          </td>
+                          <td>
+                            <input
+                              {...register("ES008")}
+                              defaultValue={dadosEsgoto?.es008}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "volumes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Volumes</DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <th>Ano: {anoSelected}</th>
+                          <th></th>
+                        </tr>
+                        <tr>
+                          <td>ES005</td>
+                          <td>Volume de esgoto coletado</td>
+                          <td>
+                            <input
+                              {...register("ES005")}
+                              defaultValue={dadosEsgoto?.es005}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES006</td>
+                          <td>Volume de esgoto tratado</td>
+                          <td>
+                            <input
+                              {...register("ES006")}
+                              defaultValue={dadosEsgoto?.es006}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES007</td>
+                          <td>Volume de esgoto faturado</td>
+                          <td>
+                            <input
+                              {...register("ES007")}
+                              defaultValue={dadosEsgoto?.es007}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES012</td>
+                          <td>Volume de esgoto bruto exportado</td>
+                          <td>
+                            <input
+                              {...register("ES012")}
+                              defaultValue={dadosEsgoto?.es012}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES015</td>
+                          <td>
+                            Volume de esgoto bruto tratado nas instalações do
+                            importador
+                          </td>
+                          <td>
+                            <input
+                              {...register("ES015")}
+                              defaultValue={dadosEsgoto?.es015}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "extencao"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Extenção da rede</DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <td>Ano: {anoSelected}</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>ES004</td>
+                          <td>Extenção da rede</td>
+                          <td>
+                            <input
+                              {...register("ES004")}
+                              defaultValue={dadosEsgoto?.es004}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>KM</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "consumo"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Consumo de energia elétrica
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <td>Ano: {anoSelected}</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>ES028</td>
+                          <td>
+                            Consumo total de energia elétrica nos sistemas de
+                            esgoto
+                          </td>
+                          <td>
+                            <input
+                              {...register("ES028")}
+                              defaultValue={dadosEsgoto?.es028}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000kWh/ano</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "observacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Observações, esclarecimentos ou sugestões
+                    </DivTituloConteudo>
+                  </DivTitulo>
                   <table>
-                    <tbody>
-                      <tr>
-                        <th>Código SNIS</th>
-                        <th>Descrição</th>
-                        <th>Ano: {anoSelected}</th>
-                        <th></th>
-                      </tr>
-                      <tr>
-                        <td>ES009</td>
-                        <td>Quantidade de ligações totais de esgoto</td>
-                        <td>
-                          <input
-                            {...register("ES009")}
-                            defaultValue={dadosEsgoto?.es009}
-                            onChange={handleOnChange}
-                            type="text"
-                            onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-
-                      <tr>
-                        <td>ES002</td>
-                        <td>Quantidade de ligações ativas de esgoto</td>
-                        <td>
-                          <input
-                            {...register("ES002")}
-                            defaultValue={dadosEsgoto?.es002}
-                            onChange={handleOnChange}
-                            type="text"
-                            onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-
-                      <tr>
-                        <td>ES003</td>
-                        <td>Quantidade de economias ativas de esgoto</td>
-                        <td>
-                          <input
-                            {...register("ES003")}
-                            defaultValue={dadosEsgoto?.es003}
-                            onChange={handleOnChange}
-                            type="text"
-                            onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-
-                      <tr>
-                        <td>ES008</td>
-                        <td>
-                          Quantidade de economias residenciais ativas de esgoto
-                        </td>
-                        <td>
-                          <input
-                            {...register("ES008")}
-                            defaultValue={dadosEsgoto?.es008}
-                            onChange={handleOnChange}
-                            type="text"
-                            onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </DivFormConteudo>
-             
-              <DivFormConteudo active={activeForm === "volumes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Volumes</DivTituloConteudo>
-                </DivTitulo>
-                <div style={{ display: "flex", flexDirection: "column"}}>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>ES005</td>
-                      <td>Volume de esgoto coletado</td>
-                      <td>
-                        <input
-                          {...register("ES005")}
-                          defaultValue={dadosEsgoto?.es005}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES006</td>
-                      <td>Volume de esgoto tratado</td>
-                      <td>
-                        <input
-                          {...register("ES006")}
-                          defaultValue={dadosEsgoto?.es006}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES007</td>
-                      <td>Volume de esgoto faturado</td>
-                      <td>
-                        <input
-                          {...register("ES007")}
-                          defaultValue={dadosEsgoto?.es007}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES012</td>
-                      <td>Volume de esgoto bruto exportado</td>
-                      <td>
-                        <input
-                          {...register("ES012")}
-                          defaultValue={dadosEsgoto?.es012}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES015</td>
-                      <td>
-                        Volume de esgoto bruto tratado nas instalações do
-                        importador
-                      </td>
-                      <td>
-                        <input
-                          {...register("ES015")}
-                          defaultValue={dadosEsgoto?.es015}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-                </div>
-              </DivFormConteudo>
-             
-              <DivFormConteudo active={activeForm === "extencao"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Extenção da rede</DivTituloConteudo>
-                </DivTitulo>
-                <div style={{ display: "flex", flexDirection: "column"}}>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <td>Ano: {anoSelected}</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>ES004</td>
-                      <td>Extenção da rede</td>
-                      <td>
-                        <input
-                          {...register("ES004")}
-                          defaultValue={dadosEsgoto?.es004}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>KM</td>
-                    </tr>
-                  </tbody>
-                </table>
-                </div>
-              </DivFormConteudo>
-              
-              <DivFormConteudo active={activeForm === "consumo"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Consumo de energia elétrica
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <div style={{ display: "flex", flexDirection: "column"}}>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <td>Ano: {anoSelected}</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>ES028</td>
-                      <td>Consumo total de energia elétrica nos sistemas de esgoto</td>
-                      <td>
-                        <input
-                          {...register("ES028")}
-                          defaultValue={dadosEsgoto?.es028}
-                          onChange={handleOnChange}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                            }}
-                        ></input>
-                      </td>
-                      <td>1.000kWh/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-                </div>
-               
-              </DivFormConteudo>
-             
-              <DivFormConteudo active={activeForm === "observacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Observações, esclarecimentos ou sugestões
-                  </DivTituloConteudo>
-                </DivTitulo>
-                  <table >
                     <tbody>
                       <tr>
                         <th>Código SNIS</th>
@@ -533,35 +561,37 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                       <tr>
                         <td>ES098</td>
                         <td>Campo de justificativa</td>
-                        <td >
-                          <textarea style={{ width: "500px" }}
-                              {...register("ES098")}
-                              defaultValue={dadosEsgoto?.es098}
-                              onChange={handleOnChange}
-                            />
+                        <td>
+                          <textarea
+                            style={{ width: "500px" }}
+                            {...register("ES098")}
+                            defaultValue={dadosEsgoto?.es098}
+                            onChange={handleOnChange}
+                          />
                         </td>
-                        <td ></td>
+                        <td></td>
                       </tr>
                       <tr>
                         <td>ES099</td>
                         <td>Observações</td>
                         <td>
-                          <textarea style={{ width: "500px" }}
-                              {...register("ES099")}
-                              defaultValue={dadosEsgoto?.es099}
-                              onChange={handleOnChange}
-                            />
+                          <textarea
+                            style={{ width: "500px" }}
+                            {...register("ES099")}
+                            defaultValue={dadosEsgoto?.es099}
+                            onChange={handleOnChange}
+                          />
                         </td>
                         <td></td>
                       </tr>
                     </tbody>
-                  </table>          
-
-              </DivFormConteudo>
+                  </table>
+                </DivFormConteudo>
+                {anoSelected && isEditor && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
               </DivFormEixo>
             </DivForm>
-
-            {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>
