@@ -160,12 +160,16 @@ interface IPoliticas {
   titulo: string;
   ano: string;
   id_arquivo: string;
+  file?: string;
+  situacao: string;
 }
 interface IPlanos {
   id_plano_municipal: string;
   titulo: string;
   ano: string;
   id_arquivo: string;
+  file?: string;
+  situacao?: string;
 }
 
 interface IParticipacao {
@@ -192,6 +196,7 @@ export default function GestaoIndicadores({
   const [presidentesConselho, setPresidentesConselho] = useState([]);
   const [isClient, setIsClient] = useState(null);
   const [updatePresidente, setUpdatePresidente] = useState(null);
+  const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
   const {
     register,
     handleSubmit,
@@ -200,17 +205,28 @@ export default function GestaoIndicadores({
     setValue,
     formState: { errors },
   } = useForm();
-
+  const [showModalPlano, setShowModalPlano] = useState(false);
+  const [updatePlano, setUpdatePlano] = useState<IPlanos | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showModalPolitica, setShowModalPolitica] = useState(false);
   const [listParticipacoes, setListParticipacoes] = useState(null);
   const [ShowModalPresidente, setShowModalPresidente] = useState(false);
   const [activeForm, setActiveForm] = useState("gestaoAssociada");
   const [content, setContent] = useState("");
-  const [listPoliticas, setPoliticas] = useState(null);
+  const [listPoliticas, setPoliticas] = useState<IPoliticas[] | null>(null);
   const [listPlanos, setPlanos] = useState(null);
   const [updateRepresentantes, setUpdateRepresentantes] = useState(null);
+  const [politicaSituacao, setPoliticaSituacao] = useState("aprovado"); // Valor padrão
+  const [planoSituacao, setPlanoSituacao] = useState("aprovado"); // Valor padrão
+  const [conselhoSituacao, setConselhoSituacao] = useState("operante");
+  const [showModalParticipacao, setShowModalParticipacao] = useState(false);
+  const [updateParticipacao, setUpdateParticipacao] =
+    useState<IParticipacao | null>(null);
+
   const editor = useRef(null);
   let txtArea = useRef();
+
+  console.log("Dados Gestão", usuario?.id_municipio);
 
   useEffect(() => {
     if (usuario?.id_municipio) {
@@ -224,6 +240,57 @@ export default function GestaoIndicadores({
       getGestao();
     }
   }, [usuario]);
+
+  useEffect(() => {
+    if (
+      listPoliticas &&
+      listPoliticas.length > 0 &&
+      listPoliticas[0]?.situacao
+    ) {
+      console.log("Setando politica situacao", listPoliticas[0].situacao);
+      setPoliticaSituacao(listPoliticas[0].situacao);
+    }
+  }, [listPoliticas]);
+
+  useEffect(() => {
+    if (listPlanos && listPlanos.length > 0 && listPlanos[0]?.situacao) {
+      console.log("Setando plano situacao", listPlanos[0].situacao);
+      setPlanoSituacao(listPlanos[0].situacao);
+    }
+  }, [listPlanos]);
+
+  useEffect(() => {
+    if (conselho && conselho.length > 0 && conselho[0]?.situacao) {
+      setConselhoSituacao(conselho[0].situacao);
+    }
+  }, [conselho]);
+
+  function handlePoliticaSituacaoChange(situacao) {
+    setPoliticaSituacao(situacao);
+
+    if (situacao === "nao_tem") {
+      setValue("politica_titulo", "");
+      setValue("politica_ano", "");
+    }
+  }
+  function handlePlanoSituacaoChange(situacao) {
+    setPlanoSituacao(situacao);
+
+    if (situacao === "nao_tem") {
+      setValue("plano_titulo", "");
+      setValue("plano_ano", "");
+    }
+  }
+
+  function handleConselhoSituacaoChange(situacao) {
+    setConselhoSituacao(situacao);
+
+    if (situacao === "nao_tem") {
+      setValue("conselho_titulo", "");
+      setValue("conselho_ano", "");
+      setValue("conselho_arquivo", null);
+    }
+  }
 
   async function getMunicipio() {
     const res = await api
@@ -336,7 +403,7 @@ export default function GestaoIndicadores({
 
   async function getGestao() {
     const resGestao = await api.get("/getGestao", {
-      params: { id_municipio: usuario.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
 
     setGestao(resGestao.data[0]);
@@ -440,6 +507,17 @@ export default function GestaoIndicadores({
         : ""
     );
 
+    if (listPoliticas && listPoliticas.length > 0) {
+      formData.append(
+        "id_politica_municipal",
+        listPoliticas[0].id_politica_municipal
+      );
+    }
+
+    if (listPlanos && listPlanos.length > 0) {
+      formData.append("id_plano_municipal", listPlanos[0].id_plano_municipal);
+    }
+
     formData.append(
       "nome_associacao",
       data.nome_associacao ? data.nome_associacao : dadosGestao?.ga_nome
@@ -453,13 +531,40 @@ export default function GestaoIndicadores({
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
     formData.append("pcs_titulo", data.pcs_titulo);
 
-    formData.append("plano_ano", data.plano_ano);
-    formData.append("plano_arquivo", data.plano_arquivo[0]);
-    formData.append("plano_titulo", data.plano_titulo);
+    if (planoSituacao !== "nao_tem") {
+      formData.append("plano_ano", data.plano_ano);
+      if (data.plano_arquivo && data.plano_arquivo[0]) {
+        formData.append("plano_arquivo", data.plano_arquivo[0]);
+      }
+      formData.append("plano_titulo", data.plano_titulo);
+    }
 
-    formData.append("politica_ano", data.politica_ano);
-    formData.append("politica_arquivo", data.politica_arquivo[0]);
-    formData.append("politica_titulo", data.politica_titulo);
+    formData.append("plano_situacao", planoSituacao);
+    // formData.append("plano_ano", data.plano_ano);
+    // formData.append("plano_arquivo", data.plano_arquivo[0]);
+    // formData.append("plano_titulo", data.plano_titulo);
+
+    if (politicaSituacao !== "nao_tem") {
+      formData.append("politica_ano", data.politica_ano);
+      if (data.politica_arquivo && data.politica_arquivo[0]) {
+        formData.append("politica_arquivo", data.politica_arquivo[0]);
+      }
+      formData.append("politica_titulo", data.politica_titulo);
+    }
+
+    formData.append("politica_situacao", politicaSituacao);
+    if (conselhoSituacao !== "nao_tem") {
+      formData.append("conselho_titulo", data.conselho_titulo);
+      formData.append("conselho_ano", data.conselho_ano);
+      if (data.conselho_arquivo && data.conselho_arquivo[0]) {
+        formData.append("conselho_arquivo", data.conselho_arquivo[0]);
+      }
+    }
+    formData.append("conselho_situacao", conselhoSituacao);
+
+    // formData.append("politica_ano", data.politica_ano);
+    // formData.append("politica_arquivo", data.politica_arquivo[0]);
+    // formData.append("politica_titulo", data.politica_titulo);
 
     // formData.append("conselho_ano", data.conselho_ano);
     // formData.append("conselho_arquivo", data.conselho_arquivo[0]);
@@ -488,26 +593,34 @@ export default function GestaoIndicadores({
         },
       })
       .then((response) => {
-        toast.notify("Representante cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-        getPoliticas();
-        getPlanos();
-        getParticipacoes();
-        getRepresentantes();
-        reset({
-          pcs_ano: "",
-          pcs_titulo: "",
-          pcs_arquivo: "",
-          plano_ano: "",
-          plano_titulo: "",
-          plano_arquivo: "",
-          politica_ano: "",
-          politica_titulo: "",
-          politica_arquivo: "",
-        });
+        if (response.success) {
+          toast.notify(response.message, {
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          });
+          getPoliticas();
+          getPlanos();
+          getParticipacoes();
+          getRepresentantes();
+          reset({
+            pcs_ano: "",
+            pcs_titulo: "",
+            pcs_arquivo: "",
+            plano_ano: "",
+            plano_titulo: "",
+            plano_arquivo: "",
+            politica_ano: "",
+            politica_titulo: "",
+            politica_arquivo: "",
+          });
+        } else {
+          toast.notify(response.message, {
+            title: "Erro!",
+            duration: 7,
+            type: "error",
+          });
+        }
       })
       .catch((error) => {
         toast.notify("Não foi possivel cadastrar o representante! ", {
@@ -520,7 +633,7 @@ export default function GestaoIndicadores({
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
       {
-        params: { id_municipio: dadosMunicipio?.id_municipio },
+        params: { id_municipio: usuario?.id_municipio },
       }
     );
     const participacoes = await resParticipacao.data;
@@ -535,6 +648,7 @@ export default function GestaoIndicadores({
   }
   function handleCloseModal() {
     setShowModal(false);
+    setShowModalPolitica(false);
   }
   function handleShowModalPresidente() {
     setShowModalPresidente(true);
@@ -580,13 +694,6 @@ export default function GestaoIndicadores({
     getRepresentantes();
   }
 
-  /*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Sets the content of the component.
-   *
-   * @param {string} content The new content.
-   */
-  /*******  112199f0-4cb9-446e-8f0a-8ee030697671  *******/
   function handleOnChange(content) {
     setContent(content);
   }
@@ -717,6 +824,44 @@ export default function GestaoIndicadores({
       });
   }
 
+  async function updatePoliticaMunicipal(data: IPoliticas) {
+    console.log("Antes de atualizar politicas", data);
+
+    if (!usuario.id_municipio || !data.id_politica_municipal) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("updatePoliticaMunicipal", {
+        id_politica_municipal: data.id_politica_municipal,
+        politica_titulo: data.politica_titulo,
+        politica_ano: data.politica_ano,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Politica Municipal atualizada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getPoliticas();
+        setShowModalPolitica(false);
+        setUpdatePolitica(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar a política municipal!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
+
   async function handleEditarRepresentante(representante) {
     setUpdateRepresentantes(representante);
     setShowModal(true);
@@ -730,6 +875,67 @@ export default function GestaoIndicadores({
     setValue("ga_cargo", representante.cargo);
     setValue("ga_telefone", representante.telefone);
     setValue("ga_email", representante.email);
+  }
+
+  async function handleEditarPolitica(politica: IPoliticas): Promise<void> {
+    setUpdatePolitica(politica);
+    setShowModalPolitica(true);
+
+    // Preenche os campos do formulário com os dados do representante
+    setValue("id_politica_municipal", politica.id_politica_municipal);
+    setValue("politica_titulo", politica.titulo);
+    setValue("politica_ano", politica.ano);
+  }
+
+  async function handleEditarParticipacao(
+    participacao: IParticipacao
+  ): Promise<void> {
+    setUpdateParticipacao(participacao);
+    setShowModalParticipacao(true);
+
+    // Preenche os campos do formulário com os dados da participação
+    setValue(
+      "id_participacao_controle_social",
+      participacao.id_participacao_controle_social
+    );
+    setValue("pcs_titulo", participacao.titulo);
+    setValue("pcs_ano", participacao.ano);
+  }
+
+  async function updateParticipacaoControleSocial(data: IParticipacao) {
+    if (!usuario.id_municipio || !data.id_participacao_controle_social) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("updateParticipacaoControleSocial", {
+        id_participacao_controle_social: data.id_participacao_controle_social,
+        pcs_titulo: data.pcs_titulo,
+        pcs_ano: data.pcs_ano,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Participação e Controle Social atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getParticipacoes();
+        setShowModalParticipacao(false);
+        setUpdateParticipacao(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar a participação!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
   }
 
   async function updatePresidenteConselho(data) {
@@ -797,6 +1003,54 @@ export default function GestaoIndicadores({
 
   if (!usuario?.id_municipio) {
     return null;
+  }
+
+  async function handleEditarPlano(plano: IPlanos): Promise<void> {
+    setUpdatePlano(plano);
+    setShowModalPlano(true);
+
+    setValue("id_plano_municipal", plano.id_plano_municipal);
+    setValue("plano_titulo", plano.titulo);
+    setValue("plano_ano", plano.ano);
+  }
+
+  async function updatePlanoMunicipal(data: IPlanos) {
+    console.log("Antes de atualizar plano", data);
+
+    if (!usuario.id_municipio || !data.id_plano_municipal) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("updatePlanoMunicipal", {
+        id_plano_municipal: data.id_plano_municipal,
+        plano_titulo: data.plano_titulo,
+        plano_ano: data.plano_ano,
+        id_municipio: usuario.id_municipio,
+        situacao: planoSituacao,
+      })
+      .then((response) => {
+        toast.notify("Plano Municipal atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getPlanos();
+        setShowModalPlano(false);
+        setUpdatePlano(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar o plano municipal!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
   }
 
   return (
@@ -892,7 +1146,7 @@ export default function GestaoIndicadores({
                   }}
                 >
                   Adicionar
-                </span>{" "}
+                </span>
               </DivEixo>
 
               <Tabela>
@@ -966,6 +1220,87 @@ export default function GestaoIndicadores({
               <DivTituloForm>
                 Política Municipal de Saneamento Básico
               </DivTituloForm>
+
+              <div style={{ marginBottom: "20px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Situação da Política Municipal:
+                </label>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "aprovado"}
+                      onChange={() => handlePoliticaSituacaoChange("aprovado")}
+                    />
+                    Aprovado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "elaborado"}
+                      onChange={() => handlePoliticaSituacaoChange("elaborado")}
+                    />
+                    Elaborado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "em_construcao"}
+                      onChange={() =>
+                        handlePoliticaSituacaoChange("em_construcao")
+                      }
+                    />
+                    Em construção
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "nao_tem"}
+                      onChange={() => handlePoliticaSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+              </div>
+
               <table>
                 <tr>
                   <td>
@@ -981,6 +1316,7 @@ export default function GestaoIndicadores({
                         type="text"
                         //aceita apenas letras e caracteres especiais
                         onKeyPress={onlyLettersAndCharacters}
+                        disabled={politicaSituacao === "nao_tem"}
                       ></input>
                     </InputG>
                   </td>
@@ -998,6 +1334,7 @@ export default function GestaoIndicadores({
                             e.preventDefault();
                           }
                         }}
+                        disabled={politicaSituacao === "nao_tem"}
                       ></input>
                     </InputP>
                   </td>
@@ -1007,6 +1344,7 @@ export default function GestaoIndicadores({
                       <input
                         {...register("politica_arquivo")}
                         type="file"
+                        disabled={politicaSituacao === "nao_tem"}
                       ></input>
                     </InputM>
                   </td>
@@ -1035,10 +1373,37 @@ export default function GestaoIndicadores({
                         <td>{politica.ano}</td>
                         <td>
                           <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() => handleEditarPolitica(politica)}
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                              style={{
+                                cursor:
+                                  politicaSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                              {...(politicaSituacao === "nao_tem"
+                                ? { onClick: (e) => e.preventDefault() }
+                                : {})}
+                            />
                             <a
                               href={politica.file}
                               rel="noreferrer"
                               target="_blank"
+                              style={{
+                                pointerEvents:
+                                  politicaSituacao === "nao_tem"
+                                    ? "none"
+                                    : "auto",
+                                opacity:
+                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
                             >
                               <FaFilePdf></FaFilePdf>
                             </a>
@@ -1048,10 +1413,20 @@ export default function GestaoIndicadores({
                               width={25}
                               height={25}
                               onClick={() => {
-                                handleRemoverPolitica({
-                                  id: politica.id_politica_municipal,
-                                  id_arquivo: politica.id_arquivo,
-                                });
+                                if (politicaSituacao !== "nao_tem") {
+                                  handleRemoverPolitica({
+                                    id: politica.id_politica_municipal,
+                                    id_arquivo: politica.id_arquivo,
+                                  });
+                                }
+                              }}
+                              style={{
+                                cursor:
+                                  politicaSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
                               }}
                             />
                           </Actions>
@@ -1069,7 +1444,15 @@ export default function GestaoIndicadores({
                 }}
               >
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton
+                    type="submit"
+                    disabled={politicaSituacao === "nao_tem"}
+                    style={{
+                      opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
@@ -1078,24 +1461,125 @@ export default function GestaoIndicadores({
               <DivTituloForm>
                 Plano Municipal de Saneamento Básico
               </DivTituloForm>
+              <div style={{ marginBottom: "20px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Situação do Plano Municipal:
+                </label>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "aprovado"}
+                      onChange={() => handlePlanoSituacaoChange("aprovado")}
+                    />
+                    Aprovado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "elaborado"}
+                      onChange={() => handlePlanoSituacaoChange("elaborado")}
+                    />
+                    Elaborado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "em_construcao"}
+                      onChange={() =>
+                        handlePlanoSituacaoChange("em_construcao")
+                      }
+                    />
+                    Em construção
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "nao_tem"}
+                      onChange={() => handlePlanoSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+              </div>
               <table>
                 <tr>
                   <td>
                     <InputG>
                       <label>Título</label>
-                      <input {...register("plano_titulo")} type="text"></input>
+                      <input
+                        {...register("plano_titulo")}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("plano_titulo", value);
+                        }}
+                        onKeyPress={onlyLettersAndCharacters}
+                        disabled={planoSituacao === "nao_tem"}
+                      />
                     </InputG>
                   </td>
                   <td>
                     <InputP>
                       <label>Ano</label>
-                      <input {...register("plano_ano")} type="text"></input>
+                      <input
+                        {...register("plano_ano")}
+                        type="text"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        disabled={planoSituacao === "nao_tem"}
+                      />
                     </InputP>
                   </td>
                   <td>
                     <InputM>
                       <label>Arquivo</label>
-                      <input {...register("plano_arquivo")} type="file"></input>
+                      <input
+                        {...register("plano_arquivo")}
+                        type="file"
+                        disabled={planoSituacao === "nao_tem"}
+                      />
                     </InputM>
                   </td>
                 </tr>
@@ -1123,10 +1607,33 @@ export default function GestaoIndicadores({
                         <td>{plano.ano}</td>
                         <td>
                           <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() => handleEditarPlano(plano)}
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                              style={{
+                                cursor:
+                                  planoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                              {...(planoSituacao === "nao_tem"
+                                ? { onClick: (e) => e.preventDefault() }
+                                : {})}
+                            />
                             <a
                               href={plano.file}
                               rel="noreferrer"
                               target="_blank"
+                              style={{
+                                pointerEvents:
+                                  planoSituacao === "nao_tem" ? "none" : "auto",
+                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
                             >
                               <FaFilePdf></FaFilePdf>
                             </a>
@@ -1136,10 +1643,19 @@ export default function GestaoIndicadores({
                               width={25}
                               height={25}
                               onClick={() => {
-                                handleRemoverPlano({
-                                  id: plano.id_plano_municipal,
-                                  id_arquivo: plano.id_arquivo,
-                                });
+                                if (planoSituacao !== "nao_tem") {
+                                  handleRemoverPlano({
+                                    id: plano.id_plano_municipal,
+                                    id_arquivo: plano.id_arquivo,
+                                  });
+                                }
+                              }}
+                              style={{
+                                cursor:
+                                  planoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
                               }}
                             />
                           </Actions>
@@ -1156,7 +1672,15 @@ export default function GestaoIndicadores({
                 }}
               >
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton
+                    type="submit"
+                    disabled={planoSituacao === "nao_tem"}
+                    style={{
+                      opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
@@ -1165,6 +1689,69 @@ export default function GestaoIndicadores({
               <DivTituloForm>
                 Conselho Municipal de Saneamento Básico
               </DivTituloForm>
+              <div style={{ marginBottom: "20px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Situação do Conselho Municipal:
+                </label>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "operante"}
+                      onChange={() => handleConselhoSituacaoChange("operante")}
+                    />
+                    Operante
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "nao_operante"}
+                      onChange={() =>
+                        handleConselhoSituacaoChange("nao_operante")
+                      }
+                    />
+                    Não operante
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "nao_tem"}
+                      onChange={() => handleConselhoSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+              </div>
               <table>
                 <tr>
                   <td>
@@ -1172,10 +1759,14 @@ export default function GestaoIndicadores({
                       <label>Título</label>
                       <input
                         {...register("conselho_titulo")}
-                        defaultValue={"Teste"}
-                        // onChange={"conselho_titulo"}
-                        type="text"
-                      ></input>
+                        defaultValue={dadosGestao?.conselho_titulo}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("conselho_titulo", value);
+                        }}
+                        onKeyPress={onlyLettersAndCharacters}
+                        disabled={conselhoSituacao === "nao_tem"}
+                      />
                     </InputG>
                   </td>
                   <td>
@@ -1183,9 +1774,16 @@ export default function GestaoIndicadores({
                       <label>Ano</label>
                       <input
                         {...register("conselho_ano")}
-                        defaultValue={"22"}
+                        defaultValue={dadosGestao?.conselho_ano}
+                        onChange={handleOnChange}
                         type="text"
-                      ></input>
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        disabled={conselhoSituacao === "nao_tem"}
+                      />
                     </InputP>
                   </td>
                   <td>
@@ -1194,6 +1792,7 @@ export default function GestaoIndicadores({
                       <input
                         {...register("conselho_arquivo")}
                         type="file"
+                        disabled={conselhoSituacao === "nao_tem"}
                       ></input>
                     </InputM>
                   </td>
@@ -1259,18 +1858,39 @@ export default function GestaoIndicadores({
                               alt="Editar"
                               width={25}
                               height={25}
+                              style={{
+                                cursor:
+                                  conselhoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                              {...(conselhoSituacao === "nao_tem"
+                                ? { onClick: (e) => e.preventDefault() }
+                                : {})}
                             />
 
                             <Image
-                              onClick={() =>
-                                handleRemoverPresidente({
-                                  id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
-                                })
-                              }
+                              onClick={() => {
+                                if (conselhoSituacao !== "nao_tem") {
+                                  handleRemoverPresidente({
+                                    id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
+                                  });
+                                }
+                              }}
                               src={Excluir}
                               alt="Excluir"
                               width={25}
                               height={25}
+                              style={{
+                                cursor:
+                                  conselhoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
                             />
                           </Actions>
                         </td>
@@ -1287,7 +1907,15 @@ export default function GestaoIndicadores({
                 }}
               >
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton
+                    type="submit"
+                    disabled={conselhoSituacao === "nao_tem"}
+                    style={{
+                      opacity: conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
@@ -1356,6 +1984,16 @@ export default function GestaoIndicadores({
                         <td>{participacao.ano}</td>
                         <td>
                           <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() =>
+                                handleEditarParticipacao(participacao)
+                              }
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                            />
                             <a
                               href={participacao.file}
                               rel="noreferrer"
@@ -1597,6 +2235,90 @@ export default function GestaoIndicadores({
             </ContainerModal>
           )}
 
+          {showModalPolitica && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updatePolitica
+                      ? updatePoliticaMunicipal
+                      : handleAddRepresentante
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      handleCloseModal();
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Título<span> *</span>
+                      </label>
+                      <input
+                        {...register("politica_titulo", {
+                          required: "O título é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("politica_titulo", value);
+                        }}
+                        disabled={politicaSituacao === "nao_tem"}
+                      ></input>
+                    </InputG>
+                    {errors.politica_titulo && (
+                      <span>{errors.politica_titulo.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Ano<span> *</span>
+                      </label>
+                      <input
+                        {...register("politica_ano", {
+                          required: "O ano é obrigatório",
+                          pattern: {
+                            value: /^[0-9]{4}$/,
+                            message: "Digite um ano válido com 4 dígitos",
+                          },
+                        })}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        type="text"
+                        maxLength={4}
+                        onChange={(e) => {
+                          // Remove qualquer caractere que não seja número
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setValue("politica_ano", value);
+                        }}
+                        disabled={politicaSituacao === "nao_tem"}
+                      ></input>
+                    </InputP>
+                    {errors.politica_ano && (
+                      <span>{errors.politica_ano.message}</span>
+                    )}
+
+                    <ModalSubmitButton
+                      type="submit"
+                      disabled={politicaSituacao === "nao_tem"}
+                      style={{
+                        opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
+                      }}
+                    >
+                      Gravar
+                    </ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
           {showModal && (
             <ContainerModal>
               <Modal>
@@ -1614,7 +2336,6 @@ export default function GestaoIndicadores({
                   >
                     X
                   </CloseModalButton>
-
                   <ConteudoModal>
                     <InputG>
                       <label>
@@ -1652,7 +2373,6 @@ export default function GestaoIndicadores({
                       ></input>
                     </InputP>
                     {errors.ga_cargo && <span>{errors.ga_cargo.message}</span>}
-
                     <InputP>
                       <label>
                         Telefone<span> *</span>
@@ -1700,6 +2420,160 @@ export default function GestaoIndicadores({
                         type="text"
                       ></input>
                     </InputM>
+                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+          {showModalPlano && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updatePlano ? handleCadastro : handleAddPlano
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      setShowModalPlano(false);
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Título<span> *</span>
+                      </label>
+                      <input
+                        {...register("plano_titulo", {
+                          required: "O título é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("plano_titulo", value);
+                        }}
+                        disabled={planoSituacao === "nao_tem"}
+                      ></input>
+                    </InputG>
+                    {errors.plano_titulo && (
+                      <span>{errors.plano_titulo.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Ano<span> *</span>
+                      </label>
+                      <input
+                        {...register("plano_ano", {
+                          required: "O ano é obrigatório",
+                          pattern: {
+                            value: /^[0-9]{4}$/,
+                            message: "Digite um ano válido com 4 dígitos",
+                          },
+                        })}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        type="text"
+                        maxLength={4}
+                        onChange={(e) => {
+                          // Remove qualquer caractere que não seja número
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setValue("plano_ano", value);
+                        }}
+                        disabled={planoSituacao === "nao_tem"}
+                      ></input>
+                    </InputP>
+                    {errors.plano_ano && (
+                      <span>{errors.plano_ano.message}</span>
+                    )}
+
+                    <ModalSubmitButton
+                      type="submit"
+                      disabled={planoSituacao === "nao_tem"}
+                      style={{
+                        opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                      }}
+                    >
+                      Gravar
+                    </ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+          {showModalParticipacao && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updateParticipacao
+                      ? updateParticipacaoControleSocial
+                      : handleAddParticipacao
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      setShowModalParticipacao(false);
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Título<span> *</span>
+                      </label>
+                      <input
+                        {...register("pcs_titulo", {
+                          required: "O título é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("pcs_titulo", value);
+                        }}
+                      ></input>
+                    </InputG>
+                    {errors.pcs_titulo && (
+                      <span>{errors.pcs_titulo.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Ano<span> *</span>
+                      </label>
+                      <input
+                        {...register("pcs_ano", {
+                          required: "O ano é obrigatório",
+                          pattern: {
+                            value: /^[0-9]{4}$/,
+                            message: "Digite um ano válido com 4 dígitos",
+                          },
+                        })}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        type="text"
+                        maxLength={4}
+                        onChange={(e) => {
+                          // Remove qualquer caractere que não seja número
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setValue("pcs_ano", value);
+                        }}
+                      ></input>
+                    </InputP>
+                    {errors.pcs_ano && <span>{errors.pcs_ano.message}</span>}
+
                     <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
                   </ConteudoModal>
                 </Form>

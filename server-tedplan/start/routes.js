@@ -107,6 +107,7 @@ Route.post("addGestaoIndicadores", "GestaoIndicadoresController.store");
 Route.get("getGestao", "GestaoIndicadoresController.getGestaoAssociada");
 Route.get("getPlanos", "GestaoIndicadoresController.getPlanos");
 Route.get("getPoliticas", "GestaoIndicadoresController.getPoliticas");
+Route.put("updatePoliticaMunicipal", "GestaoIndicadoresController.store");
 Route.get(
   "getParticipacaoControleSocial",
   "GestaoIndicadoresController.getParticipacaoCS"
