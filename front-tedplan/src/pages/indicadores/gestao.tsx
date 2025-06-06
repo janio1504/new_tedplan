@@ -289,8 +289,6 @@ export default function GestaoIndicadores({
   const editor = useRef(null);
   let txtArea = useRef();
 
-  console.log("Dados Gestão", usuario?.id_municipio);
-
   useEffect(() => {
     if (usuario?.id_municipio) {
       getMunicipio();
@@ -311,14 +309,12 @@ export default function GestaoIndicadores({
       listPoliticas.length > 0 &&
       listPoliticas[0]?.situacao
     ) {
-      console.log("Setando politica situacao", listPoliticas[0].situacao);
       setPoliticaSituacao(listPoliticas[0].situacao);
     }
   }, [listPoliticas]);
 
   useEffect(() => {
     if (listPlanos && listPlanos.length > 0 && listPlanos[0]?.situacao) {
-      console.log("Setando plano situacao", listPlanos[0].situacao);
       setPlanoSituacao(listPlanos[0].situacao);
     }
   }, [listPlanos]);
