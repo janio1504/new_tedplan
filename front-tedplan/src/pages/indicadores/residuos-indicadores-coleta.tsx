@@ -76,7 +76,7 @@ interface MunicipioProps {
 }
 
 export default function ResiduosColeta({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, anoEditorSimisab } = useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register: registerExternal,
@@ -125,7 +125,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     createDataCoopCat,
     removeCoopCat,
   } = useResiduos();
-  const {dadosMunicipio, loadMunicipio } = useMunicipio();
+  const { dadosMunicipio, loadMunicipio } = useMunicipio();
   const [municipios, setMunicipios] = useState(null);
   const [unidadesProcessamento, setUnidadesProcessamento] = useState(null);
   const [unidadeP, setUnidadeP] = useState(null);
@@ -185,9 +185,16 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     setModalAssCatadores(true);
   }
 
+  function handleSetStep(step) {
+    alert(
+      "Atenção! Você está saindo do passo atual, os dados não salvos serão perdidos."
+    );
+    setCurrentStep(step);
+  }
+
   async function handleCadastroCAC(data) {
-    if(usuario?.id_permissao === 4){
-      return
+    if (usuario?.id_permissao === 4) {
+      return;
     }
     try {
       const result = await createDataCoopCat({
@@ -245,8 +252,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   }
 
   function handleCadastro(data) {
-    if(usuario?.id_permissao === 4){
-      return
+    if (usuario?.id_permissao === 4) {
+      return;
     }
     if (anoSelected === null || anoSelected === "Selecionar") {
       toast.notify("Selecione um ano!", {
@@ -490,9 +497,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
       parseFloat(data.CO142) +
       parseFloat(data.CO111) +
       parseFloat(data.CO115);
-   
-    data.id_residuos_solidos_coleta = dadosResiduos?.id_residuos_solidos_coleta
-   
+
+    data.id_residuos_solidos_coleta = dadosResiduos?.id_residuos_solidos_coleta;
+
     data.id_municipio = usuario?.id_municipio;
     data.ano = anoSelected;
     const apiClient = getAPIClient();
@@ -504,7 +511,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
           duration: 7,
           type: "success",
         });
-        loadDadosResiduos({ano: anoSelected, id: usuario?.id_municipio});
+        loadDadosResiduos({ ano: anoSelected, id: usuario?.id_municipio });
         return response;
       })
       .catch((error) => {
@@ -518,8 +525,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastroUnidadeRsc(data) {
-    if(usuario?.id_permissao === 4){
-      return
+    if (usuario?.id_permissao === 4) {
+      return;
     }
     try {
       const result = await createDataUnidadeRsc({
@@ -583,8 +590,8 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   };
 
   async function handleCadastroUnidadeRss(data) {
-    if(usuario?.id_permissao === 4){
-      return
+    if (usuario?.id_permissao === 4) {
+      return;
     }
     try {
       const result = await createDataUnidadeRss({
@@ -622,16 +629,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     e.target.value == "Sim" ? setRsExportado(false) : setRsExportado(true);
   }
 
-  async function handleSignOut() {
-    signOut();
-  }
 
   function unidadeProcessamento() {
     Router.push("/indicadores/residuos-indicadores-unidade");
   }
 
   function seletcAno(ano: any) {
-    
     setAnoSelected(ano);
     //resetExternal()
     loadDadosResiduos({ ano: ano, id: usuario?.id_municipio });
@@ -705,6 +708,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 0}
                     completed={currentStep > 0}
+                    onClick={() => setCurrentStep(0)}
                   >
                     1
                   </ModalStepButton>
@@ -715,6 +719,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 1}
                     completed={currentStep > 1}
+                    onClick={() => setCurrentStep(1)}
                   >
                     2
                   </ModalStepButton>
@@ -725,6 +730,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 2}
                     completed={currentStep > 2}
+                    onClick={() => setCurrentStep(2)}
                   >
                     3
                   </ModalStepButton>
@@ -735,6 +741,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 3}
                     completed={currentStep > 3}
+                    onClick={() => setCurrentStep(3)}
                   >
                     4
                   </ModalStepButton>
@@ -744,6 +751,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 4}
                     completed={currentStep > 4}
+                    onClick={() => setCurrentStep(4)}
                   >
                     5
                   </ModalStepButton>
@@ -754,6 +762,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 5}
                     completed={currentStep > 5}
+                    onClick={() => setCurrentStep(5)}
                   >
                     6
                   </ModalStepButton>
@@ -763,6 +772,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 6}
                     completed={currentStep > 6}
+                    onClick={() => setCurrentStep(6)}
                   >
                     7
                   </ModalStepButton>
@@ -772,6 +782,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 7}
                     completed={currentStep > 7}
+                    onClick={() => setCurrentStep(7)}
                   >
                     8
                   </ModalStepButton>
@@ -781,6 +792,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 8}
                     completed={currentStep > 8}
+                    onClick={() => setCurrentStep(8)}
                   >
                     9
                   </ModalStepButton>
@@ -790,6 +802,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 9}
                     completed={currentStep > 9}
+                    onClick={() => setCurrentStep(9)}
                   >
                     10
                   </ModalStepButton>
@@ -799,6 +812,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 10}
                     completed={currentStep > 10}
+                    onClick={() => setCurrentStep(10)}
                   >
                     11
                   </ModalStepButton>
@@ -808,6 +822,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   <ModalStepButton
                     active={currentStep === 11}
                     completed={currentStep > 11}
+                    onClick={() => setCurrentStep(11)}
                   >
                     12
                   </ModalStepButton>
@@ -821,17 +836,34 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </DivTituloConteudo>
                 </DivTitulo>
                 <InputP>
-                  <label>Selecione o ano desejado:</label>
-                  <select
-                    name="ano"
-                    id="ano"
-                    onChange={(e) => seletcAno(e.target.value)}
-                  >
-                    <option>Selecionar</option>
-                    {anosSelect().map((ano) => (
-                      <option value={ano}>{ano}</option>
-                    ))}
-                  </select>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </InputP>
               </DivFormConteudo>
               <ModalStepContent active={currentStep === 0}>
@@ -1392,100 +1424,112 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   </DivTitulo>
 
                   <table>
-                   
                     <tr>
                       <td>
                         <tr>
                           <th></th>
-                          <th colSpan={3} style={{textAlign: "center"}}>Prefeitura ou SLU</th>
+                          <th colSpan={3} style={{ textAlign: "center" }}>
+                            Prefeitura ou SLU
+                          </th>
                         </tr>
                         <tr>
                           <th>Tipo de veículo (Quantidade)</th>
-                          <th style={{textAlign: "center"}}>0 a 5 anos</th>
-                          <th style={{textAlign: "center"}}>5 a 10 anos</th>
-                          <th style={{textAlign: "center"}}>Maior que 10 anos</th>
+                          <th style={{ textAlign: "center" }}>0 a 5 anos</th>
+                          <th style={{ textAlign: "center" }}>5 a 10 anos</th>
+                          <th style={{ textAlign: "center" }}>
+                            Maior que 10 anos
+                          </th>
                         </tr>
                         <tr>
                           <td></td>
-                          <td style={{textAlign: "center"}}>CO054</td>
-                          <td style={{textAlign: "center"}}>CO055</td>
-                          <td style={{textAlign: "center"}}>CO056</td>
+                          <td style={{ textAlign: "center" }}>CO054</td>
+                          <td style={{ textAlign: "center" }}>CO055</td>
+                          <td style={{ textAlign: "center" }}>CO056</td>
                         </tr>
                         <tr>
-                          <td><InputM>Caminhão compactador</InputM></td>
+                          <td>
+                            <InputM>Caminhão compactador</InputM>
+                          </td>
                           <td>
                             <InputP>
-                              <input 
-                               {...registerExternal("CO054")}
-                               type="text"
-                               defaultValue={dadosResiduos?.co054}
-                               onChange={handleOnChange}                              
+                              <input
+                                {...registerExternal("CO054")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co054}
+                                onChange={handleOnChange}
                               />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO055")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co055}
-                              onChange={handleOnChange}
+                              <input
+                                {...registerExternal("CO055")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co055}
+                                onChange={handleOnChange}
                               />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                               {...registerExternal("CO056")}
-                               type="text"
-                               defaultValue={dadosResiduos?.co056}
-                               onChange={handleOnChange}
+                              <input
+                                {...registerExternal("CO056")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co056}
+                                onChange={handleOnChange}
                               />
                             </InputP>
                           </td>
                         </tr>
                       </td>
-                      
+
                       <td>
-                      <tr>                         
-                          <th colSpan={2} style={{textAlign: "center"}}>Empr. Contratada</th>
-                        </tr>
-                      <tr>
-                          <th style={{textAlign: "center"}}>0 a 5 anos</th>
-                          <th style={{textAlign: "center"}}>5 a 10 anos</th>
-                          <th style={{textAlign: "center"}}>Maior que 10 anos</th>
+                        <tr>
+                          <th colSpan={2} style={{ textAlign: "center" }}>
+                            Empr. Contratada
+                          </th>
                         </tr>
                         <tr>
-                          <td style={{textAlign: "center"}}>CO057</td>
-                          <td style={{textAlign: "center"}}>CO058</td>
-                          <td style={{textAlign: "center"}}>CO059</td>
+                          <th style={{ textAlign: "center" }}>0 a 5 anos</th>
+                          <th style={{ textAlign: "center" }}>5 a 10 anos</th>
+                          <th style={{ textAlign: "center" }}>
+                            Maior que 10 anos
+                          </th>
+                        </tr>
+                        <tr>
+                          <td style={{ textAlign: "center" }}>CO057</td>
+                          <td style={{ textAlign: "center" }}>CO058</td>
+                          <td style={{ textAlign: "center" }}>CO059</td>
                         </tr>
                         <tr>
                           <td>
                             <InputP>
                               <input
-                              {...registerExternal("CO057")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co057}
-                              onChange={handleOnChange} />
+                                {...registerExternal("CO057")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co057}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO058")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co058}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO058")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co058}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO059")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co059}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO059")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co059}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
@@ -1493,77 +1537,87 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </tr>
 
                     <tr>
-                      <td>                       
+                      <td>
                         <tr>
                           <td></td>
-                          <td style={{textAlign: "center"}}>CO063</td>
-                          <td style={{textAlign: "center"}}>CO064</td>
-                          <td style={{textAlign: "center"}}>CO065</td>
+                          <td style={{ textAlign: "center" }}>CO063</td>
+                          <td style={{ textAlign: "center" }}>CO064</td>
+                          <td style={{ textAlign: "center" }}>CO065</td>
                         </tr>
                         <tr>
-                          <td><InputM>Caminhão basculante, baú ou carroceria</InputM></td>
+                          <td>
+                            <InputM>
+                              Caminhão basculante, baú ou carroceria
+                            </InputM>
+                          </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO063")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co063}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO063")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co063}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO064")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co064}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO064")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co064}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO065")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co065}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO065")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co065}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
                       </td>
-                      
-                      <td>                    
+
+                      <td>
                         <tr>
-                          <td style={{textAlign: "center"}}>CO066</td>
-                          <td style={{textAlign: "center"}}>CO067</td>
-                          <td style={{textAlign: "center"}}>CO068</td>
+                          <td style={{ textAlign: "center" }}>CO066</td>
+                          <td style={{ textAlign: "center" }}>CO067</td>
+                          <td style={{ textAlign: "center" }}>CO068</td>
                         </tr>
                         <tr>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO066")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co066}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO066")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co066}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO067")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co067}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO067")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co067}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO068")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co068}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO068")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co068}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
@@ -1571,77 +1625,85 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </tr>
 
                     <tr>
-                      <td>                       
+                      <td>
                         <tr>
                           <td></td>
-                          <td style={{textAlign: "center"}}>CO072</td>
-                          <td style={{textAlign: "center"}}>CO073</td>
-                          <td style={{textAlign: "center"}}>CO074</td>
+                          <td style={{ textAlign: "center" }}>CO072</td>
+                          <td style={{ textAlign: "center" }}>CO073</td>
+                          <td style={{ textAlign: "center" }}>CO074</td>
                         </tr>
                         <tr>
-                          <td><InputM>Caminhão poliguindastes (brook)</InputM></td>
+                          <td>
+                            <InputM>Caminhão poliguindastes (brook)</InputM>
+                          </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO072")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co072}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO072")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co072}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO073")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co073}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO073")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co073}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO074")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co074}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO074")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co074}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
                       </td>
-                      
-                      <td>                    
+
+                      <td>
                         <tr>
-                          <td style={{textAlign: "center"}}>CO075</td>
-                          <td style={{textAlign: "center"}}>CO076</td>
-                          <td style={{textAlign: "center"}}>CO077</td>
+                          <td style={{ textAlign: "center" }}>CO075</td>
+                          <td style={{ textAlign: "center" }}>CO076</td>
+                          <td style={{ textAlign: "center" }}>CO077</td>
                         </tr>
                         <tr>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO075")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co075}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO075")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co075}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO076")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co076}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO076")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co076}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO077")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co077}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO077")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co077}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
@@ -1649,76 +1711,84 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </tr>
 
                     <tr>
-                      <td>                       
+                      <td>
                         <tr>
                           <td></td>
-                          <td style={{textAlign: "center"}}>CO071</td>
-                          <td style={{textAlign: "center"}}>CO082</td>
-                          <td style={{textAlign: "center"}}>CO083</td>
-                        </tr>
-                        <tr>
-                          <td><InputM>Trator agrícola com reboque</InputM></td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO071")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co071}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO082")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co082}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO083")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co083}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                        </tr>
-                      </td>                      
-                      <td>                    
-                        <tr>
-                          <td style={{textAlign: "center"}}>CO084</td>
-                          <td style={{textAlign: "center"}}>CO085</td>
-                          <td style={{textAlign: "center"}}>CO086</td>
+                          <td style={{ textAlign: "center" }}>CO071</td>
+                          <td style={{ textAlign: "center" }}>CO082</td>
+                          <td style={{ textAlign: "center" }}>CO083</td>
                         </tr>
                         <tr>
                           <td>
+                            <InputM>Trator agrícola com reboque</InputM>
+                          </td>
+                          <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO084")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co084}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO071")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co071}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO085")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co085}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO082")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co082}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO086")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co086}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO083")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co083}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                        </tr>
+                      </td>
+                      <td>
+                        <tr>
+                          <td style={{ textAlign: "center" }}>CO084</td>
+                          <td style={{ textAlign: "center" }}>CO085</td>
+                          <td style={{ textAlign: "center" }}>CO086</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO084")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co084}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO085")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co085}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO086")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co086}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
@@ -1726,178 +1796,193 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </tr>
 
                     <tr>
-                      <td>                       
+                      <td>
                         <tr>
                           <td></td>
-                          <td style={{textAlign: "center"}}>CO090</td>
-                          <td style={{textAlign: "center"}}>CO091</td>
-                          <td style={{textAlign: "center"}}>CO092</td>
-                        </tr>
-                        <tr>
-                          <td><InputM>Tração animal</InputM></td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO090")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co090}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO091")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co091}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO092")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co092}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                        </tr>
-                      </td>                      
-                      <td>                    
-                        <tr>
-                          <td style={{textAlign: "center"}}>CO093</td>
-                          <td style={{textAlign: "center"}}>CO094</td>
-                          <td style={{textAlign: "center"}}>CO095</td>
+                          <td style={{ textAlign: "center" }}>CO090</td>
+                          <td style={{ textAlign: "center" }}>CO091</td>
+                          <td style={{ textAlign: "center" }}>CO092</td>
                         </tr>
                         <tr>
                           <td>
+                            <InputM>Tração animal</InputM>
+                          </td>
+                          <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO093")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co093}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO090")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co090}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO094")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co094}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO091")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co091}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO095")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co095}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO092")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co092}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                        </tr>
+                      </td>
+                      <td>
+                        <tr>
+                          <td style={{ textAlign: "center" }}>CO093</td>
+                          <td style={{ textAlign: "center" }}>CO094</td>
+                          <td style={{ textAlign: "center" }}>CO095</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO093")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co093}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO094")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co094}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO095")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co095}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
                       </td>
                     </tr>
 
-                    
                     <tr>
-                      <td>                       
+                      <td>
                         <tr>
                           <td></td>
-                          <td style={{textAlign: "center"}}>CO155</td>
-                          <td style={{textAlign: "center"}}>CO156</td>
-                          <td style={{textAlign: "center"}}>CO157</td>
-                        </tr>
-                        <tr>
-                          <td><InputM>Veículos aquáticos (embarcações)</InputM></td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO155")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co155}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO156")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co156}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                          <td>
-                            <InputP>
-                              <input 
-                              {...registerExternal("CO157")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co157}
-                              onChange={handleOnChange} />
-                            </InputP>
-                          </td>
-                        </tr>
-                      </td>                      
-                      <td>                    
-                        <tr>
-                          <td style={{textAlign: "center"}}>CO158</td>
-                          <td style={{textAlign: "center"}}>CO159</td>
-                          <td style={{textAlign: "center"}}>CO160</td>
+                          <td style={{ textAlign: "center" }}>CO155</td>
+                          <td style={{ textAlign: "center" }}>CO156</td>
+                          <td style={{ textAlign: "center" }}>CO157</td>
                         </tr>
                         <tr>
                           <td>
+                            <InputM>Veículos aquáticos (embarcações)</InputM>
+                          </td>
+                          <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO158")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co158}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO155")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co155}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO159")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co159}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO156")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co156}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                           <td>
                             <InputP>
-                              <input 
-                              {...registerExternal("CO160")}
-                              type="text"
-                              defaultValue={dadosResiduos?.co160}
-                              onChange={handleOnChange} />
+                              <input
+                                {...registerExternal("CO157")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co157}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                        </tr>
+                      </td>
+                      <td>
+                        <tr>
+                          <td style={{ textAlign: "center" }}>CO158</td>
+                          <td style={{ textAlign: "center" }}>CO159</td>
+                          <td style={{ textAlign: "center" }}>CO160</td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO158")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co158}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO159")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co159}
+                                onChange={handleOnChange}
+                              />
+                            </InputP>
+                          </td>
+                          <td>
+                            <InputP>
+                              <input
+                                {...registerExternal("CO160")}
+                                type="text"
+                                defaultValue={dadosResiduos?.co160}
+                                onChange={handleOnChange}
+                              />
                             </InputP>
                           </td>
                         </tr>
                       </td>
                     </tr>
-                    
                   </table>
 
                   <table>
                     <tr aria-rowspan={4}>
-                      <td ><InputM>Outros veículos</InputM></td>
+                      <td>
+                        <InputM>Outros veículos</InputM>
+                      </td>
                       <td colSpan={3}>
-                      <InputGG>                  
-                        <label>CO163</label>
-                        <textarea
-                          {...registerExternal("CO163")}
-                          defaultValue={dadosResiduos?.co163}
-                          onChange={handleOnChange}
-                        />
-                      </InputGG>
+                        <InputGG>
+                          <label>CO163</label>
+                          <textarea
+                            {...registerExternal("CO163")}
+                            defaultValue={dadosResiduos?.co163}
+                            onChange={handleOnChange}
+                          />
+                        </InputGG>
                       </td>
                     </tr>
                   </table>
-               
                 </DivFormConteudo>
               </ModalStepContent>
 
@@ -1917,126 +2002,164 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td>CO154</td>
-                      <td> Os residuos provenientes da varrição ou limpeza de
-                      logradouros públicos são recolhidos junto com os residuos
-                      domiciliares?</td>
                       <td>
-                      <select {...registerExternal("CO154")}>
-                      <option value="">{dadosResiduos?.co154 ? dadosResiduos?.co154 : "Opções" }</option>
-                      <option value="Sim">Sim</option>
-                      <option value="Não">Não</option>
-                    </select>
+                        {" "}
+                        Os residuos provenientes da varrição ou limpeza de
+                        logradouros públicos são recolhidos junto com os
+                        residuos domiciliares?
+                      </td>
+                      <td>
+                        <select {...registerExternal("CO154")}>
+                          <option value="">
+                            {dadosResiduos?.co154
+                              ? dadosResiduos?.co154
+                              : "Opções"}
+                          </option>
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
+                        </select>
                       </td>
                       <td></td>
                     </tr>
                     <tr>
                       <td>CO012</td>
-                      <td> Valor contratado (preço unitário) do serviço de RDO e RPU
-                      diurna</td>
                       <td>
-                      <InputP>
-                      <input
-                      {...registerExternal("CO012")}
-                      type="text"
-                      defaultValue={dadosResiduos?.co012}
-                      onChange={handleOnChange}
-                    ></input>
-                    </InputP>
+                        {" "}
+                        Valor contratado (preço unitário) do serviço de RDO e
+                        RPU diurna
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...registerExternal("CO012")}
+                            type="text"
+                            defaultValue={dadosResiduos?.co012}
+                            onChange={handleOnChange}
+                          ></input>
+                        </InputP>
                       </td>
                       <td>R$/tonelada</td>
                     </tr>
                     <tr>
                       <td>CO146</td>
-                      <td>  Valor contratual (preço unitário) do serviço de transporte
-                      de RDO e RPU até a unidade de destinação final</td>
                       <td>
-                      <InputP>
-                      <input
-                      {...registerExternal("CO146")}
-                      type="text"
-                      defaultValue={dadosResiduos?.co146}
-                      onChange={handleOnChange}
-                    ></input>
-                    </InputP>
+                        {" "}
+                        Valor contratual (preço unitário) do serviço de
+                        transporte de RDO e RPU até a unidade de destinação
+                        final
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...registerExternal("CO146")}
+                            type="text"
+                            defaultValue={dadosResiduos?.co146}
+                            onChange={handleOnChange}
+                          ></input>
+                        </InputP>
                       </td>
                       <td>R$/tonelada</td>
                     </tr>
                     <tr>
                       <td>CO148</td>
-                      <td>No preço acima está incluido o transporte de RDO e RPU
-                      coletados até a destinação final?</td>
                       <td>
-                      <select {...registerExternal("CO148")}>
-                      <option value="">{dadosResiduos?.co148 ? dadosResiduos?.co148 : "Opções"}</option>
-                      <option value="Sim">Sim</option>
-                      <option value="Não">Não</option>
-                    </select>
+                        No preço acima está incluido o transporte de RDO e RPU
+                        coletados até a destinação final?
+                      </td>
+                      <td>
+                        <select {...registerExternal("CO148")}>
+                          <option value="">
+                            {dadosResiduos?.co148
+                              ? dadosResiduos?.co148
+                              : "Opções"}
+                          </option>
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
+                        </select>
                       </td>
                       <td></td>
                     </tr>
                     <tr>
                       <td>CO149</td>
-                      <td> A distancia média do centro de massa à unidade de
-                      destinação final é superior a 15 km?</td>
                       <td>
-                      <select {...registerExternal("CO149")}>
-                      <option value="">{dadosResiduos?.co149 ? dadosResiduos?.co149 : "Opções"}</option>
-                      <option value="Sim">Sim</option>
-                      <option value="Não">Não</option>
-                      </select>
+                        {" "}
+                        A distancia média do centro de massa à unidade de
+                        destinação final é superior a 15 km?
+                      </td>
+                      <td>
+                        <select {...registerExternal("CO149")}>
+                          <option value="">
+                            {dadosResiduos?.co149
+                              ? dadosResiduos?.co149
+                              : "Opções"}
+                          </option>
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
+                        </select>
                       </td>
                       <td></td>
                     </tr>
                     <tr>
                       <td>CO150</td>
-                      <td>Especifique a distancia do centro de massa à unidade de
-                      destinação final superior a 15km</td>
                       <td>
-                      <InputP>
-                      <input
-                      {...registerExternal("CO150")}
-                      type="text"
-                      defaultValue={dadosResiduos?.co150}
-                      onChange={handleOnChange}
-                    ></input>
-                    </InputP>
+                        Especifique a distancia do centro de massa à unidade de
+                        destinação final superior a 15km
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...registerExternal("CO150")}
+                            type="text"
+                            defaultValue={dadosResiduos?.co150}
+                            onChange={handleOnChange}
+                          ></input>
+                        </InputP>
                       </td>
                       <td>Km</td>
                     </tr>
                     <tr>
                       <td>CO151</td>
-                      <td> A distancia média de transporte à unidade de destinação
-                      final é superior a 15km?</td>
                       <td>
-                      <select {...registerExternal("CO151")}>
-                      <option value="">{dadosResiduos?.co151 ? dadosResiduos?.co151 : "Opções"}</option>
-                      <option value="Sim">Sim</option>
-                      <option value="Não">Não</option>
-                    </select>
+                        {" "}
+                        A distancia média de transporte à unidade de destinação
+                        final é superior a 15km?
+                      </td>
+                      <td>
+                        <select {...registerExternal("CO151")}>
+                          <option value="">
+                            {dadosResiduos?.co151
+                              ? dadosResiduos?.co151
+                              : "Opções"}
+                          </option>
+                          <option value="Sim">Sim</option>
+                          <option value="Não">Não</option>
+                        </select>
                       </td>
                       <td></td>
                     </tr>
                     <tr>
                       <td>CO152</td>
-                      <td> Especifique a distancia de transporte à unidade de
-                      destinação final superior a 15km</td>
                       <td>
-                      <InputP>
-                      <input
-                      {...registerExternal("CO152")}
-                      type="text"
-                      defaultValue={dadosResiduos?.co152}
-                      onChange={handleOnChange}
-                    ></input>
-                    </InputP>
+                        {" "}
+                        Especifique a distancia de transporte à unidade de
+                        destinação final superior a 15km
+                      </td>
+                      <td>
+                        <InputP>
+                          <input
+                            {...registerExternal("CO152")}
+                            type="text"
+                            defaultValue={dadosResiduos?.co152}
+                            onChange={handleOnChange}
+                          ></input>
+                        </InputP>
                       </td>
                       <td>Km</td>
                     </tr>
                   </table>
-                
 
                   <table>
-                  <tbody>
+                    <tbody>
                       <tr>
                         <th>
                           <span>
@@ -2063,8 +2186,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                           <span>Total</span>
                         </th>
                       </tr>
-                    
-                    
+
                       <tr>
                         <td></td>
                         <td>
@@ -2345,7 +2467,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.co021}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.co021}</option>
                               <option value="Sim">Sim</option>
                               <option value="Nao">Não</option>
@@ -2679,7 +2800,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs057}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.cs057 ? dadosResiduos?.cs057 : "Selecionar"}</option>
+                              <option>
+                                {dadosResiduos?.cs057
+                                  ? dadosResiduos?.cs057
+                                  : "Selecionar"}
+                              </option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3304,7 +3429,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.cs051}
                               onChange={handleOnChange}
                             >
-                              <option >{dadosResiduos?.cs051}</option>
+                              <option>{dadosResiduos?.cs051}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3490,7 +3615,11 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs004}
                               onChange={handleOnChange}
                             >
-                              <option>{dadosResiduos?.rs004 ? dadosResiduos?.rs004 : "Selecionar"}</option>
+                              <option>
+                                {dadosResiduos?.rs004
+                                  ? dadosResiduos?.rs004
+                                  : "Selecionar"}
+                              </option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -3635,7 +3764,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               {...registerExternal("RS026")}
                               defaultValue={dadosResiduos?.rs026}
                               onChange={handleOnChange}
-                            >                              
+                            >
                               <option>{dadosResiduos?.rs026}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
@@ -3823,7 +3952,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.rs030}
                               onChange={rsExportadoChange}
                             >
-                              <option >{dadosResiduos?.rs030}</option>
+                              <option>{dadosResiduos?.rs030}</option>
                               <option value="Sim">Sim</option>
                               <option value="Não">Não</option>
                             </select>
@@ -4551,7 +4680,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os004}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os004}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -4564,7 +4692,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               {...registerExternal("OS015")}
                               defaultValue={dadosResiduos?.os015}
                               onChange={handleOnChange}
-                            >                              
+                            >
                               <option>{dadosResiduos?.os015}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -4952,7 +5080,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os021}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os021}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5005,7 +5132,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os011}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os011}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5019,7 +5145,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os022}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os022}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5097,7 +5222,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os042}
                               onChange={handleOnChange}
                             >
-                             
                               <option>{dadosResiduos?.os042}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5151,7 +5275,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os044}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os044}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5205,7 +5328,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os047}
                               onChange={handleOnChange}
                             >
-                             
                               <option>{dadosResiduos?.os047}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5219,7 +5341,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os048}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os048}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5273,7 +5394,6 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                               defaultValue={dadosResiduos?.os050}
                               onChange={handleOnChange}
                             >
-                              
                               <option>{dadosResiduos?.os050}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
@@ -5364,13 +5484,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                         </td>
                         <td>
                           <InputP>
-                            <select {...registerExternal("CA008")}
-                               defaultValue={dadosResiduos?.ca008}
-                               onChange={handleOnChange}
+                            <select
+                              {...registerExternal("CA008")}
+                              defaultValue={dadosResiduos?.ca008}
+                              onChange={handleOnChange}
                             >
-                              <option >
-                              {dadosResiduos?.ca008}
-                              </option>
+                              <option>{dadosResiduos?.ca008}</option>
                               <option value={"Sim"}>Sim</option>
                               <option value={"Não"}>Não</option>
                             </select>
@@ -5566,7 +5685,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                   Proximo
                 </ModalStepperButton>
               )}
-              {currentStep === 11 && usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+              {currentStep === 11 && isEditor && (
+                <SubmitButton type="submit">Gravar</SubmitButton>
+              )}
             </ModalStepperNavigation>
           </ModalStepperContainer>
         </Form>
@@ -5584,7 +5705,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 >
                   <span></span>
                 </CloseModalButton>
-                {usuario?.id_permissao !== 4 &&  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>}
+                {isEditor && (
+                  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
+                )}
                 <table>
                   <tr>
                     <th>Município</th>
@@ -5731,7 +5854,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 >
                   <span></span>
                 </CloseModalButton>
-                {usuario?.id_permissao !== 4 &&  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>}
+                {isEditor && (
+                  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
+                )}
                 <table>
                   <tr>
                     <th>Município</th>
@@ -5878,7 +6003,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
                 >
                   <span></span>
                 </CloseModalButton>
-                {usuario?.id_permissao !== 4 &&  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>}
+                {isEditor && (
+                  <SubmitButtonModal type="submit">Gravar</SubmitButtonModal>
+                )}
                 <TabelaModal>
                   <table>
                     <tbody>

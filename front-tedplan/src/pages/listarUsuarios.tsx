@@ -27,9 +27,13 @@ import {
   ImagemModal,
   TextoModal,
   SubmitButton,
+  BotaoAdicionar,
+  BotaoPermissao,
 } from "../styles/dashboard";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { InputP } from "../styles/financeiro";
+import { anosSelect } from "@/util/util";
+import { permissionByYear } from "@/services/auth";
 
 interface IUsuario {
   id_usuario: string;
@@ -74,6 +78,10 @@ export default function Postagens({
     formState: { errors },
   } = useForm();
 
+  const { permission } = useContext(AuthContext);
+
+  const [isModalEditorVisible, setModalEditorVisible] = useState(false);
+
   const [isModalVisible, setModalVisible] = useState(false);
   const [usuarioModal, setUsuarioModal] = useState(null);
   const [isModalConfirm, setModalConfirm] = useState(false);
@@ -106,9 +114,39 @@ export default function Postagens({
     setModalVisible(true);
   }
 
+  async function handleEditorSimisabShowModal(usuario: IUsuario) {  
+
+    if(Number(usuario.id_permissao) !== 4) {
+      toast.notify("O usuário deve ser revisor!", {
+      title: "Permissão negada",
+      duration: 7,
+      type: "error",
+      });
+      return;
+    }
+    setUsuarioModal(usuario);
+
+    const editorSimisabPorAno = await permissionByYear(usuario.id_usuario);
+
+    setValue("editor_ativo", editorSimisabPorAno?.ativo ? "true" : "false");
+
+    setValue("id_editor_simisab", editorSimisabPorAno?.id_editor_simisab || "");
+
+    setValue("ano_editor_simisab", editorSimisabPorAno?.ano || "");
+
+    setValue("id_usuario", usuario.id_usuario);
+
+    setModalEditorVisible(true);
+  }
+
   function handleCloseModal() {
     Router.reload();
     setModalVisible(false);
+  }
+
+  function handleEditorSimisabCloseModal() {
+    Router.reload();
+    setModalEditorVisible(false);
   }
 
   function handleOpenConfirm(usuario: IUsuario) {
@@ -119,7 +157,7 @@ export default function Postagens({
   function handleCloseConfirm() {
     setModalConfirm(false);
   }
-
+  
   async function getPermissoes() {
     const permissoes = await api.get("/get-permissoes").then((response) => {
       return response.data;
@@ -181,14 +219,39 @@ export default function Postagens({
     }, 2000);
   }
 
-  const setOptions = {
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
+  async function handleEditorSimisabPorAno(data: any) {    
+        
+    if (!data.ano_editor_simisab) {
+      toast.notify("Selecione um ano para editar!", {
+        title: "Atenção!",
+        duration: 7,
+        type: "warning",
+      });
+      return;
+    }
+    await api.post("create-editor-simisab-por-ano", {
+        id_editor_simisab: data.id_editor_simisab,
+        id_usuario: data.id_usuario,
+        ano: data.ano_editor_simisab,
+        ativo: data.editor_ativo,
+      })
+      .then((response) => {
+        toast.notify("Permissão atualizada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    setTimeout(() => {
+      setModalEditorVisible(false);
+      Router.push("/listarUsuarios");
+    }, 2000);
+  }
 
-  const { usuario } = useContext(AuthContext);
+  
 
   return (
     <Container>
@@ -202,7 +265,7 @@ export default function Postagens({
               <th>Login</th>
               <th>Permissão Usuário</th>
               <th>Ativo</th>
-              <th>Ações</th>
+              <th style={{ textAlign: "center" }}>Ações</th>
             </tr>
           </thead>
           {usuarios.map((usuario) => {
@@ -212,13 +275,18 @@ export default function Postagens({
                   <td>{usuario.login}</td>
                   <td>{usuario.permissao_usuario}</td>
                   <td>{usuario.ativo ? "Sim" : "Não"}</td>
-                  <td>
-                    <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
-                      Remover
-                    </BotaoRemover>
+                  <td style={{ width: "450px" }}>
                     <BotaoEditar onClick={() => handleShowModal(usuario)}>
                       Editar Permissões
                     </BotaoEditar>
+                    <BotaoPermissao
+                      onClick={() => handleEditorSimisabShowModal(usuario)}
+                    >
+                      Permissão de edição por ano
+                    </BotaoPermissao>
+                    <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
+                      Remover
+                    </BotaoRemover>
 
                     {isModalConfirm && (
                       <ContainerModal>
@@ -335,6 +403,57 @@ export default function Postagens({
                                     type="password"
                                   />
                                 </InputP>
+                              </ConteudoModal>
+                            </TextoModal>
+                          </FormModal>
+                        </Modal>
+                      </ContainerModal>
+                    )}
+
+                    {isModalEditorVisible && (
+                      <ContainerModal>
+                        <Modal>
+                          <FormModal
+                            onSubmit={handleSubmit(handleEditorSimisabPorAno)}
+                          >
+                            <TextoModal>
+                              <CloseModalButton
+                                onClick={handleEditorSimisabCloseModal}
+                              >
+                                Fechar
+                              </CloseModalButton>
+                              <SubmitButton type="submit">Gravar</SubmitButton>
+
+                              <ConteudoModal>
+                                <input
+                                  type="hidden"
+                                  {...register("id_usuario")}
+                                  value={usuarioModal.id_usuario}
+                                />
+                                  <input
+                                  type="hidden"
+                                  {...register("id_editor_simisab")}
+                                  name="id_editor_simisab"
+                                />
+                                <p>Nome: {usuarioModal.nome}</p>
+                                <p>Login: {usuarioModal.login}</p>
+
+                                <label>Status Permissão</label>
+                                <select {...register("editor_ativo")} name="editor_ativo">
+                                  <option value="true">Ativo</option>
+                                  <option value="false">Inativo</option>
+                                </select>
+
+                                <label>Selecione o ano que será editado.</label>
+                                <select
+                                  {...register("ano_editor_simisab")}
+                                  name="ano_editor_simisab"
+                                >
+                                  <option value="">Selecione um ano</option>
+                                  {anosSelect().map((ano) => (
+                                    <option value={ano}>{ano}</option>
+                                  ))}
+                                </select>
                               </ConteudoModal>
                             </TextoModal>
                           </FormModal>

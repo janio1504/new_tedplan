@@ -93,7 +93,7 @@ interface MunicipioProps {
 }
 
 export default function ResiduosUnidades({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, anoEditorSimisab, isEditor } = useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
@@ -117,13 +117,19 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [disabledProximo, setDisabledProximo] = useState(false);
   const [idMunicipio, setIdMunicipio] = useState(null);
-   const [dadosMunicipio, setDadosMunicipio] = useState(null)
+  const [dadosMunicipio, setDadosMunicipio] = useState(null);
 
   useEffect(() => {
-    getResiduosRecebidos(anoSelected);
+    if (anoEditorSimisab) {
+      setAnoSelected(anoEditorSimisab);
+      getResiduosRecebidos(anoEditorSimisab);
+      setDisabledProximo(true);
+    } else {
+      getResiduosRecebidos(anoSelected);
+    }
     getUnidadesProcessamento();
     getMunicipios();
-    getMunicipio()
+    getMunicipio();
   }, []);
 
   async function getMunicipio() {
@@ -132,11 +138,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        const res = response.data;
-        setDadosMunicipio(res[0]);
+        setDadosMunicipio(response.data);
       });
   }
-
 
   function handleOnChange(content) {
     setContent(content.target.value);
@@ -150,7 +154,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     setVisibleUnidade(true);
   }
 
-  async function getResiduosRecebidos(ano) {    
+  async function getResiduosRecebidos(ano) {
     const res = await api
       .post("list-residuos-recebidos", { ano: ano })
       .then((response) => {
@@ -172,7 +176,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     data.ano = anoSelected;
     data.id_municipio = idMunicipio;
 
-    data.UP080 =      
+    data.UP080 =
       (data.UP007
         ? parseFloat(data.UP007.replace(".", "").replace(",", "."))
         : 0) +
@@ -215,20 +219,28 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     setVisibleResiduosRecebidos(false);
   }
 
-  async function handleCadastroDadosUP(data) {
-    if(usuario?.id_permissao === 4){
-      return
-    }
-     data.id_unidade_processamento = Number(unidadeProcessamento.id_unidade_processamento)
-    if(anoSelected === null || anoSelected === 'Selecionar') {
+  async function handleCadastroDadosUP(data) {   
+     if (!isEditor) {
+          toast.notify("Você não tem permissão para editar!", {
+            title: "Atenção!",
+            duration: 7,
+            type: "error",
+          });
+          return;
+        }
+
+    data.id_unidade_processamento = Number(
+      unidadeProcessamento.id_unidade_processamento
+    );
+    if (anoSelected === null || anoSelected === "Selecionar") {
       toast.notify("Selecione um ano!", {
         title: "Erro",
         duration: 7,
         type: "error",
-      })
-      return
-    }    
-    
+      });
+      return;
+    }
+
     data.UP079a ? (data.UP079 = data.UP079a) : data.UP079;
     data.UP051a ? (data.UP051 = data.UP051a) : data.UP051;
     data.UP001a ? (data.UP001 = data.UP001a) : data.UP001;
@@ -237,7 +249,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       dadosUnidade?.id_residuos_unidade_processamento;
     data.id_municipio = usuario.id_municipio;
     data.ano = anoSelected;
+
     
+   
     const resCad = await api
       .post("create-dados-unidade-processamento", data)
       .then((response) => {
@@ -255,14 +269,21 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
           type: "error",
         });
       });
+    const id = unidadeProcessamento.id_unidade_processamento;
+    const ano = anoSelected || anoEditorSimisab;
+    getDadosUnidadeProcessamento({ id, ano });
   }
 
   async function handleCadastroUnidadeProcessamento(data) {
+    if (!isEditor) {
+          toast.notify("Você não tem permissão para editar!", {
+            title: "Atenção!",
+            duration: 7,
+            type: "error",
+          });
+          return;
+        }
 
-    if(usuario?.id_permissao === 4){
-      return
-    }
-    
     data.id_municipio = usuario.id_municipio;
 
     if (!usuario.id_municipio) {
@@ -273,8 +294,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       });
       return;
     }
-  
-    
+
     const resCad = await api
       .post("create-unidade-processamento", data)
       .then((response) => {
@@ -302,7 +322,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         ano: ano,
         id_municipio: id_municipio,
       })
-      .then((response) => {        
+      .then((response) => {
         return response.data;
       })
       .catch((error) => {
@@ -312,7 +332,6 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   }
 
   async function getUnidadeProcessamento(id) {
-    
     const res = await api
       .post("get-unidade-processamento", {
         id_unidade_processamento: id,
@@ -322,12 +341,12 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       })
       .catch((error) => {
         console.log(error);
-      }); 
+      });
     setVisibleUnidade(true);
     setUnidadeProcessamento(res[0]);
   }
 
-  async function getDadosUnidadeProcessamento({id, ano}) {        
+  async function getDadosUnidadeProcessamento({ id, ano }) {
     const res = await api
       .post("get-dados-unidade-processamento", {
         id_unidade_processamento: id,
@@ -339,8 +358,8 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       })
       .catch((error) => {
         console.log(error);
-      });      
-    setDadosUnidade(res[0]);    
+      });
+    setDadosUnidade(res[0]);
     setVisibleCadastro(false);
   }
 
@@ -367,52 +386,39 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     }
   }
 
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
-
   function unidadeColeta() {
     Router.push("/indicadores/residuos-indicadores-coleta");
   }
 
   const handleNextStep = () => {
+    
     setCurrentStep((prev) => Math.min(prev + 1, 3));
   };
 
   const handlePrevStep = () => {
+    
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
   function seletcAno(ano) {
-    if(ano !== ""){
-      const id = unidadeProcessamento.id_unidade_processamento
-      setDisabledProximo(true)
+    if (ano !== "") {
+      const id = unidadeProcessamento.id_unidade_processamento;
+      setDisabledProximo(true);
       setAnoSelected(ano);
-      getResiduosRecebidos(ano)
-      getDadosUnidadeProcessamento({id, ano});
-    }else{
-      setDisabledProximo(false)
+      getResiduosRecebidos(ano);
+      getDadosUnidadeProcessamento({ id, ano });
+    } else {
+      setDisabledProximo(false);
     }
-    
   }
 
   return (
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <DivCenter>
         <DivFormResiduo>
@@ -510,9 +516,15 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   <tr>
                     <td>
                       <InputM>
-                        <input style={{ width: 220 }}
+                        <input
+                          style={{ width: 220 }}
                           aria-invalid={errors.value ? "true" : "false"}
                           {...register("cnpj")}
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
                         ></input>
                         {errors.cnpj && errors.cnpj.type && (
                           <span style={{ color: "red" }}>
@@ -542,9 +554,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         Tipo de Unidade
                       </label>
                     </td>
-                    <td>
-                     
-                    </td>
+                    <td></td>
                   </tr>
                   <tr>
                     <td>
@@ -590,9 +600,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         )}
                       </InputM>
                     </td>
-                    <td>
-                     
-                    </td>
+                    <td></td>
                     <td></td>
                   </tr>
                 </tbody>
@@ -672,8 +680,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 <ModalStepperWrapper>
                   <div>
                     <ModalStepButton
-                      active={currentStep === 0}
-                      completed={currentStep > 0}
+                    active={currentStep === 0}
+                    completed={currentStep > 0}
+                    onClick={() => setCurrentStep(0)}
                     >
                       1
                     </ModalStepButton>
@@ -684,6 +693,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     <ModalStepButton
                       active={currentStep === 1}
                       completed={currentStep > 1}
+                      onClick={() => setCurrentStep(1)}
                     >
                       2
                     </ModalStepButton>
@@ -694,6 +704,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     <ModalStepButton
                       active={currentStep === 2}
                       completed={currentStep > 2}
+                      onClick={() => setCurrentStep(2)}
                     >
                       3
                     </ModalStepButton>
@@ -704,6 +715,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     <ModalStepButton
                       active={currentStep === 3}
                       completed={currentStep > 3}
+                      onClick={() => setCurrentStep(3)}
                     >
                       4
                     </ModalStepButton>
@@ -714,27 +726,51 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 <ModalStepContent active={currentStep === 0}>
                   <ConteudoModalResiduoSolido>
                     <DivTitulo>
-                      <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>                     
+                      <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>
                     </DivTitulo>
-                       <div style={{ marginTop: "10px", marginBottom: "10px", padding: "10px", borderTop: "1px solid #ccc", borderBottom: "1px solid #ccc"}}>
-                        <label style={{ fontWeight: "bold" }}>Selecione um ano para visualização dos dados:</label>
-                        <InputM>
-                          
-                          <select
-                            name="ano"
-                            id="ano"
-                            onChange={(e) => seletcAno(e.target.value)}
+                    <div
+                      style={{
+                        marginTop: "10px",
+                        marginBottom: "10px",
+                        padding: "10px",
+                        borderTop: "1px solid #ccc",
+                        borderBottom: "1px solid #ccc",
+                      }}
+                    >
+                      <label style={{ fontWeight: "bold" }}>
+                        Selecione um ano para visualização dos dados:
+                      </label>
+                      <InputM>
+                        {anoEditorSimisab ? (
+                          <div
+                            style={{
+                              marginLeft: 40,
+                              fontSize: 18,
+                              fontWeight: "bolder",
+                            }}
                           >
-                            <option value={""}>Selecionar</option>                           
-                              <option value="2025">2025</option>
-                              <option value="2024">2024</option>
-                              <option value="2023">2023</option>
-                              <option value="2022">2022</option>
-                              <option value="2021">2021</option>
-                              <option value="2020">2020</option>                           
-                          </select>
-                        </InputM>
-                      </div>
+                            {anoEditorSimisab}
+                          </div>
+                        ) : (
+                          ""
+                        )}
+                        {!anoEditorSimisab && (
+                          <>
+                            <label>Selecione o ano desejado:</label>
+                            <select
+                              name="ano"
+                              id="ano"
+                              onChange={(e) => seletcAno(e.target.value)}
+                            >
+                              <option>Selecionar</option>
+                              {anosSelect().map((ano) => (
+                                <option value={ano}>{ano}</option>
+                              ))}
+                            </select>
+                          </>
+                        )}
+                      </InputM>
+                    </div>
                     <table>
                       <thead>
                         <tr>
@@ -756,7 +792,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               <input
                                 disabled={true}
                                 {...register("UP079")}
-                                defaultValue={unidadeProcessamento?.municipio_unidade_processamento}
+                                defaultValue={
+                                  unidadeProcessamento?.municipio_unidade_processamento
+                                }
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -774,10 +812,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               <input
                                 disabled={true}
                                 {...register("UP003")}
-                                defaultValue={unidadeProcessamento?.tipo_unidade}
+                                defaultValue={
+                                  unidadeProcessamento?.tipo_unidade
+                                }
                                 onChange={handleOnChange}
-                              >                               
-                              </input>
+                              ></input>
                             </InputG>
                           </td>
                         </tr>
@@ -791,7 +830,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               <input
                                 disabled={true}
                                 {...register("UP001")}
-                                defaultValue={unidadeProcessamento?.nome_unidade_processamento}
+                                defaultValue={
+                                  unidadeProcessamento?.nome_unidade_processamento
+                                }
                                 onChange={handleOnChange}
                                 type="text"
                               ></input>
@@ -848,7 +889,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={unidadeProcessamento?.up051}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{unidadeProcessamento?.up051 ? unidadeProcessamento?.up051 : "Opções"}</option>
+                                <option value="">
+                                  {unidadeProcessamento?.up051
+                                    ? unidadeProcessamento?.up051
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -901,7 +946,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 {...register("UP004")}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{unidadeProcessamento?.up004 ? unidadeProcessamento?.up004 : "Opções"}</option>
+                                <option value="">
+                                  {unidadeProcessamento?.up004
+                                    ? unidadeProcessamento?.up004
+                                    : "Opções"}
+                                </option>
                                 <option>Prefeitura</option>
                                 <option>Empresa privada</option>
                                 <option>Associação de catadores</option>
@@ -925,7 +974,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 {...register("UP084")}
                                 defaultValue={unidadeProcessamento?.up084}
                               >
-                                <option value="">{unidadeProcessamento?.up084 ? unidadeProcessamento?.up084 : "Opções"}</option>
+                                <option value="">
+                                  {unidadeProcessamento?.up084
+                                    ? unidadeProcessamento?.up084
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -948,7 +1001,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={unidadeProcessamento?.up050}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{unidadeProcessamento?.up050 ? unidadeProcessamento?.up050 : "Opções"}</option>
+                                <option value="">
+                                  {unidadeProcessamento?.up050
+                                    ? unidadeProcessamento?.up050
+                                    : "Opções"}
+                                </option>
                                 <option>Operação</option>
                                 <option>Instalação</option>
                                 <option>Prévia</option>
@@ -971,7 +1028,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 {...register("UP012")}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{unidadeProcessamento?.up012 ? unidadeProcessamento?.up012 : "Opções"}</option>
+                                <option value="">
+                                  {unidadeProcessamento?.up012
+                                    ? unidadeProcessamento?.up012
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1050,7 +1111,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up027}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up027 ? dadosUnidade?.up027 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up027
+                                    ? dadosUnidade?.up027
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1072,7 +1137,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up028}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up028 ? dadosUnidade?.up028 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up028
+                                    ? dadosUnidade?.up028
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1094,7 +1163,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up029}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up029 ? dadosUnidade?.up029 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up029
+                                    ? dadosUnidade?.up029
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1115,7 +1188,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up030}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up030 ? dadosUnidade?.up030 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up030
+                                    ? dadosUnidade?.up030
+                                    : "Opções"}
+                                </option>
                                 <option>Não e realizado</option>
                                 <option>Diária</option>
                                 <option>Semanal</option>
@@ -1136,7 +1213,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up031}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up031 ? dadosUnidade?.up031 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up031
+                                    ? dadosUnidade?.up031
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1158,7 +1239,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up052}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up052 ? dadosUnidade?.up052 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up052
+                                    ? dadosUnidade?.up052
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1180,7 +1265,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up032}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up032 ? dadosUnidade?.up032 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up032
+                                    ? dadosUnidade?.up032
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1202,7 +1291,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up033}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up033 ? dadosUnidade?.up033 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up033
+                                    ? dadosUnidade?.up033
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1224,7 +1317,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up053}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up053 ? dadosUnidade?.up053 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up053
+                                    ? dadosUnidade?.up053
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1245,7 +1342,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up054}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up054 ? dadosUnidade?.up054 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up054
+                                    ? dadosUnidade?.up054
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1267,7 +1368,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up034}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up034 ? dadosUnidade?.up034 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up034
+                                    ? dadosUnidade?.up034
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1289,7 +1394,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up035}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up035 ? dadosUnidade?.up035 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up035
+                                    ? dadosUnidade?.up035
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1312,7 +1421,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up036}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up036 ? dadosUnidade?.up036 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up036
+                                    ? dadosUnidade?.up036
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1333,7 +1446,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up037}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up037 ? dadosUnidade?.up037 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up037
+                                    ? dadosUnidade?.up037
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1356,7 +1473,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up038}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up038 ? dadosUnidade?.up038 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up038
+                                    ? dadosUnidade?.up038
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1378,7 +1499,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up081}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up081 ? dadosUnidade?.up081 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up081
+                                    ? dadosUnidade?.up081
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1394,14 +1519,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                             </InputGG>
                           </td>
                           <td>
-                           
-                              <input style={{width: 100, padding: 2, textAlign: "right", paddingRight: 10}}
-                                {...register("UP082")}
-                                defaultValue={dadosUnidade?.up082}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input>
-                            
+                            <input
+                              style={{
+                                width: 100,
+                                padding: 2,
+                                textAlign: "right",
+                                paddingRight: 10,
+                              }}
+                              {...register("UP082")}
+                              defaultValue={dadosUnidade?.up082}
+                              onChange={handleOnChange}
+                              type="text"
+                            ></input>
                           </td>
                           <td>Catadores</td>
                         </tr>
@@ -1414,14 +1543,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                             </InputGG>
                           </td>
                           <td>
-                           
-                              <input style={{width: 100, padding: 2, textAlign: "right", paddingRight: 10}}
-                                {...register("UP083")}
-                                defaultValue={dadosUnidade?.up083}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input>
-                            
+                            <input
+                              style={{
+                                width: 100,
+                                padding: 2,
+                                textAlign: "right",
+                                paddingRight: 10,
+                              }}
+                              {...register("UP083")}
+                              defaultValue={dadosUnidade?.up083}
+                              onChange={handleOnChange}
+                              type="text"
+                            ></input>
                           </td>
                           <td>Catadores</td>
                         </tr>
@@ -1440,7 +1573,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 defaultValue={dadosUnidade?.up039}
                                 onChange={handleOnChange}
                               >
-                                <option value="">{dadosUnidade?.up039 ? dadosUnidade?.up039 : "Opções"}</option>
+                                <option value="">
+                                  {dadosUnidade?.up039
+                                    ? dadosUnidade?.up039
+                                    : "Opções"}
+                                </option>
                                 <option value="Sim">Sim</option>
                                 <option value="Não">Não</option>
                               </select>
@@ -1455,14 +1592,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                             </InputGG>
                           </td>
                           <td>
-                            
-                              <input style={{width: 100, padding: 2, textAlign: "right", paddingRight: 10}}
-                                {...register("UP040")}
-                                defaultValue={dadosUnidade?.up040}
-                                onChange={handleOnChange}
-                                type="text"
-                              ></input>
-                            
+                            <input
+                              style={{
+                                width: 100,
+                                padding: 2,
+                                textAlign: "right",
+                                paddingRight: 10,
+                              }}
+                              {...register("UP040")}
+                              defaultValue={dadosUnidade?.up040}
+                              onChange={handleOnChange}
+                              type="text"
+                            ></input>
                           </td>
                           <td>Domicílios</td>
                         </tr>
@@ -1913,7 +2054,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                           {residuosRecebidos?.map((rr, key) => (
                             <>
                               <tr key={key}>
-                                <td style={{ color: "#FFFFF" }}>{rr.nome_municipio}</td>
+                                <td style={{ color: "#FFFFF" }}>
+                                  {rr.nome_municipio}
+                                </td>
                                 <td>{rr.up007}</td>
                                 <td>{rr.up008}</td>
                                 <td>{rr.up009}</td>
@@ -1928,7 +2071,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                       </table>
                     </Tabela>
                   </DivFormConteudoModal>
-                  {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
+                  {isEditor && (
+                    <SubmitButton type="submit">Gravar</SubmitButton>
+                  )}
                 </ModalStepContent>
 
                 <ModalStepperNavigation>
@@ -1943,9 +2088,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   {currentStep === 3 ? (
                     <h1></h1>
                   ) : (
-                   disabledProximo && <ModalStepperButton onClick={handleNextStep}>
-                      Proximo
-                    </ModalStepperButton>
+                    disabledProximo && (
+                      <ModalStepperButton onClick={handleNextStep}>
+                        Proximo
+                      </ModalStepperButton>
+                    )
                   )}
                 </ModalStepperNavigation>
               </ModalStepperContainer>
@@ -2022,18 +2169,22 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                       <tr>
                         <td>
                           <InputP>
-                          <select style={{padding: 11, borderRadius: 5, border: '1px solid #ccc', width: 150}}
-                            onChange={(e) =>
-                              setIdMunicipio(e.target.value)
-                            }
-                          >
-                            <option value={null}>Selecionar</option>
-                            {municipios?.map((municipio, key) => (
-                              <option value={municipio?.id_municipio}>
-                                {municipio?.nome}
-                              </option>
-                            ))}
-                          </select>
+                            <select
+                              style={{
+                                padding: 11,
+                                borderRadius: 5,
+                                border: "1px solid #ccc",
+                                width: 150,
+                              }}
+                              onChange={(e) => setIdMunicipio(e.target.value)}
+                            >
+                              <option value={null}>Selecionar</option>
+                              {municipios?.map((municipio, key) => (
+                                <option value={municipio?.id_municipio}>
+                                  {municipio?.nome}
+                                </option>
+                              ))}
+                            </select>
                           </InputP>
                         </td>
                         <td>
@@ -2100,16 +2251,14 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                     </tbody>
                   </table>
                 </DivFormConteudoModal>
-                {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
-                
+                {isEditor && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
               </ConteudoModal>
             </FormModal>
           </Modal>
         </ContainerModal>
       )}
-      
     </Container>
   );
 }
-
-

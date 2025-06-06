@@ -27,8 +27,13 @@ import {
   SubmitButtonModal,
   Tabela,
   Actions,
+  ButtonAdicionarPresidente,
+  Tooltip,
+  TooltipText,
 } from "../../styles/indicadores";
+
 import Editar from "../../img/editar.png";
+import ajuda from "../../img/ajuda.png";
 import HeadIndicadores from "../../components/headIndicadores";
 import Image from "next/image";
 import "suneditor/dist/css/suneditor.min.css";
@@ -39,7 +44,7 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import RepresentanteGestaoAssociada from "../../components/RepresentanteGestaoAssociada";
-import { FormModal } from "../../styles/dashboard";
+// import { FormModal } from "../../styles/dashboard";
 import Excluir from "../../img/excluir.png";
 import Pdf from "../../img/pdf.png";
 import {
@@ -61,6 +66,7 @@ import {
   MainContent,
   SidebarItem,
 } from "@/styles/esgoto-indicadores";
+import { DivTitulo } from "@/styles/drenagem-indicadores";
 
 const InputMask = require("react-input-mask");
 
@@ -95,7 +101,6 @@ const ModalSubmitButton = styled.button`
     cursor: not-allowed;
   }
 `;
-
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -110,7 +115,6 @@ interface IMunicipio {
   municipio_email: string;
   municipio_nome_prefeito: string;
 }
-
 interface IGestao {
   id_gestao_associada: string;
   nome_associacao: string;
@@ -128,7 +132,6 @@ interface IGestao {
   ct_descricao: string;
   string: string;
 }
-
 interface IRepresentantes {
   id_representante_servicos_ga: string;
   cargo: string;
@@ -136,7 +139,6 @@ interface IRepresentantes {
   telefone: string;
   nome: string;
 }
-
 interface IConselho {
   id_conselho_municipal_saneamento_basico: number;
   titulo: string;
@@ -144,7 +146,6 @@ interface IConselho {
   id_arquivo: string;
   id_municipio: Number;
 }
-
 interface IPresidencia {
   id_presidencia_conselho_municipal_saneamento_basico: string;
   nome_presidente: string;
@@ -154,7 +155,6 @@ interface IPresidencia {
   integrantes: string;
   id_municipio: string;
 }
-
 interface IPoliticas {
   id_politica_municipal: string;
   titulo: string;
@@ -171,14 +171,12 @@ interface IPlanos {
   file?: string;
   situacao?: string;
 }
-
 interface IParticipacao {
   id_participacao_controle_social: string;
   titulo: string;
   ano: string;
   id_arquivo: string;
 }
-
 interface MunicipioProps {
   municipio: IMunicipio[];
   gestao: IGestao[];
@@ -193,10 +191,11 @@ export default function GestaoIndicadores({
   const [dadosGestao, setGestao] = useState<IGestao | any>(gestao);
   const [representantes, setRepresentantes] = useState(null);
   const [conselho, setConselho] = useState(null);
-  const [presidentesConselho, setPresidentesConselho] = useState([]);
+  const [conselhoMunicipal, setConselhoMunicipal] = useState(null);
   const [isClient, setIsClient] = useState(null);
   const [updatePresidente, setUpdatePresidente] = useState(null);
   const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -207,6 +206,70 @@ export default function GestaoIndicadores({
   } = useForm();
   const [showModalPlano, setShowModalPlano] = useState(false);
   const [updatePlano, setUpdatePlano] = useState<IPlanos | null>(null);
+
+  const {
+    register: registerGestao,
+    handleSubmit: handleSubmitGestao,
+    reset: resetGestao,
+    setValue: setValueGestao,
+    formState: { errors: errorsGestao },
+    control: controlGestao,
+  } = useForm();
+
+  const {
+    register: registerPolitica,
+    handleSubmit: handleSubmitPolitica,
+    reset: resetPolitica,
+    setValue: setValuePolitica,
+    formState: { errors: errorsPolitica },
+    control: controlPolitica,
+  } = useForm();
+
+  const {
+    register: registerPlano,
+    handleSubmit: handleSubmitPlano,
+    reset: resetPlano,
+    setValue: setValuePlano,
+    formState: { errors: errorsPlano },
+    control: controlPlano,
+  } = useForm();
+
+  const {
+    register: registerConselho,
+    handleSubmit: handleSubmitConselho,
+    reset: resetConselho,
+    setValue: setValueConselho,
+    formState: { errors: errorsConselho },
+    control: controlConselho,
+  } = useForm();
+
+  const {
+    register: registerParticipacao,
+    handleSubmit: handleSubmitParticipacao,
+    reset: resetParticipacao,
+    setValue: setValueParticipacao,
+    formState: { errors: errorsParticipacao },
+    control: controlParticipacao,
+  } = useForm();
+
+  const {
+    register: registerSR,
+    handleSubmit: handleSubmitSR,
+    reset: resetSR,
+    setValue: setValueSR,
+    formState: { errors: errorsSR },
+    control: controlSR,
+  } = useForm();
+
+  const {
+    register: registerCT,
+    handleSubmit: handleSubmitCT,
+    reset: resetCT,
+    setValue: setValueCT,
+    formState: { errors: errorsCT },
+    control: controlCT,
+  } = useForm();
+
   const [showModal, setShowModal] = useState(false);
   const [showModalPolitica, setShowModalPolitica] = useState(false);
   const [listParticipacoes, setListParticipacoes] = useState(null);
@@ -238,6 +301,7 @@ export default function GestaoIndicadores({
       getParticipacoes();
       getRepresentantes();
       getGestao();
+      getConselhoMunicipal();
     }
   }, [usuario]);
 
@@ -292,6 +356,8 @@ export default function GestaoIndicadores({
     }
   }
 
+  // ------------- Funções GET -------------
+
   async function getMunicipio() {
     const res = await api
       .get("getMunicipio", {
@@ -301,7 +367,6 @@ export default function GestaoIndicadores({
         setDadosMunicipio(response.data[0]);
       });
   }
-
   async function getPoliticas() {
     const resPoliticas = await api.get("getPoliticas", {
       params: { id_municipio: usuario?.id_municipio },
@@ -331,7 +396,32 @@ export default function GestaoIndicadores({
       setPoliticas(resPoliticas);
     }
   }
-
+  async function getConselhoMunicipal() {
+    const res = await api.get(
+      `get-conselhos-municipais/${usuario?.id_municipio}`,
+      {
+        params: { id_municipio: usuario?.id_municipio },
+      }
+    );
+    const conselhos = res.data;
+    if (conselhos) {
+      const resConselhoMunicipal = await Promise.all(
+        conselhos.map(async (p) => {
+          const file = await api
+            .get("getFile", {
+              params: { id: p.id_arquivo },
+              responseType: "blob",
+            })
+            .then((response) => URL.createObjectURL(response.data))
+            .catch((error) => {
+              console.log(error);
+            });
+          return { ...p, file };
+        })
+      );
+      setConselhoMunicipal(resConselhoMunicipal);
+    }
+  }
   async function getPlanos() {
     const resPlanos = await api.get("getPlanos", {
       params: { id_municipio: usuario?.id_municipio },
@@ -361,7 +451,6 @@ export default function GestaoIndicadores({
       setPlanos(resPlanos);
     }
   }
-
   async function getParticipacoes() {
     const resParticipacao = await api.get("getParticipacaoControleSocial", {
       params: { id_municipio: usuario?.id_municipio },
@@ -391,7 +480,6 @@ export default function GestaoIndicadores({
       setListParticipacoes(resParticipacoes);
     }
   }
-
   async function getRepresentantes() {
     const resRepresentantes = await api.get("getRepresentantesServicos", {
       params: { id_municipio: usuario?.id_municipio },
@@ -400,7 +488,6 @@ export default function GestaoIndicadores({
 
     setRepresentantes(representantes);
   }
-
   async function getGestao() {
     const resGestao = await api.get("/getGestao", {
       params: { id_municipio: usuario?.id_municipio },
@@ -408,7 +495,6 @@ export default function GestaoIndicadores({
 
     setGestao(resGestao.data[0]);
   }
-
   async function getPresidentesConselho() {
     if (!usuario?.id_municipio) return;
     try {
@@ -425,6 +511,8 @@ export default function GestaoIndicadores({
       setConselho([]);
     }
   }
+
+  // ------------- Funções ADD -------------
 
   async function handleAddPresidente(data) {
     if (!usuario.id_municipio) {
@@ -444,6 +532,8 @@ export default function GestaoIndicadores({
         email_presidente: data.email_presidente,
         integrantes: data.integrantes,
         id_municipio: usuario.id_municipio,
+        id_conselho_municipal_saneamento_basico:
+          data.id_conselho_municipal_saneamento_basico || null,
       })
       .then((response) => {
         toast.notify(
@@ -455,6 +545,7 @@ export default function GestaoIndicadores({
           }
         );
         setShowModalPresidente(false);
+        reset();
         return response;
       })
       .catch((error) => {
@@ -466,6 +557,266 @@ export default function GestaoIndicadores({
       });
     getPresidentesConselho();
   }
+  async function handleAddGestaoAssociada(data) {
+    if (usuario?.id_permissao === 4) return;
+
+    const formData = new FormData();
+    formData.append("id_municipio", usuario.id_municipio);
+    formData.append("nome_associacao", data.nome_associacao || "");
+    formData.append("norma_associacao", data.norma_associacao || "");
+
+    await api
+      .post("addGestaoIndicadores", formData)
+      .then(() => {
+        toast.notify("Gestão Associada cadastrada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        resetGestao();
+        getGestao();
+        getRepresentantes();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar Gestão Associada!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+
+    console.log("Dados enviados:", data);
+  }
+  async function handleAddConselhoMunicipal(data) {
+    if (!usuario.id_municipio) {
+      toast.notify("Não existe Município, entre novamente no sistema!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      signOut();
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("titulo", data.titulo || "");
+    formData.append("ano", data.ano || "");
+    formData.append("id_municipio", usuario.id_municipio);
+    formData.append("arquivo", data.arquivo[0]);
+
+    await api
+      .post("create-conselho-municipal", formData)
+      .then(() => {
+        toast.notify("Conselho Municipal cadastrado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getConselhoMunicipal();
+        resetConselho();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar o Conselho Municipal!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+        console.log(data);
+      });
+  }
+  async function handleAddPolitica(data) {
+    if (usuario?.id_permissao === 4) return;
+
+    const formData = new FormData();
+    formData.append("id_municipio", usuario.id_municipio);
+    formData.append("politica_titulo", data.politica_titulo || "");
+    formData.append("politica_ano", data.politica_ano || "");
+    formData.append("politica_arquivo", data.politica_arquivo[0] || "");
+
+    await api
+      .post("addGestaoIndicadores", formData)
+      .then(() => {
+        toast.notify(
+          "Política Municipal de Saneamento cadastrada com sucesso!",
+          {
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          }
+        );
+        resetPolitica();
+        getPoliticas();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar Política Municipal de Saneamento!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+
+    console.log("Dados enviados:", data);
+  }
+  async function handleAddRepresentante(data) {
+    if (!usuario.id_municipio) {
+      toast.notify("Não existe Município, entre novamente no sistema! ", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      signOut();
+    }
+
+    const id = await api
+      .post("addRepresentanteServicos", {
+        ga_cargo: data.ga_cargo,
+        ga_email: data.ga_email,
+        ga_nome_representante: data.ga_nome_representante,
+        ga_telefone: data.ga_telefone,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Representante cadastrado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        setShowModal(false);
+        return response;
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel cadastrar o representante! ", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getRepresentantes();
+  }
+  async function handleAddPlano(data) {
+    if (usuario?.id_permissao === 4) return;
+
+    const formData = new FormData();
+    formData.append("id_municipio", usuario.id_municipio);
+    formData.append("plano_titulo", data.plano_titulo || "");
+    formData.append("plano_ano", data.plano_ano || "");
+    formData.append("plano_arquivo", data.plano_arquivo[0] || "");
+
+    await api
+      .post("addGestaoIndicadores", formData)
+      .then(() => {
+        toast.notify("Plano Municipal de Saneamento cadastrada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        resetPlano();
+        getPlanos();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar Plano Municipal de Saneamento!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+
+    console.log("Dados enviados:", data);
+  }
+  async function handleAddParticipacao(data) {
+    if (usuario?.id_permissao === 4) return;
+
+    const formData = new FormData();
+    formData.append("id_municipio", usuario.id_municipio);
+    formData.append("pcs_titulo", data.pcs_titulo || "");
+    formData.append("pcs_ano", data.pcs_ano || "");
+    formData.append("pcs_arquivo", data.pcs_arquivo[0] || "");
+
+    await api
+      .post("addGestaoIndicadores", formData)
+      .then(() => {
+        toast.notify(
+          "Participação e Controle Social de Saneamento cadastrado com sucesso!",
+          {
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          }
+        );
+        resetParticipacao();
+        getParticipacoes();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar Participação e Controle Social!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+
+    console.log("Dados enviados:", data);
+  }
+  async function handleAddSaneamentoRural(data) {
+    if (usuario?.id_permissao === 4) return;
+
+    const formData = new FormData();
+
+    formData.append("sr_descricao", data.sr_descricao || "");
+    formData.append("id_municipio", usuario.id_municipio);
+
+    await api
+      .post("addGestaoIndicadores", formData)
+      .then(() => {
+        toast.notify("Descrição Saneamento Rural cadastrada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        resetSR();
+        // getSR();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar Descrição Saneamento Rural!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+
+    console.log("Dados enviados:", data);
+  }
+  async function handleAddComunidadesTradicionais(data) {
+    if (usuario?.id_permissao === 4) return;
+
+    const formData = new FormData();
+
+    formData.append("ct_nomes_comunidades", data.ct_nomes_comunidades || "");
+    formData.append("ct_descricao", data.ct_descricao || "");
+    formData.append("id_municipio", usuario.id_municipio);
+
+    await api
+      .post("addGestaoIndicadores", formData)
+      .then(() => {
+        toast.notify("Comunidades Tradicionais cadastrada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        resetCT();
+        // getCT();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar Comunidades Tradicionais!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+
+    console.log("Dados enviados:", data);
+  }
+
+  // ------------- Funções DELETE -------------
 
   async function handleRemoverPresidente({ id }) {
     try {
@@ -475,7 +826,7 @@ export default function GestaoIndicadores({
         duration: 7,
         type: "success",
       });
-      getPresidentesConselho(); // Atualiza a lista após remoção
+      getPresidentesConselho();
     } catch (error) {
       toast.notify("Não foi possível remover o presidente!", {
         title: "Erro!",
@@ -484,7 +835,128 @@ export default function GestaoIndicadores({
       });
     }
   }
+  async function handleRemoverParticipacao({ id, id_arquivo }) {
+    await api
+      .delete("remover-participacao", {
+        params: { id: id, id_arquivo: id_arquivo },
+      })
+      .then((response) => {
+        toast.notify("Participacão removido com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel remover a participação! ", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getParticipacoes();
+  }
+  async function handleRemoverPolitica({ id, id_arquivo }) {
+    await api
+      .delete("remover-politica", {
+        params: { id: id, id_arquivo: id_arquivo },
+      })
+      .then((response) => {
+        toast.notify("Política removida com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel remover a politica municipal! ", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getPoliticas();
+  }
+  async function handleRemoverPlano({ id, id_arquivo }) {
+    await api
+      .delete("remover-plano", {
+        params: { id: id, id_arquivo: id_arquivo },
+      })
+      .then((response) => {
+        toast.notify("Plano removido com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel remover o plano municipal! ", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getPlanos();
+  }
+  async function handleRemoverRepresentante({ id }) {
+    await api
+      .delete("remover-representante", {
+        params: { id: id },
+      })
+      .then((response) => {
+        toast.notify("Representante removido com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel remover o representante!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getRepresentantes();
+  }
+  async function handleRemoverConselho({ id }) {
+    await api
+      .delete(`delete-conselho-municipal/${id}`)
+      .then((response) => {
+        toast.notify("Conselho Municipal removido com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+      })
+      .catch((error) => {
+        toast.notify("Não foi possivel remover o conselho municipal! ", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+    getConselhoMunicipal();
+  }
 
+  // ------------- Funções UPDATE -------------
+
+  // ------------------------------------------
+
+  async function handleSignOut() {
+    signOut();
+  }
+
+  function handleShowModalPresidente() {
+    setShowModalPresidente(true);
+  }
+  function handleCloseModalPresidente() {
+    setShowModalPresidente(false);
+    reset();
+  }
+  function handleOnChange(content) {
+    setContent(content);
+  }
   async function handleCadastro(data) {
     if (usuario?.id_permissao === 4) {
       return;
@@ -566,10 +1038,6 @@ export default function GestaoIndicadores({
     // formData.append("politica_arquivo", data.politica_arquivo[0]);
     // formData.append("politica_titulo", data.politica_titulo);
 
-    // formData.append("conselho_ano", data.conselho_ano);
-    // formData.append("conselho_arquivo", data.conselho_arquivo[0]);
-    // formData.append("conselho_titulo", data.conselho_titulo);
-
     formData.append(
       "sr_descricao",
       data.sr_descricao ? data.sr_descricao : dadosGestao?.sr_descricao
@@ -639,9 +1107,6 @@ export default function GestaoIndicadores({
     const participacoes = await resParticipacao.data;
     setListParticipacoes(participacoes);
   }
-  async function handleSignOut() {
-    signOut();
-  }
 
   function handleShowModal() {
     setShowModal(true);
@@ -649,141 +1114,6 @@ export default function GestaoIndicadores({
   function handleCloseModal() {
     setShowModal(false);
     setShowModalPolitica(false);
-  }
-  function handleShowModalPresidente() {
-    setShowModalPresidente(true);
-  }
-  function handleCloseModalPresidente() {
-    setShowModalPresidente(false);
-  }
-
-  async function handleAddRepresentante(data) {
-    if (!usuario.id_municipio) {
-      toast.notify("Não existe Município, entre novamente no sistema! ", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
-      signOut();
-    }
-
-    const id = await api
-      .post("addRepresentanteServicos", {
-        ga_cargo: data.ga_cargo,
-        ga_email: data.ga_email,
-        ga_nome_representante: data.ga_nome_representante,
-        ga_telefone: data.ga_telefone,
-        id_municipio: usuario.id_municipio,
-      })
-      .then((response) => {
-        toast.notify("Representante cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-        setShowModal(false);
-        return response;
-      })
-      .catch((error) => {
-        toast.notify("Não foi possivel cadastrar o representante! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
-      });
-    getRepresentantes();
-  }
-
-  function handleOnChange(content) {
-    setContent(content);
-  }
-
-  async function handleRemoverParticipacao({ id, id_arquivo }) {
-    await api
-      .delete("remover-participacao", {
-        params: { id: id, id_arquivo: id_arquivo },
-      })
-      .then((response) => {
-        toast.notify("Participacão removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-      })
-      .catch((error) => {
-        toast.notify("Não foi possivel remover a participação! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
-      });
-    getParticipacoes();
-  }
-
-  async function handleRemoverPolitica({ id, id_arquivo }) {
-    await api
-      .delete("remover-politica", {
-        params: { id: id, id_arquivo: id_arquivo },
-      })
-      .then((response) => {
-        toast.notify("Política removida com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-      })
-      .catch((error) => {
-        toast.notify("Não foi possivel remover a politica municipal! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
-      });
-    getPoliticas();
-  }
-
-  async function handleRemoverPlano({ id, id_arquivo }) {
-    await api
-      .delete("remover-plano", {
-        params: { id: id, id_arquivo: id_arquivo },
-      })
-      .then((response) => {
-        toast.notify("Plano removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-      })
-      .catch((error) => {
-        toast.notify("Não foi possivel remover o plano municipal! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
-      });
-    getPlanos();
-  }
-
-  async function handleRemoverRepresentante({ id }) {
-    await api
-      .delete("remover-representante", {
-        params: { id: id },
-      })
-      .then((response) => {
-        toast.notify("Representante removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-      })
-      .catch((error) => {
-        toast.notify("Não foi possivel remover o plano municipal! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
-      });
-    getRepresentantes();
   }
 
   async function updateRepresentantesServicos(data) {
@@ -811,7 +1141,7 @@ export default function GestaoIndicadores({
           duration: 7,
           type: "success",
         });
-        getRepresentantes(); // <-- Atualiza a lista após editar
+        getRepresentantes();
         setShowModal(false);
         setUpdateRepresentantes(null);
       })

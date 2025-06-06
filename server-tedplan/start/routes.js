@@ -23,6 +23,8 @@ Route.get("getMunicipio", "MunicipioController.getMunicipio");
 Route.post("addMunicipio", "MunicipioController.store");
 Route.get("getEscalas", "EscalaController.index");
 
+Route.get("pdf/:id", "FileController.getPdf");
+
 Route.get("getFile", "FileController.showFile");
 Route.get("getImagem", "FileController.showImagem");
 Route.get("getImagens", "FileController.show");
@@ -173,6 +175,10 @@ Route.post(
   "get-dados-unidade-processamento",
   "PsResiduosUnidadeController.getDadosUnidadeProcessamento"
 );
+Route.post(
+  "get-residuos-unidades-processamento",
+  "PsResiduosUnidadeController.getResiduosUnidadesProcessamento"
+);
 Route.delete(
   "detete-unidade-processamento/:id",
   "PsResiduosUnidadeController.destroy"
@@ -231,6 +237,15 @@ Route.post(
 );
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
+Route.get(
+  "get-editor-simisab-por-ano/:id",
+  "UsuariosController.getEditorSimisabPorAno"
+);
+
+Route.post(
+  "create-editor-simisab-por-ano",
+  "UsuariosController.createEditorSimisabPorAno"
+);
 
 Route.post(
   "create-descricao-indicador",

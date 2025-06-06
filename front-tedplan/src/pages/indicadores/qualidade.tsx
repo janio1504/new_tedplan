@@ -47,14 +47,9 @@ import {
 import HeadIndicadores from "../../components/headIndicadores";
 import { toast, ToastContainer } from "react-nextjs-toast";
 import "suneditor/dist/css/suneditor.min.css";
-import { getAPIClient } from "../../services/axios";
-import MenuIndicadores from "../../components/MenuIndicadores";
-import { parseCookies } from "nookies";
-import { GetServerSideProps } from "next";
 import Router from "next/router";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { AuthContext } from "../../contexts/AuthContext";
-import CurrencyInput from "react-currency-masked-input";
 import {
   Tabela,
   ContainerModal,
@@ -84,8 +79,8 @@ interface MunicipioProps {
 }
 
 export default function ResiduosUnidades({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
-  const [dadosMunicipio, setDadosMunicipio] = useState(null)
+  const { usuario, isEditor, anoEditorSimisab } = useContext(AuthContext);
+  const [dadosMunicipio, setDadosMunicipio] = useState(null);
   const {
     register,
     handleSubmit,
@@ -98,9 +93,12 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [activeForm, setActiveForm] = useState("agua");
 
   useEffect(() => {
-    getMunicipio()
-  }, [municipio]);
-
+    getMunicipio();
+      if (anoEditorSimisab) {
+      getDadosQualidade(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [municipio, anoEditorSimisab]);
 
   async function getMunicipio() {
     const res = await api
@@ -113,17 +111,18 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       });
   }
 
- 
   function handleOnChange(content) {
     setContent(content);
   }
 
-  function handleCloseModalCO020() {}
-
   async function handleCadastro(data) {
-
-    if(usuario?.id_permissao === 4){
-      return
+    if (!isEditor) {
+      toast.notify("Você não tem permissão para editar!", {
+        title: "Atenção!",
+        duration: 7,
+        type: "error",
+      });
+      return;
     }
 
     data.id_qualidade = dadosQualidade?.id_qualidade;
@@ -156,24 +155,6 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       .catch((error) => {
         console.log(error);
       });
-
-    
-  }
-
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
   }
 
   const [anoSelected, setAnoSelected] = useState(null);
@@ -189,7 +170,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       <Sidebar>
         <SidebarItem
@@ -245,22 +228,49 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                 <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo>
               </DivFormEixo> */}
               <DivFormEixo>
-              <DivFormConteudo active={activeForm === "agua" || activeForm === "interrupcoes" || activeForm === "extravasamento" || activeForm === "tipoatendimento" || activeForm === "amostra" || activeForm === "reclamacoes" || activeForm === "observacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Ano</DivTituloConteudo>
-                </DivTitulo>
-                <label>Selecione o ano desejado:</label>
-                <select
-                  name="ano"
-                  id="ano"
-                  onChange={(e) => seletcAno(e.target.value)}
+                <DivFormConteudo
+                  active={
+                    activeForm === "agua" ||
+                    activeForm === "interrupcoes" ||
+                    activeForm === "extravasamento" ||
+                    activeForm === "tipoatendimento" ||
+                    activeForm === "amostra" ||
+                    activeForm === "reclamacoes" ||
+                    activeForm === "observacoes"
+                  }
                 >
-                  <option>Selecionar</option>
-                  {anosSelect().map((ano) => (
-                    <option value={ano}>{ano}</option>
-                  ))}
-                </select>
-              </DivFormConteudo>
+                  <DivTitulo>
+                    <DivTituloConteudo>Ano</DivTituloConteudo>
+                  </DivTitulo>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
+                </DivFormConteudo>
               </DivFormEixo>
               <DivFormEixo>
                 <DivFormConteudo active={activeForm === "agua"}>
@@ -289,6 +299,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd002}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -305,11 +320,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               {...register("QD003")}
                               defaultValue={dadosQualidade?.qd003}
                               onChange={handleOnChange}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                               type="text"
                             ></input>
                           </InputP>
                         </td>
-                        <td>horas</td>
+                        <td>Horas</td>
                       </tr>
                       <tr>
                         <td>
@@ -323,6 +343,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd004}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -359,6 +384,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd021}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -376,10 +406,15 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd022}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
-                        <td>Hora</td>
+                        <td>Horas</td>
                       </tr>
                       <tr>
                         <td>
@@ -393,6 +428,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd015}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -427,6 +467,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd011}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -436,7 +481,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         <td>
                           <InputSNIS>QD012</InputSNIS>
                         </td>
-                        <td>Duração dos extravasamentos registrados</td>
+                        <td>Duração dos extravasamento registrado</td>
                         <td>
                           <InputP>
                             <input
@@ -444,6 +489,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd012}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -480,6 +530,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd001}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -498,7 +553,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                   </DivTitulo>
                   <table>
                     <tbody>
-                      <tr >
+                      <tr>
                         <th>Código SNIS</th>
                         <th style={{ width: "500px" }}>Descrição</th>
                         <th>Ano {anoSelected}</th>
@@ -519,6 +574,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd020}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -539,6 +599,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd006}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -559,6 +624,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd007}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -598,6 +668,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd019}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -618,6 +693,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd008}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -638,6 +718,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd009}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -676,6 +761,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd018}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -696,6 +786,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd016}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -716,6 +811,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd017}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -755,6 +855,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd028}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -775,6 +880,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd026}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -795,6 +905,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd027}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -832,6 +947,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd023}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -852,6 +972,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd024}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -869,6 +994,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               defaultValue={dadosQualidade?.qd025}
                               onChange={handleOnChange}
                               type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
                             ></input>
                           </InputP>
                         </td>
@@ -894,21 +1024,20 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                         <td>QD099</td>
                         <td>Observações, esclarecimentos ou sugestões</td>
                         <td>
-                            <textarea style={{width: "500px"}}
-                              {...register("QD099")}
-                              defaultValue={dadosQualidade?.qd099}
-                              onChange={handleOnChange}
-                            />
-                        
+                          <textarea
+                            style={{ width: "500px" }}
+                            {...register("QD099")}
+                            defaultValue={dadosQualidade?.qd099}
+                            onChange={handleOnChange}
+                          />
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </DivFormConteudo>
+                {isEditor && <SubmitButton type="submit">Gravar</SubmitButton>}
               </DivFormEixo>
             </DivForm>
-
-            {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>

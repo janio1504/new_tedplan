@@ -69,7 +69,8 @@ interface MunicipioProps {
 }
 
 export default function Financeiro({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, isAuthenticated, anoEditorSimisab, permission } =
+    useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
@@ -89,14 +90,17 @@ export default function Financeiro({ municipio }: MunicipioProps) {
 
   useEffect(() => {
     getDadosMunicipio();
-  }, [municipio, usuario]);
+    if (anoEditorSimisab) {
+      getFinaceiroMunicipio(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [municipio, usuario, anoEditorSimisab]);
 
   async function getDadosMunicipio() {
     const res = await api.get("getMunicipio", {
       params: { id_municipio: usuario?.id_municipio },
     });
-    const municipio = await res.data;
-    setDadosMunicipio(municipio[0]);
+    setDadosMunicipio(res.data);
   }
 
   function handleOnChange(content) {
@@ -114,7 +118,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   }
 
   async function handleCadastro(data) {
-    if (usuario?.id_permissao === 4) {
+    if (!isEditor) {
+      toast.notify("Você não tem permissão para editar!", {
+        title: "Atenção!",
+        duration: 7,
+        type: "error",
+      });
       return;
     }
     // CALCULO DA FORMULAS DO SNIS
@@ -587,21 +596,6 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     return resCad;
   }
 
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
   async function getFinaceiroMunicipio(ano: any) {
     await api
       .post("get-ps-financeiro-por-ano", {
@@ -762,17 +756,34 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   <DivTitulo>
                     <DivTituloConteudo>Ano</DivTituloConteudo>
                   </DivTitulo>
-                  <label>Selecione o ano desejado:</label>
-                  <select
-                    name="ano"
-                    id="ano"
-                    onChange={(e) => seletcAno(e.target.value)}
-                  >
-                    <option>Selecionar</option>
-                    {anosSelect().map((ano) => (
-                      <option value={ano}>{ano}</option>
-                    ))}
-                  </select>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </DivFormConteudo>
               </DivFormEixo>
               <DivFormEixo>
@@ -2814,12 +2825,9 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                             {...register("FN213")}
                             onKeyPress={(e) => {
                               if (!/[0-9]/.test(e.key)) {
-                                e.preventDefault();
                               }
                             }}
                             type="text"
-                            defaultValue={dadosFinanceiros?.fn213}
-                            onChange={handleOnChange}
                           ></input>
                         </td>
                         <td>R$/ano</td>
@@ -3164,8 +3172,6 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       </tr>
                     </tbody>
                   </table>
-
-                  <table></table>
                 </DivFormConteudo>
               </DivFormEixo>
             </DivForm>

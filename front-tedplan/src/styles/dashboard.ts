@@ -92,7 +92,7 @@ export const BotaoVisualizar = styled.button`
   margin-right: 5px;
 `;
 export const BotaoEditar = styled.button`
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: #28a745;
   border: none;
   color: #fff;
@@ -104,6 +104,21 @@ export const BotaoEditar = styled.button`
 
   &:hover {
     background: #218838;
+  }
+`;
+export const BotaoPermissao = styled.button`
+  padding: 10px 16px;
+  background:rgb(21, 155, 217);
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+  margin-right: 8px;
+
+  &:hover {
+    background:rgb(18, 113, 172);
   }
 `;
 
@@ -118,7 +133,7 @@ export const BotaoAdicionar = styled.div`
   cursor: pointer;
 `;
 export const BotaoRemover = styled.button`
-  padding: 8px 16px;
+  padding: 10px 16px;
   background: #dc3545;
   border: none;
   color: #fff;
