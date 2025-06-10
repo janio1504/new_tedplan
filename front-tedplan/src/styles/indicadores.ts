@@ -1824,6 +1824,26 @@ export const StepperNavigation = styled.div`
   border-top: 1px solid #ddd;
 `;
 
+export const SteppButton = styled.button<{ active?: boolean; completed?: boolean }>`
+padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: ${(props) => (props.active ? "#666" : "#008080")};
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: ${(props) => (props.active ? "#555" : "#006666")};
+  }
+
+  &:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+  }
+`
+
 export const StepperButton = styled.button<{ secondary?: boolean }>`
   padding: 10px 20px;
   border: none;

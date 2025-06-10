@@ -1741,10 +1741,6 @@ async function handleSignOut() {
                 required
               ></textarea>
             </DivTextArea>
-
-        
-          
-
             <SubmitButtonContainer style={{
               bottom: "-50px",
               right: "-10px"
