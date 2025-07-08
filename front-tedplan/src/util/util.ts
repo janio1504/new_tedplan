@@ -39,3 +39,22 @@ export const capitalizeFrasal = (Frasal: string) => {
     )
     .join(" ");
 };
+
+export function breadCrumb(pathname: string){
+  const segments = pathname.split("/").filter(Boolean)
+
+   
+  const breadcrumb = segments.map((segment, index) => {
+    const href = '/' + segments.slice(0, index + 1).join('/');
+    const name = decodeURIComponent(segment)
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+
+  return {
+    name,
+    href,
+  };
+  });
+
+  return breadcrumb; 
+};

@@ -21,6 +21,7 @@ import {
   Ps3ImageEsquerda,
   Ps3ImageDireita,
   TitlePsOnMouse,
+  BreadCrumbStyle
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -41,6 +42,8 @@ import Balanco from "../../img/balanco.png"
 import Tarifas from "../../img/tarifas.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { set } from "react-hook-form";
+import BreadCrumb from "./componentes/breadCrumb";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -141,6 +144,19 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
+      <BreadCrumbStyle style={{ width: '25%', position: 'absolute', marginTop: '20px'}}>
+              <nav>
+                <ol>
+                  <li>
+                    <Link href="./home_indicadores">Home</Link>
+                    <span> / </span>
+                  </li>
+                  <li>
+                    <span>Prestação de Serviços</span>
+                  </li>
+                </ol>
+              </nav>
+        </BreadCrumbStyle>
       <div style={{marginTop:"150px"}}>
       </div>
       <ContainerPs>

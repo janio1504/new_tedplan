@@ -62,6 +62,7 @@ import {
   TabelaModal,
   ModalForm,
 } from "../../styles/esgoto-indicadores";
+import Link from "next/link";
 import { Tooltip, TooltipText } from "@/styles/indicadores";
 import styled from "styled-components";
 import { DivFormCadastro, MainContent, SidebarItem} from "@/styles/esgoto-indicadores";
@@ -73,6 +74,8 @@ import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { anosSelect } from "../../util/util";
 import ajuda from "../../img/ajuda.png";
+import BreadCrumb from "./componentes/breadCrumb";
+import { BreadCrumbStyle } from "@/styles/indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -436,6 +439,26 @@ const handleNext = () => {
         </SidebarItem>
       </Sidebar>
       <MainContent>
+        <>
+      <BreadCrumbStyle style={{ width: '25%'}}>
+        <nav>
+          <ol>
+            <li>
+              <Link href="./home_indicadores">Home</Link>
+              <span> / </span>
+            </li>
+            <li>
+              <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+              <span> / </span>
+            </li>
+            <li>
+              <span>Geral</span>
+            </li>
+          </ol>
+        </nav>
+      </BreadCrumbStyle>
+   
+    </>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
 

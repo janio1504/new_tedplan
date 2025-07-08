@@ -779,6 +779,8 @@ export const SubmitButton = styled.button`
   justify-content: center;
   align-items: center;
   float: right;
+  font-size: 16px;
+  font-weight: 600;
   svg {
     margin-right: 8px;
   }

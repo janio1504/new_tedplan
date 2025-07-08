@@ -54,7 +54,7 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import CurrencyInput from "react-currency-masked-input";
-import { MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import {
@@ -71,6 +71,7 @@ import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import api from "../../services/api";
 import { anosSelect } from "../../util/util";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -205,6 +206,23 @@ export default function Tarifa({ municipio }: MunicipioProps) {
         </SidebarItem>
       </Sidebar>
       <MainContent>
+        <BreadCrumbStyle style={{ width: '25%'}}>
+                                      <nav>
+                                        <ol>
+                                          <li>
+                                            <Link href="./home_indicadores">Home</Link>
+                                            <span> / </span>
+                                          </li>
+                                          <li>
+                                            <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                            <span> / </span>
+                                          </li>
+                                          <li>
+                                            <span>Tarifa</span>
+                                          </li>
+                                        </ol>
+                                      </nav>
+          </BreadCrumbStyle>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm>

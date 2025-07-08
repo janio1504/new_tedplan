@@ -55,6 +55,8 @@ import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { anosSelect } from "../../util/util";
+import { BreadCrumbStyle } from "@/styles/indicadores";
+import Link from "next/link";
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
@@ -160,6 +162,23 @@ export default function Balanco({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <BreadCrumbStyle style={{ width: '25%', marginTop: '10px'}}>
+                                    <nav>
+                                      <ol>
+                                        <li>
+                                          <Link href="./home_indicadores">Home</Link>
+                                          <span> / </span>
+                                        </li>
+                                        <li>
+                                          <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                          <span> / </span>
+                                        </li>
+                                        <li>
+                                          <span>Balanço</span>
+                                        </li>
+                                      </ol>
+                                    </nav>
+        </BreadCrumbStyle>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <DivForm>

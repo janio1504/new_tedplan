@@ -48,9 +48,10 @@ import { toast, ToastContainer } from "react-nextjs-toast";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
 import { bold } from "@uiw/react-md-editor/lib/commands";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -191,6 +192,23 @@ export default function Agua() {
         </SidebarItem>
       </Sidebar>
       <MainContent>
+        <BreadCrumbStyle style={{ width: '25%'}}>
+                        <nav>
+                          <ol>
+                            <li>
+                              <Link href="./home_indicadores">Home</Link>
+                              <span> / </span>
+                            </li>
+                            <li>
+                              <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                              <span> / </span>
+                            </li>
+                            <li>
+                              <span>Água</span>
+                            </li>
+                          </ol>
+                        </nav>
+                  </BreadCrumbStyle>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm style={{ borderColor: "#12B2D5" }}>

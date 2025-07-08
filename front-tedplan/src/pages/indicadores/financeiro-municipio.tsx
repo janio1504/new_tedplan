@@ -53,10 +53,11 @@ import api from "../../services/api";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { log } from "console";
-import { MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
 import { SidebarItem, Sidebar } from "../../styles/residuo-solido-coleta-in";
 import { LineSideBar } from "../../styles/drenagem-indicadores";
 import { anosSelect } from "../../util/util";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -727,6 +728,23 @@ export default function Financeiro({ municipio }: MunicipioProps) {
         </SidebarItem>
       </Sidebar>
       <MainContent>
+        <BreadCrumbStyle style={{ width: '27%'}}>
+                <nav>
+                  <ol>
+                    <li>
+                      <Link href="./home_indicadores">Home</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <span>Financeiro</span>
+                    </li>
+                  </ol>
+                </nav>
+          </BreadCrumbStyle>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm>

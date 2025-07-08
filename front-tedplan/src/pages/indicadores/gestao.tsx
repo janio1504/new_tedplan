@@ -30,6 +30,7 @@ import {
   ButtonAdicionarPresidente,
   Tooltip,
   TooltipText,
+  BreadCrumbStyle
 } from "../../styles/indicadores";
 
 import Editar from "../../img/editar.png";
@@ -63,7 +64,7 @@ import {
 } from "@/util/util";
 import { DivFormCadastro, MainContent, SidebarItem } from "@/styles/esgoto-indicadores";
 import { DivTitulo } from "@/styles/drenagem-indicadores";
-
+import BreadCrumb from "./componentes/breadCrumb";
 
 const InputMask = require("react-input-mask");
 
@@ -1038,6 +1039,7 @@ async function handleSignOut() {
         </SidebarItem>
       </Sidebar>
     <MainContent>
+      <BreadCrumb/>
       <DivCenter>
         {activeForm === "gestaoAssociada" && (
           <Form onSubmit={handleSubmitGestao(handleAddGestaoAssociada)}>

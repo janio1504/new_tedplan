@@ -1284,7 +1284,6 @@ export const DivMenuCadastro = styled.div`
 
 export const DivBotaoMenuCadastro = styled.div`
   display: flex;
-
   align-items: center;
   margin: 0 10px;
 `;
@@ -2012,5 +2011,55 @@ export const ModalStepContent = styled.div<{ active?: boolean }>`
       opacity: 1;
       transform: translateY(0);
     }
+  }
+`;
+
+export const BreadCrumbStyle = styled.div`
+  color: black;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12%;
+  padding: 10px;
+  border-radius: 5px;
+  color: #666;
+  
+  nav {
+    margin-bottom: 2px;
+  }
+
+  ol{
+    list-style: none;
+    display: flex;
+    margin: 0;
+    color: #666;
+    font-weight: bold;
+
+  }
+
+  li{
+    display: flex;
+    height: 100%;
+  }
+
+  a{
+  color: #666;
+  text-decoration: none;
+  margin-top: 4px;
+  box-sizing: border-box;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  transition: background 0.2s;
+  }
+
+  a:hover {
+  color: #0085bd;
+  border-radius: 8px;
+  }
+
+  span{
+  margin: 5px;
   }
 `;
