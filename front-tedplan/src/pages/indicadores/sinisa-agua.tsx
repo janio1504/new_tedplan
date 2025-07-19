@@ -63,7 +63,7 @@ interface MunicipioProps {
   Imunicipio: IMunicipio[];
 }
 
-export default function Agua() {
+export default function SinisaAgua() {
   const { usuario, signOut, anoEditorSimisab, permission, isEditor } =
     useContext(AuthContext);
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio>(null);
@@ -75,14 +75,13 @@ export default function Agua() {
     formState: { errors },
   } = useForm();
 
-  const [dadosAgua, setDadosAgua] = useState(null);
+
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("teste");
 
   useEffect(() => {
     getMunicipio();
     if (anoEditorSimisab) {
-      getDadosAgua(anoEditorSimisab);
       setAnoSelected(anoEditorSimisab);
     }
   }, [anoEditorSimisab]);
@@ -111,46 +110,13 @@ export default function Agua() {
       return;
     }
 
-    data.id_agua = dadosAgua?.id_agua;
-    data.id_municipio = usuario?.id_municipio;
-    data.ano = anoSelected;
-
-    const resCad = await api
-      .post("create-agua", data)
-      .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-        return response.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    getDadosAgua(anoSelected);
   }
 
-  async function getDadosAgua(ano) {
-    const id_municipio = usuario?.id_municipio;
-    const res = await api
-      .post("get-agua-por-ano", { id_municipio: id_municipio, ano: ano })
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  async function selectAno(ano: string) {
+  setAnoSelected(ano);
+    }
 
-    setDadosAgua(res[0]);
-  }
-
-  function seletcAno(ano: any) {
-    setAnoSelected(ano);
-
-    getDadosAgua(ano);
-  }
-
+  
   return (
     <Container>
       <ToastContainer></ToastContainer>
@@ -218,7 +184,7 @@ export default function Agua() {
                       <select
                         name="ano"
                         id="ano"
-                        onChange={(e) => seletcAno(e.target.value)}
+                        onChange={(e) => selectAno(e.target.value)}
                       >
                         <option>Selecionar</option>
                         {anosSelect().map((ano) => (
