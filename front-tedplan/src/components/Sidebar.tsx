@@ -99,6 +99,22 @@ const Sidebar = () => {
     Router.push("/listarInfoIndicador");
   }
 
+  function handleMenus() {
+    Router.push("/listarMenus");
+  }
+
+  function handleMenuItems() {
+    Router.push("/listarMenuItems");
+  }
+
+  function handleTiposCampo() {
+    Router.push("/listarTiposCampo");
+  }
+
+  function handleIndicadores() {
+    Router.push("/listarIndicadores");
+  }
+
   function handlePublicacoes() {
     Router.push("/listarPublicacoes");
   }
@@ -142,6 +158,18 @@ const Sidebar = () => {
             />
           </MenuItemWithSubmenu>
           <SubmenuContainer isOpen={isCadastroOpen}>
+            <SubmenuItem onClick={handleMenus}>
+              Menus
+            </SubmenuItem>
+            <SubmenuItem onClick={handleMenuItems}>
+              Itens de Menu
+            </SubmenuItem>
+            <SubmenuItem onClick={handleTiposCampo}>
+              Tipos de Campo
+            </SubmenuItem>
+            <SubmenuItem onClick={handleIndicadores}>
+              Indicadores
+            </SubmenuItem>
             <SubmenuItem onClick={handleAddIndicador}>
               Informações de Indicador
             </SubmenuItem>
