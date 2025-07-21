@@ -30,7 +30,6 @@ import {
   ButtonAdicionarPresidente,
   Tooltip,
   TooltipText,
-  BreadCrumbStyle
 } from "../../styles/indicadores";
 
 import Editar from "../../img/editar.png";
@@ -62,9 +61,12 @@ import {
   onlyLettersAndCharacters,
   toTitleCase,
 } from "@/util/util";
-import { DivFormCadastro, MainContent, SidebarItem } from "@/styles/esgoto-indicadores";
+import {
+  DivFormCadastro,
+  MainContent,
+  SidebarItem,
+} from "@/styles/esgoto-indicadores";
 import { DivTitulo } from "@/styles/drenagem-indicadores";
-import BreadCrumb from "./componentes/breadCrumb";
 
 const InputMask = require("react-input-mask");
 
@@ -158,12 +160,16 @@ interface IPoliticas {
   titulo: string;
   ano: string;
   id_arquivo: string;
+  file?: string;
+  situacao: string;
 }
 interface IPlanos {
   id_plano_municipal: string;
   titulo: string;
   ano: string;
   id_arquivo: string;
+  file?: string;
+  situacao?: string;
 }
 interface IParticipacao {
   id_participacao_controle_social: string;
@@ -187,8 +193,9 @@ export default function GestaoIndicadores({
   const [conselho, setConselho] = useState(null);
   const [conselhoMunicipal, setConselhoMunicipal] = useState(null);
   const [isClient, setIsClient] = useState(null);
-  const [updatePresidente, setUpdatePresidente] = useState(null); 
-  
+  const [updatePresidente, setUpdatePresidente] = useState(null);
+  const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -197,6 +204,8 @@ export default function GestaoIndicadores({
     setValue,
     formState: { errors },
   } = useForm();
+  const [showModalPlano, setShowModalPlano] = useState(false);
+  const [updatePlano, setUpdatePlano] = useState<IPlanos | null>(null);
 
   const {
     register: registerGestao,
@@ -230,7 +239,7 @@ export default function GestaoIndicadores({
     handleSubmit: handleSubmitConselho,
     reset: resetConselho,
     setValue: setValueConselho,
-    formState: { errors: errorsConselho},
+    formState: { errors: errorsConselho },
     control: controlConselho,
   } = useForm();
 
@@ -262,13 +271,21 @@ export default function GestaoIndicadores({
   } = useForm();
 
   const [showModal, setShowModal] = useState(false);
+  const [showModalPolitica, setShowModalPolitica] = useState(false);
   const [listParticipacoes, setListParticipacoes] = useState(null);
   const [ShowModalPresidente, setShowModalPresidente] = useState(false);
   const [activeForm, setActiveForm] = useState("gestaoAssociada");
   const [content, setContent] = useState("");
-  const [listPoliticas, setPoliticas] = useState(null);
+  const [listPoliticas, setPoliticas] = useState<IPoliticas[] | null>(null);
   const [listPlanos, setPlanos] = useState(null);
   const [updateRepresentantes, setUpdateRepresentantes] = useState(null);
+  const [politicaSituacao, setPoliticaSituacao] = useState("aprovado"); // Valor padrão
+  const [planoSituacao, setPlanoSituacao] = useState("aprovado"); // Valor padrão
+  const [conselhoSituacao, setConselhoSituacao] = useState("operante");
+  const [showModalParticipacao, setShowModalParticipacao] = useState(false);
+  const [updateParticipacao, setUpdateParticipacao] =
+    useState<IParticipacao | null>(null);
+
   const editor = useRef(null);
   let txtArea = useRef();
 
@@ -283,22 +300,68 @@ export default function GestaoIndicadores({
       getRepresentantes();
       getGestao();
       getConselhoMunicipal();
-      }
+    }
   }, [usuario]);
 
-  
+  useEffect(() => {
+    if (
+      listPoliticas &&
+      listPoliticas.length > 0 &&
+      listPoliticas[0]?.situacao
+    ) {
+      setPoliticaSituacao(listPoliticas[0].situacao);
+    }
+  }, [listPoliticas]);
 
+  useEffect(() => {
+    if (listPlanos && listPlanos.length > 0 && listPlanos[0]?.situacao) {
+      setPlanoSituacao(listPlanos[0].situacao);
+    }
+  }, [listPlanos]);
+
+  useEffect(() => {
+    if (conselho && conselho.length > 0 && conselho[0]?.situacao) {
+      setConselhoSituacao(conselho[0].situacao);
+    }
+  }, [conselho]);
+
+  function handlePoliticaSituacaoChange(situacao) {
+    setPoliticaSituacao(situacao);
+
+    if (situacao === "nao_tem") {
+      setValue("politica_titulo", "");
+      setValue("politica_ano", "");
+    }
+  }
+  function handlePlanoSituacaoChange(situacao) {
+    setPlanoSituacao(situacao);
+
+    if (situacao === "nao_tem") {
+      setValue("plano_titulo", "");
+      setValue("plano_ano", "");
+    }
+  }
+
+  function handleConselhoSituacaoChange(situacao) {
+    setConselhoSituacao(situacao);
+
+    if (situacao === "nao_tem") {
+      setValue("conselho_titulo", "");
+      setValue("conselho_ano", "");
+      setValue("conselho_arquivo", null);
+    }
+  }
 
   // ------------- Funções GET -------------
 
   async function getMunicipio() {
-      const res = await api
-        .get("getMunicipio", {
-          params: { id_municipio: usuario.id_municipio },
-        })
-        .then((response) => {
-          setDadosMunicipio(response.data[0]);
-        });
+    const res = await api
+      .get("getMunicipio", {
+        params: { id_municipio: usuario.id_municipio },
+      })
+      .then((response) => {
+        setDadosMunicipio(response.data[0]);
+      });
   }
   async function getPoliticas() {
     const resPoliticas = await api.get("getPoliticas", {
@@ -330,9 +393,12 @@ export default function GestaoIndicadores({
     }
   }
   async function getConselhoMunicipal() {
-    const res = await api.get(`get-conselhos-municipais/${usuario?.id_municipio}`, {
-      params: { id_municipio: usuario?.id_municipio },
-    });
+    const res = await api.get(
+      `get-conselhos-municipais/${usuario?.id_municipio}`,
+      {
+        params: { id_municipio: usuario?.id_municipio },
+      }
+    );
     const conselhos = res.data;
     if (conselhos) {
       const resConselhoMunicipal = await Promise.all(
@@ -420,7 +486,7 @@ export default function GestaoIndicadores({
   }
   async function getGestao() {
     const resGestao = await api.get("/getGestao", {
-      params: { id_municipio: usuario.id_municipio },
+      params: { id_municipio: usuario?.id_municipio },
     });
 
     setGestao(resGestao.data[0]);
@@ -442,8 +508,8 @@ export default function GestaoIndicadores({
     }
   }
 
-// ------------- Funções ADD -------------
- 
+  // ------------- Funções ADD -------------
+
   async function handleAddPresidente(data) {
     if (!usuario.id_municipio) {
       toast.notify("Não existe Município, entre novamente no sistema! ", {
@@ -462,14 +528,18 @@ export default function GestaoIndicadores({
         email_presidente: data.email_presidente,
         integrantes: data.integrantes,
         id_municipio: usuario.id_municipio,
-        id_conselho_municipal_saneamento_basico: data.id_conselho_municipal_saneamento_basico || null,
+        id_conselho_municipal_saneamento_basico:
+          data.id_conselho_municipal_saneamento_basico || null,
       })
       .then((response) => {
-          toast.notify("Presidência do Conselho Municipal adicionada com sucesso", {
+        toast.notify(
+          "Presidência do Conselho Municipal adicionada com sucesso",
+          {
             title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+            duration: 7,
+            type: "success",
+          }
+        );
         setShowModalPresidente(false);
         reset();
         return response;
@@ -491,7 +561,8 @@ export default function GestaoIndicadores({
     formData.append("nome_associacao", data.nome_associacao || "");
     formData.append("norma_associacao", data.norma_associacao || "");
 
-    await api.post("addGestaoIndicadores", formData)
+    await api
+      .post("addGestaoIndicadores", formData)
       .then(() => {
         toast.notify("Gestão Associada cadastrada com sucesso!", {
           title: "Sucesso!",
@@ -510,48 +581,47 @@ export default function GestaoIndicadores({
         });
       });
 
-      console.log("Dados enviados:", data);
+    console.log("Dados enviados:", data);
   }
-  async function handleAddConselhoMunicipal(data){
+  async function handleAddConselhoMunicipal(data) {
     if (!usuario.id_municipio) {
-    toast.notify("Não existe Município, entre novamente no sistema!", {
-      title: "Erro!",
-      duration: 7,
-      type: "error",
-    });
-    signOut();
-    return;
-  }
+      toast.notify("Não existe Município, entre novamente no sistema!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      signOut();
+      return;
+    }
 
     const formData = new FormData();
     formData.append("titulo", data.titulo || "");
     formData.append("ano", data.ano || "");
     formData.append("id_municipio", usuario.id_municipio);
     formData.append("arquivo", data.arquivo[0]);
-  
 
-  await api.post("create-conselho-municipal", formData)
-    .then(() => {
-      toast.notify("Conselho Municipal cadastrado com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
+    await api
+      .post("create-conselho-municipal", formData)
+      .then(() => {
+        toast.notify("Conselho Municipal cadastrado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getConselhoMunicipal();
+        resetConselho();
+      })
+      .catch(() => {
+        toast.notify("Erro ao cadastrar o Conselho Municipal!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+        console.log(data);
       });
-      getConselhoMunicipal(); 
-      resetConselho();
-    })
-    .catch(() => {
-      toast.notify("Erro ao cadastrar o Conselho Municipal!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
-      console.log(data)
-    });
-   
   }
-  async function handleAddPolitica(data){
-  if (usuario?.id_permissao === 4) return;
+  async function handleAddPolitica(data) {
+    if (usuario?.id_permissao === 4) return;
 
     const formData = new FormData();
     formData.append("id_municipio", usuario.id_municipio);
@@ -559,13 +629,17 @@ export default function GestaoIndicadores({
     formData.append("politica_ano", data.politica_ano || "");
     formData.append("politica_arquivo", data.politica_arquivo[0] || "");
 
-    await api.post("addGestaoIndicadores", formData)
+    await api
+      .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify("Política Municipal de Saneamento cadastrada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.notify(
+          "Política Municipal de Saneamento cadastrada com sucesso!",
+          {
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          }
+        );
         resetPolitica();
         getPoliticas();
       })
@@ -577,7 +651,7 @@ export default function GestaoIndicadores({
         });
       });
 
-      console.log("Dados enviados:", data);
+    console.log("Dados enviados:", data);
   }
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
@@ -616,7 +690,7 @@ export default function GestaoIndicadores({
     getRepresentantes();
   }
   async function handleAddPlano(data) {
-  if (usuario?.id_permissao === 4) return;
+    if (usuario?.id_permissao === 4) return;
 
     const formData = new FormData();
     formData.append("id_municipio", usuario.id_municipio);
@@ -624,7 +698,8 @@ export default function GestaoIndicadores({
     formData.append("plano_ano", data.plano_ano || "");
     formData.append("plano_arquivo", data.plano_arquivo[0] || "");
 
-    await api.post("addGestaoIndicadores", formData)
+    await api
+      .post("addGestaoIndicadores", formData)
       .then(() => {
         toast.notify("Plano Municipal de Saneamento cadastrada com sucesso!", {
           title: "Sucesso!",
@@ -642,10 +717,10 @@ export default function GestaoIndicadores({
         });
       });
 
-      console.log("Dados enviados:", data);
+    console.log("Dados enviados:", data);
   }
   async function handleAddParticipacao(data) {
-  if (usuario?.id_permissao === 4) return;
+    if (usuario?.id_permissao === 4) return;
 
     const formData = new FormData();
     formData.append("id_municipio", usuario.id_municipio);
@@ -653,13 +728,17 @@ export default function GestaoIndicadores({
     formData.append("pcs_ano", data.pcs_ano || "");
     formData.append("pcs_arquivo", data.pcs_arquivo[0] || "");
 
-    await api.post("addGestaoIndicadores", formData)
+    await api
+      .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify("Participação e Controle Social de Saneamento cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.notify(
+          "Participação e Controle Social de Saneamento cadastrado com sucesso!",
+          {
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          }
+        );
         resetParticipacao();
         getParticipacoes();
       })
@@ -671,17 +750,18 @@ export default function GestaoIndicadores({
         });
       });
 
-      console.log("Dados enviados:", data);
+    console.log("Dados enviados:", data);
   }
   async function handleAddSaneamentoRural(data) {
-  if (usuario?.id_permissao === 4) return;
+    if (usuario?.id_permissao === 4) return;
 
     const formData = new FormData();
 
     formData.append("sr_descricao", data.sr_descricao || "");
     formData.append("id_municipio", usuario.id_municipio);
 
-    await api.post("addGestaoIndicadores", formData)
+    await api
+      .post("addGestaoIndicadores", formData)
       .then(() => {
         toast.notify("Descrição Saneamento Rural cadastrada com sucesso!", {
           title: "Sucesso!",
@@ -699,7 +779,7 @@ export default function GestaoIndicadores({
         });
       });
 
-      console.log("Dados enviados:", data);
+    console.log("Dados enviados:", data);
   }
   async function handleAddComunidadesTradicionais(data) {
     if (usuario?.id_permissao === 4) return;
@@ -710,7 +790,8 @@ export default function GestaoIndicadores({
     formData.append("ct_descricao", data.ct_descricao || "");
     formData.append("id_municipio", usuario.id_municipio);
 
-    await api.post("addGestaoIndicadores", formData)
+    await api
+      .post("addGestaoIndicadores", formData)
       .then(() => {
         toast.notify("Comunidades Tradicionais cadastrada com sucesso!", {
           title: "Sucesso!",
@@ -728,12 +809,12 @@ export default function GestaoIndicadores({
         });
       });
 
-      console.log("Dados enviados:", data);
+    console.log("Dados enviados:", data);
   }
 
-// ------------- Funções DELETE -------------
+  // ------------- Funções DELETE -------------
 
-  async function handleRemoverPresidente({id}) {
+  async function handleRemoverPresidente({ id }) {
     try {
       await api.delete(`delete-presidencia-conselho-municipal/${id}`);
       toast.notify("Presidente removido com sucesso!", {
@@ -834,9 +915,9 @@ export default function GestaoIndicadores({
       });
     getRepresentantes();
   }
-  async function handleRemoverConselho({id}){
+  async function handleRemoverConselho({ id }) {
     await api
-      .delete(`delete-conselho-municipal/${id}`, )
+      .delete(`delete-conselho-municipal/${id}`)
       .then((response) => {
         toast.notify("Conselho Municipal removido com sucesso!", {
           title: "Sucesso!",
@@ -854,21 +935,14 @@ export default function GestaoIndicadores({
     getConselhoMunicipal();
   }
 
-// ------------- Funções UPDATE -------------
+  // ------------- Funções UPDATE -------------
 
+  // ------------------------------------------
 
-// ------------------------------------------
-  
-
-async function handleSignOut() {
+  async function handleSignOut() {
     signOut();
   }
-  function handleShowModal() {
-    setShowModal(true);
-  }
-   function handleCloseModal() {
-    setShowModal(false);
-  }
+
   function handleShowModalPresidente() {
     setShowModalPresidente(true);
   }
@@ -901,6 +975,17 @@ async function handleSignOut() {
         : ""
     );
 
+    if (listPoliticas && listPoliticas.length > 0) {
+      formData.append(
+        "id_politica_municipal",
+        listPoliticas[0].id_politica_municipal
+      );
+    }
+
+    if (listPlanos && listPlanos.length > 0) {
+      formData.append("id_plano_municipal", listPlanos[0].id_plano_municipal);
+    }
+
     formData.append(
       "nome_associacao",
       data.nome_associacao ? data.nome_associacao : dadosGestao?.ga_nome
@@ -914,9 +999,36 @@ async function handleSignOut() {
     formData.append("pcs_arquivo", data.pcs_arquivo[0]);
     formData.append("pcs_titulo", data.pcs_titulo);
 
+    if (planoSituacao !== "nao_tem") {
+      formData.append("plano_ano", data.plano_ano);
+      if (data.plano_arquivo && data.plano_arquivo[0]) {
+        formData.append("plano_arquivo", data.plano_arquivo[0]);
+      }
+      formData.append("plano_titulo", data.plano_titulo);
+    }
+
+    formData.append("plano_situacao", planoSituacao);
     formData.append("plano_ano", data.plano_ano);
     formData.append("plano_arquivo", data.plano_arquivo[0]);
     formData.append("plano_titulo", data.plano_titulo);
+
+    if (politicaSituacao !== "nao_tem") {
+      formData.append("politica_ano", data.politica_ano);
+      if (data.politica_arquivo && data.politica_arquivo[0]) {
+        formData.append("politica_arquivo", data.politica_arquivo[0]);
+      }
+      formData.append("politica_titulo", data.politica_titulo);
+    }
+
+    formData.append("politica_situacao", politicaSituacao);
+    if (conselhoSituacao !== "nao_tem") {
+      formData.append("conselho_titulo", data.conselho_titulo);
+      formData.append("conselho_ano", data.conselho_ano);
+      if (data.conselho_arquivo && data.conselho_arquivo[0]) {
+        formData.append("conselho_arquivo", data.conselho_arquivo[0]);
+      }
+    }
+    formData.append("conselho_situacao", conselhoSituacao);
 
     formData.append("politica_ano", data.politica_ano);
     formData.append("politica_arquivo", data.politica_arquivo[0]);
@@ -945,27 +1057,36 @@ async function handleSignOut() {
         },
       })
       .then((response) => {
-        toast.notify("Representante cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
-        console.log(data);
-        getPoliticas();
-        getPlanos();
-        getParticipacoes();
-        getRepresentantes();
-        reset({
-          pcs_ano: "",
-          pcs_titulo: "",
-          pcs_arquivo: "",
-          plano_ano: "",
-          plano_titulo: "",
-          plano_arquivo: "",
-          politica_ano: "",
-          politica_titulo: "",
-          politica_arquivo: "",
-        });
+        if (response.data.success) {
+          toast.notify(response.data.message, {
+            title: "Sucesso!",
+            duration: 7,
+            type: "success",
+          });
+          getPoliticas();
+          getPlanos();
+          getParticipacoes();
+          getRepresentantes();
+          reset({
+            pcs_ano: "",
+            pcs_titulo: "",
+            pcs_arquivo: "",
+            plano_ano: "",
+            plano_titulo: "",
+            plano_arquivo: "",
+            politica_ano: "",
+            politica_titulo: "",
+            politica_arquivo: "",
+            ga_nome: "",
+            ga_norma: "",
+          });
+        } else {
+          toast.notify(response.data.message, {
+            title: "Erro!",
+            duration: 7,
+            type: "error",
+          });
+        }
       })
       .catch((error) => {
         toast.notify("Não foi possivel cadastrar o representante! ", {
@@ -973,448 +1094,1041 @@ async function handleSignOut() {
           duration: 7,
           type: "error",
         });
+        console.log(error);
       });
 
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
       {
-        params: {id_municipio: usuario.id_municipio },
+        params: { id_municipio: usuario?.id_municipio },
       }
     );
     const participacoes = await resParticipacao.data;
     setListParticipacoes(participacoes);
-
   }
 
+  function handleShowModal() {
+    setShowModal(true);
+  }
+  function handleCloseModal() {
+    setShowModal(false);
+    setShowModalPolitica(false);
+  }
 
+  async function updateRepresentantesServicos(data) {
+    if (!usuario.id_municipio || !data.id_representante_servicos_ga) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
 
+    await api
+      .put("updateRepresentanteServicos", {
+        id_representante_servicos_ga: data.id_representante_servicos_ga,
+        ga_nome_representante: data.ga_nome_representante,
+        ga_cargo: data.ga_cargo,
+        ga_telefone: data.ga_telefone,
+        ga_email: data.ga_email,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Representante atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getRepresentantes();
+        setShowModal(false);
+        setUpdateRepresentantes(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar o representante!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+        console.log(error);
+      });
+  }
 
-    if (!usuario?.id_municipio) {
+  async function updatePoliticaMunicipal(data: IPoliticas) {
+    console.log("Antes de atualizar politicas", data);
+
+    if (!usuario.id_municipio || !data.id_politica_municipal) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("updatePoliticaMunicipal", {
+        id_politica_municipal: data.id_politica_municipal,
+        politica_titulo: data.politica_titulo,
+        politica_ano: data.politica_ano,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Politica Municipal atualizada com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getPoliticas();
+        setShowModalPolitica(false);
+        setUpdatePolitica(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar a política municipal!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
+
+  async function handleEditarRepresentante(representante) {
+    setUpdateRepresentantes(representante);
+    setShowModal(true);
+
+    // Preenche os campos do formulário com os dados do representante
+    setValue(
+      "id_representante_servicos_ga",
+      representante.id_representante_servicos_ga
+    );
+    setValue("ga_nome_representante", representante.nome);
+    setValue("ga_cargo", representante.cargo);
+    setValue("ga_telefone", representante.telefone);
+    setValue("ga_email", representante.email);
+  }
+
+  async function handleEditarPolitica(politica: IPoliticas): Promise<void> {
+    setUpdatePolitica(politica);
+    setShowModalPolitica(true);
+
+    // Preenche os campos do formulário com os dados do representante
+    setValue("id_politica_municipal", politica.id_politica_municipal);
+    setValue("politica_titulo", politica.titulo);
+    setValue("politica_ano", politica.ano);
+  }
+
+  async function handleEditarParticipacao(
+    participacao: IParticipacao
+  ): Promise<void> {
+    setUpdateParticipacao(participacao);
+    setShowModalParticipacao(true);
+
+    // Preenche os campos do formulário com os dados da participação
+    setValue(
+      "id_participacao_controle_social",
+      participacao.id_participacao_controle_social
+    );
+    setValue("pcs_titulo", participacao.titulo);
+    setValue("pcs_ano", participacao.ano);
+  }
+
+  async function updateParticipacaoControleSocial(data: IParticipacao) {
+    if (!usuario.id_municipio || !data.id_participacao_controle_social) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("updateParticipacaoControleSocial", {
+        id_participacao_controle_social: data.id_participacao_controle_social,
+        pcs_titulo: data.pcs_titulo,
+        pcs_ano: data.pcs_ano,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Participação e Controle Social atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getParticipacoes();
+        setShowModalParticipacao(false);
+        setUpdateParticipacao(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar a participação!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
+
+  async function updatePresidenteConselho(data) {
+    console.log("Dados do presidente:", data);
+    if (
+      !usuario.id_municipio ||
+      !data.id_presidencia_conselho_municipal_saneamento_basico
+    ) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("update-presidencia-conselho-municipal", {
+        id_presidencia_conselho_municipal_saneamento_basico:
+          data.id_presidencia_conselho_municipal_saneamento_basico,
+        nome_presidente: data.nome_presidente,
+        telefone_presidente: data.telefone_presidente,
+        email_presidente: data.email_presidente,
+        setor_responsavel: data.setor_responsavel,
+        integrantes: data.integrantes,
+        id_municipio: usuario.id_municipio,
+      })
+      .then((response) => {
+        toast.notify("Presidente atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getPresidentesConselho(); // Atualiza a lista
+        setShowModalPresidente(false);
+        setUpdatePresidente(null);
+      })
+      .catch((error) => {
+        console.log(
+          "Erro ao atualizar presidente:",
+          error.response?.data || error
+        );
+        toast.notify("Não foi possível atualizar o presidente!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
+  }
+
+  async function handleEditarPresidente(presidente) {
+    setUpdatePresidente(presidente);
+    setShowModalPresidente(true);
+
+    setValue(
+      "id_presidencia_conselho_municipal_saneamento_basico",
+      presidente.id_presidencia_conselho_municipal_saneamento_basico
+    );
+    setValue("nome_presidente", presidente.nome_presidente);
+    setValue("telefone_presidente", presidente.telefone_presidente);
+    setValue("email_presidente", presidente.email_presidente);
+    setValue("setor_responsavel", presidente.setor_responsavel);
+    setValue("integrantes", presidente.integrantes);
+  }
+
+  if (!usuario?.id_municipio) {
     return null;
+  }
+
+  async function handleEditarPlano(plano: IPlanos): Promise<void> {
+    setUpdatePlano(plano);
+    setShowModalPlano(true);
+
+    setValue("id_plano_municipal", plano.id_plano_municipal);
+    setValue("plano_titulo", plano.titulo);
+    setValue("plano_ano", plano.ano);
+  }
+
+  async function updatePlanoMunicipal(data: IPlanos) {
+    console.log("Antes de atualizar plano", data);
+
+    if (!usuario.id_municipio || !data.id_plano_municipal) {
+      toast.notify("Dados insuficientes para atualizar!", {
+        title: "Erro!",
+        duration: 7,
+        type: "error",
+      });
+      return;
+    }
+
+    await api
+      .put("updatePlanoMunicipal", {
+        id_plano_municipal: data.id_plano_municipal,
+        plano_titulo: data.plano_titulo,
+        plano_ano: data.plano_ano,
+        id_municipio: usuario.id_municipio,
+        situacao: planoSituacao,
+      })
+      .then((response) => {
+        toast.notify("Plano Municipal atualizado com sucesso!", {
+          title: "Sucesso!",
+          duration: 7,
+          type: "success",
+        });
+        getPlanos();
+        setShowModalPlano(false);
+        setUpdatePlano(null);
+      })
+      .catch((error) => {
+        toast.notify("Não foi possível atualizar o plano municipal!", {
+          title: "Erro!",
+          duration: 7,
+          type: "error",
+        });
+      });
   }
 
   return (
     <Container>
       <ToastContainer></ToastContainer>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal
-        municipio={[]}
-      ></MenuHorizontal>
+      <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <Sidebar>
-        <SidebarItem active={activeForm === "gestaoAssociada"}
-        onClick={() => setActiveForm("gestaoAssociada")}
+        <SidebarItem
+          active={activeForm === "gestaoAssociada"}
+          onClick={() => setActiveForm("gestaoAssociada")}
         >
           Gestão Associada
         </SidebarItem>
-        <SidebarItem active={activeForm === "politicaSaneamento"}
-        onClick={() => setActiveForm("politicaSaneamento")}
+        <SidebarItem
+          active={activeForm === "politicaSaneamento"}
+          onClick={() => setActiveForm("politicaSaneamento")}
         >
           Política Municipal de Saneamento
         </SidebarItem>
-        <SidebarItem active={activeForm === "planoSaneamento"}
-        onClick={() => setActiveForm("planoSaneamento")}
+        <SidebarItem
+          active={activeForm === "planoSaneamento"}
+          onClick={() => setActiveForm("planoSaneamento")}
         >
           Plano Municipal de Saneamento
         </SidebarItem>
-        <SidebarItem active={activeForm === "conselhoSaneamento"}
-        onClick={() => setActiveForm("conselhoSaneamento")}
+        <SidebarItem
+          active={activeForm === "conselhoSaneamento"}
+          onClick={() => setActiveForm("conselhoSaneamento")}
         >
           Conselho Municipal de Saneamento Básico
         </SidebarItem>
-        <SidebarItem active={activeForm === "participacaoSocial"}
-        onClick={() => setActiveForm("participacaoSocial")}
+        <SidebarItem
+          active={activeForm === "participacaoSocial"}
+          onClick={() => setActiveForm("participacaoSocial")}
         >
           Participação e controle social
         </SidebarItem>
-        <SidebarItem active={activeForm === "saneamentoRural"}
-        onClick={() => setActiveForm("saneamentoRural")}
+        <SidebarItem
+          active={activeForm === "saneamentoRural"}
+          onClick={() => setActiveForm("saneamentoRural")}
         >
           Saneamento Rural
         </SidebarItem>
-        <SidebarItem active={activeForm === "comunidadesTradicionais"}
-        onClick={() => setActiveForm("comunidadesTradicionais")}
+        <SidebarItem
+          active={activeForm === "comunidadesTradicionais"}
+          onClick={() => setActiveForm("comunidadesTradicionais")}
         >
           Comunidades Tradicionais
         </SidebarItem>
       </Sidebar>
-    <MainContent>
-      <BreadCrumb/>
-      <DivCenter>
-        {activeForm === "gestaoAssociada" && (
-          <Form onSubmit={handleSubmitGestao(handleAddGestaoAssociada)}>
-          <DivFormCadastro active>
-            <DivTituloForm>Gestão Associada</DivTituloForm>
-            
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Nome da associação</label>
-                    <input
-                      {...registerGestao("nome_associacao")}
-                      required
-                      defaultValue={dadosGestao?.ga_nome}
-                      type="text"
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputG>
-                    <label>
-                      Norma da associação<span> *</span>
-                    </label>
-                    <input
-                      {...registerGestao("norma_associacao")}
-                      defaultValue={dadosGestao?.ga_norma}
-                      required
-                      type="text"
-                    ></input>
-                  </InputG>
-                </td>
-              </tr>
-            </table>
-            <DivEixo>
-              Representantes{" "}
-              <span
-                onClick={() => {
-                  handleShowModal();
+
+      <MainContent>
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <DivFormCadastro active={activeForm === "gestaoAssociada"}>
+              <DivTituloForm>Gestão Associada</DivTituloForm>
+
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Nome da associação</label>
+                      <input
+                        {...register("nome_associacao")}
+                        defaultValue={dadosGestao?.ga_nome}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputG>
+                      <label>
+                        Norma da associação<span> *</span>
+                      </label>
+                      <input
+                        {...register("norma_associacao")}
+                        defaultValue={dadosGestao?.ga_norma}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputG>
+                  </td>
+                </tr>
+              </table>
+              <DivEixo>
+                Representantes{" "}
+                <span
+                  onClick={() => {
+                    handleShowModal();
+                  }}
+                >
+                  Adicionar
+                </span>
+              </DivEixo>
+
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {representantes && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Cargo</th>
+                        <th>Telefone</th>
+                        <th>email</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+
+                    {representantes?.map((representante, index) => (
+                      <tr role="row" key={index}>
+                        <td>{representante.id_representante_servicos_ga}</td>
+                        <td>
+                          <InputM>{representante.nome}</InputM>
+                        </td>
+                        <td>{representante.cargo}</td>
+                        <td>{representante.telefone}</td>
+                        <td>{representante.email}</td>
+                        <td style={{ justifyContent: "center" }}>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() =>
+                                handleEditarRepresentante(representante)
+                              }
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                            />
+
+                            <Image
+                              onClick={() =>
+                                handleRemoverRepresentante({
+                                  id: representante.id_representante_servicos_ga,
+                                })
+                              }
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
                 }}
               >
-                Adicionar
-              </span>{" "}
-            </DivEixo>
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
 
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {representantes && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Cargo</th>
-                      <th>Telefone</th>
-                      <th>email</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
+            <DivFormCadastro active={activeForm === "politicaSaneamento"}>
+              <DivTituloForm>
+                Política Municipal de Saneamento Básico
+              </DivTituloForm>
 
-                  {representantes?.map((representante, index) => (
-                    <tr role="row" key={index}>
-                      <td>{representante.id_representante_servicos_ga}</td>
-                      <td>
-                        <InputM>{representante.nome}</InputM>
-                      </td>
-                      <td>{representante.cargo}</td>
-                      <td>{representante.telefone}</td>
-                      <td>{representante.email}</td>
-                      <td  style={{ justifyContent: "center"}}>
-                        <Actions>
-
-                          {/* <Image
-                            title="Editar"
-                            // onClick={() =>
-                            //  updat
-                            // }
-
-                            src={Editar}
-                            alt="Editar"
-                            width={25}
-                            height={25}
-                          />
-                         */}
-                          <Image
-                            onClick={() =>
-                              handleRemoverRepresentante({
-                                id: representante.id_representante_servicos_ga,
-                              })
-                            }
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                          />
-                        </Actions>
-                        
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
-
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              <SubmitButton type="submit">Gravar</SubmitButton>
-            </SubmitButtonContainer>
-
-          </DivFormCadastro>
-        </Form>  
-        )}
-
-        {activeForm === "politicaSaneamento" && (
-        <Form onSubmit={handleSubmitPolitica(handleAddPolitica)}>
-          <DivFormCadastro active>
-            <DivTituloForm>
-              Política Municipal de Saneamento Básico
-            </DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Título</label>
+              <div style={{ marginBottom: "20px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Situação da Política Municipal:
+                </label>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
                     <input
-                      {...registerPolitica("politica_titulo")}
-                      defaultValue={dadosGestao?.politica_titulo}
-                      onChange={(e) => {
-                        const value = capitalizeFrasal(e.target.value);
-                        setValue("politica_titulo", value);
-                      }}
-                      type="text"
-                      //aceita apenas letras e caracteres especiais
-                      onKeyPress={onlyLettersAndCharacters}
-                      required
-                      style={{ textTransform: "capitalize" }}
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputP>
-                    <label>Ano</label>
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "aprovado"}
+                      onChange={() => handlePoliticaSituacaoChange("aprovado")}
+                    />
+                    Aprovado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
                     <input
-                      {...registerPolitica("politica_ano")}
-                      defaultValue={dadosGestao?.politica_ano}
-                      onChange={handleOnChange}
-                      type="text"
-                      //aceita apenas números
-                      onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      required
-                    ></input>
-                  </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "elaborado"}
+                      onChange={() => handlePoliticaSituacaoChange("elaborado")}
+                    />
+                    Elaborado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
                     <input
-                      {...registerPolitica("politica_arquivo")}
-                      type="file"
-                      required
-                    ></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "em_construcao"}
+                      onChange={() =>
+                        handlePoliticaSituacaoChange("em_construcao")
+                      }
+                    />
+                    Em construção
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="politica_situacao"
+                      checked={politicaSituacao === "nao_tem"}
+                      onChange={() => handlePoliticaSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+              </div>
 
-            <DivEixo>Atualizações</DivEixo>
-
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {listPoliticas && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-                  {listPoliticas?.map((politica, index) => (
-                    <tr key={index}>
-                      <td>{politica.id_politica_municipal}</td>
-                      <td>
-                        <InputG>{politica.titulo}</InputG>
-                      </td>
-                      <td>{politica.ano}</td>
-                      <td>
-                        <Actions>
-                          <a
-                            href={politica.file}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() => {
-                              handleRemoverPolitica({
-                                id: politica.id_politica_municipal,
-                                id_arquivo: politica.id_arquivo,
-                              });
-                            }}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
-
-          
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-
-          </DivFormCadastro>
-        </Form>
-        )}
-
-        {activeForm === "planoSaneamento" &&(
-        <Form onSubmit={handleSubmitPlano(handleAddPlano)}>
-          <DivFormCadastro active>
-            <DivTituloForm>Plano Municipal de Saneamento Básico</DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Título</label>
-                    <input {...registerPlano("plano_titulo")} type="text"
-                    required
-                    style={{textTransform: "capitalize"}}
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputP>
-                    <label>Ano</label>
-                    <input {...registerPlano("plano_ano")} type="text"
-                    onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      required
-                    ></input>
-                  </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input {...registerPlano("plano_arquivo")} type="file"
-                    required></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
-
-            <DivEixo>Atualizações</DivEixo>
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {listPlanos && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {listPlanos?.map((plano, index) => (
-                    <tr key={index}>
-                      <td>{plano.id_plano_municipal}</td>
-                      <td>
-                        <InputG>{plano.titulo}</InputG>
-                      </td>
-                      <td>{plano.ano}</td>
-                      <td>
-                        <Actions>
-                          <a href={plano.file} rel="noreferrer" target="_blank">
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() => {
-                              handleRemoverPlano({
-                                id: plano.id_plano_municipal,
-                                id_arquivo: plano.id_arquivo,
-                              });
-                            }}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-          </DivFormCadastro>
-        </Form>
-        )}
-
-        {activeForm === "conselhoSaneamento" && (
-        <Form onSubmit={handleSubmitConselho(handleAddConselhoMunicipal)}>  
-          <DivFormCadastro active
-          // style={{maxWidth: "1045px"}}
-          > 
-            <DivTituloForm>
-              Conselho Municipal de Saneamento Básico
-            </DivTituloForm>
-            
-            <table style={{width: '100%', display: 'flex', justifyContent: "center"}}>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Título</label>
-                    <input 
-                    {...registerConselho("titulo")} type="text"
-                    required  
-                    style={{textTransform: "capitalize"}}
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Título</label>
+                      <input
+                        {...register("politica_titulo")}
+                        defaultValue={dadosGestao?.politica_titulo}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("politica_titulo", value);
+                        }}
+                        type="text"
+                        //aceita apenas letras e caracteres especiais
+                        onKeyPress={onlyLettersAndCharacters}
+                        disabled={politicaSituacao === "nao_tem"}
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
                     <InputP>
                       <label>Ano</label>
-                      <input 
-                      {...registerConselho("ano")} type="text"
-                      onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      required
+                      <input
+                        {...register("politica_ano")}
+                        defaultValue={dadosGestao?.politica_ano}
+                        onChange={handleOnChange}
+                        type="text"
+                        //aceita apenas números
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        disabled={politicaSituacao === "nao_tem"}
                       ></input>
                     </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input
-                    {...registerConselho("arquivo")}
-                     type="file"
-                    required
-                    ></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input
+                        {...register("politica_arquivo")}
+                        type="file"
+                        disabled={politicaSituacao === "nao_tem"}
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </table>
 
-            <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
+              <DivEixo>Atualizações</DivEixo>
+
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {listPoliticas && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+                    {listPoliticas?.map((politica, index) => (
+                      <tr key={index}>
+                        <td>{politica.id_politica_municipal}</td>
+                        <td>
+                          <InputG>{politica.titulo}</InputG>
+                        </td>
+                        <td>{politica.ano}</td>
+                        <td>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() => handleEditarPolitica(politica)}
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                              style={{
+                                cursor:
+                                  politicaSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                              {...(politicaSituacao === "nao_tem"
+                                ? { onClick: (e) => e.preventDefault() }
+                                : {})}
+                            />
+                            <a
+                              href={politica.file}
+                              rel="noreferrer"
+                              target="_blank"
+                              style={{
+                                pointerEvents:
+                                  politicaSituacao === "nao_tem"
+                                    ? "none"
+                                    : "auto",
+                                opacity:
+                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                            >
+                              <FaFilePdf></FaFilePdf>
+                            </a>
+                            <Image
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              onClick={() => {
+                                if (politicaSituacao !== "nao_tem") {
+                                  handleRemoverPolitica({
+                                    id: politica.id_politica_municipal,
+                                    id_arquivo: politica.id_arquivo,
+                                  });
+                                }
+                              }}
+                              style={{
+                                cursor:
+                                  politicaSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton
+                    type="submit"
+                    disabled={politicaSituacao === "nao_tem"}
+                    style={{
+                      opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "planoSaneamento"}>
+              <DivTituloForm>
+                Plano Municipal de Saneamento Básico
+              </DivTituloForm>
+              <div style={{ marginBottom: "20px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Situação do Plano Municipal:
+                </label>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "aprovado"}
+                      onChange={() => handlePlanoSituacaoChange("aprovado")}
+                    />
+                    Aprovado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "elaborado"}
+                      onChange={() => handlePlanoSituacaoChange("elaborado")}
+                    />
+                    Elaborado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "em_construcao"}
+                      onChange={() =>
+                        handlePlanoSituacaoChange("em_construcao")
+                      }
+                    />
+                    Em construção
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "nao_tem"}
+                      onChange={() => handlePlanoSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+              </div>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Título</label>
+                      <input
+                        {...register("plano_titulo")}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("plano_titulo", value);
+                        }}
+                        onKeyPress={onlyLettersAndCharacters}
+                        disabled={planoSituacao === "nao_tem"}
+                      />
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input
+                        {...register("plano_ano")}
+                        type="text"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        disabled={planoSituacao === "nao_tem"}
+                      />
+                    </InputP>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input
+                        {...register("plano_arquivo")}
+                        type="file"
+                        disabled={planoSituacao === "nao_tem"}
+                      />
+                    </InputM>
+                  </td>
+                </tr>
+              </table>
+
+              <DivEixo>Atualizações</DivEixo>
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {listPlanos && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+
+                    {listPlanos?.map((plano, index) => (
+                      <tr key={index}>
+                        <td>{plano.id_plano_municipal}</td>
+                        <td>
+                          <InputG>{plano.titulo}</InputG>
+                        </td>
+                        <td>{plano.ano}</td>
+                        <td>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() => handleEditarPlano(plano)}
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                              style={{
+                                cursor:
+                                  planoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                              {...(planoSituacao === "nao_tem"
+                                ? { onClick: (e) => e.preventDefault() }
+                                : {})}
+                            />
+                            <a
+                              href={plano.file}
+                              rel="noreferrer"
+                              target="_blank"
+                              style={{
+                                pointerEvents:
+                                  planoSituacao === "nao_tem" ? "none" : "auto",
+                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                            >
+                              <FaFilePdf></FaFilePdf>
+                            </a>
+                            <Image
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              onClick={() => {
+                                if (planoSituacao !== "nao_tem") {
+                                  handleRemoverPlano({
+                                    id: plano.id_plano_municipal,
+                                    id_arquivo: plano.id_arquivo,
+                                  });
+                                }
+                              }}
+                              style={{
+                                cursor:
+                                  planoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton
+                    type="submit"
+                    disabled={planoSituacao === "nao_tem"}
+                    style={{
+                      opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "conselhoSaneamento"}>
+              <DivTituloForm>
+                Conselho Municipal de Saneamento Básico
+              </DivTituloForm>
+              <div style={{ marginBottom: "20px" }}>
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  Situação do Conselho Municipal:
+                </label>
+                <div style={{ display: "flex", gap: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "operante"}
+                      onChange={() => handleConselhoSituacaoChange("operante")}
+                    />
+                    Operante
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "nao_operante"}
+                      onChange={() =>
+                        handleConselhoSituacaoChange("nao_operante")
+                      }
+                    />
+                    Não operante
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "nao_tem"}
+                      onChange={() => handleConselhoSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+              </div>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Título</label>
+                      <input
+                        {...register("conselho_titulo")}
+                        defaultValue={dadosGestao?.conselho_titulo}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("conselho_titulo", value);
+                        }}
+                        onKeyPress={onlyLettersAndCharacters}
+                        disabled={conselhoSituacao === "nao_tem"}
+                      />
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input
+                        {...register("conselho_ano")}
+                        defaultValue={dadosGestao?.conselho_ano}
+                        onChange={handleOnChange}
+                        type="text"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        disabled={conselhoSituacao === "nao_tem"}
+                      />
+                    </InputP>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input
+                        {...register("conselho_arquivo")}
+                        type="file"
+                        disabled={conselhoSituacao === "nao_tem"}
+                      ></input>
+                    </InputM>
+                  </td>
+                </tr>
+              </table>
+              <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
               Presidente{" "}
                <ButtonAdicionarPresidente
                onClick={handleShowModalPresidente}
@@ -1424,69 +2138,97 @@ async function handleSignOut() {
               </ButtonAdicionarPresidente>
             </DivEixo>
 
-            <Tabela style={{overflow: 'auto'}}>
-              <table cellSpacing={0}>
-                <tbody>
-                  {conselho && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Presidente</th>
-                      <th>Telefone</th>
-                      <th>email</th>
-                      <th>Setor Responsável</th>
-                      <th>Integrantes</th>
-                      {/* <th>Município</th> */}
-                      <th>Ações</th>
-                    </tr>
-                  )}
+              <Tabela style={{ overflow: "scroll" }}>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {conselho && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Presidente</th>
+                        <th>Telefone</th>
+                        <th>email</th>
+                        <th>Setor Responsável</th>
+                        <th>Integrantes</th>
+                        <th>Município</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
 
-                  {conselho?.map((presidente, index) => (
-                    <tr role="row" key={index}>
-                      <td>{presidente.id_presidencia_conselho_municipal_saneamento_basico}</td>
-                      <td>
-                        <InputM>{presidente.nome_presidente}</InputM>
-                      </td>
-                        
-                      <td style={{whiteSpace: 'nowrap'}} >
-                        {presidente.telefone_presidente}</td>
-                      <td>{presidente.email_presidente}</td>
-                      <td>{presidente.setor_responsavel}</td>
-                      <td
-                      style={{
-                            whiteSpace: 'nowrap'}}>
-                      {presidente.integrantes}</td>
-                      {/* <td>{presidente.id_municipio}</td> */}
-                      <td>
-                        <Actions>
-                          {/* <Image
-                            title="Editar"
-                            onClick={() => editPresidente(presidente)}
-                            src={Editar}
-                            alt="Editar"
-                            width={25}
-                            height={25}
-                          /> */}
-                          
-                          <Image
-                            onClick={() =>
-                              handleRemoverPresidente(
-                                {id:presidente.id_presidencia_conselho_municipal_saneamento_basico,}
-                              )
-                            }
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Tabela>
+                    {conselho?.map((presidente, index) => (
+                      <tr role="row" key={index}>
+                        <td>
+                          {
+                            presidente.id_presidencia_conselho_municipal_saneamento_basico
+                          }
+                        </td>
+                        <td>
+                          <InputM>{presidente.nome_presidente}</InputM>
+                        </td>
 
-            <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {presidente.telefone_presidente}
+                        </td>
+                        <td>{presidente.email_presidente}</td>
+                        <td>{presidente.setor_responsavel}</td>
+                        <td
+                          style={{
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {presidente.integrantes}
+                        </td>
+                        <td>{presidente.id_municipio}</td>
+                        <td>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() => handleEditarPresidente(presidente)}
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                              style={{
+                                cursor:
+                                  conselhoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                              {...(conselhoSituacao === "nao_tem"
+                                ? { onClick: (e) => e.preventDefault() }
+                                : {})}
+                            />
+
+                            <Image
+                              onClick={() => {
+                                if (conselhoSituacao !== "nao_tem") {
+                                  handleRemoverPresidente({
+                                    id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
+                                  });
+                                }
+                              }}
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              style={{
+                                cursor:
+                                  conselhoSituacao === "nao_tem"
+                                    ? "not-allowed"
+                                    : "pointer",
+                                opacity:
+                                  conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                              }}
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+              <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
               Atualizações
             </DivEixo>
             <Tabela>
@@ -1532,453 +2274,705 @@ async function handleSignOut() {
               </table>
              </Tabela>
 
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton
+                    type="submit"
+                    disabled={conselhoSituacao === "nao_tem"}
+                    style={{
+                      opacity: conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
 
-            
-          
-
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-            
-          </DivFormCadastro>
-        </Form>
-        )}
-
-        {activeForm === "participacaoSocial" && (
-        <Form onSubmit={handleSubmitParticipacao(handleAddParticipacao)}>
-          <DivFormCadastro active>
-            <DivTituloForm>Participação e Controle Social</DivTituloForm>
-            <table>
-              <tr>
-                <td>
-                  <InputG>
-                    <label>Titulo</label>
-                    <input
-                      {...registerParticipacao("pcs_titulo")}
-                      onChange={(e) => {
-                        const value = capitalizeFrasal(e.target.value);
-                        setValue("pcs_titulo", value);
-                      }}
-                      type="text"
-                      onKeyPress={onlyLettersAndCharacters}
-                      style={{ textTransform: "capitalize" }}
-                      required
-                    ></input>
-                  </InputG>
-                </td>
-                <td>
-                  <InputP>
-                    <label>Ano</label>
-                    <input
-                      {...registerParticipacao("pcs_ano")}
-                      type="text"
-                      onKeyPress={(e) => {
-                        if (!/[0-9]/.test(e.key)) {
-                          e.preventDefault();
-                        }
-                      }}
-                      required
-                    ></input>
-                  </InputP>
-                </td>
-                <td>
-                  <InputM>
-                    <label>Arquivo</label>
-                    <input {...registerParticipacao("pcs_arquivo")}
-                    required
-                    type="file"></input>
-                  </InputM>
-                </td>
-              </tr>
-            </table>
-
-            <DivEixo>Atualizações</DivEixo>
-
-            <Tabela>
-              <table cellSpacing={0}>
-                <tbody>
-                  {listParticipacoes && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {listParticipacoes?.map((participacao, index) => (
-                    <tr key={index}>
-                      <td>{participacao.id_participacao_controle_social}</td>
-                      <td>
-                        <InputG>{participacao.titulo}</InputG>
-                      </td>
-                      <td>{participacao.ano}</td>
-                      <td>
-                        <Actions>
-                          <a
-                            href={participacao.file}
-                            rel="noreferrer"
-                            target="_blank"
-                          >
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() =>
-                              handleRemoverParticipacao({
-                                id: participacao.id_participacao_controle_social,
-                                id_arquivo: participacao.id_arquivo,
-                              })
-                            }
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+            <DivFormCadastro active={activeForm === "participacaoSocial"}>
+              <DivTituloForm>Participação e Controle Social</DivTituloForm>
+              <table>
+                <tr>
+                  <td>
+                    <InputG>
+                      <label>Titulo</label>
+                      <input
+                        {...register("pcs_titulo")}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("pcs_titulo", value);
+                        }}
+                        type="text"
+                        onKeyPress={onlyLettersAndCharacters}
+                      ></input>
+                    </InputG>
+                  </td>
+                  <td>
+                    <InputP>
+                      <label>Ano</label>
+                      <input
+                        {...register("pcs_ano")}
+                        type="text"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                      ></input>
+                    </InputP>
+                  </td>
+                  <td>
+                    <InputM>
+                      <label>Arquivo</label>
+                      <input {...register("pcs_arquivo")} type="file"></input>
+                    </InputM>
+                  </td>
+                </tr>
               </table>
-            </Tabela>
 
-          {/* </DivFormCadastro>
-          <DivForm> */}
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-          </DivFormCadastro>
-         </Form> 
-        )}
+              <DivEixo>Atualizações</DivEixo>
 
-        {activeForm === "saneamentoRural" && (
-       <Form onSubmit={handleSubmitSR(handleAddSaneamentoRural)}>
-          <DivFormCadastro
-          style={{minWidth: "1045px", minHeight: "380px"}}
-          active>
-          
-            <DivTituloForm style={{display: "flex",alignItems: "center", gap: "10px"}}>
-              Saneamento Rural
+              <Tabela>
+                <table cellSpacing={0}>
+                  <tbody>
+                    {listParticipacoes && (
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Ano</th>
+                        <th>Ações</th>
+                      </tr>
+                    )}
+
+                    {listParticipacoes?.map((participacao, index) => (
+                      <tr key={index}>
+                        <td>{participacao.id_participacao_controle_social}</td>
+                        <td>
+                          <InputG>{participacao.titulo}</InputG>
+                        </td>
+                        <td>{participacao.ano}</td>
+                        <td>
+                          <Actions>
+                            <Image
+                              title="Editar"
+                              onClick={() =>
+                                handleEditarParticipacao(participacao)
+                              }
+                              src={Editar}
+                              alt="Editar"
+                              width={25}
+                              height={25}
+                            />
+                            <a
+                              href={participacao.file}
+                              rel="noreferrer"
+                              target="_blank"
+                            >
+                              <FaFilePdf></FaFilePdf>
+                            </a>
+                            <Image
+                              src={Excluir}
+                              alt="Excluir"
+                              width={25}
+                              height={25}
+                              onClick={() =>
+                                handleRemoverParticipacao({
+                                  id: participacao.id_participacao_controle_social,
+                                  id_arquivo: participacao.id_arquivo,
+                                })
+                              }
+                            />
+                          </Actions>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Tabela>
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "saneamentoRural"}
+            style={{minWidth: "1045px", minHeight: "380px"}}>
+              <DivTituloForm style={{display: "flex",alignItems: "center", gap: "10px"}}>
+                Saneamento Rural
+                <Actions>
+                  <Tooltip>
+                  <Image
+                    src={ajuda}
+                    alt="Ajuda"
+                    width={20}
+                    height={20}
+                    style={{ cursor: "pointer" }}
+                  />
+                    <TooltipText>
+                      Insira informações sobre o saneamento rural, como por exemplo:
+                      informações sobre população rural, situação atual dos serviços de saneamento,
+                      aspectos ambientais, etc.
+                    </TooltipText>
+                  </Tooltip>
+                </Actions>
+                </DivTituloForm>
+              <DivTextArea>
+                <label>Breve Descrição</label>
+                <textarea
+                  ref={txtArea}
+                  {...register("sr_descricao")}
+                  onChange={handleOnChange}
+                  // required
+                ></textarea>
+              </DivTextArea>
+
+              <SubmitButtonContainer style={{
+                bottom: "-50px",
+                right: "-10px"
+              }}>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+              </SubmitButtonContainer>
+            </DivFormCadastro>
+
+            <DivFormCadastro active={activeForm === "comunidadesTradicionais"}
+            style={{minWidth: "1045px", height: "658px"}}
+           >
+            <DivTituloForm style={{display: "flex", alignItems: "center", gap: "10px"}}>Comunidades Tradicionais
               <Actions>
-                <Tooltip>
-                <Image
-                  src={ajuda}
-                  alt="Ajuda"
-                  width={20}
-                  height={20}
-                  style={{ cursor: "pointer" }}
-                />
-                  <TooltipText>
-                    Insira informações sobre o saneamento rural, como por exemplo:
-                    informações sobre população rural, situação atual dos serviços de saneamento,
-                    aspectos ambientais, etc.
-                  </TooltipText>
-                </Tooltip>
-              </Actions>
-              </DivTituloForm>
-            <DivTextArea>
-              <label>Breve Descrição</label>
-              <textarea
-                ref={txtArea}
-                {...registerSR("sr_descricao")}
-                onChange={handleOnChange}
-                required
-              ></textarea>
-            </DivTextArea>
+                  <Tooltip>
+                  <Image
+                    src={ajuda}
+                    alt="Ajuda"
+                    width={20}
+                    height={20}
+                    style={{ cursor: "pointer" }}
+                  />
+                    <TooltipText>
+                      Insira informações sobre as comunidades tradicionais, como por exemplo:
+                      condições da infraestrutura e serviços de saneamento nessas comunidades.
+                    </TooltipText>
+                  </Tooltip>
+                </Actions>
 
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
-          </DivFormCadastro>
-        </Form>
-        )}
+            </DivTituloForm>
 
-        {activeForm === "comunidadesTradicionais" && (
-        <Form onSubmit={handleSubmitCT(handleAddComunidadesTradicionais)}>
-          <DivFormCadastro 
-          style={{minWidth: "1045px", height: "658px"}}
-          active={activeForm === "comunidadesTradicionais"}>
-          <DivTituloForm style={{display: "flex", alignItems: "center", gap: "10px"}}>Comunidades Tradicionais
-            <Actions>
-                <Tooltip>
-                <Image
-                  src={ajuda}
-                  alt="Ajuda"
-                  width={20}
-                  height={20}
-                  style={{ cursor: "pointer" }}
-                />
-                  <TooltipText>
-                    Insira informações sobre as comunidades tradicionais, como por exemplo:
-                    condições da infraestrutura e serviços de saneamento nessas comunidades.
-                  </TooltipText>
-                </Tooltip>
-              </Actions>
+              <DivTextArea>
+                <label>Nome das Comunidades Beneficiadas</label>
 
-          </DivTituloForm>
+                <textarea
+                  ref={txtArea}
+                  {...register("ct_nomes_comunidades")}
+                  // required
+                ></textarea>
 
-            <DivTextArea>
-              <label>Nome das Comunidades Beneficiadas</label>
+                <label>Breve Descrição</label>
 
-              <textarea
-                ref={txtArea}
-                {...registerCT("ct_nomes_comunidades")}
-                required
-              ></textarea>
+                <textarea
+                  ref={txtArea}
+                  {...register("ct_descricao")}
+                  // required
+                ></textarea>
+              </DivTextArea>
+              <SubmitButtonContainer style={{
+                bottom: "-50px",
+                right: "-10px"
+              }}>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+              </SubmitButtonContainer>
 
-              <label>Breve Descrição</label>
+            </DivFormCadastro>
 
-              <textarea
-                ref={txtArea}
-                {...registerCT("ct_descricao")}
-                required
-              ></textarea>
-            </DivTextArea>
-            <SubmitButtonContainer style={{
-              bottom: "-50px",
-              right: "-10px"
-            }}>
-              {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-            </SubmitButtonContainer>
+          </Form>
 
-          </DivFormCadastro>
-        </Form>  
-        )}
-
-        {ShowModalPresidente && (
-          <ContainerModal>
-            <Modal>
-              <Form onSubmit={handleSubmit(handleAddPresidente)}>
-                <CloseModalButton
-                  onClick={() => {
-                    handleCloseModalPresidente();
-                  }}
-                >
-                  X
-                </CloseModalButton>
-                <ConteudoModal>
-
-                  <DivTituloForm
-                  style={{marginTop: "-25px", width: "1370px", marginLeft: "-25px"}}>Adicionar presidente do conselho
-                  </DivTituloForm>
-
-                  {conselhoMunicipal && conselhoMunicipal.length === 1 && (
-                    <input
-                      type="hidden"
-                      {...register("id_conselho_municipal_saneamento_basico")}
-                      value={conselhoMunicipal[0].id_conselho_municipal_saneamento_basico}
-                      readOnly
-                    />
+          {ShowModalPresidente && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updatePresidente
+                      ? updatePresidenteConselho
+                      : handleAddPresidente
                   )}
-
-                  <InputP>
-                  <input
-                      type="hidden"
-                      {...register("id_presidencia_conselho_municipal_saneamento_basico")}
-                    />
-                  </InputP>
-                  <InputG>
-                    <label>
-                      Nome<span> *</span>
-                    </label>
-                    <input
-                      {...register("nome_presidente", {
-                        required: "O nome é obrigatório",
-                      })}
-                      onKeyPress={onlyLettersAndCharacters}
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("nome_presidente", value);
-                      }}
-                      type="text"
-                    ></input>
-                  </InputG>
-                   {errors.nome_presidente && <span>{errors.nome_presidente.message}</span>}
-                  <InputP>
-                    <label>
-                      Telefone<span> *</span>
-                    </label>
-                    <Controller
-                      name="telefone_presidente"
-                      control={control}
-                      rules={{ required: "O telefone é obrigatório" }}
-                      render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <>
-                          <InputMask
-                            mask="(99) 99999-9999"
-                            maskChar={null}
-                            value={value}
-                            onChange={e => onChange(e.target.value)}
-                          >
-                            {(inputProps) => (
-                              <input {...inputProps} type="text" />
-                            )}
-                          </InputMask>
-                          {error && <span>{error.message}</span>}
-                        </>
-                      )}
-                    />
-                  </InputP>
-                  {errors.telefone_presidente && <span>{errors.telefone_presidente.message}</span>}
-                  <InputP>
-                    <label>
-                     Email<span> *</span>
-                    </label>
-                    <input
-                      {...register("email_presidente", {required: "O email é obrigatório"})}
-                      // defaultValue={dadosGestao?.ga_telefone}
-                      onChange={handleOnChange}
-                      type="text"
-                    ></input>
-                  </InputP>
-                  {errors.email_presidente && <span>{errors.email_presidente.message}</span>}
-                  <InputM>
-                    <label>
-                      Setor Responsável<span> *</span>
-                    </label>
-                    <input
-                      {...register("setor_responsavel", {required: "O setor é obrigatório"})}
-                      onKeyPress={onlyLettersAndCharacters}
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("setor_responsavel", value)}}
-                      type="text"
-                    ></input>
-                  </InputM>
-                  {errors.setor_responsavel && <span>{errors.setor_responsavel.message}</span>}
-                  
-                  
-                  <InputG>
-                    <label>
-                     Integrantes<span> *</span>
-                    </label>
-                    <input
-                      {...register("integrantes", {required: "Os integrantes são obrigatórios"})}
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("integrantes", value);}}
-                      type="text"
-                    ></input>
-                  </InputG>
-                  {errors.integrantes && <span>{errors.integrantes.message}</span>}
-                  
-
-                  <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
-                </ConteudoModal>
-              </Form>
-            </Modal>
-          </ContainerModal>
-        )}
-        
-        {showModal && (
-          <ContainerModal>
-            <Modal>
-              <Form onSubmit={handleSubmit(handleAddRepresentante)}>
-                <CloseModalButton
-                  onClick={() => {
-                    handleCloseModal();
-                  }}
                 >
-                  X
-                </CloseModalButton>
+                  <CloseModalButton
+                    onClick={() => {
+                      handleCloseModalPresidente();
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Nome<span> *</span>
+                      </label>
+                      <input
+                        {...register("nome_presidente", {
+                          required: "O nome é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        style={{ textTransform: "capitalize" }}
+                        onChange={(e) => {
+                          const value = toTitleCase(e.target.value);
+                          setValue("nome_presidente", value);
+                        }}
+                        type="text"
+                      ></input>
+                    </InputG>
+                    {errors.nome_presidente && (
+                      <span>{errors.nome_presidente.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <Controller
+                        name="telefone_presidente"
+                        control={control}
+                        rules={{ required: "O telefone é obrigatório" }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <InputMask
+                              mask="(99) 99999-9999"
+                              maskChar={null}
+                              value={value}
+                              onChange={(e) => onChange(e.target.value)}
+                            >
+                              {(inputProps) => (
+                                <input {...inputProps} type="text" />
+                              )}
+                            </InputMask>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
+                    </InputP>
+                    {errors.telefone_presidente && (
+                      <span>{errors.telefone_presidente.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("email_presidente", {
+                          required: "O email é obrigatório",
+                        })}
+                        // defaultValue={dadosGestao?.ga_telefone}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputP>
+                    {errors.email_presidente && (
+                      <span>{errors.email_presidente.message}</span>
+                    )}
+                    <InputM>
+                      <label>
+                        Setor Responsável<span> *</span>
+                      </label>
+                      <input
+                        {...register("setor_responsavel", {
+                          required: "O setor é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        style={{ textTransform: "capitalize" }}
+                        onChange={(e) => {
+                          const value = toTitleCase(e.target.value);
+                          setValue("setor_responsavel", value);
+                        }}
+                        type="text"
+                      ></input>
+                    </InputM>
+                    {errors.setor_responsavel && (
+                      <span>{errors.setor_responsavel.message}</span>
+                    )}
+                    <InputG>
+                      <label>
+                        Integrantes<span> *</span>
+                      </label>
+                      <input
+                        {...register("integrantes", {
+                          required: "Os integrantes são obrigatórios",
+                        })}
+                        style={{ textTransform: "capitalize" }}
+                        onChange={(e) => {
+                          const value = toTitleCase(e.target.value);
+                          setValue("integrantes", value);
+                        }}
+                        type="text"
+                      ></input>
+                    </InputG>
+                    {errors.integrantes && (
+                      <span>{errors.integrantes.message}</span>
+                    )}
+                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
 
-                <ConteudoModal>
-                  <DivTituloForm
-                  style={{marginTop: "-25px", width: "1370px", marginLeft: "-25px"}}>Adicionar representante
-                  </DivTituloForm>
-                  <InputG>
-                    <label>
-                      Nome<span> *</span>
-                    </label>
-                    <input
-                      {...register("ga_nome_representante", {
-                        required: "O nome é obrigatório",
-                      })}
-                      onKeyPress={onlyLettersAndCharacters}
-                      type="text"
-                      style={{ textTransform: "capitalize" }}
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("ga_nome_representante", value);
-                      }}
-                    ></input>
-                  </InputG>
-                  {errors.ga_nome_representante && (
-                    <span>{errors.ga_nome_representante.message}</span>
+          {showModalPolitica && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updatePolitica
+                      ? updatePoliticaMunicipal
+                      : handleAddRepresentante
                   )}
-                  <InputP>
-                    <label>
-                      Cargo<span> *</span>
-                    </label>
-                    <input
-                      {...register("ga_cargo", {
-                        required: "O cargo é obrigatório",
-                      })}
-                      onKeyPress={onlyLettersAndCharacters}
-                      type="text"
-                      onChange={(e) => {
-                        const value = toTitleCase(e.target.value);
-                        setValue("ga_cargo", value);
-                      }}
-                    ></input>
-                  </InputP>
-                  {errors.ga_cargo && <span>{errors.ga_cargo.message}</span>}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      handleCloseModal();
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
 
-                  <InputP>
-                    <label>
-                      Telefone<span> *</span>
-                    </label>
-                    <Controller
-                      name="ga_telefone"
-                      control={control}
-                      rules={{ required: "O telefone é obrigatório" }}
-                      render={({ field: { onChange, value }, fieldState: { error } }) => (
-                        <>
-                          <InputMask
-                            mask="(99) 99999-9999"
-                            maskChar={null}
-                            value={value}
-                            onChange={e => onChange(e.target.value)}
-                          >
-                            {(inputProps) => (
-                              <input {...inputProps} type="text" />
-                            )}
-                          </InputMask>
-                          {error && <span>{error.message}</span>}
-                        </>
-                      )}
-                    />
-                  </InputP>
-                  <InputM>
-                    <label>
-                      Email<span> *</span>
-                    </label>
-                    <input
-                      {...register("ga_email")}
-                      defaultValue={dadosGestao?.ga_email}
-                      onChange={handleOnChange}
-                      type="text"
-                    ></input>
-                  </InputM>
-                  <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
-                </ConteudoModal>
-              </Form>
-            </Modal>
-          </ContainerModal>
-        )}
-      </DivCenter>
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Título<span> *</span>
+                      </label>
+                      <input
+                        {...register("politica_titulo", {
+                          required: "O título é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("politica_titulo", value);
+                        }}
+                        disabled={politicaSituacao === "nao_tem"}
+                      ></input>
+                    </InputG>
+                    {errors.politica_titulo && (
+                      <span>{errors.politica_titulo.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Ano<span> *</span>
+                      </label>
+                      <input
+                        {...register("politica_ano", {
+                          required: "O ano é obrigatório",
+                          pattern: {
+                            value: /^[0-9]{4}$/,
+                            message: "Digite um ano válido com 4 dígitos",
+                          },
+                        })}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        type="text"
+                        maxLength={4}
+                        onChange={(e) => {
+                          // Remove qualquer caractere que não seja número
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setValue("politica_ano", value);
+                        }}
+                        disabled={politicaSituacao === "nao_tem"}
+                      ></input>
+                    </InputP>
+                    {errors.politica_ano && (
+                      <span>{errors.politica_ano.message}</span>
+                    )}
+
+                    <ModalSubmitButton
+                      type="submit"
+                      disabled={politicaSituacao === "nao_tem"}
+                      style={{
+                        opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
+                      }}
+                    >
+                      Gravar
+                    </ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+          {showModal && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updateRepresentantes
+                      ? updateRepresentantesServicos
+                      : handleAddRepresentante
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      handleCloseModal();
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Nome<span> *</span>
+                      </label>
+                      <input
+                        {...register("ga_nome_representante", {
+                          required: "O nome é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("ga_nome_representante", value);
+                        }}
+                      ></input>
+                    </InputG>
+                    {errors.ga_nome_representante && (
+                      <span>{errors.ga_nome_representante.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Cargo<span> *</span>
+                      </label>
+                      <input
+                        {...register("ga_cargo", {
+                          required: "O cargo é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("ga_cargo", value);
+                        }}
+                      ></input>
+                    </InputP>
+                    {errors.ga_cargo && <span>{errors.ga_cargo.message}</span>}
+                    <InputP>
+                      <label>
+                        Telefone<span> *</span>
+                      </label>
+                      <Controller
+                        name="ga_telefone"
+                        control={control}
+                        rules={{ required: "O telefone é obrigatório" }}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error },
+                        }) => (
+                          <>
+                            <InputMask
+                              mask="(99) 99999-9999"
+                              maskChar={null}
+                              value={value}
+                              onChange={(e) => {
+                                const justNumbers = e.target.value.replace(
+                                  /\D/g,
+                                  ""
+                                );
+                                if (justNumbers.length <= 11) {
+                                  onChange(justNumbers);
+                                }
+                              }}
+                            >
+                              {(inputProps) => (
+                                <input {...inputProps} type="text" />
+                              )}
+                            </InputMask>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
+                    </InputP>
+                    <InputM>
+                      <label>
+                        Email<span> *</span>
+                      </label>
+                      <input
+                        {...register("ga_email")}
+                        defaultValue={dadosGestao?.ga_email}
+                        onChange={handleOnChange}
+                        type="text"
+                      ></input>
+                    </InputM>
+                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+          {showModalPlano && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updatePlano ? handleCadastro : handleAddPlano
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      setShowModalPlano(false);
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Título<span> *</span>
+                      </label>
+                      <input
+                        {...register("plano_titulo", {
+                          required: "O título é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("plano_titulo", value);
+                        }}
+                        disabled={planoSituacao === "nao_tem"}
+                      ></input>
+                    </InputG>
+                    {errors.plano_titulo && (
+                      <span>{errors.plano_titulo.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Ano<span> *</span>
+                      </label>
+                      <input
+                        {...register("plano_ano", {
+                          required: "O ano é obrigatório",
+                          pattern: {
+                            value: /^[0-9]{4}$/,
+                            message: "Digite um ano válido com 4 dígitos",
+                          },
+                        })}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        type="text"
+                        maxLength={4}
+                        onChange={(e) => {
+                          // Remove qualquer caractere que não seja número
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setValue("plano_ano", value);
+                        }}
+                        disabled={planoSituacao === "nao_tem"}
+                      ></input>
+                    </InputP>
+                    {errors.plano_ano && (
+                      <span>{errors.plano_ano.message}</span>
+                    )}
+
+                    <ModalSubmitButton
+                      type="submit"
+                      disabled={planoSituacao === "nao_tem"}
+                      style={{
+                        opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                      }}
+                    >
+                      Gravar
+                    </ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+          {showModalParticipacao && (
+            <ContainerModal>
+              <Modal>
+                <Form
+                  onSubmit={handleSubmit(
+                    updateParticipacao
+                      ? updateParticipacaoControleSocial
+                      : handleAddParticipacao
+                  )}
+                >
+                  <CloseModalButton
+                    onClick={() => {
+                      setShowModalParticipacao(false);
+                    }}
+                  >
+                    X
+                  </CloseModalButton>
+
+                  <ConteudoModal>
+                    <InputG>
+                      <label>
+                        Título<span> *</span>
+                      </label>
+                      <input
+                        {...register("pcs_titulo", {
+                          required: "O título é obrigatório",
+                        })}
+                        onKeyPress={onlyLettersAndCharacters}
+                        type="text"
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValue("pcs_titulo", value);
+                        }}
+                      ></input>
+                    </InputG>
+                    {errors.pcs_titulo && (
+                      <span>{errors.pcs_titulo.message}</span>
+                    )}
+                    <InputP>
+                      <label>
+                        Ano<span> *</span>
+                      </label>
+                      <input
+                        {...register("pcs_ano", {
+                          required: "O ano é obrigatório",
+                          pattern: {
+                            value: /^[0-9]{4}$/,
+                            message: "Digite um ano válido com 4 dígitos",
+                          },
+                        })}
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        type="text"
+                        maxLength={4}
+                        onChange={(e) => {
+                          // Remove qualquer caractere que não seja número
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          setValue("pcs_ano", value);
+                        }}
+                      ></input>
+                    </InputP>
+                    {errors.pcs_ano && <span>{errors.pcs_ano.message}</span>}
+
+                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                  </ConteudoModal>
+                </Form>
+              </Modal>
+            </ContainerModal>
+          )}
+        </DivCenter>
       </MainContent>
     </Container>
   );

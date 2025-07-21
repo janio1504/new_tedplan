@@ -105,7 +105,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
       getDadosTarifa(anoEditorSimisab);
       setAnoSelected(anoEditorSimisab);
     }
-  }, [municipio]);
+  }, [municipio, anoEditorSimisab]);
 
   async function getMunicipio() {
     const res = await api
@@ -116,13 +116,6 @@ export default function Tarifa({ municipio }: MunicipioProps) {
         setDadosMunicipio(response.data);
       });
   }
-
-  const setOptions = {
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
 
   function handleOnChange(content) {
     setContent(content);
@@ -166,8 +159,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
       })
       .catch((error) => {
         console.log(error);
-      });
-
+      });    
     setDadosTarifa(res[0]);
   }
 
@@ -1100,10 +1092,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                     />
                   </InputGG>
                 </DivFormConteudo>
+                {isEditor && <SubmitButton type="submit">Gravar</SubmitButton>}
               </DivFormEixo>
             </DivForm>
 
-            {isEditor && <SubmitButton type="submit">Gravar</SubmitButton>}
+            
           </Form>
         </DivCenter>
       </MainContent>
@@ -1111,35 +1104,4 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-  ctx
-) => {
-  const apiClient = getAPIClient(ctx);
-  const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
 
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login_indicadores",
-        permanent: false,
-      },
-    };
-  }
-
-  const resUsuario = await apiClient.get("getUsuario", {
-    params: { id_usuario: id_usuario },
-  });
-  const usuario = await resUsuario.data;
-
-  const res = await apiClient.get("getMunicipio", {
-    params: { id_municipio: usuario[0].id_municipio },
-  });
-  const municipio = await res.data;
-
-  return {
-    props: {
-      municipio,
-    },
-  };
-};
