@@ -25,6 +25,7 @@ import {
   StepperButton,
   DivFormCadastro,
   StepButton,
+  BreadCrumbStyle
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -40,6 +41,7 @@ import { onlyLettersAndCharacters, toTitleCase } from "@/util/util";
 import api from "@/services/api";
 import { Loading } from "@/components/Loading";
 import styled from "styled-components";
+import BreadCrumb from "./componentes/breadCrumb";
 
 interface MunicipioProps {
   municipio: Municipio;
@@ -322,6 +324,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         </SidebarItem>
       </Sidebar>
       <MainContent>
+        <BreadCrumb />
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivFormCadastro active={activeForm === "dadosMunicipio"}>

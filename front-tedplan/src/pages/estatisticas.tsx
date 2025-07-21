@@ -18,6 +18,8 @@ import AguaComp from "../components/Agua";
 import DrenagemComp from "../components/Drenagem";
 import EsgotoComp from "../components/Esgoto";
 import ResiduosComp from "../components/ResiduosSolidos";
+import { BreadCrumbStyle } from "@/styles/indicadores";
+import Link from "next/link";
 
 
 
@@ -33,6 +35,19 @@ export default function Estatistica() {
   return (
     <Container>
       <HeadPublico></HeadPublico>
+      <BreadCrumbStyle style={{ width: '25%', marginBottom: '-20px'}}>
+              <nav>
+                <ol>
+                  <li>
+                    <Link href="./indicadores/home_indicadores">Home</Link>
+                    <span> / </span>
+                  </li>
+                  <li>
+                    <span>Estatísticas</span>
+                  </li>
+                </ol>
+              </nav>
+        </BreadCrumbStyle>
       <DivCenter>     
       <DivEixosEstatisticas>
           <DivColEstatisticas>

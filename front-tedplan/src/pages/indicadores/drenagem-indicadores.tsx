@@ -50,8 +50,9 @@ import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -189,6 +190,23 @@ export default function Drenagem({ municipio }: MunicipioProps) {
       </Sidebar>
 
       <MainContent>
+        <BreadCrumbStyle style={{ width: '27%'}}>
+                                <nav>
+                                  <ol>
+                                    <li>
+                                      <Link href="./home_indicadores">Home</Link>
+                                      <span> / </span>
+                                    </li>
+                                    <li>
+                                      <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                      <span> / </span>
+                                    </li>
+                                    <li>
+                                      <span>Drenagem</span>
+                                    </li>
+                                  </ol>
+                                </nav>
+          </BreadCrumbStyle>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm>

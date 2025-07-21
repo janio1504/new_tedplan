@@ -1008,9 +1008,9 @@ export default function GestaoIndicadores({
     }
 
     formData.append("plano_situacao", planoSituacao);
-    // formData.append("plano_ano", data.plano_ano);
-    // formData.append("plano_arquivo", data.plano_arquivo[0]);
-    // formData.append("plano_titulo", data.plano_titulo);
+    formData.append("plano_ano", data.plano_ano);
+    formData.append("plano_arquivo", data.plano_arquivo[0]);
+    formData.append("plano_titulo", data.plano_titulo);
 
     if (politicaSituacao !== "nao_tem") {
       formData.append("politica_ano", data.politica_ano);
@@ -1030,9 +1030,9 @@ export default function GestaoIndicadores({
     }
     formData.append("conselho_situacao", conselhoSituacao);
 
-    // formData.append("politica_ano", data.politica_ano);
-    // formData.append("politica_arquivo", data.politica_arquivo[0]);
-    // formData.append("politica_titulo", data.politica_titulo);
+    formData.append("politica_ano", data.politica_ano);
+    formData.append("politica_arquivo", data.politica_arquivo[0]);
+    formData.append("politica_titulo", data.politica_titulo);
 
     formData.append(
       "sr_descricao",
@@ -1057,8 +1057,8 @@ export default function GestaoIndicadores({
         },
       })
       .then((response) => {
-        if (response.success) {
-          toast.notify(response.message, {
+        if (response.data.success) {
+          toast.notify(response.data.message, {
             title: "Sucesso!",
             duration: 7,
             type: "success",
@@ -1077,9 +1077,11 @@ export default function GestaoIndicadores({
             politica_ano: "",
             politica_titulo: "",
             politica_arquivo: "",
+            ga_nome: "",
+            ga_norma: "",
           });
         } else {
-          toast.notify(response.message, {
+          toast.notify(response.data.message, {
             title: "Erro!",
             duration: 7,
             type: "error",
@@ -1092,6 +1094,7 @@ export default function GestaoIndicadores({
           duration: 7,
           type: "error",
         });
+        console.log(error);
       });
 
     const resParticipacao = await apiClient.get(
@@ -1147,6 +1150,7 @@ export default function GestaoIndicadores({
           duration: 7,
           type: "error",
         });
+        console.log(error);
       });
   }
 
@@ -2124,16 +2128,15 @@ export default function GestaoIndicadores({
                   </td>
                 </tr>
               </table>
-              <DivEixo>
-                Presidente{" "}
-                <span
-                  onClick={() => {
-                    handleShowModalPresidente();
-                  }}
-                >
-                  Adicionar
-                </span>{" "}
-              </DivEixo>
+              <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
+              Presidente{" "}
+               <ButtonAdicionarPresidente
+               onClick={handleShowModalPresidente}
+               disabled={!conselhoMunicipal || conselhoMunicipal.length === 0}
+               >
+                Adicionar Presidente
+              </ButtonAdicionarPresidente>
+            </DivEixo>
 
               <Tabela style={{ overflow: "scroll" }}>
                 <table cellSpacing={0}>
@@ -2225,6 +2228,51 @@ export default function GestaoIndicadores({
                   </tbody>
                 </table>
               </Tabela>
+              <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
+              Atualizações
+            </DivEixo>
+            <Tabela>
+            <table cellSpacing={0}>
+                <tbody>
+                  {conselhoMunicipal && (
+                    <tr>
+                      <th>ID</th>
+                      <th>Título</th>
+                      <th>Ano</th>
+                      <th>Ações</th>
+                    </tr>
+                  )}
+
+                  {conselhoMunicipal?.map((conselho, index) => (
+                    <tr key={index}>
+                      <td>{conselho.id_conselho_municipal_saneamento_basico}</td>
+                      <td>
+                        <InputG>{conselho.titulo}</InputG>
+                      </td>
+                      <td>{conselho.ano}</td>
+                      <td>
+                        <Actions>
+                          <a href={conselho.file} rel="noreferrer" target="_blank">
+                            <FaFilePdf></FaFilePdf>
+                          </a>
+                          <Image
+                            src={Excluir}
+                            alt="Excluir"
+                            width={25}
+                            height={25}
+                            onClick={() => {
+                              handleRemoverConselho({
+                                id: conselho.id_conselho_municipal_saneamento_basico,
+                              });
+                            }}
+                          />
+                        </Actions>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+             </Tabela>
 
               <SubmitButtonContainer
                 style={{
@@ -2347,8 +2395,6 @@ export default function GestaoIndicadores({
                 </table>
               </Tabela>
 
-              {/* </DivFormCadastro>
-          <DivForm> */}
               <SubmitButtonContainer
                 style={{
                   bottom: "-50px",
@@ -2361,35 +2407,66 @@ export default function GestaoIndicadores({
               </SubmitButtonContainer>
             </DivFormCadastro>
 
-            <DivFormCadastro active={activeForm === "saneamentoRural"}>
-              <DivTituloForm>Saneamento Rural</DivTituloForm>
+            <DivFormCadastro active={activeForm === "saneamentoRural"}
+            style={{minWidth: "1045px", minHeight: "380px"}}>
+              <DivTituloForm style={{display: "flex",alignItems: "center", gap: "10px"}}>
+                Saneamento Rural
+                <Actions>
+                  <Tooltip>
+                  <Image
+                    src={ajuda}
+                    alt="Ajuda"
+                    width={20}
+                    height={20}
+                    style={{ cursor: "pointer" }}
+                  />
+                    <TooltipText>
+                      Insira informações sobre o saneamento rural, como por exemplo:
+                      informações sobre população rural, situação atual dos serviços de saneamento,
+                      aspectos ambientais, etc.
+                    </TooltipText>
+                  </Tooltip>
+                </Actions>
+                </DivTituloForm>
               <DivTextArea>
                 <label>Breve Descrição</label>
-
                 <textarea
                   ref={txtArea}
                   {...register("sr_descricao")}
-                  defaultValue={
-                    dadosGestao?.sr_descricao ? dadosGestao?.sr_descricao : ""
-                  }
                   onChange={handleOnChange}
+                  // required
                 ></textarea>
               </DivTextArea>
 
-              <SubmitButtonContainer
-                style={{
-                  bottom: "-50px",
-                  right: "-15px",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
-                )}
+              <SubmitButtonContainer style={{
+                bottom: "-50px",
+                right: "-10px"
+              }}>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
             </DivFormCadastro>
 
-            <DivFormCadastro active={activeForm === "comunidadesTradicionais"}>
-              <DivTituloForm>Comunidades Tradicionais</DivTituloForm>
+            <DivFormCadastro active={activeForm === "comunidadesTradicionais"}
+            style={{minWidth: "1045px", height: "658px"}}
+           >
+            <DivTituloForm style={{display: "flex", alignItems: "center", gap: "10px"}}>Comunidades Tradicionais
+              <Actions>
+                  <Tooltip>
+                  <Image
+                    src={ajuda}
+                    alt="Ajuda"
+                    width={20}
+                    height={20}
+                    style={{ cursor: "pointer" }}
+                  />
+                    <TooltipText>
+                      Insira informações sobre as comunidades tradicionais, como por exemplo:
+                      condições da infraestrutura e serviços de saneamento nessas comunidades.
+                    </TooltipText>
+                  </Tooltip>
+                </Actions>
+
+            </DivTituloForm>
 
               <DivTextArea>
                 <label>Nome das Comunidades Beneficiadas</label>
@@ -2397,12 +2474,7 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_nomes_comunidades")}
-                  defaultValue={
-                    dadosGestao?.nomes_comunidades_beneficiadas
-                      ? dadosGestao?.nomes_comunidades_beneficiadas
-                      : ""
-                  }
-                  onChange={handleOnChange}
+                  // required
                 ></textarea>
 
                 <label>Breve Descrição</label>
@@ -2410,24 +2482,18 @@ export default function GestaoIndicadores({
                 <textarea
                   ref={txtArea}
                   {...register("ct_descricao")}
-                  defaultValue={
-                    dadosGestao?.ct_descricao ? dadosGestao?.ct_descricao : ""
-                  }
-                  onChange={handleOnChange}
+                  // required
                 ></textarea>
               </DivTextArea>
-
-              <SubmitButtonContainer
-                style={{
-                  bottom: "-50px",
-                  right: "-15px",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
-                )}
+              <SubmitButtonContainer style={{
+                bottom: "-50px",
+                right: "-10px"
+              }}>
+                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
               </SubmitButtonContainer>
+
             </DivFormCadastro>
+
           </Form>
 
           {ShowModalPresidente && (

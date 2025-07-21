@@ -544,7 +544,6 @@ export const DivTituloForm = styled.div`
 
 export const Tabela = styled.div`
   width: 100%;
-  margin-bottom: 30px;
   // overflow: hidden;
   border-radius: 12px;
   background: #fff;
@@ -573,10 +572,12 @@ export const Tabela = styled.div`
 
       &:first-child {
         padding-left: 24px;
+        border-top-left-radius: 12px;
       }
 
       &:last-child {
         padding-right: 24px;
+        border-top-right-radius: 12px;
       }
     }
 
@@ -778,6 +779,8 @@ export const SubmitButton = styled.button`
   justify-content: center;
   align-items: center;
   float: right;
+  font-size: 16px;
+  font-weight: 600;
   svg {
     margin-right: 8px;
   }
