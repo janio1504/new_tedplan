@@ -271,7 +271,7 @@ export const LineSideBar = styled.div`
 export const DivFormConteudo = styled.div<{ active?: boolean }>`
   display: ${props => props.active ? 'block' : 'none'}; 
   float: left;
-  width: 97%;
+  width: 96%;
   max-width: 1320;
   min-width: 1090px;
   padding: 10px 10px 10px 15px;

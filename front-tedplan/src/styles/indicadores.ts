@@ -194,16 +194,14 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  max-width: 75%;
   width: 100%;
   height: 100%;
-
   margin-left: auto;
   margin-right: auto;
   text-align: left;
-  justify-content: center;
-  padding: 0px;
+  padding: 0;
   display: flex;
+  flex-direction: column;
 `;
 
 export const MenuMunicipio = styled.div`
@@ -577,7 +575,7 @@ export const Tabela = styled.div`
     }
 
     td {
-      wite-sapace: nowrap;
+      white-space: nowrap;
       padding: 16px 20px;
       color: #4a5568;
       border-bottom: 1px solid #e2e8f0;
@@ -866,6 +864,7 @@ export const DivEixo = styled.div`
 
 export const Form = styled.form`
   background-color: #f3f4f6;
+  width: 100%;
   font-size: 14px;
   input {
     border: 2px solid #ccc;
@@ -1275,55 +1274,76 @@ export const DivMenuCadastro = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
-  background: #1caecc;
-  padding: 10px 0;
-
+  background: linear-gradient(135deg, #1caecc 0%, #0085bd 100%);
+  padding: 12px 0;
   width: 100%;
   margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 export const DivBotaoMenuCadastro = styled.div`
   display: flex;
   align-items: center;
-  margin: 0 10px;
+  margin: 0 8px;
 `;
 
 export const NumeroMenuCadastro = styled.div`
   border-radius: 50%;
-  padding: 5px;
-
-  background: #fff;
+  padding: 6px;
+  background: #ffffff;
   color: #0085bd;
-  font-weight: bold;
-  font-size: 14px;
-  width: 20px;
-  height: 20px;
+  font-weight: 600;
+  font-size: 13px;
+  width: 22px;
+  height: 22px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 10px;
+  margin-right: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 `;
 
 export const BotaoMenuCadastro = styled.div`
   min-width: auto;
   min-height: auto;
-  border-radius: 5px;
+  border-radius: 8px;
   background: transparent;
   cursor: pointer;
-  color: #fff;
+  color: #ffffff;
   margin: 0;
   text-align: center;
-  padding: 10px 15px;
-  transition: all 0.2s;
-  font-weight: bold;
-  font-size: 20px;
+  padding: 12px 18px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  font-size: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.01em;
+  border: 2px solid transparent;
+  
   &:hover {
-    background: #193454;
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
   }
 `;
 
 export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
-  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 600;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  }
 `;
 
 // Novo CSS SIDE BAR
@@ -1333,13 +1353,13 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 // `;
 
 export const Sidebar = styled.div`
-  width: 250px;
-  background-color: #f0f0f0;
+   width: 250px;
+  background-color: white;
   padding: 1rem;
   bottom: -600px;
   position: absolute;
   left: 0;
-  top: 246px;
+  top: 255px;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -1611,8 +1631,7 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   padding: 0 1.9rem 1.9rem;
   border-radius: 7.6px;
   box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
-  width: 95%;
-  max-width: 1140px;
+  width: 90%;
   z-index: 1;
   margin: 0px auto;
   position: relative;
@@ -1647,7 +1666,7 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   }
 
   table {
-    width: 95%;
+    width: 99%;
     border-collapse: separate;
     padding-top: 9.5px;
     border-spacing: 0 9.5px;
@@ -1663,7 +1682,7 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   }
 
   ${InputG}, ${InputM}, ${InputP} {
-    width: 95%;
+    width: 100%;
   }
 
   label {

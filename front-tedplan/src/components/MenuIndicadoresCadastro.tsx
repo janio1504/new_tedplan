@@ -12,7 +12,9 @@ import { useEffect, useState } from "react";
 
 export default function HeadPublico() {
 
-  const [ rota, setRota ] = useState(null)
+  const [rota, setRota] = useState("")
+  const [isClient, setIsClient] = useState(false)
+  
   function handleDadosMunicipio() {
     Router.push("/indicadores/dados_municipio");
   }
@@ -29,9 +31,49 @@ export default function HeadPublico() {
     Router.push("/indicadores/monitoramento-avaliacao");
   }
 
-  useEffect(()=>{
-    setRota(Router.pathname)
-  },[])
+  useEffect(() => {
+    // Marca que estamos no cliente
+    setIsClient(true);
+    
+    // Define a rota inicial
+    setRota(Router.pathname);
+    
+    // Listener para mudanças de rota
+    const handleRouteChange = (url) => {
+      setRota(url);
+    };
+
+    Router.events.on('routeChangeComplete', handleRouteChange);
+
+    // Cleanup do listener
+    return () => {
+      Router.events.off('routeChangeComplete', handleRouteChange);
+    };
+  }, [])
+
+  // Não renderiza até que a hidratação esteja completa
+  if (!isClient) {
+    return (
+      <DivMenuCadastro>
+        <DivBotaoMenuCadastro>
+          <NumeroMenuCadastro>01</NumeroMenuCadastro>
+          <BotaoMenuCadastro onClick={handleDadosMunicipio}>Cadastro</BotaoMenuCadastro>
+        </DivBotaoMenuCadastro>
+        <DivBotaoMenuCadastro>
+          <NumeroMenuCadastro>02</NumeroMenuCadastro>
+          <BotaoMenuCadastro onClick={handleGestaoIndicadores}>Gestão</BotaoMenuCadastro>
+        </DivBotaoMenuCadastro>
+        <DivBotaoMenuCadastro>
+          <NumeroMenuCadastro>03</NumeroMenuCadastro>
+          <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenuCadastro>
+        </DivBotaoMenuCadastro>
+        <DivBotaoMenuCadastro>
+          <NumeroMenuCadastro>04</NumeroMenuCadastro>        
+          <BotaoMenuCadastro onClick={handleMonitoramento}>Monitoramento e Avaliação</BotaoMenuCadastro>
+        </DivBotaoMenuCadastro>
+      </DivMenuCadastro>
+    );
+  }
   
 
   return (

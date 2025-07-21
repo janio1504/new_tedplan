@@ -315,4 +315,67 @@ Route.group(() => {
   Route.post("addFile", "FileController.store");
   Route.post("addGaleria", "GaleriaController.store");
   Route.delete("deleteGaleria", "GaleriaController.destroy");
+
+  // Rotas para Menu
+  Route.get("menus", "MenuController.index");
+  Route.get("menus/:id", "MenuController.show");
+  Route.post("menus", "MenuController.store");
+  Route.put("menus/:id", "MenuController.update");
+  Route.delete("menus/:id", "MenuController.destroy");
+  Route.get("menus/modulo/:id_modulo", "MenuController.getMenusByModulo");
+  Route.get("menus/eixo/:id_eixo", "MenuController.getMenusByEixo");
+  Route.get("menus/search", "MenuController.search");
+
+  // Rotas para MenuItem
+  Route.get("menu-items", "MenuItemController.index");
+  Route.get("menu-items/:id", "MenuItemController.show");
+  Route.post("menu-items", "MenuItemController.store");
+  Route.put("menu-items/:id", "MenuItemController.update");
+  Route.delete("menu-items/:id", "MenuItemController.destroy");
+  Route.get("menu-items/menu/:id_menu", "MenuItemController.getMenuItemsByMenu");
+  Route.get("menu-items/search", "MenuItemController.search");
+
+  // Rotas para TipoCampoIndicador
+  Route.get("tipos-campo", "TipoCampoIndicadorController.index");
+  Route.get("tipos-campo/:id", "TipoCampoIndicadorController.show");
+  Route.post("tipos-campo", "TipoCampoIndicadorController.store");
+  Route.put("tipos-campo/:id", "TipoCampoIndicadorController.update");
+  Route.delete("tipos-campo/:id", "TipoCampoIndicadorController.destroy");
+  Route.get("tipos-campo/ativos", "TipoCampoIndicadorController.getTiposAtivos");
+  Route.get("tipos-campo/tipo/:tipo", "TipoCampoIndicadorController.getTiposPorTipo");
+  Route.patch("tipos-campo/:id/toggle-status", "TipoCampoIndicadorController.toggleStatus");
+  Route.get("tipos-campo/search", "TipoCampoIndicadorController.search");
+
+  // Rotas para IndicadorNovo
+  Route.get("indicadores-novo", "IndicadorNovoController.index");
+  Route.get("indicadores-novo/:id", "IndicadorNovoController.show");
+  Route.post("indicadores-novo", "IndicadorNovoController.store");
+  Route.put("indicadores-novo/:id", "IndicadorNovoController.update");
+  Route.delete("indicadores-novo/:id", "IndicadorNovoController.destroy");
+  Route.get("indicadores-novo/menu-item/:id_menu_item", "IndicadorNovoController.getIndicadoresByMenuItem");
+  Route.get("indicadores-novo/grupo/:grupo", "IndicadorNovoController.getIndicadoresByGrupo");
+  Route.get("indicadores-novo/codigo/:codigo", "IndicadorNovoController.getIndicadorByCodigo");
+  Route.get("indicadores-novo/search", "IndicadorNovoController.search");
+
+  // Rotas para IndicadorMunicipio
+  Route.get("indicadores-municipio", "IndicadorMunicipioController.index");
+  Route.get("indicadores-municipio/:id", "IndicadorMunicipioController.show");
+  Route.post("indicadores-municipio", "IndicadorMunicipioController.store");
+  Route.put("indicadores-municipio/:id", "IndicadorMunicipioController.update");
+  Route.delete("indicadores-municipio/:id", "IndicadorMunicipioController.destroy");
+  Route.get("indicadores-municipio/municipio/:id_municipio", "IndicadorMunicipioController.getIndicadoresByMunicipio");
+  Route.get("indicadores-municipio/indicador/:id_indicador", "IndicadorMunicipioController.getIndicadoresByIndicador");
+  Route.get("indicadores-municipio/ano/:ano", "IndicadorMunicipioController.getIndicadoresByAno");
+  Route.get("indicadores-municipio/buscar", "IndicadorMunicipioController.getIndicadorByCodigoMunicipioAno");
+  Route.post("indicadores-municipio/bulk-insert", "IndicadorMunicipioController.bulkInsert");
+  Route.put("indicadores-municipio/bulk-update", "IndicadorMunicipioController.bulkUpdate");
+  Route.get("menus", "MenuController.index");
+  Route.get("menus/:id", "MenuController.show");
+  Route.post("menus", "MenuController.store");
+  Route.put("menus/:id", "MenuController.update");
+  Route.delete("menus/:id", "MenuController.destroy");
+  Route.get("menus/modulo/:id_modulo", "MenuController.getMenusByModulo");
+  Route.get("menus/eixo/:id_eixo", "MenuController.getMenusByEixo");
+  Route.get("menus/search", "MenuController.search");
+
 }).middleware(["auth"]);
