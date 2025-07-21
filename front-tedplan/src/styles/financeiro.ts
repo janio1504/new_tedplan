@@ -240,9 +240,7 @@ export const DivColRelatorios = styled.div`
 `;
 
 export const DivFormEixo = styled.div`
-  float: left;
-  width: 97%;
-  min-width: 1000px;
+  width: 100%;
   padding: 10px 8px 10px 15px;
   margin-top: 30px;
   color: #667778;
@@ -252,13 +250,16 @@ export const DivFormEixo = styled.div`
 
 export const DivFormConteudo = styled.div<{ active?: boolean }>` 
   display: ${(props) => (props.active ? "block" : "none")};
-  float: left;
-  width: 97%;
-  max-width: 1320;
-  min-width: 1090px;
-  padding: 10px 10px 10px 15px;
-
-  color: #667778;
+  background-color: white;
+  padding: 0 1.9rem 1.9rem;
+  border-radius: 7.6px;
+  box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  z-index: 1;
+  margin: 0px auto;
+  position: relative;
+  color: #333;
+  overflow: hidden;
   table {
     width: 100%;
     margin-bottom: 20px;
@@ -751,7 +752,7 @@ export const SubmitButton = styled.button`
   align-items: center;
   float: right;
     margin-right: 8px;
-  }
+  
 `;
 
 export const DivInput = styled.div`

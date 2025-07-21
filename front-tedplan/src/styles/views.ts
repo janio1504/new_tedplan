@@ -394,7 +394,7 @@ export const TextoLista = styled.div`
 `;
 
 export const DivCenterHead = styled.div`
-  max-width: 80%;
+  max-width: 100%;
   width: 100%;
   height: 100%;
   margin-left: auto;
