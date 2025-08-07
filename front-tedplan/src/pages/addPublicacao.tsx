@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -116,11 +116,7 @@ export default function AddPublicacao({
         })
         .catch((error) => {
           console.error("Error fetching publication:", error);
-          toast.notify("Erro ao carregar publicação!", {
-            title: "Erro!",
-            duration: 7,
-            type: "error",
-          });
+          toast.error("Erro ao carregar publicação!", { position: "top-right", autoClose: 5000 });
         });
     }
   }, [id, reset, tipoPublicacao, eixos, municipios]);
@@ -151,32 +147,20 @@ export default function AddPublicacao({
         await apiClient.post("updatePublicacao", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.notify("Publicação atualizada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Publicação atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
       } else {
         // Modo criação
         await apiClient.post("addPublicacao", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.notify("Publicação criada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Publicação criada com sucesso!", { position: "top-right", autoClose: 5000 });
       }
 
       setTimeout(() => {
         router.push("/listarPublicacoes");
       }, 2000);
     } catch (error) {
-      toast.notify("Erro ao salvar publicação!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao salvar publicação!", { position: "top-right", autoClose: 5000 });
     }
   };
   async function handleAddPublicacao({
@@ -205,19 +189,11 @@ export default function AddPublicacao({
         },
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         if (error) {
-          toast.notify("Erro ao gravar!", {
-            title: "Erro!",
-            duration: 7,
-            type: "error",
-          });
+          toast.error("Erro ao gravar!", { position: "top-right", autoClose: 5000 });
           return error;
         }
       });
@@ -350,7 +326,7 @@ export default function AddPublicacao({
         </Form>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

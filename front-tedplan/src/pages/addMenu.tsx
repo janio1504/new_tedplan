@@ -2,7 +2,7 @@ import {} from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -118,11 +118,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
       });
     } catch (error) {
       console.error("Erro ao carregar dados do menu:", error);
-      toast.notify("Erro ao carregar dados do menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar dados do menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -145,19 +141,11 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
       if (isEditing && menuId) {
         // Atualizar menu existente
         await apiClient.put(`/menus/${menuId}`, menuData);
-        toast.notify("Menu atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Menu atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
       } else {
         // Criar novo menu
         await apiClient.post("/menus", menuData);
-        toast.notify("Menu cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Menu cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
       }
 
       reset({
@@ -172,11 +160,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
       }, 2000);
     } catch (error) {
       console.error("Erro ao salvar menu:", error);
-      toast.notify("Erro ao salvar menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao salvar menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -241,7 +225,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
         </Form>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

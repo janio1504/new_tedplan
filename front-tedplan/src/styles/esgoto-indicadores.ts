@@ -110,7 +110,7 @@ export const Table = styled.table`
 
 
     td {
-      wite-sapace: nowrap;
+      white-space: nowrap;
       padding: 16px 20px;
       color: #4a5568;
       border-bottom: 1px solid #e2e8f0;

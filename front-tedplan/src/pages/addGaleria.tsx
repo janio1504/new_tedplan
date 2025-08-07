@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -101,11 +101,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
   //       },
   //     })
   //     .then((response) => {
-  //       toast.notify('Dados gravados com sucesso!',{
-  //         title: "Sucesso!",
-  //         duration: 7,
-  //         type: "success",
-  //       })
+  //       toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 })
   //       reset({
   //         imagem: "",
   //         titulo: "",
@@ -118,11 +114,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
   //     })
   //     .catch((error) => {
   //       if (error) {
-  //         toast.notify('Erro ao gravar dados!',{
-  //           title: "Erro!",
-  //           duration: 7,
-  //           type: "error",
-  //         })
+  //         toast.error("Erro ao gravar dados!", { position: "top-right", autoClose: 5000 })
   //         return error;
   //       }
   //     });
@@ -149,11 +141,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
         },
       });
 
-      toast.notify("Galeria criada com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Galeria criada com sucesso!", { position: "top-right", autoClose: 5000 });
 
       // Adicionar redirecionamento
       setTimeout(() => {
@@ -161,11 +149,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
       }, 2000);
     } catch (error) {
       console.error("Erro ao criar galeria:", error);
-      toast.notify("Erro ao criar galeria!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao criar galeria!", { position: "top-right", autoClose: 5000 });
     }
   };
   const anos = [
@@ -318,7 +302,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
         </Form>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

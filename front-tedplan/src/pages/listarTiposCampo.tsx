@@ -5,7 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   NewButton,
@@ -100,11 +100,7 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
       setTiposCampoList(response.data);
     } catch (error) {
       console.error("Erro ao carregar tipos de campo:", error);
-      toast.notify("Erro ao carregar tipos de campo!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar tipos de campo!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -133,22 +129,14 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
       const apiClient = getAPIClient();
       await apiClient.delete(`/tipos-campo/${tipoCampoSelecionado.id_tipo_campo_indicador}`);
       
-      toast.notify("Tipo de campo removido com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Tipo de campo removido com sucesso!", { position: "top-right", autoClose: 5000 });
       
       setModalConfirm(false);
       setTipoCampoSelecionado(null);
       loadTiposCampo(); // Recarregar a lista
     } catch (error) {
       console.error("Erro ao remover tipo de campo:", error);
-      toast.notify("Erro ao remover tipo de campo!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao remover tipo de campo!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -157,20 +145,12 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
       const apiClient = getAPIClient();
       await apiClient.patch(`/tipos-campo/${tipoCampo.id_tipo_campo_indicador}/toggle-status`);
       
-      toast.notify("Status alterado com sucesso!", {
-        title: "Sucesso!",
-        duration: 5,
-        type: "success",
-      });
+      toast.success("Status alterado com sucesso!", { position: "top-right", autoClose: 5000 });
       
       loadTiposCampo(); // Recarregar a lista
     } catch (error) {
       console.error("Erro ao alterar status:", error);
-      toast.notify("Erro ao alterar status!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao alterar status!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -344,7 +324,7 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
 
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer />
+        
       </Footer>
     </Container>
   );

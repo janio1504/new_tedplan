@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { anosSelect } from "../../util/util";
 import {
   Container,
@@ -201,11 +201,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-residuos-recebidos", data)
       .then((response) => {
-        toast.notify("Sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Sucesso!", { position: "top-right", autoClose: 5000 });
         return response;
       })
       .catch((error) => {
@@ -223,11 +219,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
   async function handleCadastroDadosUP(data) {   
      if (!isEditor) {
-          toast.notify("Você não tem permissão para editar!", {
-            title: "Atenção!",
-            duration: 7,
-            type: "error",
-          });
+          toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
           return;
         }
 
@@ -235,11 +227,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       unidadeProcessamento.id_unidade_processamento
     );
     if (anoSelected === null || anoSelected === "Selecionar") {
-      toast.notify("Selecione um ano!", {
-        title: "Erro",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Selecione um ano!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
@@ -257,19 +245,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-dados-unidade-processamento", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         getUnidadesProcessamento();
       })
       .catch((error) => {
-        toast.notify("Aconteceu o seguinte erro: ", {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 });
       });
     const id = unidadeProcessamento.id_unidade_processamento;
     const ano = anoSelected || anoEditorSimisab;
@@ -278,40 +258,27 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
   async function handleCadastroUnidadeProcessamento(data) {
     if (!isEditor) {
-          toast.notify("Você não tem permissão para editar!", {
-            title: "Atenção!",
-            duration: 7,
-            type: "error",
-          });
+          toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
           return;
         }
 
     data.id_municipio = usuario.id_municipio;
 
     if (!usuario.id_municipio) {
-      toast.notify("Não existe id_municipio, entre novamente no sistema!", {
-        title: "Erro",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Não existe id_municipio, entre novamente no sistema!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
     const resCad = await api
       .post("create-unidade-processamento", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         getUnidadesProcessamento();
       })
       .catch((error) => {
-        toast.notify("Aconteceu o seguinte erro: " + error, {
-          title: "Erro",
-          duration: 7,
-          type: "error",
+        toast.error("Aconteceu o seguinte erro: " + error, {
+          position: "top-right",
+          autoClose: 7000,
         });
       });
   }
@@ -371,18 +338,13 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       await api
         .delete("detete-unidade-processamento/" + id)
         .then((response) => {
-          toast.notify("Sucesso!", {
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
-          });
+          toast.success("Sucesso!", { position: "top-right", autoClose: 5000 });
           getUnidadesProcessamento();
         })
         .catch((error) => {
-          toast.notify("Aconteceu o seguinte erro: " + error, {
-            title: "Erro",
-            duration: 7,
-            type: "error",
+          toast.error("Aconteceu o seguinte erro: " + error, {
+            position: "top-right",
+            autoClose: 7000,
           });
         });
     }
@@ -416,7 +378,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
@@ -426,7 +388,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                               <nav>
                                 <ol>
                                   <li>
-                                    <Link href="./home_indicadores">Home</Link>
+                                    <Link href="/indicadores/home_indicadores">Home</Link>
                                     <span> / </span>
                                   </li>
                                   <li>
@@ -2122,7 +2084,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
 
       {visibleResiduosRecebidos && (
         <ContainerModal>
-          <ToastContainer></ToastContainer>
+          
           <Modal>
             <FormModal onSubmit={handleSubmit(handleCreateResiduosRecebidos)}>
               <ConteudoModal>

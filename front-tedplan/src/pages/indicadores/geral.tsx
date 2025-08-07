@@ -67,7 +67,7 @@ import { Tooltip, TooltipText } from "@/styles/indicadores";
 import styled from "styled-components";
 import { DivFormCadastro, MainContent, SidebarItem} from "@/styles/esgoto-indicadores";
 import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast } from 'react-toastify'
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
@@ -167,11 +167,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         setDadosGeral(response.data[0])
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -184,11 +180,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         setConcessionarias(response.data)
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -202,11 +194,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         setDadosConcessionaria(res[0])
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -219,11 +207,7 @@ export default function Geral({ municipio }: MunicipioProps) {
   async function handleCadastro(data) {
 
     if(!isEditor){
-       toast.notify("Você não tem permissão para editar!", {
-               title: "Atenção!",
-               duration: 7,
-               type: "error",
-             });
+       toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
       return
     }
 
@@ -255,18 +239,10 @@ export default function Geral({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-geral", data)
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!', {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        })
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 })
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -278,19 +254,11 @@ export default function Geral({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-concessionaria", data)
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!', {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        })
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 })
         getConcessionarias(anoSelected)
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -418,7 +386,7 @@ const handleNext = () => {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
@@ -444,7 +412,7 @@ const handleNext = () => {
         <nav>
           <ol>
             <li>
-              <Link href="./home_indicadores">Home</Link>
+                              <Link href="/indicadores/home_indicadores">Home</Link>
               <span> / </span>
             </li>
             <li>

@@ -5,7 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   NewButton,
@@ -28,6 +28,7 @@ interface IMenuItem {
   id_menu_item: string;
   nome_menu_item: string;
   id_menu: string;
+  ordem_item_menu?: number;
   created_at: string;
   updated_at: string;
   menu?: {
@@ -60,14 +61,30 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
     try {
       const apiClient = getAPIClient();
       const response = await apiClient.get("/menu-items");
-      setMenuItemsList(response.data);
+      
+      // Ordenar por ordem_item_menu ascendente, itens sem ordem vão para o final
+      const menuItemsOrdenados = response.data.sort((a: IMenuItem, b: IMenuItem) => {
+        // Se ambos têm ordem_item_menu, ordenar por ela
+        if (a.ordem_item_menu !== null && a.ordem_item_menu !== undefined && 
+            b.ordem_item_menu !== null && b.ordem_item_menu !== undefined) {
+          return a.ordem_item_menu - b.ordem_item_menu;
+        }
+        // Se apenas A tem ordem, A vem primeiro
+        if (a.ordem_item_menu !== null && a.ordem_item_menu !== undefined) {
+          return -1;
+        }
+        // Se apenas B tem ordem, B vem primeiro
+        if (b.ordem_item_menu !== null && b.ordem_item_menu !== undefined) {
+          return 1;
+        }
+        // Se nenhum tem ordem, manter ordem alfabética por nome
+        return a.nome_menu_item.localeCompare(b.nome_menu_item);
+      });
+      
+      setMenuItemsList(menuItemsOrdenados);
     } catch (error) {
       console.error("Erro ao carregar itens de menu:", error);
-      toast.notify("Erro ao carregar itens de menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar itens de menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -96,29 +113,22 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       const apiClient = getAPIClient();
       await apiClient.delete(`/menu-items/${menuItemSelecionado.id_menu_item}`);
       
-      toast.notify("Item de menu removido com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Item de menu removido com sucesso!", { position: "top-right", autoClose: 5000 });
       
       setModalConfirm(false);
       setMenuItemSelecionado(null);
       loadMenuItems(); // Recarregar a lista
     } catch (error) {
       console.error("Erro ao remover item de menu:", error);
-      toast.notify("Erro ao remover item de menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao remover item de menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
   // Filtrar itens de menu baseado no termo de busca
   const menuItemsFiltrados = menuItemsList.filter((menuItem) =>
     menuItem.nome_menu_item.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (menuItem.menu?.titulo && menuItem.menu.titulo.toLowerCase().includes(searchTerm.toLowerCase()))
+    (menuItem.menu?.titulo && menuItem.menu.titulo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (menuItem.ordem_item_menu && menuItem.ordem_item_menu.toString().includes(searchTerm))
   );
 
   return (
@@ -138,7 +148,7 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
         <div style={{ marginBottom: "20px" }}>
           <input
             type="text"
-            placeholder="Buscar por nome do item ou menu..."
+            placeholder="Buscar por nome do item, menu ou ordem..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -169,9 +179,25 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                     <div style={{ flex: 1 }}>
-                      <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
-                        {menuItem.nome_menu_item}
-                      </h3>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                        <h3 style={{ margin: "0", color: "#333" }}>
+                          {menuItem.nome_menu_item}
+                        </h3>
+                        {menuItem.ordem_item_menu && (
+                          <span style={{
+                            backgroundColor: "#1e88e5",
+                            color: "white",
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            minWidth: "30px",
+                            textAlign: "center"
+                          }}>
+                            #{menuItem.ordem_item_menu}
+                          </span>
+                        )}
+                      </div>
                       <div style={{ fontSize: "14px", color: "#666" }}>
                         <span><strong>Menu:</strong> {menuItem.menu?.titulo || `ID: ${menuItem.id_menu}`}</span>
                       </div>
@@ -220,7 +246,7 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
 
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer />
+        
       </Footer>
     </Container>
   );
@@ -242,9 +268,28 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const apiClient = getAPIClient(ctx);
     const response = await apiClient.get("/menu-items");
 
+    // Ordenar por ordem_item_menu ascendente
+    const menuItemsOrdenados = (response.data || []).sort((a: IMenuItem, b: IMenuItem) => {
+      // Se ambos têm ordem_item_menu, ordenar por ela
+      if (a.ordem_item_menu !== null && a.ordem_item_menu !== undefined && 
+          b.ordem_item_menu !== null && b.ordem_item_menu !== undefined) {
+        return a.ordem_item_menu - b.ordem_item_menu;
+      }
+      // Se apenas A tem ordem, A vem primeiro
+      if (a.ordem_item_menu !== null && a.ordem_item_menu !== undefined) {
+        return -1;
+      }
+      // Se apenas B tem ordem, B vem primeiro
+      if (b.ordem_item_menu !== null && b.ordem_item_menu !== undefined) {
+        return 1;
+      }
+      // Se nenhum tem ordem, manter ordem alfabética por nome
+      return a.nome_menu_item.localeCompare(b.nome_menu_item);
+    });
+
     return {
       props: {
-        menuItems: response.data || [],
+        menuItems: menuItemsOrdenados,
       },
     };
   } catch (error) {

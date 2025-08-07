@@ -25,6 +25,8 @@ Route.get("getEscalas", "EscalaController.index");
 
 Route.get("pdf/:id", "FileController.getPdf");
 
+
+
 Route.get("getFile", "FileController.showFile");
 Route.get("getImagem", "FileController.showImagem");
 Route.get("getImagens", "FileController.show");
@@ -343,8 +345,28 @@ Route.group(() => {
   Route.delete("tipos-campo/:id", "TipoCampoIndicadorController.destroy");
   Route.get("tipos-campo/ativos", "TipoCampoIndicadorController.getTiposAtivos");
   Route.get("tipos-campo/tipo/:tipo", "TipoCampoIndicadorController.getTiposPorTipo");
+  Route.get("tipos-campo/indicador/:indicadorId", "TipoCampoIndicadorController.getTiposPorIndicador");
+  Route.delete("tipos-campo/indicador/:indicadorId", "TipoCampoIndicadorController.deleteTiposPorIndicador");
   Route.patch("tipos-campo/:id/toggle-status", "TipoCampoIndicadorController.toggleStatus");
   Route.get("tipos-campo/search", "TipoCampoIndicadorController.search");
+
+  // Rotas para SelectOptions
+  Route.get("select-options", "SelectOptionController.index");
+  Route.get("select-options/:id", "SelectOptionController.show");
+  Route.post("select-options", "SelectOptionController.store");
+  Route.put("select-options/:id", "SelectOptionController.update");
+  Route.delete("select-options/:id", "SelectOptionController.destroy");
+  Route.get("select-options/tipo-campo/:tipoCampoId", "SelectOptionController.getOptionsByTipoCampo");
+  Route.delete("select-options/tipo-campo/:tipoCampoId", "SelectOptionController.deleteOptionsByTipoCampo");
+
+  // Rotas para ItemCheckBox
+  Route.get("item-check-box", "ItemCheckBoxController.index");
+  Route.post("item-check-box", "ItemCheckBoxController.store");
+  Route.get("item-check-box/indicador/:indicadorId", "ItemCheckBoxController.getItemsByIndicador");
+  Route.delete("item-check-box/indicador/:indicadorId", "ItemCheckBoxController.deleteItemsByIndicador");
+  Route.get("item-check-box/:id", "ItemCheckBoxController.show");
+  Route.put("item-check-box/:id", "ItemCheckBoxController.update");
+  Route.delete("item-check-box/:id", "ItemCheckBoxController.destroy");
 
   // Rotas para IndicadorNovo
   Route.get("indicadores-novo", "IndicadorNovoController.index");

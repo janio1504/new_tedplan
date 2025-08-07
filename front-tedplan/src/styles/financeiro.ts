@@ -240,15 +240,16 @@ export const DivColRelatorios = styled.div`
 `;
 
 export const DivFormEixo = styled.div`
-  width: 100%;
-  padding: 10px 8px 10px 15px;
-  margin-top: 30px;
+  width: 98%;
+  padding: 10px 8px 10px 0;
+  margin: 30px 0 20px 0;
   color: #667778;
-
   margin-left: 5px;
 `;
 
-export const DivFormConteudo = styled.div<{ active?: boolean }>` 
+export const DivFormConteudo = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>` 
   display: ${(props) => (props.active ? "block" : "none")};
   background-color: white;
   padding: 0 1.9rem 1.9rem;

@@ -39,7 +39,7 @@ export default function Estatistica() {
               <nav>
                 <ol>
                   <li>
-                    <Link href="./indicadores/home_indicadores">Home</Link>
+                    <Link href="/indicadores/home_indicadores">Home</Link>
                     <span> / </span>
                   </li>
                   <li>

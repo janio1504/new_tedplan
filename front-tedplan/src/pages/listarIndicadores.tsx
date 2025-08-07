@@ -5,7 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   NewButton,
@@ -24,6 +24,29 @@ import {
   BotaoAdicionar,
 } from "../styles/dashboard";
 
+interface ISelectOption {
+  id_select_option: string;
+  value: string;
+  descricao: string;
+  ordem_option: number;
+}
+
+interface ICheckBoxItem {
+  id_item_check_box: string;
+  descricao: string;
+  valor: string;
+}
+
+interface ITipoCampoIndicador {
+  id_tipo_campo_indicador: string;
+  type: string;
+  name_campo: string;
+  enable: boolean;
+  default_value: string;
+  selectOptions?: ISelectOption[];
+  checkBoxItems?: ICheckBoxItem[];
+}
+
 interface IIndicador {
   id_indicador: string;
   codigo_indicador: string;
@@ -35,7 +58,6 @@ interface IIndicador {
   informacoes_indicador: string;
   indicador_correspondente_ou_similar_snis: string;
   id_menu_item: string;
-  id_tipo_campo_indicador: string;
   created_at: string;
   updated_at: string;
   menuItem?: {
@@ -45,10 +67,7 @@ interface IIndicador {
       titulo: string;
     };
   };
-  tipoCampoIndicador?: {
-    name_campo: string;
-    type: string;
-  };
+  tiposCampo?: ITipoCampoIndicador[];
 }
 
 interface IndicadorProps {
@@ -89,6 +108,108 @@ const GrupoBadge = ({ grupo }: { grupo: string }) => {
   );
 };
 
+// Componente para exibir tipo de campo
+const TipoCampoInfo = ({ tipoCampo }: { tipoCampo: ITipoCampoIndicador }) => {
+  const getTipoLabel = (type: string) => {
+    const tipos: { [key: string]: string } = {
+      "text": "Texto",
+      "number": "Número",
+      "email": "Email", 
+      "password": "Senha",
+      "textarea": "Área de Texto",
+      "select": "Seleção (Dropdown)",
+      "checkbox": "Caixa de Seleção",
+      "radio": "Botões de Opção",
+      "date": "Data",
+      "file": "Arquivo",
+    };
+    return tipos[type] || type;
+  };
+
+  return (
+    <div style={{ 
+      backgroundColor: "#f0f7ff", 
+      padding: "12px", 
+      borderRadius: "6px", 
+      marginTop: "10px",
+      border: "1px solid #d1ecf1"
+    }}>
+      <div style={{ fontSize: "14px", marginBottom: "8px" }}>
+        <strong>Campo de Entrada:</strong> {tipoCampo.name_campo}
+      </div>
+      <div style={{ fontSize: "14px", marginBottom: "5px", color: "#495057" }}>
+        <strong>Tipo:</strong> {getTipoLabel(tipoCampo.type)}
+      </div>
+      {tipoCampo.default_value && (
+        <div style={{ fontSize: "14px", marginBottom: "5px", color: "#495057" }}>
+          <strong>Valor Padrão:</strong> {tipoCampo.default_value}
+        </div>
+      )}
+      <div style={{ fontSize: "14px", marginBottom: "5px" }}>
+        <span style={{ 
+          color: tipoCampo.enable ? "#28a745" : "#dc3545",
+          fontWeight: "bold"
+        }}>
+          {tipoCampo.enable ? "✓ Ativo" : "✗ Inativo"}
+        </span>
+      </div>
+      
+      {/* Mostrar opções de select se houver */}
+      {tipoCampo.type === "select" && tipoCampo.selectOptions && tipoCampo.selectOptions.length > 0 && (
+        <div style={{ marginTop: "10px" }}>
+          <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
+            Opções disponíveis:
+          </div>
+          <div style={{ fontSize: "13px" }}>
+            {tipoCampo.selectOptions
+              .sort((a, b) => a.ordem_option - b.ordem_option)
+              .map((option, index) => (
+                <span key={option.id_select_option}>
+                  <code style={{ 
+                    backgroundColor: "#e9ecef", 
+                    padding: "2px 5px", 
+                    borderRadius: "3px",
+                    marginRight: "5px"
+                  }}>
+                    {option.value}
+                  </code>
+                  <span style={{ color: "#6c757d" }}>({option.descricao})</span>
+                  {index < tipoCampo.selectOptions!.length - 1 && ", "}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      )}
+
+      {/* Mostrar itens de checkbox se houver */}
+      {tipoCampo.type === "checkbox" && tipoCampo.checkBoxItems && tipoCampo.checkBoxItems.length > 0 && (
+        <div style={{ marginTop: "10px" }}>
+          <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
+            Itens disponíveis:
+          </div>
+          <div style={{ fontSize: "13px" }}>
+            {tipoCampo.checkBoxItems.map((item, index) => (
+              <span key={item.id_item_check_box}>
+                <code style={{ 
+                  backgroundColor: "#e9ecef", 
+                  padding: "2px 5px", 
+                  borderRadius: "3px",
+                  marginRight: "5px"
+                }}>
+                  {item.descricao}
+                </code>
+                {index < tipoCampo.checkBoxItems!.length - 1 && ", "}
+              </span>
+            ))
+            }
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function ListarIndicadores({ indicadores }: IndicadorProps) {
   const { permission } = useContext(AuthContext);
 
@@ -97,6 +218,8 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
   const [indicadoresList, setIndicadoresList] = useState<IIndicador[]>(indicadores || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [filtroGrupo, setFiltroGrupo] = useState<string>("todos");
+  const [filtroTipoCampo, setFiltroTipoCampo] = useState<string>("todos");
+  const [loadingTipos, setLoadingTipos] = useState(false);
 
   // Grupos únicos dos indicadores
   const gruposUnicos = Array.from(new Set(indicadoresList
@@ -104,26 +227,112 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     .map(ind => ind.grupo_indicador)
   )).sort();
 
+  // Tipos de campo únicos
+  const tiposCampoUnicos = Array.from(new Set(indicadoresList
+    .filter(ind => ind.tiposCampo && ind.tiposCampo.length > 0)
+    .map(ind => ind.tiposCampo![0].type)
+  )).sort();
+
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
     if (!token) {
       Router.push("/login");
     }
-    loadIndicadores();
+    
+    // Só carregar os tipos se não vieram do SSR
+    if (indicadores && indicadores.length > 0) {
+      loadTiposCampoForIndicadores();
+    }
   }, []);
+
+  async function loadTiposCampoForIndicadores() {
+    setLoadingTipos(true);
+    try {
+      const apiClient = getAPIClient();
+      
+      // Carregar tipos de campo para cada indicador de forma mais robusta
+      const indicadoresComTipos = await Promise.allSettled(
+        indicadoresList.map(async (indicador) => {
+          try {
+            // Buscar tipos de campo do indicador
+            const tiposResponse = await apiClient.get(`/tipos-campo/indicador/${indicador.id_indicador}`);
+            const tiposCampo = tiposResponse.data || [];
+            
+            // Para tipos select, buscar opções
+            const tiposComOpcoes = await Promise.allSettled(
+              tiposCampo.map(async (tipo: ITipoCampoIndicador) => {
+                if (tipo.type === "select") {
+                  try {
+                    const opcoesResponse = await apiClient.get(`/select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`);
+                    return {
+                      ...tipo,
+                      selectOptions: opcoesResponse.data || []
+                    };
+                  } catch (error) {
+                    console.error(`Erro ao carregar opções para tipo ${tipo.id_tipo_campo_indicador}:`, error);
+                    return tipo;
+                  }
+                }
+                if (tipo.type === "checkbox") {
+                  try {
+                    const checkBoxResponse = await apiClient.get(`/item-check-box/indicador/${indicador.id_indicador}`);
+                    return {
+                      ...tipo,
+                      checkBoxItems: checkBoxResponse.data || []
+                    };
+                  } catch (error) {
+                    console.error(`Erro ao carregar itens de checkbox para tipo ${tipo.id_tipo_campo_indicador}:`, error);
+                    return tipo;
+                  }
+                }
+                return tipo;
+              })
+            );
+            
+            const tiposCompletos = tiposComOpcoes
+              .filter(result => result.status === 'fulfilled')
+              .map(result => result.status === 'fulfilled' ? result.value : null)
+              .filter(Boolean);
+            
+            return {
+              ...indicador,
+              tiposCampo: tiposCompletos
+            };
+          } catch (error) {
+            console.error(`Erro ao carregar tipos para indicador ${indicador.id_indicador}:`, error);
+            return indicador;
+          }
+        })
+      );
+      
+      // Processar apenas os resultados bem-sucedidos
+      const resultados = indicadoresComTipos
+        .filter(result => result.status === 'fulfilled')
+        .map(result => result.status === 'fulfilled' ? result.value : null)
+        .filter(Boolean);
+      
+      setIndicadoresList(resultados);
+    } catch (error) {
+      console.error("Erro ao carregar tipos de campo:", error);
+      toast.error("Erro ao carregar detalhes dos indicadores!", { position: "top-right", autoClose: 5000 });
+    } finally {
+      setLoadingTipos(false);
+    }
+  }
 
   async function loadIndicadores() {
     try {
       const apiClient = getAPIClient();
       const response = await apiClient.get("/indicadores-novo");
-      setIndicadoresList(response.data);
+      setIndicadoresList(response.data || []);
+      
+      // Recarregar tipos de campo
+      if (response.data && response.data.length > 0) {
+        loadTiposCampoForIndicadores();
+      }
     } catch (error) {
       console.error("Erro ao carregar indicadores:", error);
-      toast.notify("Erro ao carregar indicadores!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar indicadores!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -150,41 +359,72 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
 
     try {
       const apiClient = getAPIClient();
+      
+      // Tentar remover tipos de campo e opções do indicador primeiro
+      try {
+        await apiClient.delete(`/tipos-campo/indicador/${indicadorSelecionado.id_indicador}`);
+      } catch (error) {
+        console.log("Aviso: Erro ao remover tipos de campo (pode não existir):", error);
+      }
+
+      // Tentar remover itens de checkbox do indicador
+      try {
+        await apiClient.delete(`/item-check-box/indicador/${indicadorSelecionado.id_indicador}`);
+      } catch (error) {
+        console.log("Aviso: Erro ao remover itens de checkbox (pode não existir):", error);
+      }
+      
+      // Remover o indicador
       await apiClient.delete(`/indicadores-novo/${indicadorSelecionado.id_indicador}`);
       
-      toast.notify("Indicador removido com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Indicador removido com sucesso!", { position: "top-right", autoClose: 5000 });
       
       setModalConfirm(false);
       setIndicadorSelecionado(null);
       loadIndicadores(); // Recarregar a lista
     } catch (error) {
       console.error("Erro ao remover indicador:", error);
-      toast.notify("Erro ao remover indicador!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao remover indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
 
-  // Filtrar indicadores baseado no termo de busca e grupo
+  // Filtrar indicadores baseado no termo de busca, grupo e tipo de campo
   const indicadoresFiltrados = indicadoresList.filter((indicador) => {
     const matchesSearch = 
       indicador.nome_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
       indicador.codigo_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (indicador.palavra_chave && indicador.palavra_chave.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (indicador.unidade_indicador && indicador.unidade_indicador.toLowerCase().includes(searchTerm.toLowerCase()));
+      (indicador.unidade_indicador && indicador.unidade_indicador.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (indicador.tiposCampo && indicador.tiposCampo.length > 0 && 
+       indicador.tiposCampo[0].name_campo.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesGrupo = 
       filtroGrupo === "todos" ||
       indicador.grupo_indicador === filtroGrupo;
 
-    return matchesSearch && matchesGrupo;
+    const matchesTipoCampo = 
+      filtroTipoCampo === "todos" ||
+      (indicador.tiposCampo && indicador.tiposCampo.length > 0 && 
+       indicador.tiposCampo[0].type === filtroTipoCampo);
+
+    return matchesSearch && matchesGrupo && matchesTipoCampo;
   });
+
+  const getTipoLabel = (type: string) => {
+    const tipos: { [key: string]: string } = {
+      "text": "Texto",
+      "number": "Número", 
+      "email": "Email",
+      "password": "Senha",
+      "textarea": "Área de Texto",
+      "select": "Seleção",
+      "checkbox": "Checkbox",
+      "radio": "Radio",
+      "date": "Data",
+      "file": "Arquivo",
+    };
+    return tipos[type] || type;
+  };
 
   return (
     <Container>
@@ -200,14 +440,15 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
           )}
         </div>
 
-        <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
+        <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
           <input
             type="text"
-            placeholder="Buscar por nome, código, palavra-chave ou unidade..."
+            placeholder="Buscar por nome, código, palavra-chave, unidade ou campo..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
               flex: 1,
+              minWidth: "300px",
               padding: "10px",
               border: "1px solid #ddd",
               borderRadius: "4px",
@@ -232,12 +473,60 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
               </option>
             ))}
           </select>
+          <select
+            value={filtroTipoCampo}
+            onChange={(e) => setFiltroTipoCampo(e.target.value)}
+            style={{
+              padding: "10px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              fontSize: "16px",
+              minWidth: "150px",
+            }}
+          >
+            <option value="todos">Todos os tipos</option>
+            {tiposCampoUnicos.map((tipo) => (
+              <option key={tipo} value={tipo}>
+                {getTipoLabel(tipo)}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div style={{ marginBottom: "15px", fontSize: "14px", color: "#666" }}>
+          Mostrando {indicadoresFiltrados.length} de {indicadoresList.length} indicadores
+          {loadingTipos && (
+            <span style={{ marginLeft: "10px", color: "#007bff" }}>
+              (Carregando detalhes dos campos...)
+            </span>
+          )}
         </div>
 
         <ListPost>
           {indicadoresFiltrados.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px" }}>
-              <p>Nenhum indicador encontrado.</p>
+              <p>
+                {indicadoresList.length === 0 
+                  ? "Nenhum indicador cadastrado." 
+                  : "Nenhum indicador encontrado com os filtros aplicados."
+                }
+              </p>
+              {(permission.adminGeral || permission.adminTedPlan) && (
+                <button
+                  onClick={handleAddIndicador}
+                  style={{
+                    marginTop: "15px",
+                    padding: "10px 20px",
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Cadastrar Primeiro Indicador
+                </button>
+              )}
             </div>
           ) : (
             indicadoresFiltrados.map((indicador) => (
@@ -277,12 +566,6 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                         </div>
                       )}
 
-                      {indicador.tipoCampoIndicador && (
-                        <div style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>
-                          <strong>Tipo de Campo:</strong> {indicador.tipoCampoIndicador.name_campo} ({indicador.tipoCampoIndicador.type})
-                        </div>
-                      )}
-
                       {indicador.palavra_chave && (
                         <div style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>
                           <strong>Palavras-chave:</strong> {indicador.palavra_chave}
@@ -295,6 +578,12 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                         </div>
                       )}
 
+                      {indicador.formula_calculo_indicador && (
+                        <div style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>
+                          <strong>Fórmula:</strong> {indicador.formula_calculo_indicador}
+                        </div>
+                      )}
+
                       {indicador.informacoes_indicador && (
                         <div style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
                           <strong>Informações:</strong> 
@@ -303,6 +592,32 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                               ? `${indicador.informacoes_indicador.substring(0, 200)}...`
                               : indicador.informacoes_indicador
                             }
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Exibir informações do tipo de campo */}
+                      {indicador.tiposCampo && indicador.tiposCampo.length > 0 ? (
+                        <TipoCampoInfo tipoCampo={indicador.tiposCampo[0]} />
+                      ) : (
+                        <div style={{ 
+                          backgroundColor: "#fff3cd", 
+                          padding: "10px", 
+                          borderRadius: "4px", 
+                          marginTop: "10px",
+                          border: "1px solid #ffeaa7",
+                          fontSize: "14px",
+                          color: "#856404"
+                        }}>
+                          <strong>⚠️ Campo de entrada não configurado</strong>
+                          <div style={{ marginTop: "5px", fontSize: "13px" }}>
+                            Este indicador ainda não possui um campo de entrada definido. 
+                            <span 
+                              style={{ cursor: "pointer", color: "#007bff", textDecoration: "underline" }}
+                              onClick={() => handleEditIndicador(indicador)}
+                            >
+                              Clique aqui para configurar
+                            </span>.
                           </div>
                         </div>
                       )}
@@ -340,7 +655,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
             <TextoModal>
               Tem certeza que deseja remover o indicador "{indicadorSelecionado?.nome_indicador}" ({indicadorSelecionado?.codigo_indicador})?
               <br />
-              <strong>Esta ação não pode ser desfeita.</strong>
+              <strong>Esta ação removerá também o tipo de campo e suas opções. Esta ação não pode ser desfeita.</strong>
             </TextoModal>
             <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
               <CancelButton onClick={handleCloseConfirm}>Cancelar</CancelButton>
@@ -352,7 +667,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
 
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer />
+        
       </Footer>
     </Container>
   );

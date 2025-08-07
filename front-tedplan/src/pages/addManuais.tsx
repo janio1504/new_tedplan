@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   FaSearch,
   FaDatabase,
@@ -48,11 +48,7 @@ export default function AddManual() {
         },
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         reset({
           nome: "",
           data_cadastro: "",
@@ -62,11 +58,7 @@ export default function AddManual() {
       .catch((error) => {
         if (error) {
           console.log(error);
-          toast.notify("Ocorreu um erro ao gravar os dados!", {
-            title: "Erro!",
-            duration: 7,
-            type: "error",
-          });
+          toast.error("Ocorreu um erro ao gravar os dados!", { position: "top-right", autoClose: 5000 });
           return error;
         }
       });
@@ -75,7 +67,7 @@ export default function AddManual() {
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>
-      <ToastContainer></ToastContainer>
+      
       <DivCenter>
         <DivInstrucoes>
           <b>Cadastro de Manuais:</b>

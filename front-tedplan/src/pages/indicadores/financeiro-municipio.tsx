@@ -43,7 +43,7 @@ import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -120,11 +120,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
 
   async function handleCadastro(data) {
     if (!isEditor) {
-      toast.notify("Você não tem permissão para editar!", {
-        title: "Atenção!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
       return;
     }
     // CALCULO DA FORMULAS DO SNIS
@@ -582,11 +578,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("addPsFinanceiro", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         getFinaceiroMunicipio(anoSelected);
         return response;
       })
@@ -614,7 +606,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
@@ -732,7 +724,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                 <nav>
                   <ol>
                     <li>
-                      <Link href="./home_indicadores">Home</Link>
+                      <Link href="/indicadores/home_indicadores">Home</Link>
                       <span> / </span>
                     </li>
                     <li>

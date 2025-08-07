@@ -6,7 +6,7 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   NewButton,
@@ -117,11 +117,7 @@ export default function Postagens({
   async function handleEditorSimisabShowModal(usuario: IUsuario) {  
 
     if(Number(usuario.id_permissao) !== 4) {
-      toast.notify("O usuário deve ser revisor!", {
-      title: "Permissão negada",
-      duration: 7,
-      type: "error",
-      });
+      toast.error("O usuário deve ser revisor!", { position: "top-right", autoClose: 5000 });
       return;
     }
     setUsuarioModal(usuario);
@@ -177,11 +173,7 @@ export default function Postagens({
       .delete("removerUsuario", { params: { id_usuario: id_usuario } })
       .then((response) => {})
       .catch((error) => {
-        toast.notify("Não foi possivel remover o usuário!", {
-          title: "Aconteceu o seguinte erro",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover o usuário!", { position: "top-right", autoClose: 5000 });
       });
 
     setModalConfirm(false);
@@ -203,11 +195,7 @@ export default function Postagens({
         senha: data.senha,
       })
       .then((response) => {
-        toast.notify("Dados atualizados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados atualizados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         console.log(error);
@@ -222,11 +210,7 @@ export default function Postagens({
   async function handleEditorSimisabPorAno(data: any) {    
         
     if (!data.ano_editor_simisab) {
-      toast.notify("Selecione um ano para editar!", {
-        title: "Atenção!",
-        duration: 7,
-        type: "warning",
-      });
+      toast.warning("Selecione um ano para editar!", { position: "top-right", autoClose: 5000 });
       return;
     }
     await api.post("create-editor-simisab-por-ano", {
@@ -236,11 +220,7 @@ export default function Postagens({
         ativo: data.editor_ativo,
       })
       .then((response) => {
-        toast.notify("Permissão atualizada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Permissão atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         console.log(error);
@@ -469,7 +449,7 @@ export default function Postagens({
       </DivCenter>
       <Footer>
         &copy; Todos os direitos reservados{" "}
-        <ToastContainer align={"center"} position={"button"} />
+        
       </Footer>
     </Container>
   );

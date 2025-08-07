@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import "suneditor/dist/css/suneditor.min.css";
 import { getData } from "./api/post";
 
@@ -173,11 +173,7 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         console.log(error);
@@ -195,20 +191,12 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        toast.notify("Norma removida com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Norma removida com sucesso!", { position: "top-right", autoClose: 5000 });
         setModalConfirm(false);
         Router.push("/listarNormas");
       })
       .catch((error) => {
-        toast.notify("Aconteceu um erro!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Aconteceu um erro!", { position: "top-right", autoClose: 5000 });
         setModalConfirm(false);
         Router.push("/listarNormas");
       });
@@ -232,11 +220,7 @@ export default function Postagens({ normas }: NormasProps) {
         },
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         return response;
       })
       .catch((error) => {
@@ -259,7 +243,7 @@ export default function Postagens({ normas }: NormasProps) {
   return (
     <Container>
       <MenuSuperior usuarios={[]}></MenuSuperior>
-      <ToastContainer></ToastContainer>
+      
       <DivCenter>
         <NewButton onClick={handleAddNorma}>Adicionar Norma</NewButton>
         <ListPost>

@@ -44,7 +44,7 @@ import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
@@ -103,11 +103,7 @@ export default function Agua() {
 
   async function handleCadastro(data) {
     if (!isEditor) {
-      toast.notify("Você não tem permissão para editar!", {
-        title: "Atenção!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
@@ -118,11 +114,7 @@ export default function Agua() {
     const resCad = await api
       .post("create-agua", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         return response.data;
       })
       .catch((error) => {
@@ -153,7 +145,7 @@ export default function Agua() {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
@@ -196,11 +188,11 @@ export default function Agua() {
                         <nav>
                           <ol>
                             <li>
-                              <Link href="./home_indicadores">Home</Link>
+                              <Link href="/indicadores/home_indicadores">Home</Link>
                               <span> / </span>
                             </li>
                             <li>
-                              <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                              <Link href="/indicadores/prestacao-servicos">Prestação de Serviços</Link>
                               <span> / </span>
                             </li>
                             <li>

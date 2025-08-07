@@ -16,7 +16,7 @@ import {
   FaTrashAlt,
 } from "react-icons/fa";
 import { useToasts } from "react-toast-notifications";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import "suneditor/dist/css/suneditor.min.css";
 import { getData } from "./api/post";
 
@@ -127,11 +127,7 @@ export default function ArquivosOndrive({
     const resDelete = await api.delete("deletePost", {
       params: { id_arquivo_ondrive: id_arquivo_ondrive },
     });
-    toast.notify("Dados removidos com sucesso!", {
-      title: "Sucesso!",
-      duration: 7,
-      type: "success",
-    });
+    toast.success("Dados removidos com sucesso!", { position: "top-right", autoClose: 5000 });
     setModalConfirm(false);
     Router.push("/postagens");
   }
@@ -283,7 +279,7 @@ export default function ArquivosOndrive({
         </DivFormConteudo>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>{" "}
+        &copy; Todos os direitos reservados{" "}
       </Footer>
     </Container>
   );

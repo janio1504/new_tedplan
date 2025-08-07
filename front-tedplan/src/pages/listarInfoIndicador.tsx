@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { useInfoIndicador } from "../contexts/InfoIndicadorContext";
 import {
   Container,
@@ -64,9 +64,9 @@ export default function ListarIndicadores() {
 
   useEffect(() => {
     if (error) {
-      toast.notify(error, {
-        type: "error",
-        duration: 7,
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 7000,
       });
       clearError();
     }
@@ -118,18 +118,12 @@ export default function ListarIndicadores() {
   async function handleRemoverIndicador(id: number, id_imagem?: number) {
     try {
       await deleteInfoIndicador(id, id_imagem);
-      toast.notify("Indicador removido com sucesso!", {
-        type: "success",
-        duration: 7,
-      });
+      toast.success("Indicador removido com sucesso!", { position: "top-right", autoClose: 5000 });
       setModalConfirm(false);
       loadInfoIndicadores();
       Router.push("/listarInfoIndicador");
     } catch (error) {
-      toast.notify("Erro ao remover indicador!", {
-        type: "error",
-        duration: 7,
-      });
+      toast.error("Erro ao remover indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -148,17 +142,11 @@ export default function ListarIndicadores() {
 
     try {
       await updateInfoIndicador(formData);
-      toast.notify("Indicador atualizado com sucesso!", {
-        type: "success",
-        duration: 7,
-      });
+      toast.success("Indicador atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
       handleCloseModal();
       loadInfoIndicadores();
     } catch (error) {
-      toast.notify("Erro ao atualizar indicador!", {
-        type: "error",
-        duration: 7,
-      });
+      toast.error("Erro ao atualizar indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -342,7 +330,7 @@ export default function ListarIndicadores() {
       </DivCenter>
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer align={"center"} position={"button"} />
+        
       </Footer>
     </Container>
   );

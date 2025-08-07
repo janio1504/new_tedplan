@@ -19,7 +19,7 @@ return (
     <nav> 
       <ol>
         <li>
-          <Link href="./home_indicadores">
+                      <Link href="/indicadores/home_indicadores">
             Home
           </Link>
         </li>

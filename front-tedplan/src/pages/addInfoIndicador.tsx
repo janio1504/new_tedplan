@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { useInfoIndicador } from "../contexts/InfoIndicadorContext";
 import MenuSuperior from "../components/head";
@@ -117,10 +117,7 @@ export default function AddIndicador() {
           }
         } catch (error) {
           console.error("Error loading indicator:", error);
-          toast.notify("Erro ao carregar dados do indicador!", {
-            type: "error",
-            duration: 7,
-          });
+          toast.error("Erro ao carregar dados do indicador!", { position: "top-right", autoClose: 5000 });
         }
       }
     };
@@ -144,18 +141,12 @@ export default function AddIndicador() {
       if (id) {
         formData.append("id_descricao_indicador", id as string);
         await updateInfoIndicador(formData);
-        toast.notify("Indicador atualizado com sucesso!", {
-          type: "success",
-          duration: 7,
-        });
+        toast.success("Indicador atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
 
         loadInfoIndicadores();
       } else {
         await createInfoIndicador(formData);
-        toast.notify("Indicador cadastrado com sucesso!", {
-          type: "success",
-          duration: 7,
-        });
+        toast.success("Indicador cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
       }
 
       reset();
@@ -165,9 +156,9 @@ export default function AddIndicador() {
       }, 2000);
     } catch (error) {
       console.error(error);
-      toast.notify(`Erro ao ${id ? "atualizar" : "cadastrar"} indicador!`, {
-        type: "error",
-        duration: 7,
+      toast.error(`Erro ao ${id ? "atualizar" : "cadastrar"} indicador!`, {
+        position: "top-right",
+        autoClose: 7000,
       });
     }
   };
@@ -186,7 +177,7 @@ export default function AddIndicador() {
   return (
     <Container>
       <MenuSuperior usuarios={[]} />
-      <ToastContainer></ToastContainer>
+      
       <DivCenter>
         <DivInstrucoes>
           <b>{id ? "Editar" : "Adicionar"} Informações de Indicador:</b>
