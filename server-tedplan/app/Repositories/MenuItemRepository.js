@@ -14,7 +14,8 @@ class MenuItemRepository {
         const menuItem = await MenuItem.query()
             .where('id_menu_item', id)
             .with('menu')
-            .first();
+            .orderBy("ordem_item_menu", "asc")
+            .fetch();
         return menuItem ? menuItem.toJSON() : null;
     }
 
@@ -22,11 +23,11 @@ class MenuItemRepository {
         const menuItems = await MenuItem.query()
             .where('id_menu', id_menu)
             .with('menu')
-            .orderBy("nome_menu_item", "asc")
+            .orderBy("ordem_item_menu", "asc")
             .fetch();
         return menuItems.toJSON();
     }
-    
+
     async addMenuItem(data) {
         const menuItem = await MenuItem.create(data);
         // Recarregar com relacionamentos
@@ -36,14 +37,14 @@ class MenuItemRepository {
             .first();
         return menuItemWithRelations ? menuItemWithRelations.toJSON() : menuItem.toJSON();
     }
-    
+
     async updateMenuItem(id, data) {
         const menuItem = await MenuItem.findOrFail(id);
         menuItem.merge(data);
         await menuItem.save();
         return menuItem;
     }
-    
+
     async deleteMenuItem(id) {
         const menuItem = await MenuItem.findOrFail(id);
         await menuItem.delete();

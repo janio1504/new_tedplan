@@ -328,7 +328,7 @@ export const DivInput = styled.div`
 
 export const Form = styled.form`
   margin: 40px auto;
-  max-width: 500px;
+  max-width: 1000px;
   width: 100%;
   display: flex;
   flex-direction: column;

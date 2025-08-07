@@ -5,7 +5,7 @@ class IndicadorNovoRepository {
     async getAllIndicadores() {
         const indicadores = await IndicadorNovo.query()
             .with('menuItem')
-            .with('tipoCampoIndicador')
+            .with('tiposCampo')
             .orderBy("nome_indicador", "asc")
             .fetch();
         return indicadores;
@@ -15,7 +15,7 @@ class IndicadorNovoRepository {
         const indicador = await IndicadorNovo.query()
             .where('id_indicador', id)
             .with('menuItem')
-            .with('tipoCampoIndicador')
+            .with('tiposCampo')
             .with('indicadoresMunicipio')
             .first();
         return indicador;
@@ -24,7 +24,7 @@ class IndicadorNovoRepository {
     async getIndicadoresByMenuItem(id_menu_item) {
         const indicadores = await IndicadorNovo.query()
             .where('id_menu_item', id_menu_item)
-            .with('tipoCampoIndicador')
+            .with('tiposCampo')
             .orderBy("nome_indicador", "asc")
             .fetch();
         return indicadores;
@@ -34,7 +34,7 @@ class IndicadorNovoRepository {
         const indicadores = await IndicadorNovo.query()
             .where('grupo_indicador', grupo_indicador)
             .with('menuItem')
-            .with('tipoCampoIndicador')
+            .with('tiposCampo')
             .orderBy("nome_indicador", "asc")
             .fetch();
         return indicadores;
@@ -44,23 +44,23 @@ class IndicadorNovoRepository {
         const indicador = await IndicadorNovo.query()
             .where('codigo_indicador', codigo_indicador)
             .with('menuItem')
-            .with('tipoCampoIndicador')
+            .with('tiposCampo')
             .first();
         return indicador;
     }
-    
+
     async addIndicador(data) {
         const indicador = await IndicadorNovo.create(data);
         return indicador;
     }
-    
+
     async updateIndicador(id, data) {
         const indicador = await IndicadorNovo.findOrFail(id);
         indicador.merge(data);
         await indicador.save();
         return indicador;
     }
-    
+
     async deleteIndicador(id) {
         const indicador = await IndicadorNovo.findOrFail(id);
         await indicador.delete();
@@ -72,8 +72,9 @@ class IndicadorNovoRepository {
             .where('nome_indicador', 'ilike', `%${searchTerm}%`)
             .orWhere('codigo_indicador', 'ilike', `%${searchTerm}%`)
             .orWhere('palavra_chave', 'ilike', `%${searchTerm}%`)
+            .orWhere('unidade_indicador', 'ilike', `%${searchTerm}%`)
             .with('menuItem')
-            .with('tipoCampoIndicador')
+            .with('tiposCampo')
             .orderBy("nome_indicador", "asc")
             .fetch();
         return indicadores;

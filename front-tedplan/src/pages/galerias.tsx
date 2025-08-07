@@ -25,7 +25,7 @@ import {
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast } from 'react-toastify'
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
 import { ImagenAmpliada, ModalImgAmpliada } from "../styles/dashboard";
@@ -91,11 +91,7 @@ export default function Galerias({
     );
     const galerias = resBusca.data;
     if (galerias.length == 0){
-      toast.notify('Nenhum resultado encontrado para a busca!',{
-        title: "Atenção",
-        duration: 7,
-        type: "error",
-      })
+      toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 })
       return
     }
     getGalerias(galerias);
@@ -282,7 +278,7 @@ export default function Galerias({
                       </ContainerModal>
                     )}
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
+      <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );
 }

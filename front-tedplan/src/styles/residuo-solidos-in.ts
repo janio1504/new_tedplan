@@ -1292,7 +1292,9 @@ export const MainContent = styled.div`
   min-height: calc(100vh - 160px);
 `;
 
-export const SidebarItem = styled.div<{ active?: boolean }>`
+export const SidebarItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
   cursor: pointer;
   padding: 0.75rem 1rem;
   margin-bottom: 0.25rem;

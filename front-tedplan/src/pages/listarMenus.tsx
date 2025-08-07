@@ -5,7 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   NewButton,
@@ -61,11 +61,7 @@ export default function ListarMenus({ menus }: MenuProps) {
       setMenusList(response.data);
     } catch (error) {
       console.error("Erro ao carregar menus:", error);
-      toast.notify("Erro ao carregar menus!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar menus!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -94,22 +90,14 @@ export default function ListarMenus({ menus }: MenuProps) {
       const apiClient = getAPIClient();
       await apiClient.delete(`/menus/${menuSelecionado.id_menu}`);
       
-      toast.notify("Menu removido com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Menu removido com sucesso!", { position: "top-right", autoClose: 5000 });
       
       setModalConfirm(false);
       setMenuSelecionado(null);
       loadMenus(); // Recarregar a lista
     } catch (error) {
       console.error("Erro ao remover menu:", error);
-      toast.notify("Erro ao remover menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao remover menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -222,7 +210,7 @@ export default function ListarMenus({ menus }: MenuProps) {
 
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer />
+        
       </Footer>
     </Container>
   );

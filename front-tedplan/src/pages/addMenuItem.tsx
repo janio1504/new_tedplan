@@ -2,7 +2,7 @@ import {} from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -24,6 +24,7 @@ interface IMenuItem {
   id_menu_item: string;
   nome_menu_item: string;
   id_menu: string;
+  ordem_item_menu?: number;
 }
 
 interface IMenu {
@@ -85,20 +86,18 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
       reset({
         nome_menu_item: menuItemData.nome_menu_item,
         id_menu: menuItemData.id_menu,
+        ordem_item_menu: menuItemData.ordem_item_menu,
       });
     } catch (error) {
       console.error("Erro ao carregar dados do item de menu:", error);
-      toast.notify("Erro ao carregar dados do item de menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar dados do item de menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
   async function handleAddMenuItem({
     nome_menu_item,
     id_menu,
+    ordem_item_menu,
   }) {
     try {
       const apiClient = getAPIClient();
@@ -106,29 +105,23 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
       const menuItemData = {
         nome_menu_item,
         id_menu: parseInt(id_menu),
+        ordem_item_menu: ordem_item_menu ? parseInt(ordem_item_menu) : null,
       };
 
       if (isEditing && menuItemId) {
         // Atualizar item de menu existente
         await apiClient.put(`/menu-items/${menuItemId}`, menuItemData);
-        toast.notify("Item de menu atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Item de menu atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
       } else {
         // Criar novo item de menu
         await apiClient.post("/menu-items", menuItemData);
-        toast.notify("Item de menu cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Item de menu cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
       }
 
       reset({
         nome_menu_item: "",
         id_menu: "",
+        ordem_item_menu: "",
       });
 
       setTimeout(() => {
@@ -136,11 +129,7 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
       }, 2000);
     } catch (error) {
       console.error("Erro ao salvar item de menu:", error);
-      toast.notify("Erro ao salvar item de menu!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao salvar item de menu!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -182,13 +171,26 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
             <span>O campo Nome do Item é obrigatório!</span>
           )}
 
+          <label>Ordem do Item</label>
+          <input
+            aria-invalid={errors.ordem_item_menu ? "true" : "false"}
+            {...register("ordem_item_menu")}
+            type="number"
+            placeholder="Ex: 1, 2, 3..."
+            name="ordem_item_menu"
+            min="1"
+          />
+          <small style={{ color: "#666", fontSize: "12px", marginTop: "5px", display: "block" }}>
+            Defina a ordem de exibição dos itens no menu (opcional)
+          </small>
+
           <SubmitButton type="submit">
             {isEditing ? "Atualizar" : "Gravar"}
           </SubmitButton>
         </Form>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

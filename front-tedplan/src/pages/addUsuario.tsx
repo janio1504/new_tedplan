@@ -2,7 +2,7 @@ import {} from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -104,18 +104,10 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
         id_municipio,
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Erro ao gravar dados!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao gravar dados!", { position: "top-right", autoClose: 5000 });
       });
 
     reset({
@@ -241,7 +233,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
         </Form>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

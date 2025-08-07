@@ -7,7 +7,7 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -186,11 +186,7 @@ export default function Publicacoes({
         titulo: data.titulo,
       })
       .then((response) => {
-        toast.notify("Dados atualizados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados atualizados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         console.log(error);
@@ -215,11 +211,7 @@ export default function Publicacoes({
         },
       })
       .then((response) => {
-        toast.notify("Imagem atualizada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Imagem atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
         return response;
       })
       .catch((error) => {
@@ -295,7 +287,7 @@ export default function Publicacoes({
         </ListPost>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados <ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados 
       </Footer>
       {isModalConfirm && (
         <ContainerModal>

@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 //import suneditor from "suneditor";
@@ -139,11 +139,7 @@ export default function Postagens({ posts }: PostProps) {
     const resDelete = await api.delete("deletePost", {
       params: { id_posts: idPost, id_imagem: idImagem },
     });
-    toast.notify("Post removido com sucesso!", {
-      title: "Ação executada com sucesso!",
-      duration: 7,
-      type: "success",
-    });
+    toast.success("Post removido com sucesso!", { position: "top-right", autoClose: 5000 });
     setModalConfirm(false);
     Router.push("/listarPostagens");
   }
@@ -167,11 +163,7 @@ export default function Postagens({ posts }: PostProps) {
         },
       })
       .then((response) => {
-        toast.notify("Imagem atualizada com sucesso!", {
-          title: "Ação executada com sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Imagem atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
         return response;
       })
       .catch((error) => {
@@ -364,7 +356,7 @@ export default function Postagens({ posts }: PostProps) {
         </ListPost>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

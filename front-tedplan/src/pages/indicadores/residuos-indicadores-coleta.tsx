@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { set, useForm } from "react-hook-form";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { anosSelect } from "../../util/util";
 import {
   Container,
@@ -203,21 +203,16 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         numero_associados: data.numero_associados,
         ano: anoSelected,
       }).then((response) => {
-        toast.notify("Cooperativa cadastrada com sucesso", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Cooperativa cadastrada com sucesso", { position: "top-right", autoClose: 5000 });
         loadDadosCooperativasCatadores({
           ano: anoSelected,
           id: usuario?.id_municipio,
         });
       });
     } catch (error) {
-      toast.notify(error.message || "Erro ao cadastrar cooperativa catadores", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
+      toast.error(error.message || "Erro ao cadastrar cooperativa catadores", {
+        position: "top-right",
+        autoClose: 7000,
       });
     } finally {
       handleCloseAssCatadores();
@@ -228,21 +223,13 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     if (confirm("Deseja realmente excluir a cooperativa?")) {
       const result = await removeCoopCat(id)
         .then((response) => {
-          toast.notify("Cooperativa removida com sucesso!", {
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
-          });
+          toast.success("Cooperativa removida com sucesso!", { position: "top-right", autoClose: 5000 });
         })
         .catch((error) => {
-          toast.notify(
-            error.message || "Erro ao remover cooperativa catadores",
-            {
-              title: "Erro!",
-              duration: 7,
-              type: "error",
-            }
-          );
+          toast.error(error.message || "Erro ao remover cooperativa catadores", {
+            position: "top-right",
+            autoClose: 7000,
+          });
         });
     }
     loadDadosCooperativasCatadores({
@@ -256,11 +243,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
       return;
     }
     if (anoSelected === null || anoSelected === "Selecionar") {
-      toast.notify("Selecione um ano!", {
-        title: "Erro",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Selecione um ano!", { position: "top-right", autoClose: 5000 });
       return;
     }
     data.TB013 =
@@ -506,20 +489,12 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
     const resCad = apiClient
       .post("addPsResiduosColeta", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         loadDadosResiduos({ ano: anoSelected, id: usuario?.id_municipio });
         return response;
       })
       .catch((error) => {
-        toast.notify("Ocorreu um erro ao gravar os dados!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Ocorreu um erro ao gravar os dados!", { position: "top-right", autoClose: 5000 });
         console.log(error);
       });
   }
@@ -536,10 +511,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         ano: anoSelected,
         quant_residuos_exportados: data.quant_residuos_exportados,
       }).then((response) => {
-        toast.notify(response.message, {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 7000,
         });
         loadDadosUnidadesRsc({
           ano: anoSelected,
@@ -547,10 +521,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         });
       });
     } catch (error) {
-      toast.notify(error.message || "Erro ao cadastrar unidade RSC", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
+      toast.error(error.message || "Erro ao cadastrar unidade RSC", {
+        position: "top-right",
+        autoClose: 7000,
       });
     } finally {
       handleCloseModalCO020();
@@ -560,11 +533,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   const handleRemoveUnidadeRss = async (id: string) => {
     if (confirm("Deseja realmente excluir a unidade?")) {
       const result = await removeUnidadeRss(id).then((response) => {
-        toast.notify("Unidade removida com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Unidade removida com sucesso!", { position: "top-right", autoClose: 5000 });
         loadDadosUnidadesRss({
           ano: anoSelected,
           id: usuario?.id_municipio,
@@ -576,11 +545,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
   const handleRemoveUnidadeRsc = async (id: string) => {
     if (confirm("Deseja realmente excluir a unidade?")) {
       const result = await removeUnidadeRsc(id).then((response) => {
-        toast.notify("Unidade removida com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Unidade removida com sucesso!", { position: "top-right", autoClose: 5000 });
         loadDadosUnidadesRsc({
           ano: anoSelected,
           id: usuario?.id_municipio,
@@ -601,10 +566,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         ano: anoSelected,
         quant_residuos_exportados: data.quant_residuos_exportados,
       }).then((response) => {
-        toast.notify(response.message, {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
+        toast.success(response.message, {
+          position: "top-right",
+          autoClose: 7000,
         });
       });
       loadDadosUnidadesRss({
@@ -612,10 +576,9 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
         id: usuario?.id_municipio,
       });
     } catch (error) {
-      toast.notify(error.message || "Erro ao cadastrar unidade RSS", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
+      toast.error(error.message || "Erro ao cadastrar unidade RSS", {
+        position: "top-right",
+        autoClose: 7000,
       });
     } finally {
       handleCloseModalRS031();
@@ -671,7 +634,7 @@ export default function ResiduosColeta({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}

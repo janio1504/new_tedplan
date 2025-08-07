@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   Form,
@@ -138,19 +138,11 @@ export default function AddNorma({
         },
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         if (error) {
-          toast.notify("Erro ao gravar dados!", {
-            title: "Erro!",
-            duration: 7,
-            type: "error",
-          });
+          toast.error("Erro ao gravar dados!", { position: "top-right", autoClose: 5000 });
           return error;
         }
       });
@@ -192,20 +184,12 @@ export default function AddNorma({
         await apiClient.post("updateNorma", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.notify("Norma atualizada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Norma atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
       } else {
         await apiClient.post("addNorma", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.notify("Norma criada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Norma criada com sucesso!", { position: "top-right", autoClose: 5000 });
       }
 
       setTimeout(() => {
@@ -213,11 +197,7 @@ export default function AddNorma({
       }, 2000);
     } catch (error) {
       console.error("Erro ao salvar norma:", error);
-      toast.notify("Erro ao salvar norma!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao salvar norma!", { position: "top-right", autoClose: 5000 });
     }
   };
 
@@ -303,7 +283,7 @@ export default function AddNorma({
       </DivCenter>
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer />
+        
       </Footer>
     </Container>
   );

@@ -14,7 +14,7 @@ import {
   FaSignOutAlt,
   FaRegTimesCircle,
 } from "react-icons/fa";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
@@ -156,11 +156,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
     const resDelete = await api.delete("deleteGaleria", {
       params: { id_galeria: idGaleria, id_imagem: idImagem },
     });
-    toast.notify("Os dados foram removidos!", {
-      title: "Atenção!",
-      duration: 7,
-      type: "error",
-    });
+    toast.error("Os dados foram removidos!", { position: "top-right", autoClose: 5000 });
     setModalConfirm(false);
     Router.push("/listarGalerias");
   }
@@ -169,11 +165,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
     try {
       // Verificar se há arquivos selecionados
       if (!data.imagem || !data.imagem.length) {
-        toast.notify("Selecione pelo menos uma imagem!", {
-          title: "Atenção!",
-          duration: 7,
-          type: "warning",
-        });
+        toast.warning("Selecione pelo menos uma imagem!", { position: "top-right", autoClose: 5000 });
         return;
       }
 
@@ -189,22 +181,14 @@ export default function Postagens({ galerias }: GaleriaProps) {
         });
       }
 
-      toast.notify("Imagens adicionadas com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Imagens adicionadas com sucesso!", { position: "top-right", autoClose: 5000 });
 
       // Fechar modal e atualizar lista
       setModalVisible(false);
       Router.reload();
     } catch (error) {
       console.error("Erro ao adicionar imagens:", error);
-      toast.notify("Erro ao adicionar imagens!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao adicionar imagens!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -212,11 +196,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
     const resDelete = await api.delete("deleteImagem", {
       params: { id_imagem: id_imagem },
     });
-    toast.notify("Os dados foram removidos!", {
-      title: "Atenção!",
-      duration: 7,
-      type: "error",
-    });
+    toast.error("Os dados foram removidos!", { position: "top-right", autoClose: 5000 });
     handleModalGaleriaOpen({ id_galeria: idGaleria });
   }
 
@@ -313,7 +293,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
         </ListPost>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>{" "}
+        &copy; Todos os direitos reservados{" "}
       </Footer>
       {isModalConfirm && (
         <ContainerModal>

@@ -7,25 +7,32 @@ class MenuController {
     this.menuRepository = new MenuRepository();
   }
 
-  async index({ response }) {
+  async index({ request, response }) {
     try {
-      const menus = await this.menuRepository.getAllMenus();
-      return response.status(200).json(menus);
+      const { id } = request.get();
+
+      if (id) {
+        const menus = await this.menuRepository.getMenusByModulo(id);
+        return response.status(200).json(menus);
+      } else {
+        const menus = await this.menuRepository.getAllMenus();
+        return response.status(200).json(menus);
+      }
     } catch (error) {
-      console.log(error);
       return response.status(500).json({ error: 'Erro interno do servidor' });
     }
   }
 
   async show({ params, response }) {
+
     try {
       const { id } = params;
       const menu = await this.menuRepository.getMenuById(id);
-      
+
       if (!menu) {
         return response.status(404).json({ error: 'Menu não encontrado' });
       }
-      
+
       return response.status(200).json(menu);
     } catch (error) {
       console.log(error);
@@ -36,7 +43,7 @@ class MenuController {
   async store({ request, response }) {
     try {
       const data = request.all();
-      
+
       // Validações básicas
       if (!data.titulo) {
         return response.status(400).json({ error: 'Título é obrigatório' });
@@ -54,7 +61,7 @@ class MenuController {
     try {
       const { id } = params;
       const data = request.all();
-      
+
       const menu = await this.menuRepository.updateMenu(id, data);
       return response.status(200).json(menu);
     } catch (error) {
@@ -105,7 +112,7 @@ class MenuController {
   async search({ request, response }) {
     try {
       const { q } = request.get();
-      
+
       if (!q) {
         return response.status(400).json({ error: 'Parâmetro de busca é obrigatório' });
       }

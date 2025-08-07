@@ -14,7 +14,7 @@ class MenuRepository {
         const menu = await Menu.query()
             .where('id_menu', id)
             .with('menuItems')
-            .first();
+            .fetch();
         return menu;
     }
 
@@ -30,24 +30,26 @@ class MenuRepository {
     async getMenusByEixo(id_eixo) {
         const menus = await Menu.query()
             .where('id_eixo', id_eixo)
-            .with('menuItems')
+            .with('menuItems', (builder) => {
+                builder.orderBy('ordem_item_menu', 'asc').orderBy('nome_menu_item', 'asc');
+            })
             .orderBy("titulo", "asc")
             .fetch();
         return menus;
     }
-    
+
     async addMenu(data) {
         const menu = await Menu.create(data);
         return menu;
     }
-    
+
     async updateMenu(id, data) {
         const menu = await Menu.findOrFail(id);
         menu.merge(data);
         await menu.save();
         return menu;
     }
-    
+
     async deleteMenu(id) {
         const menu = await Menu.findOrFail(id);
         await menu.delete();
@@ -58,7 +60,9 @@ class MenuRepository {
         const menus = await Menu.query()
             .where('titulo', 'ilike', `%${searchTerm}%`)
             .orWhere('descricao', 'ilike', `%${searchTerm}%`)
-            .with('menuItems')
+            .with('menuItems', (builder) => {
+                builder.orderBy('ordem_item_menu', 'asc').orderBy('nome_menu_item', 'asc');
+            })
             .orderBy("titulo", "asc")
             .fetch();
         return menus;

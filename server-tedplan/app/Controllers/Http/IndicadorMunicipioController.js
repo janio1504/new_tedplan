@@ -21,11 +21,11 @@ class IndicadorMunicipioController {
     try {
       const { id } = params;
       const indicador = await this.indicadorMunicipioRepository.getIndicadorMunicipioById(id);
-      
+
       if (!indicador) {
         return response.status(404).json({ error: 'Indicador de município não encontrado' });
       }
-      
+
       return response.status(200).json(indicador);
     } catch (error) {
       console.log(error);
@@ -36,12 +36,12 @@ class IndicadorMunicipioController {
   async store({ request, response }) {
     try {
       const data = request.all();
-      
+
       // Validações básicas
-      if (!data.id_indicador) {
-        return response.status(400).json({ error: 'ID do indicador é obrigatório' });
+      if (!data.codigo_indicador) {
+        return response.status(400).json({ error: 'Código do indicador é obrigatório' });
       }
-      
+
       if (!data.id_municipio) {
         return response.status(400).json({ error: 'ID do município é obrigatório' });
       }
@@ -50,6 +50,21 @@ class IndicadorMunicipioController {
         return response.status(400).json({ error: 'Ano é obrigatório' });
       }
 
+      // Verificar se já existe um registro com o mesmo código, município e ano
+      const existingRecord = await this.indicadorMunicipioRepository.getIndicadorByCodigoMunicipioAno(
+        data.codigo_indicador, data.id_municipio, data.ano
+      );
+
+      if (existingRecord) {
+        // Se já existe, atualizar o valor
+        const updatedRecord = await this.indicadorMunicipioRepository.updateIndicadorMunicipio(
+          existingRecord.id_incicador_municipio,
+          { valor_indicador: data.valor_indicador }
+        );
+        return response.status(200).json(updatedRecord);
+      }
+
+      // Se não existe, criar novo registro
       const indicador = await this.indicadorMunicipioRepository.addIndicadorMunicipio(data);
       return response.status(201).json(indicador);
     } catch (error) {
@@ -62,7 +77,7 @@ class IndicadorMunicipioController {
     try {
       const { id } = params;
       const data = request.all();
-      
+
       const indicador = await this.indicadorMunicipioRepository.updateIndicadorMunicipio(id, data);
       return response.status(200).json(indicador);
     } catch (error) {
@@ -92,7 +107,7 @@ class IndicadorMunicipioController {
     try {
       const { id_municipio } = params;
       const { ano } = request.get();
-      
+
       const indicadores = await this.indicadorMunicipioRepository.getIndicadoresByMunicipio(id_municipio, ano);
       return response.status(200).json(indicadores);
     } catch (error) {
@@ -105,7 +120,7 @@ class IndicadorMunicipioController {
     try {
       const { id_indicador } = params;
       const { ano } = request.get();
-      
+
       const indicadores = await this.indicadorMunicipioRepository.getIndicadoresByIndicador(id_indicador, ano);
       return response.status(200).json(indicadores);
     } catch (error) {
@@ -128,21 +143,21 @@ class IndicadorMunicipioController {
   async getIndicadorByCodigoMunicipioAno({ request, response }) {
     try {
       const { codigo_indicador, id_municipio, ano } = request.get();
-      
+
       if (!codigo_indicador || !id_municipio || !ano) {
-        return response.status(400).json({ 
-          error: 'Código do indicador, ID do município e ano são obrigatórios' 
+        return response.status(400).json({
+          error: 'Código do indicador, ID do município e ano são obrigatórios'
         });
       }
 
       const indicador = await this.indicadorMunicipioRepository.getIndicadorByCodigoMunicipioAno(
         codigo_indicador, id_municipio, ano
       );
-      
+
       if (!indicador) {
         return response.status(404).json({ error: 'Indicador não encontrado' });
       }
-      
+
       return response.status(200).json(indicador);
     } catch (error) {
       console.log(error);
@@ -153,7 +168,7 @@ class IndicadorMunicipioController {
   async bulkInsert({ request, response }) {
     try {
       const { indicadores } = request.all();
-      
+
       if (!indicadores || !Array.isArray(indicadores) || indicadores.length === 0) {
         return response.status(400).json({ error: 'Lista de indicadores é obrigatória' });
       }
@@ -169,10 +184,10 @@ class IndicadorMunicipioController {
   async bulkUpdate({ request, response }) {
     try {
       const { id_municipio, ano, indicadores } = request.all();
-      
+
       if (!id_municipio || !ano || !indicadores || !Array.isArray(indicadores)) {
-        return response.status(400).json({ 
-          error: 'ID do município, ano e lista de indicadores são obrigatórios' 
+        return response.status(400).json({
+          error: 'ID do município, ano e lista de indicadores são obrigatórios'
         });
       }
 

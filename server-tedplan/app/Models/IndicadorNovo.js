@@ -25,9 +25,9 @@ class IndicadorNovo extends Model {
     return this.belongsTo('App/Models/MenuItem', 'id_menu_item', 'id_menu_item');
   }
 
-  // Relacionamento com TipoCampoIndicador
-  tipoCampoIndicador() {
-    return this.belongsTo('App/Models/TipoCampoIndicador', 'id_tipo_campo_indicador', 'id_tipo_campo_indicador');
+  // Relacionamento com TipoCampoIndicador (hasMany porque agora cada indicador pode ter múltiplos tipos)
+  tiposCampo() {
+    return this.hasMany('App/Models/TipoCampoIndicador', 'id_indicador', 'id_indicador');
   }
 
   // Relacionamento com IndicadorMunicipio

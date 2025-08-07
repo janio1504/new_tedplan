@@ -7,7 +7,7 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   NewButton,
@@ -117,18 +117,10 @@ export default function Postagens({ manuais }: ManuaisProps) {
         },
       })
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Erro ao gravar os dados!", {
-          title: "Erro!",
-          duration: 7,
-          type: "success",
-        });
+        toast.error("Erro ao gravar os dados!", { position: "top-right", autoClose: 5000 });
         console.log(error);
         return error;
       });
@@ -148,11 +140,7 @@ export default function Postagens({ manuais }: ManuaisProps) {
         },
       })
       .then((response) => {
-        toast.notify("Imagem atualizada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Imagem atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
 
         return response;
       })
@@ -170,20 +158,12 @@ export default function Postagens({ manuais }: ManuaisProps) {
         },
       })
       .then((response) => {
-        toast.notify("Manual removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Manual removido com sucesso!", { position: "top-right", autoClose: 5000 });
         setModalConfirm(false);
         Router.push("/listarManuais");
       })
       .catch((error) => {
-        toast.notify("Aconteceu um erro!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Aconteceu um erro!", { position: "top-right", autoClose: 5000 });
         setModalConfirm(false);
         Router.push("/listarManuais");
       });
@@ -298,7 +278,7 @@ export default function Postagens({ manuais }: ManuaisProps) {
         </ListPost>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados <ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados 
       </Footer>
 
       {isModalUpdateVisible && (

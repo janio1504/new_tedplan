@@ -42,7 +42,7 @@ import {
 } from "../../styles/esgoto-indicadores";
 
 import HeadIndicadores from "../../components/headIndicadores";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -107,11 +107,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
   async function handleCadastro(data) {
     if (!isEditor) {
-      toast.notify("Você não tem permissão para editar!", {
-        title: "Atenção!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
@@ -121,19 +117,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-esgoto", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         return response.data;
       })
       .catch((error) => {
-        toast.notify("Erro ao gravar os dados!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao gravar os dados!", { position: "top-right", autoClose: 5000 });
         console.log(error);
       });
     getDadosEsgoto(anoSelected);
@@ -172,7 +160,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
@@ -215,11 +203,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                                 <nav>
                                   <ol>
                                     <li>
-                                      <Link href="./home_indicadores">Home</Link>
+                                      <Link href="/indicadores/home_indicadores">Home</Link>
                                       <span> / </span>
                                     </li>
                                     <li>
-                                      <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                      <Link href="/indicadores/prestacao-servicos">Prestação de Serviços</Link>
                                       <span> / </span>
                                     </li>
                                     <li>

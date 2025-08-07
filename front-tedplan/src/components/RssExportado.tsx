@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Form } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { useResiduos } from "../contexts/ResiduosContext";
 import { InputGG, InputP, InputSNIS } from "../styles/financeiro";
 import api from "../services/api";
@@ -25,29 +25,24 @@ export default function RssExportado(id_municipio: any) {
   const [municipios, setMunicipios] = useState(null);
 
   async function handleCadastroUnidadeRss(data) {
-    alert(id_municipio);
-    return;
     try {
       const result = await createDataUnidadeRss(data);
 
       if (result.success) {
-        toast.notify(result.message, {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
+        toast.success(result.message, {
+          position: "top-right",
+          autoClose: 7000,
         });
       } else {
-        toast.notify(result.message, {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
+        toast.error(result.message, {
+          position: "top-right",
+          autoClose: 7000,
         });
       }
     } catch (error) {
-      toast.notify(error.message || "Erro ao cadastrar unidade RSS", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
+      toast.error(error.message || "Erro ao cadastrar unidade RSS", {
+        position: "top-right",
+        autoClose: 7000,
       });
     } finally {
     }
@@ -63,9 +58,8 @@ export default function RssExportado(id_municipio: any) {
         return response.data;
       })
       .catch((error) => {
-        console.log(error);
+        // Erro ao buscar unidades de processamento
       });
-    console.log(res);
 
     setUnidadesProcessamento(res);
   }
@@ -81,16 +75,14 @@ export default function RssExportado(id_municipio: any) {
     const result = await removeUnidadeRss(id);
 
     if (result.success) {
-      toast.notify(result.message, {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
+      toast.success(result.message, {
+        position: "top-right",
+        autoClose: 7000,
       });
     } else {
-      toast.notify(result.message, {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
+      toast.error(result.message, {
+        position: "top-right",
+        autoClose: 7000,
       });
     }
   };

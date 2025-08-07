@@ -27,7 +27,7 @@ import "suneditor/dist/css/suneditor.min.css";
 
 import { AuthContext } from "../../../contexts/AuthContext";
 import { useEffect } from "react";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import { GetServerSideProps } from "next";
@@ -568,11 +568,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     const res = await api
       .post("addMunicipio", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         console.log(error);
@@ -601,7 +597,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import {
   Container,
   DivCenter,
@@ -499,11 +499,7 @@ export default function GestaoIndicadores({
       );
       setConselho(resPresidentes.data);
     } catch (error) {
-      toast.notify("Erro ao buscar presidentes do conselho!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao buscar presidentes do conselho!", { position: "top-right", autoClose: 5000 });
       setConselho([]);
     }
   }
@@ -512,11 +508,7 @@ export default function GestaoIndicadores({
 
   async function handleAddPresidente(data) {
     if (!usuario.id_municipio) {
-      toast.notify("Não existe Município, entre novamente no sistema! ", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Não existe Município, entre novamente no sistema! ", { position: "top-right", autoClose: 5000 });
       signOut();
     }
 
@@ -532,24 +524,16 @@ export default function GestaoIndicadores({
           data.id_conselho_municipal_saneamento_basico || null,
       })
       .then((response) => {
-        toast.notify(
-          "Presidência do Conselho Municipal adicionada com sucesso",
-          {
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
-          }
-        );
+        toast.success("Presidência do Conselho Municipal adicionada com sucesso", {
+          position: "top-right",
+          autoClose: 7000,
+        });
         setShowModalPresidente(false);
         reset();
         return response;
       })
       .catch((error) => {
-        toast.notify("Erro ao adicionar a Presidência do Conselho Municipal", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao adicionar a Presidência do Conselho Municipal", { position: "top-right", autoClose: 5000 });
       });
     getPresidentesConselho();
   }
@@ -564,32 +548,20 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify("Gestão Associada cadastrada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Gestão Associada cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
         resetGestao();
         getGestao();
         getRepresentantes();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar Gestão Associada!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar Gestão Associada!", { position: "top-right", autoClose: 5000 });
       });
 
     console.log("Dados enviados:", data);
   }
   async function handleAddConselhoMunicipal(data) {
     if (!usuario.id_municipio) {
-      toast.notify("Não existe Município, entre novamente no sistema!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Não existe Município, entre novamente no sistema!", { position: "top-right", autoClose: 5000 });
       signOut();
       return;
     }
@@ -603,20 +575,12 @@ export default function GestaoIndicadores({
     await api
       .post("create-conselho-municipal", formData)
       .then(() => {
-        toast.notify("Conselho Municipal cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Conselho Municipal cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
         getConselhoMunicipal();
         resetConselho();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar o Conselho Municipal!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar o Conselho Municipal!", { position: "top-right", autoClose: 5000 });
         console.log(data);
       });
   }
@@ -632,34 +596,22 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify(
-          "Política Municipal de Saneamento cadastrada com sucesso!",
-          {
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
-          }
-        );
+        toast.success("Política Municipal de Saneamento cadastrada com sucesso!", {
+          position: "top-right",
+          autoClose: 7000,
+        });
         resetPolitica();
         getPoliticas();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar Política Municipal de Saneamento!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar Política Municipal de Saneamento!", { position: "top-right", autoClose: 5000 });
       });
 
     console.log("Dados enviados:", data);
   }
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
-      toast.notify("Não existe Município, entre novamente no sistema! ", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Não existe Município, entre novamente no sistema! ", { position: "top-right", autoClose: 5000 });
       signOut();
     }
 
@@ -672,20 +624,12 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.notify("Representante cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Representante cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
         setShowModal(false);
         return response;
       })
       .catch((error) => {
-        toast.notify("Não foi possivel cadastrar o representante! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel cadastrar o representante! ", { position: "top-right", autoClose: 5000 });
       });
     getRepresentantes();
   }
@@ -701,20 +645,12 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify("Plano Municipal de Saneamento cadastrada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Plano Municipal de Saneamento cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
         resetPlano();
         getPlanos();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar Plano Municipal de Saneamento!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar Plano Municipal de Saneamento!", { position: "top-right", autoClose: 5000 });
       });
 
     console.log("Dados enviados:", data);
@@ -731,23 +667,15 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify(
-          "Participação e Controle Social de Saneamento cadastrado com sucesso!",
-          {
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
-          }
-        );
+        toast.success("Participação e Controle Social de Saneamento cadastrado com sucesso!", {
+          position: "top-right",
+          autoClose: 7000,
+        });
         resetParticipacao();
         getParticipacoes();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar Participação e Controle Social!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar Participação e Controle Social!", { position: "top-right", autoClose: 5000 });
       });
 
     console.log("Dados enviados:", data);
@@ -763,20 +691,12 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify("Descrição Saneamento Rural cadastrada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Descrição Saneamento Rural cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
         resetSR();
         // getSR();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar Descrição Saneamento Rural!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar Descrição Saneamento Rural!", { position: "top-right", autoClose: 5000 });
       });
 
     console.log("Dados enviados:", data);
@@ -793,20 +713,12 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.notify("Comunidades Tradicionais cadastrada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Comunidades Tradicionais cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
         resetCT();
         // getCT();
       })
       .catch(() => {
-        toast.notify("Erro ao cadastrar Comunidades Tradicionais!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao cadastrar Comunidades Tradicionais!", { position: "top-right", autoClose: 5000 });
       });
 
     console.log("Dados enviados:", data);
@@ -817,18 +729,10 @@ export default function GestaoIndicadores({
   async function handleRemoverPresidente({ id }) {
     try {
       await api.delete(`delete-presidencia-conselho-municipal/${id}`);
-      toast.notify("Presidente removido com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
+      toast.success("Presidente removido com sucesso!", { position: "top-right", autoClose: 5000 });
       getPresidentesConselho();
     } catch (error) {
-      toast.notify("Não foi possível remover o presidente!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Não foi possível remover o presidente!", { position: "top-right", autoClose: 5000 });
     }
   }
   async function handleRemoverParticipacao({ id, id_arquivo }) {
@@ -837,18 +741,10 @@ export default function GestaoIndicadores({
         params: { id: id, id_arquivo: id_arquivo },
       })
       .then((response) => {
-        toast.notify("Participacão removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Participacão removido com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Não foi possivel remover a participação! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover a participação! ", { position: "top-right", autoClose: 5000 });
       });
     getParticipacoes();
   }
@@ -858,18 +754,10 @@ export default function GestaoIndicadores({
         params: { id: id, id_arquivo: id_arquivo },
       })
       .then((response) => {
-        toast.notify("Política removida com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Política removida com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Não foi possivel remover a politica municipal! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover a politica municipal! ", { position: "top-right", autoClose: 5000 });
       });
     getPoliticas();
   }
@@ -879,18 +767,10 @@ export default function GestaoIndicadores({
         params: { id: id, id_arquivo: id_arquivo },
       })
       .then((response) => {
-        toast.notify("Plano removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Plano removido com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Não foi possivel remover o plano municipal! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover o plano municipal! ", { position: "top-right", autoClose: 5000 });
       });
     getPlanos();
   }
@@ -900,18 +780,10 @@ export default function GestaoIndicadores({
         params: { id: id },
       })
       .then((response) => {
-        toast.notify("Representante removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Representante removido com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Não foi possivel remover o representante!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover o representante!", { position: "top-right", autoClose: 5000 });
       });
     getRepresentantes();
   }
@@ -919,18 +791,10 @@ export default function GestaoIndicadores({
     await api
       .delete(`delete-conselho-municipal/${id}`)
       .then((response) => {
-        toast.notify("Conselho Municipal removido com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Conselho Municipal removido com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
-        toast.notify("Não foi possivel remover o conselho municipal! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover o conselho municipal! ", { position: "top-right", autoClose: 5000 });
       });
     getConselhoMunicipal();
   }
@@ -1058,10 +922,9 @@ export default function GestaoIndicadores({
       })
       .then((response) => {
         if (response.data.success) {
-          toast.notify(response.data.message, {
-            title: "Sucesso!",
-            duration: 7,
-            type: "success",
+          toast.success(response.data.message, {
+            position: "top-right",
+            autoClose: 7000,
           });
           getPoliticas();
           getPlanos();
@@ -1081,19 +944,14 @@ export default function GestaoIndicadores({
             ga_norma: "",
           });
         } else {
-          toast.notify(response.data.message, {
-            title: "Erro!",
-            duration: 7,
-            type: "error",
+          toast.error(response.data.message, {
+            position: "top-right",
+            autoClose: 7000,
           });
         }
       })
       .catch((error) => {
-        toast.notify("Não foi possivel cadastrar o representante! ", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel cadastrar o representante! ", { position: "top-right", autoClose: 5000 });
         console.log(error);
       });
 
@@ -1117,11 +975,7 @@ export default function GestaoIndicadores({
 
   async function updateRepresentantesServicos(data) {
     if (!usuario.id_municipio || !data.id_representante_servicos_ga) {
-      toast.notify("Dados insuficientes para atualizar!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
@@ -1135,21 +989,13 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.notify("Representante atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Representante atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
         getRepresentantes();
         setShowModal(false);
         setUpdateRepresentantes(null);
       })
       .catch((error) => {
-        toast.notify("Não foi possível atualizar o representante!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possível atualizar o representante!", { position: "top-right", autoClose: 5000 });
         console.log(error);
       });
   }
@@ -1158,37 +1004,25 @@ export default function GestaoIndicadores({
     console.log("Antes de atualizar politicas", data);
 
     if (!usuario.id_municipio || !data.id_politica_municipal) {
-      toast.notify("Dados insuficientes para atualizar!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
     await api
       .put("updatePoliticaMunicipal", {
         id_politica_municipal: data.id_politica_municipal,
-        politica_titulo: data.politica_titulo,
-        politica_ano: data.politica_ano,
+        politica_titulo: data?.titulo,
+        politica_ano: data?.ano,
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.notify("Politica Municipal atualizada com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Politica Municipal atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
         getPoliticas();
         setShowModalPolitica(false);
         setUpdatePolitica(null);
       })
       .catch((error) => {
-        toast.notify("Não foi possível atualizar a política municipal!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possível atualizar a política municipal!", { position: "top-right", autoClose: 5000 });
       });
   }
 
@@ -1234,37 +1068,25 @@ export default function GestaoIndicadores({
 
   async function updateParticipacaoControleSocial(data: IParticipacao) {
     if (!usuario.id_municipio || !data.id_participacao_controle_social) {
-      toast.notify("Dados insuficientes para atualizar!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
     await api
       .put("updateParticipacaoControleSocial", {
         id_participacao_controle_social: data.id_participacao_controle_social,
-        pcs_titulo: data.pcs_titulo,
-        pcs_ano: data.pcs_ano,
+        pcs_titulo: data?.titulo,
+        pcs_ano: data?.ano,
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.notify("Participação e Controle Social atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Participação e Controle Social atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
         getParticipacoes();
         setShowModalParticipacao(false);
         setUpdateParticipacao(null);
       })
       .catch((error) => {
-        toast.notify("Não foi possível atualizar a participação!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possível atualizar a participação!", { position: "top-right", autoClose: 5000 });
       });
   }
 
@@ -1274,11 +1096,7 @@ export default function GestaoIndicadores({
       !usuario.id_municipio ||
       !data.id_presidencia_conselho_municipal_saneamento_basico
     ) {
-      toast.notify("Dados insuficientes para atualizar!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
@@ -1294,11 +1112,7 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.notify("Presidente atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Presidente atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
         getPresidentesConselho(); // Atualiza a lista
         setShowModalPresidente(false);
         setUpdatePresidente(null);
@@ -1308,11 +1122,7 @@ export default function GestaoIndicadores({
           "Erro ao atualizar presidente:",
           error.response?.data || error
         );
-        toast.notify("Não foi possível atualizar o presidente!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possível atualizar o presidente!", { position: "top-right", autoClose: 5000 });
       });
   }
 
@@ -1348,44 +1158,32 @@ export default function GestaoIndicadores({
     console.log("Antes de atualizar plano", data);
 
     if (!usuario.id_municipio || !data.id_plano_municipal) {
-      toast.notify("Dados insuficientes para atualizar!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
     await api
       .put("updatePlanoMunicipal", {
         id_plano_municipal: data.id_plano_municipal,
-        plano_titulo: data.plano_titulo,
-        plano_ano: data.plano_ano,
+        plano_titulo: data?.titulo,
+        plano_ano: data?.ano,
         id_municipio: usuario.id_municipio,
         situacao: planoSituacao,
       })
       .then((response) => {
-        toast.notify("Plano Municipal atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Plano Municipal atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
         getPlanos();
         setShowModalPlano(false);
         setUpdatePlano(null);
       })
       .catch((error) => {
-        toast.notify("Não foi possível atualizar o plano municipal!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possível atualizar o plano municipal!", { position: "top-right", autoClose: 5000 });
       });
   }
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>

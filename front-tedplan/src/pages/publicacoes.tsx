@@ -22,7 +22,7 @@ import {
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
 import Router from "next/router";
@@ -111,11 +111,7 @@ export default function ViewPublicacoes({
     const publicacoes = resBusca.data;
 
     if (publicacoes.length == 0) {
-      toast.notify("Nenhum resultado encontrado para a busca!", {
-        title: "Atenção",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
       return;
     }
 
@@ -173,22 +169,14 @@ export default function ViewPublicacoes({
       const publicacoes = resBusca.data;
 
       if (publicacoes.data.length === 0) {
-        toast.notify("Nenhum resultado encontrado para a busca!", {
-          title: "Atenção",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
         return;
       }
 
       getPublicacoes(publicacoes);
       pagination(publicacoes);
     } catch (error) {
-      toast.notify("Erro ao buscar publicações", {
-        title: "Erro",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao buscar publicações", { position: "top-right", autoClose: 5000 });
       console.error(error);
     }
   }
@@ -371,7 +359,7 @@ export default function ViewPublicacoes({
         </DivFormConteudo>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

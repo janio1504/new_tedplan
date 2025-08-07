@@ -2,7 +2,7 @@ import {} from "next";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 import {
   Container,
@@ -94,11 +94,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
       });
     } catch (error) {
       console.error("Erro ao carregar dados do tipo de campo:", error);
-      toast.notify("Erro ao carregar dados do tipo de campo!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao carregar dados do tipo de campo!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -123,19 +119,11 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
       if (isEditing && tipoCampoId) {
         // Atualizar tipo de campo existente
         await apiClient.put(`/tipos-campo/${tipoCampoId}`, tipoCampoData);
-        toast.notify("Tipo de campo atualizado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Tipo de campo atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
       } else {
         // Criar novo tipo de campo
         await apiClient.post("/tipos-campo", tipoCampoData);
-        toast.notify("Tipo de campo cadastrado com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Tipo de campo cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
       }
 
       reset({
@@ -151,11 +139,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
       }, 2000);
     } catch (error) {
       console.error("Erro ao salvar tipo de campo:", error);
-      toast.notify("Erro ao salvar tipo de campo!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao salvar tipo de campo!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -238,7 +222,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
         </Form>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

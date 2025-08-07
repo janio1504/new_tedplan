@@ -148,7 +148,7 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
               <nav>
                 <ol>
                   <li>
-                    <Link href="./home_indicadores">Home</Link>
+                    <Link href="/indicadores/home_indicadores">Home</Link>
                     <span> / </span>
                   </li>
                   <li>
