@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { BreadCrumbStyle } from "../../styles/indicadores";
 import {
   Container,
   DivCenter,
@@ -31,7 +32,7 @@ import {
   Tooltip,
   TooltipText,
 } from "../../styles/indicadores";
-
+import Link from "next/link";
 import Editar from "../../img/editar.png";
 import ajuda from "../../img/ajuda.png";
 import HeadIndicadores from "../../components/headIndicadores";
@@ -1154,6 +1155,8 @@ export default function GestaoIndicadores({
     setValue("plano_ano", plano.ano);
   }
 
+
+  
   async function updatePlanoMunicipal(data: IPlanos) {
     console.log("Antes de atualizar plano", data);
 
@@ -1187,6 +1190,22 @@ export default function GestaoIndicadores({
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
+      <BreadCrumbStyle style={{ 
+        width: '25%', marginTop: '20px',
+        marginLeft: '140px', marginBottom: '-20px'
+        }}>
+                    <nav>
+                      <ol>
+                        <li>
+                          <Link href="/indicadores/home_indicadores">Home</Link>
+                          <span> / </span>
+                        </li>
+                        <li>
+                          <span>Gestão</span>
+                        </li>
+                      </ol>
+                    </nav>
+        </BreadCrumbStyle>
       <Sidebar>
         <SidebarItem
           active={activeForm === "gestaoAssociada"}

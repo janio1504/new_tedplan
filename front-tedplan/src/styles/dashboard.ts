@@ -171,7 +171,7 @@ export const ListPost = styled.table`
   thead {
     th {
       padding: 16px;
-      font-weight: 500;
+      font-weight: bold;
       font-size: 14px;
       text-transform: uppercase;
 
@@ -181,7 +181,7 @@ export const ListPost = styled.table`
       }
     }
     tr {
-      background: #1a73e8;
+      background: #0085bd;
     }
   }
   tbody {
@@ -274,7 +274,7 @@ export const DivCenter = styled.div`
   max-width: 80%;
   width: 100%;
   height: 100%;
-  background: #fff;
+  background: #f3f4f6;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -283,18 +283,62 @@ export const DivCenter = styled.div`
   padding: 120px 20px 20px 20px;
   display: flex;
   flex-direction: column;
+
+  h2{
+  color: black;
+  }
+
+
 `;
 
 export const BodyDashboard = styled.div`
   width: 100%;
   height: 100%;
-  background: #fff;
+  background: #f3f4f6;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
   display: flex;
   flex-direction: row;
 `;
+
+export const DivMenuTitulo = styled.div`
+  justify-content: center;
+  float: left;
+  width: 100%;
+  background: #0085bd;
+`;
+
+export const MenuMunicipioItem = styled.div`
+  padding: 20px;
+  float: right;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+
+    &:hover {
+      color: #000;
+    }
+  }
+`;
+
+export const DivMenu = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: linear-gradient(135deg, #1caecc 0%, #0085bd 100%);
+  padding: 12px 0;
+  width: 100%;
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+`;
+
+export const DivBotaoMenu = styled.div`
+  display: flex;
+  align-items: center;
+  margin: 0 8px;
+`;
+
 export const DivInstrucoes = styled.div`
   display: flex;
   flex-direction: column;
@@ -327,13 +371,16 @@ export const DivInput = styled.div`
 `;
 
 export const Form = styled.form`
+  display: flex;
+  align-items: center;
   margin: 40px auto;
   max-width: 1000px;
-  width: 100%;
+  width: 1000px;
+  height: 5000px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 30px;
+  padding: 0 30px 30px 30px;
   background: #ffffff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -468,9 +515,9 @@ export const NewButton = styled.button`
   padding: 12px 24px;
   color: #fff;
   border: 0;
-  background: #1a73e8;
+  background: #0085bd;
   border-radius: 6px;
-  font-weight: 500;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -478,7 +525,7 @@ export const NewButton = styled.button`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background: #1557b0;
+    background: #006666;
   }
 
   svg {
