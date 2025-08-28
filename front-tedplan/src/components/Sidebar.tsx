@@ -1,21 +1,16 @@
-import React, { useContext, useState } from "react";
-import styled from "styled-components";
+import Router, { useRouter } from "next/router";
+import { useContext, useEffect, useState } from "react";
 import {
   FaAddressBook,
-  FaFileAlt,
-  FaSignInAlt,
-  FaSignOutAlt,
-  FaEye,
-  FaUsers,
+  FaCamera,
   FaCaretDown,
   FaDatabase,
-  FaChartBar,
-  FaCamera
+  FaEye,
+  FaFileAlt,
+  FaUsers
 } from "react-icons/fa";
-import Router from "next/router";
+import styled from "styled-components";
 import { AuthContext } from "../contexts/AuthContext";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 
 interface MenuItemProps {
   $isActive?: boolean
@@ -119,6 +114,16 @@ const Sidebar = () => {
   const { signOut, usuario, permission } = useContext(AuthContext);
   const router = useRouter();
 
+
+    const safePermission = permission || {
+    adminGeral: false,
+    adminTedPlan: false,
+    editorTedPlan: false,
+    editorSimisab: false,
+    revisorTedPlan: false,
+    supervisorTedPlan: false,
+  };
+
  const isCadastroSubmenuActive = () => {
     const cadastroRoutes = [
       "/listarMenus",
@@ -192,7 +197,7 @@ const Sidebar = () => {
   return (
     <SidebarContainer>
       <MenuTitle>{usuario?.permissao_usuario}</MenuTitle>
-      {permission.adminGeral || permission.adminTedPlan || permission.editorTedPlan ? (
+      {safePermission.adminGeral || safePermission.adminTedPlan || safePermission.editorTedPlan ? (
         <>
           
           <MenuItem
@@ -243,7 +248,7 @@ const Sidebar = () => {
        ) : (
         ""
       )} 
-      {permission.adminGeral ? (        
+      {safePermission.adminGeral ? (        
           <MenuItem 
           onClick={handleUsuarios}
           $isActive={router.pathname === "/listarUsuarios"}
@@ -253,7 +258,7 @@ const Sidebar = () => {
       ) : (
         ""
       )} 
-      {permission.adminGeral || permission.adminTedPlan ? (
+      {safePermission.adminGeral || safePermission.adminTedPlan ? (
         <>
           <MenuItem 
           onClick={handlePublicacoes}
