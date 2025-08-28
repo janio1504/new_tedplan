@@ -139,7 +139,7 @@ const TipoCampoInfo = ({ tipoCampo }: { tipoCampo: ITipoCampoIndicador }) => {
       marginTop: "10px",
       border: "1px solid #d1ecf1"
     }}>
-      <div style={{ fontSize: "14px", marginBottom: "8px" }}>
+      <div style={{ fontSize: "14px", marginBottom: "8px" , color: "#495057" }}>
         <strong>Campo de Entrada:</strong> {tipoCampo.name_campo}
       </div>
       <div style={{ fontSize: "14px", marginBottom: "5px", color: "#495057" }}>
@@ -162,7 +162,7 @@ const TipoCampoInfo = ({ tipoCampo }: { tipoCampo: ITipoCampoIndicador }) => {
       {/* Mostrar opções de select se houver */}
       {tipoCampo.type === "select" && tipoCampo.selectOptions && tipoCampo.selectOptions.length > 0 && (
         <div style={{ marginTop: "10px" }}>
-          <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
+          <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "5px", color: "#6c757d" }}>
             Opções disponíveis:
           </div>
           <div style={{ fontSize: "13px" }}>
@@ -190,14 +190,14 @@ const TipoCampoInfo = ({ tipoCampo }: { tipoCampo: ITipoCampoIndicador }) => {
       {/* Mostrar itens de checkbox se houver */}
       {tipoCampo.type === "checkbox" && tipoCampo.checkBoxItems && tipoCampo.checkBoxItems.length > 0 && (
         <div style={{ marginTop: "10px" }}>
-          <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "5px" }}>
+          <div style={{ fontSize: "14px", fontWeight: "bold", marginBottom: "5px", color: "#6c757d" }}>
             Itens disponíveis:
           </div>
           <div style={{ fontSize: "13px" }}>
             {tipoCampo.checkBoxItems.map((item, index) => (
               <span key={item.id_item_check_box}>
                 <code style={{ 
-                  backgroundColor: "#e9ecef", 
+                  backgroundColor: "#0356fc", 
                   padding: "2px 5px", 
                   borderRadius: "3px",
                   marginRight: "5px"
@@ -462,7 +462,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Indicadores</h2>
-          {(permission.adminGeral || permission.adminTedPlan) && (
+          {(permission?.adminGeral || permission?.adminTedPlan) && (
             <BotaoAdicionar onClick={handleAddIndicador}>
               + Novo Indicador
             </BotaoAdicionar>
@@ -656,7 +656,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                       </div>
                     </div>
 
-                    {(permission.adminGeral || permission.adminTedPlan) && (
+                    {(permission?.adminGeral || permission?.adminTedPlan) && (
                       <div style={{ display: "flex", gap: "10px", marginLeft: "20px" }}>
                         <BotaoEditar onClick={() => handleEditIndicador(indicador)}>
                           Editar
