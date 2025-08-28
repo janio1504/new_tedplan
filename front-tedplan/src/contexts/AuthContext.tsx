@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { recoverUserInformation, signInRequest, permissionByYear } from "../services/auth";
-import { setCookie, parseCookies, destroyCookie } from "nookies";
 import Router from "next/router";
+import { destroyCookie, parseCookies, setCookie } from "nookies";
+import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
-import { set } from "react-hook-form";
+import { permissionByYear, recoverUserInformation, signInRequest } from "../services/auth";
 
 type SignInData = {
   login: string;
@@ -45,7 +44,14 @@ type AuthContextType = {
 export const AuthContext = createContext({} as AuthContextType);
 
 export function AuthProvider({ children }) {
-  const [userPermission, setUserPermission] = useState<Permission>()
+  const [userPermission, setUserPermission] = useState<Permission>({
+    adminGeral: false,
+    adminTedPlan: false,
+    editorTedPlan: false,
+    editorSimisab: false,
+    revisorTedPlan: false,
+    supervisorTedPlan: false,
+  })
 
   const [usuario, setUser] = useState(() => {
     if (typeof window !== "undefined") {
@@ -59,7 +65,14 @@ export function AuthProvider({ children }) {
 
   const isAuthenticated = !!usuario;
 
-  const permission = userPermission
+  const permission = userPermission || {
+    adminGeral: false,
+    adminTedPlan: false,
+    editorTedPlan: false,
+    editorSimisab: false,
+    revisorTedPlan: false,
+    supervisorTedPlan: false,
+  }
   const anoEditorSimisab = ano;
   const isEditor = editor;
 

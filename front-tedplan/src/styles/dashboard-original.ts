@@ -240,7 +240,7 @@ export const DivCenter = styled.div`
 export const BodyDashboard = styled.div`  
   width: 100%;
   height: 100%;
-  background: #fff;
+  background: #f3f4f6;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -339,10 +339,10 @@ export const InputData = styled.div`
 export const SubmitButton = styled.button`
   padding: 10px 15px;
   margin: 10px;
-
+  font-weight: bold;
   color: #fff;
   border: 0px;
-  background: #008080;
+  background: #0085bd;
   border-radius: 7px;
   flex-direction: row;
   cursor: pointer;
@@ -353,6 +353,10 @@ export const SubmitButton = styled.button`
   align-items: center;
   svg {
     margin-right: 8px;
+  }
+
+  &:hover{
+  background: #006666;
   }
 `;
 

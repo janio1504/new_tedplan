@@ -2,15 +2,20 @@ import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
-import { Container, Footer, BodyDashboard, Form  } from "../styles/dashboard";
+import { Container, Footer, BodyDashboard, Form,
+DivMenuTitulo, MenuMunicipioItem, DivMenu, DivBotaoMenu
+} from "../styles/dashboard";
 import { SubmitButton } from "../styles/dashboard-original";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
 import Sidebar from "../components/Sidebar";
 import styled from "styled-components";
+import { MainContent } from "@/styles/indicadores";
 import api from "../services/api";
 import Router from "next/router";
+import { Main } from "next/document";
+
 
 interface IPost {
   id_posts: string;
@@ -37,6 +42,7 @@ export default function DashboardIndicadores() {
   useEffect(() => {
     getMunicipios();
   }, []);
+
 
   async function handleSignOut() {
     signOut();
@@ -76,27 +82,70 @@ export default function DashboardIndicadores() {
     });
   }
 
+   function handleSimisab() {
+      Router.push("/indicadores/home_indicadores");
+    }
+
   const DivMunicipios = styled.h2`
-    
     height: 200px;
     display: flex;
     flex-direction: column;
     padding: 10px;
     margin: 30px;
   `;
+
+  const DivTituloForm = styled.div`
+    width: 95%;
+    padding: 15px 10px;
+    color: #fff;
+    margin: -11px -10px 0 -11px;
+    background-color: #0085bd;
+    border-top-right-radius: 12px;
+    border-top-left-radius: 12px;
+    font-weight: bolder;
+    
+  
+    width: calc(100% + 3.8rem);
+      padding: 0.95rem 1.9rem;
+      background-color: #0085bd;
+      color: white;
+      font-weight: bold;
+      font-size: 1.19rem;
+      margin: 0 -1.9rem 1.9rem;
+      border-radius: 7.6px 7.6px 0 0;
+      box-sizing: border-box;
+  `;
+
+ 
+
   
   return (
     <Container>
       <HeadPublico></HeadPublico>
+      <DivMenuTitulo> 
+        <text style={{
+          fontSize: '20px',
+          fontWeight: 'bold',
+          padding: '15px 20px',
+          float: 'left'
+          }}>
+           Painel de Edição 
+          </text>
+        <ul style={{}}>
+        <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+        <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+        </ul>
+      </DivMenuTitulo>
       <BodyDashboard>
         <Sidebar />
-        {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ?
+        
+        {/* {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ?  DESCOMENTAR AO FINALIZAR*/} 
         <DivMunicipios>          
           <Form onSubmit={handleSubmit(handleSetMunicipio)}>
-            <label>Municipios</label>
-            <select {...register("id_municipio")} name="id_municipio">
-              aria-invalid=
-              {errors.value ? "true" : "false"}
+            <DivTituloForm>Municipios</DivTituloForm>
+            <select {...register("id_municipio")} name="id_municipio"
+              aria-invalid={errors.value ? "true" : "false"}
+              >
               <option value="">Selecione um Municipio</option>
               {municipios?.map((municipio, key) => (
                 <option key={key} value={municipio.id_municipio}>
@@ -106,8 +155,12 @@ export default function DashboardIndicadores() {
             </select>
             <SubmitButton type="submit">Acessar dados do Municipio</SubmitButton>
           </Form>
-        </DivMunicipios>: ''}
+        </DivMunicipios>
+        {/* : '' */}
+        {/* } */}
+        
       </BodyDashboard>
+     
       <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );

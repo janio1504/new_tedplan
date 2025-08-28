@@ -68,7 +68,11 @@ export default function HeadPublico() {
           <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenuCadastro>
         </DivBotaoMenuCadastro>
         <DivBotaoMenuCadastro>
-          <NumeroMenuCadastro>04</NumeroMenuCadastro>        
+          <NumeroMenuCadastro>04</NumeroMenuCadastro> 
+          <BotaoMenuCadastro onClick={handlePrestacaoServicosSinisa}>Prestação de Serviços SINISA</BotaoMenuCadastro>
+        </DivBotaoMenuCadastro>
+        <DivBotaoMenuCadastro>
+          <NumeroMenuCadastro>05</NumeroMenuCadastro>        
           <BotaoMenuCadastro onClick={handleMonitoramento}>Monitoramento e Avaliação</BotaoMenuCadastro>
         </DivBotaoMenuCadastro>
       </DivMenuCadastro>

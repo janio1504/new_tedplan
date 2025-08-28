@@ -6,6 +6,7 @@ import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
+import Sidebar from "@/components/Sidebar";
 import {
   Container,
   NewButton,
@@ -22,7 +23,12 @@ import {
   ConfirmButton,
   CancelButton,
   BotaoAdicionar,
+  MenuMunicipioItem,
+  DivMenuTitulo,
 } from "../styles/dashboard";
+import { BodyDashboard } from "@/styles/dashboard-original";
+import HeadIndicadores from "@/components/headIndicadores";
+
 
 interface ITipoCampo {
   id_tipo_campo_indicador: string;
@@ -84,6 +90,7 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
   const [tiposCampoList, setTiposCampoList] = useState<ITipoCampo[]>(tiposCampo || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [filtroStatus, setFiltroStatus] = useState<"todos" | "ativos" | "inativos">("todos");
+  const {signOut} = useContext(AuthContext);
 
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
@@ -169,10 +176,34 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
     return matchesSearch && matchesStatus;
   });
 
+  async function handleSignOut() {
+      signOut();
+    }
+  
+    function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+        }
+
   return (
     <Container>
-      <MenuSuperior usuarios={[]} />
-
+      {/* <MenuSuperior usuarios={[]} /> */}
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+            <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left'
+                            }}>
+                             Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+            </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Tipos de Campo</h2>
@@ -301,6 +332,7 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
           )}
         </ListPost>
       </DivCenter>
+      </BodyDashboard>
 
       {isModalConfirm && (
         <Modal>

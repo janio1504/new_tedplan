@@ -7,8 +7,9 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
+import Sidebar from "../components/Sidebar";
 import { toast } from "react-toastify";
-
+import HeadIndicadores from "../components/headIndicadores";
 import {
   Container,
   NewButton,
@@ -31,9 +32,12 @@ import {
   SubmitButton,
   ConfirmModal,
   Form,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
 
 import { useForm } from "react-hook-form";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 type IPublicacao = {
   id_publicacao: string;
@@ -99,6 +103,7 @@ export default function Publicacoes({
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [idImagem, setIdImagem] = useState(null);
   const [idPublicacao, setIdPublicacao] = useState(null);
+  const { signOut} = useContext(AuthContext);
   const [idArquivo, setIdArquivo] = useState(null);
   const [listPublicacoes, setListPublicacoes] = useState(null);
 
@@ -230,12 +235,36 @@ export default function Publicacoes({
     }
   }
 
+    async function handleSignOut() {
+      signOut();
+    }
+  
+    function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+        }
+
   const { usuario } = useContext(AuthContext);
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
-
+      {/* <MenuSuperior usuarios={[]}></MenuSuperior> */}
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+      <DivMenuTitulo> 
+                    <text style={{
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      padding: '15px 20px',
+                      float: 'left'
+                      }}>
+                       Painel de Edição 
+                      </text>
+                    <ul style={{}}>
+                    <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                    <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                    </ul>
+      </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <NewButton onClick={handleNewPublicacao}>
           Adicionar Publicação
@@ -286,6 +315,7 @@ export default function Publicacoes({
           })}
         </ListPost>
       </DivCenter>
+      </BodyDashboard>
       <Footer>
         &copy; Todos os direitos reservados 
       </Footer>

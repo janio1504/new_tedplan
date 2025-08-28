@@ -1,16 +1,20 @@
-import React, { useContext, useState } from "react";
-import styled from "styled-components";
+import Router, { useRouter } from "next/router";
+import { useContext, useEffect, useState } from "react";
 import {
   FaAddressBook,
-  FaFileAlt,
-  FaSignInAlt,
-  FaSignOutAlt,
-  FaUsers,
+  FaCamera,
   FaCaretDown,
   FaDatabase,
+  FaEye,
+  FaFileAlt,
+  FaUsers
 } from "react-icons/fa";
-import Router from "next/router";
+import styled from "styled-components";
 import { AuthContext } from "../contexts/AuthContext";
+
+interface MenuItemProps {
+  $isActive?: boolean
+}
 
 // Container principal do menu
 const SidebarContainer = styled.div`
@@ -36,7 +40,7 @@ const MenuTitle = styled.h2`
 `;
 
 // Estilos para cada item do menu
-const MenuItem = styled.div`
+const MenuItem = styled.div <MenuItemProps>` 
   font-size: 16px;
   padding: 14px 16px;
   margin: 4px 0;
@@ -48,6 +52,12 @@ const MenuItem = styled.div`
   gap: 12px;
   color: #424242;
   font-weight: 500;
+
+  background: ${props => props.$isActive ? 'rgba(26, 35, 126, 0.08)' : 'transparent'};
+  border-left-color: ${props => props.$isActive ? '#00d4aa' : 'transparent'};
+  color: ${props => props.$isActive ? '#2c3e50' : 'black'};
+  font-weight: ${props => props.$isActive ? 'bold' : 'normal'};
+  transform: ${props => props.$isActive ? 'translateX(4px)' : 'normal'};
 
   svg {
     font-size: 20px;
@@ -61,8 +71,9 @@ const MenuItem = styled.div`
   }
 
   &:active {
-    background-color: rgba(26, 35, 126, 0.12);
+    background-color: white;
     transform: scale(0.98);
+
   }
 `;
 
@@ -88,12 +99,50 @@ const SubmenuContainer = styled.div<{ isOpen: boolean }>`
 const SubmenuItem = styled(MenuItem)`
   padding-left: 48px;
   font-size: 14px;
-  background: rgba(0, 0, 0, 0.02);
+  background: ${props => props.$isActive ? 'rgba(26, 35, 126, 0.08)' : 'transparent'};
+  border-left-color: ${props => props.$isActive ? '#00d4aa' : 'transparent'};
+  color: ${props => props.$isActive ? '#2c3e50' : 'black'};
+  font-weight: ${props => props.$isActive ? 'bold' : 'normal'}; 
+  transform: ${props => props.$isActive ? 'translateX(4px)' : 'normal'};
+  
+ 
 `;
+
+
 
 const Sidebar = () => {
   const { signOut, usuario, permission } = useContext(AuthContext);
-  const [isCadastroOpen, setIsCadastroOpen] = useState(false);
+  const router = useRouter();
+
+
+    const safePermission = permission || {
+    adminGeral: false,
+    adminTedPlan: false,
+    editorTedPlan: false,
+    editorSimisab: false,
+    revisorTedPlan: false,
+    supervisorTedPlan: false,
+  };
+
+ const isCadastroSubmenuActive = () => {
+    const cadastroRoutes = [
+      "/listarMenus",
+      "/listarMenuItems", 
+      "/listarTiposCampo",
+      "/listarIndicadores",
+      "/listarInfoIndicador"
+    ];
+    return cadastroRoutes.some(route => router.pathname === route);
+  };
+
+  const [isCadastroOpen, setIsCadastroOpen] = useState(isCadastroSubmenuActive());
+
+     useEffect(() => {
+    if (isCadastroSubmenuActive()) {
+      setIsCadastroOpen(true);
+    }
+  }, [router.pathname]);
+
 
   function handleAddIndicador() {
     Router.push("/listarInfoIndicador");
@@ -134,18 +183,32 @@ const Sidebar = () => {
   function handleSimisab() {
     Router.push("/indicadores/home_indicadores");
   }
+  function handleDashboard() {
+    Router.push("/dashboard");
+  }
+
 
   async function handleSignOut() {
     signOut();
   }
 
+
+
   return (
     <SidebarContainer>
       <MenuTitle>{usuario?.permissao_usuario}</MenuTitle>
-      {permission.adminGeral || permission.adminTedPlan || permission.editorTedPlan ? (
+      {safePermission.adminGeral || safePermission.adminTedPlan || safePermission.editorTedPlan ? (
         <>
+          
+          <MenuItem
+          onClick={handleDashboard}
+          $isActive={router.pathname === "/dashboard"}
+          >
+            <FaEye /> Visualizar Município
+          </MenuItem>
           <MenuItemWithSubmenu
             onClick={() => setIsCadastroOpen(!isCadastroOpen)}
+            $isActive={isCadastroSubmenuActive()}
           >
             <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <FaDatabase /> Cadastros
@@ -158,58 +221,74 @@ const Sidebar = () => {
             />
           </MenuItemWithSubmenu>
           <SubmenuContainer isOpen={isCadastroOpen}>
-            <SubmenuItem onClick={handleMenus}>
+            <SubmenuItem onClick={handleMenus}
+             $isActive={router.pathname === "/listarMenus"}
+            >
               Menus
             </SubmenuItem>
-            <SubmenuItem onClick={handleMenuItems}>
+            <SubmenuItem onClick={handleMenuItems}
+            $isActive={router.pathname === "/listarMenuItems"}>
               Itens de Menu
             </SubmenuItem>
-            <SubmenuItem onClick={handleTiposCampo}>
+            <SubmenuItem onClick={handleTiposCampo}
+            $isActive={router.pathname === "/listarTiposCampo"}
+            >
               Tipos de Campo
             </SubmenuItem>
-            <SubmenuItem onClick={handleIndicadores}>
+            <SubmenuItem onClick={handleIndicadores}
+            $isActive={router.pathname === "/listarIndicadores"}>
               Indicadores
             </SubmenuItem>
-            <SubmenuItem onClick={handleAddIndicador}>
+            <SubmenuItem onClick={handleAddIndicador}
+            $isActive={router.pathname === "/listarInfoIndicador"}>
               Informações de Indicador
             </SubmenuItem>
           </SubmenuContainer>       
         </>
-      ) : (
+       ) : (
         ""
-      )}
-      {permission.adminGeral ? (        
-          <MenuItem onClick={handleUsuarios}>
+      )} 
+      {safePermission.adminGeral ? (        
+          <MenuItem 
+          onClick={handleUsuarios}
+          $isActive={router.pathname === "/listarUsuarios"}
+          >
             <FaUsers /> Lista de Usuários
           </MenuItem>        
       ) : (
         ""
-      )}
-      {permission.adminGeral || permission.adminTedPlan ? (
+      )} 
+      {safePermission.adminGeral || safePermission.adminTedPlan ? (
         <>
-          <MenuItem onClick={handlePublicacoes}>
-            <FaAddressBook /> Publicações
+          <MenuItem 
+          onClick={handlePublicacoes}
+          $isActive={router.pathname === "/listarPublicacoes"}
+          >
+            <FaAddressBook /> Publicações   
           </MenuItem>
-          <MenuItem onClick={handleNormas}>
+          <MenuItem onClick={handleNormas}
+          $isActive={router.pathname === "/listarNormas"}
+          >
             <FaFileAlt /> Normas
           </MenuItem>
-          <MenuItem onClick={handleGalerias}>
-            <FaFileAlt /> Galerias
+          <MenuItem onClick={handleGalerias}
+          $isActive={router.pathname === "/listarGalerias"}>
+            <FaCamera /> Galerias
           </MenuItem>
         </>
       ) : (
         ""
-      )}
-      {permission.editorSimisab ? (
-        <MenuItem onClick={handleSimisab}>
+      )} 
+      {/* {permission.editorSimisab ? ( */}
+        {/* <MenuItem onClick={handleSimisab}>
           <FaSignInAlt /> SIMISAB
-        </MenuItem>
-      ) : (
+        </MenuItem> */}
+      {/* ) : (
         ""
-      )}
-      <MenuItem onClick={handleSignOut}>
+      )} */}
+      {/* <MenuItem onClick={handleSignOut}>
         <FaSignOutAlt /> Sair
-      </MenuItem>
+      </MenuItem> */}
     </SidebarContainer>
   );
 };

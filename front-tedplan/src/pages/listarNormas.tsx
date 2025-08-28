@@ -6,6 +6,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
+import HeadIndicadores from "../components/headIndicadores";
 import MenuSuperior from "../components/head";
 import {
   FaSearch,
@@ -16,6 +17,7 @@ import {
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "suneditor/dist/css/suneditor.min.css";
+import Sidebar from "../components/Sidebar";
 import { getData } from "./api/post";
 
 import {
@@ -39,8 +41,11 @@ import {
   TextoModal,
   SubmitButton,
   ConfirmModal,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 type INorma = {
   id_norma: string;
@@ -90,6 +95,7 @@ export default function Postagens({ normas }: NormasProps) {
   const [idNorma, setIdNorma] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
+  const { signOut} = useContext(AuthContext);
 
   useEffect(() => {}, [0]);
 
@@ -238,12 +244,35 @@ export default function Postagens({ normas }: NormasProps) {
     let texto = content;
   }
 
+      async function handleSignOut() {
+      signOut();
+    }
+  
+    function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+        }
+
   const { usuario } = useContext(AuthContext);
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
-      
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+      <DivMenuTitulo> 
+                    <text style={{
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      padding: '15px 20px',
+                      float: 'left'
+                      }}>
+                       Painel de Edição 
+                      </text>
+                    <ul style={{}}>
+                    <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                    <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                    </ul>
+      </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <NewButton onClick={handleAddNorma}>Adicionar Norma</NewButton>
         <ListPost>
@@ -301,6 +330,7 @@ export default function Postagens({ normas }: NormasProps) {
           })}
         </ListPost>
       </DivCenter>
+      </BodyDashboard>
       <Footer>&copy; Todos os direitos reservados </Footer>
 
       {isModalConfirm && (

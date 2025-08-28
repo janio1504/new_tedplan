@@ -7,6 +7,7 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
+import headIndicadores from "../components/headIndicadores";
 import {
   FaSearch,
   FaDatabase,
@@ -18,6 +19,8 @@ import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
+import Sidebar from "@/components/Sidebar";
+
 
 import {
   Container,
@@ -34,6 +37,8 @@ import {
   ContainerImagems,
   ModalImgAmpliada,
   ImagenAmpliada,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
 
 import {
@@ -48,11 +53,13 @@ import {
   CancelButton,
   ConfirmButton,
   FormModal,
+  BodyDashboard,
 } from "../styles/dashboard-original";
 
 import { useForm } from "react-hook-form";
 import image from "next/image";
 import { Form } from "../styles/indicadores";
+import HeadIndicadores from "../components/headIndicadores";
 
 interface IGaleria {
   id_galeria: string;
@@ -85,6 +92,7 @@ export default function Postagens({ galerias }: GaleriaProps) {
   const [imagensGaleria, setImagensGaleria] = useState(null);
   const [modalImagemAmpliada, setModalImagemAmpliada] = useState(false);
   const [imagemAmpliada, setImagemAmpliada] = useState(null);
+  const {signOut} = useContext(AuthContext);
 
   const fileInputRef = useRef<HTMLInputElement>();
 
@@ -238,11 +246,34 @@ export default function Postagens({ galerias }: GaleriaProps) {
   };
 
   const { usuario } = useContext(AuthContext);
+   async function handleSignOut() {
+        signOut();
+      }
+    
+      function handleSimisab() {
+            Router.push("/indicadores/home_indicadores");
+          }
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
-
+      {/* <MenuSuperior usuarios={[]}></MenuSuperior> */}
+       <HeadIndicadores usuarios={[]}></HeadIndicadores>
+              <DivMenuTitulo> 
+                    <text style={{
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      padding: '15px 20px',
+                      float: 'left'
+                      }}>
+                       Painel de Edição 
+                      </text>
+                    <ul style={{}}>
+                    <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                    <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                    </ul>
+              </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <NewButton onClick={handleAddGaleria}>Adicionar Galeria</NewButton>
         <ListPost>
@@ -292,6 +323,8 @@ export default function Postagens({ galerias }: GaleriaProps) {
           })}
         </ListPost>
       </DivCenter>
+      </BodyDashboard>
+
       <Footer>
         &copy; Todos os direitos reservados{" "}
       </Footer>

@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
 import { useInfoIndicador } from "../contexts/InfoIndicadorContext";
+import { AuthContext } from "@/contexts/AuthContext";
+import Sidebar from "@/components/Sidebar";
 import {
   Container,
   NewButton,
@@ -23,9 +25,13 @@ import {
   TituloModal,
   TextoModal,
   SubmitButton,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 import { InfoIndicador } from "../types/InfoIndicador";
+import HeadIndicadores from "@/components/headIndicadores";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 export default function ListarIndicadores() {
   const {
@@ -49,6 +55,7 @@ export default function ListarIndicadores() {
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [indicadorModal, setIndicadorModal] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
+  const {signOut} = useContext(AuthContext);
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -149,10 +156,34 @@ export default function ListarIndicadores() {
       toast.error("Erro ao atualizar indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
+   async function handleSignOut() {
+          signOut();
+        }
+      
+        function handleSimisab() {
+              Router.push("/indicadores/home_indicadores");
+            }
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]} />
+      {/* <MenuSuperior usuarios={[]} /> */}
+       <HeadIndicadores usuarios={[]}></HeadIndicadores>
+                    <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left'
+                            }}>
+                             Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+                    </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <NewButton onClick={handleAddIndicador}>Adicionar Indicador</NewButton>
         <ListPost>
@@ -328,6 +359,7 @@ export default function ListarIndicadores() {
           </ContainerModal>
         )}
       </DivCenter>
+      </BodyDashboard>
       <Footer>
         &copy; Todos os direitos reservados
         

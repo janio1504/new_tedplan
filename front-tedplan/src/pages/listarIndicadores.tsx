@@ -6,6 +6,7 @@ import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
+import Sidebar from "@/components/Sidebar";
 import {
   Container,
   NewButton,
@@ -22,7 +23,11 @@ import {
   ConfirmButton,
   CancelButton,
   BotaoAdicionar,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
+import { BodyDashboard } from "@/styles/dashboard-original";
+import HeadIndicadores from "@/components/headIndicadores";
 
 interface ISelectOption {
   id_select_option: string;
@@ -212,7 +217,7 @@ const TipoCampoInfo = ({ tipoCampo }: { tipoCampo: ITipoCampoIndicador }) => {
 
 export default function ListarIndicadores({ indicadores }: IndicadorProps) {
   const { permission } = useContext(AuthContext);
-
+  const {signOut} = useContext(AuthContext);
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [indicadorSelecionado, setIndicadorSelecionado] = useState<IIndicador | null>(null);
   const [indicadoresList, setIndicadoresList] = useState<IIndicador[]>(indicadores || []);
@@ -426,10 +431,34 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     return tipos[type] || type;
   };
 
+  async function handleSignOut() {
+      signOut();
+    }
+  
+    function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+        }
+
   return (
     <Container>
-      <MenuSuperior usuarios={[]} />
-
+      {/* <MenuSuperior usuarios={[]} /> */}
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+            <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left'
+                            }}>
+                             Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+            </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Indicadores</h2>
@@ -644,6 +673,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
           )}
         </ListPost>
       </DivCenter>
+      </BodyDashboard>
 
       {isModalConfirm && (
         <Modal>

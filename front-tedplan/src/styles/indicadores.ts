@@ -1602,8 +1602,6 @@ export const FormCadastro = styled.form`
 
 export const SubmitButtonContainer = styled.div`
   position: absolute;
-
-
   bottom: 0;
   right: 0;
   padding: 10px;

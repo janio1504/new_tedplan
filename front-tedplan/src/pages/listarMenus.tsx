@@ -5,6 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
+import Sidebar from "@/components/Sidebar";
 import { toast } from "react-toastify";
 import {
   Container,
@@ -22,7 +23,11 @@ import {
   ConfirmButton,
   CancelButton,
   BotaoAdicionar,
+  MenuMunicipioItem,
+  DivMenuTitulo,
 } from "../styles/dashboard";
+import HeadIndicadores from "@/components/headIndicadores";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IMenu {
   id_menu: string;
@@ -45,6 +50,7 @@ export default function ListarMenus({ menus }: MenuProps) {
   const [menuSelecionado, setMenuSelecionado] = useState<IMenu | null>(null);
   const [menusList, setMenusList] = useState<IMenu[]>(menus || []);
   const [searchTerm, setSearchTerm] = useState("");
+  const {signOut} = useContext(AuthContext)
 
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
@@ -101,6 +107,15 @@ export default function ListarMenus({ menus }: MenuProps) {
     }
   }
 
+    async function handleSignOut() {
+          signOut();
+        }
+      
+        function handleSimisab() {
+              Router.push("/indicadores/home_indicadores");
+            }
+
+
   // Filtrar menus baseado no termo de busca
   const menusFiltrados = menusList.filter((menu) =>
     menu.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -109,8 +124,24 @@ export default function ListarMenus({ menus }: MenuProps) {
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]} />
-
+      {/* <MenuSuperior usuarios={[]} /> */}
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+                          <DivMenuTitulo> 
+                                <text style={{
+                                  fontSize: '20px',
+                                  fontWeight: 'bold',
+                                  padding: '15px 20px',
+                                  float: 'left'
+                                  }}>
+                                   Painel de Edição 
+                                  </text>
+                                <ul style={{}}>
+                                <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                                <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                                </ul>
+                          </DivMenuTitulo>
+     <BodyDashboard>
+      <Sidebar />
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Menus</h2>
@@ -187,6 +218,7 @@ export default function ListarMenus({ menus }: MenuProps) {
           )}
         </ListPost>
       </DivCenter>
+      </BodyDashboard>
 
       {isModalConfirm && (
         <Modal>
