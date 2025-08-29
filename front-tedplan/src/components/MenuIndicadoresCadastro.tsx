@@ -18,14 +18,14 @@ export default function HeadPublico() {
   function handleDadosMunicipio() {
     Router.push("/indicadores/dados_municipio");
   }
-  function handlePrestacaoServicosSinisa() {
-      Router.push("/indicadores/prestacao-servicos-sinisa");
+  function handlePrestacaoServicos() {
+      Router.push("/indicadores/prestacao-servicos");
   }
   function handleGestaoIndicadores() {
     Router.push("/indicadores/gestao");
   }
   function handleGestaoPrestacaoServicos() {
-    Router.push("/indicadores/prestacao-servicos");
+    Router.push("/indicadores/prestacao-servicos-snis");
   }
   function handleMonitoramento() {
     Router.push("/indicadores/monitoramento-avaliacao");
@@ -65,11 +65,11 @@ export default function HeadPublico() {
         </DivBotaoMenuCadastro>
         <DivBotaoMenuCadastro>
           <NumeroMenuCadastro>03</NumeroMenuCadastro>
-          <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenuCadastro>
+          <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuCadastro>
         </DivBotaoMenuCadastro>
         <DivBotaoMenuCadastro>
           <NumeroMenuCadastro>04</NumeroMenuCadastro> 
-          <BotaoMenuCadastro onClick={handlePrestacaoServicosSinisa}>Prestação de Serviços SINISA</BotaoMenuCadastro>
+          <BotaoMenuCadastro onClick={handlePrestacaoServicos}>Prestação de Serviços</BotaoMenuCadastro>
         </DivBotaoMenuCadastro>
         <DivBotaoMenuCadastro>
           <NumeroMenuCadastro>05</NumeroMenuCadastro>        
@@ -96,15 +96,15 @@ export default function HeadPublico() {
       </DivBotaoMenuCadastro>
       <DivBotaoMenuCadastro>
         <NumeroMenuCadastro>03</NumeroMenuCadastro>
-        { rota == "/indicadores/prestacao-servicos" 
-        ?<BotaoMenuActiveCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenuActiveCadastro> : 
-        <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços</BotaoMenuCadastro>}
+        { rota == "/indicadores/prestacao-servicos-snis" 
+        ?<BotaoMenuActiveCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuActiveCadastro> : 
+        <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuCadastro>}
       </DivBotaoMenuCadastro>
       <DivBotaoMenuCadastro>
         <NumeroMenuCadastro>04</NumeroMenuCadastro>
-        { rota == "/indicadores/prestacao-servicos-sinisa" 
-        ?<BotaoMenuActiveCadastro onClick={handlePrestacaoServicosSinisa}>Prestação de Serviços SINISA</BotaoMenuActiveCadastro> : 
-        <BotaoMenuCadastro onClick={handlePrestacaoServicosSinisa}>Prestação de Serviços SINISA</BotaoMenuCadastro>}
+        { rota == "/indicadores/prestacao-servicos" 
+        ?<BotaoMenuActiveCadastro onClick={handlePrestacaoServicos}>Prestação de Serviços  </BotaoMenuActiveCadastro> : 
+        <BotaoMenuCadastro onClick={handlePrestacaoServicos}>Prestação de Serviços </BotaoMenuCadastro>}
       </DivBotaoMenuCadastro>
         <DivBotaoMenuCadastro>
         <NumeroMenuCadastro>05</NumeroMenuCadastro>        

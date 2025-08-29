@@ -2,17 +2,7 @@ import { GetServerSideProps } from "next";
 import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
-
-import {
-  Container,
-  Form,
-  Footer,
-  DivCenter,
-  DivInstrucoes,
-} from "../styles/dashboard";
-
-import { SubmitButton } from "../styles/dashboard-original";
-
+import { Footer } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
@@ -61,16 +51,17 @@ export default function AddPublicacao({
   municipios,
   tipoPublicacao,
   eixos,
+  categorias,
 }: MunicipiosProps) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
-  const [disabledTipoPublicacao, setdisabledTipoPublicacao] = useState(false);
-  const [disabledMunicipio, setdisabledMunicipio] = useState(false);
+  const [disabledTipoPublicacao, setDisabledTipoPublicacao] = useState(false);
+  const [disabledMunicipio, setDisabledMunicipio] = useState(false);
   const router = useRouter();
   const { id } = router.query;
 
@@ -97,246 +88,579 @@ export default function AddPublicacao({
             (m) => m.nome.trim() === pub.municipio.trim()
           )?.id_municipio;
 
-          const publicacaoFormatted = {
-            ...pub,
-            id_tipo_publicacao: tipoPublicacaoId,
-            id_eixo: eixoId,
-            id_municipio: municipioId,
-          };
+          const categoriaId = categorias.find(
+            (c) => c.nome.trim() === pub.categoria.trim()
+          )?.id_categoria;
 
-          setPublicacao(publicacaoFormatted);
-
-          reset({
+          setPublicacao({
             titulo: pub.titulo,
-            id_tipo_publicacao: tipoPublicacaoId,
-            id_municipio: municipioId,
-            id_eixo: eixoId,
-            id_categoria: pub.categoria,
+            id_tipo_publicacao: tipoPublicacaoId || "",
+            id_eixo: eixoId || "",
+            id_municipio: municipioId || "",
+            id_categoria: categoriaId || "",
           });
+
+          if (pub.tipo_publicacao.trim() === "Geral") {
+            setDisabledTipoPublicacao(true);
+            setDisabledMunicipio(true);
+          }
         })
         .catch((error) => {
-          console.error("Error fetching publication:", error);
+          console.error("Erro ao carregar publicação:", error);
           toast.error("Erro ao carregar publicação!", { position: "top-right", autoClose: 5000 });
         });
     }
-  }, [id, reset, tipoPublicacao, eixos, municipios]);
+  }, [id, tipoPublicacao, eixos, municipios, categorias]);
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-
-    if (data.imagem?.[0]) {
-      formData.append("imagem", data.imagem[0]);
-    }
-
-    if (data.arquivo?.[0]) {
-      formData.append("file", data.arquivo[0]);
-    }
-
-    formData.append("titulo", data.titulo);
-    formData.append("id_eixo", data.id_eixo);
-    formData.append("id_tipo_publicacao", data.id_tipo_publicacao);
-    formData.append("id_categoria", data.id_categoria);
-    formData.append("id_municipio", data.id_municipio);
-
-    const apiClient = getAPIClient();
-
+  async function handleAddPublicacao(data) {
     try {
-      if (id) {
-        // Modo edição
-        formData.append("id_publicacao", id as string);
-        await apiClient.post("updatePublicacao", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success("Publicação atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
-      } else {
-        // Modo criação
-        await apiClient.post("addPublicacao", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success("Publicação criada com sucesso!", { position: "top-right", autoClose: 5000 });
+      const formData = new FormData();
+
+      formData.append("titulo", data.titulo);
+      formData.append("id_tipo_publicacao", data.id_tipo_publicacao);
+      formData.append("id_eixo", data.id_eixo);
+      formData.append("id_categoria", data.id_categoria);
+      formData.append("id_municipio", data.id_municipio);
+
+      if (data.imagem && data.imagem[0]) {
+        formData.append("imagem", data.imagem[0]);
       }
 
-      setTimeout(() => {
-        router.push("/listarPublicacoes");
-      }, 2000);
+      if (data.arquivo && data.arquivo[0]) {
+        formData.append("arquivo", data.arquivo[0]);
+      }
+
+      const apiClient = getAPIClient();
+      const response = await apiClient.post("addPublicacao", formData);
+
+      if (response.data.success) {
+        toast.success("Publicação cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        reset();
+        setTimeout(() => {
+          router.push("/listarPublicacoes");
+        }, 2000);
+      } else {
+        toast.error("Erro ao cadastrar publicação!", { position: "top-right", autoClose: 5000 });
+      }
     } catch (error) {
-      toast.error("Erro ao salvar publicação!", { position: "top-right", autoClose: 5000 });
-    }
-  };
-  async function handleAddPublicacao({
-    titulo,
-    id_eixo,
-    id_categoria,
-    id_tipo_publicacao,
-    id_municipio,
-    arquivo,
-    imagem,
-  }: IPublicacao) {
-    const formData = new FormData();
-
-    formData.append("imagem", imagem[0]);
-    formData.append("file", arquivo[0]);
-    formData.append("titulo", titulo);
-    formData.append("id_eixo", id_eixo);
-    formData.append("id_tipo_publicacao", id_tipo_publicacao);
-    formData.append("id_categoria", id_categoria);
-    formData.append("id_municipio", id_municipio);
-    const apiClient = getAPIClient();
-    const response = await apiClient
-      .post("addPublicacao", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
-      })
-      .catch((error) => {
-        if (error) {
-          toast.error("Erro ao gravar!", { position: "top-right", autoClose: 5000 });
-          return error;
-        }
-      });
-
-    reset({
-      imagem: "",
-      arquivo: "",
-      titulo: "",
-      eixo: "",
-      id_categoria: "",
-      id_municipio: "",
-    });
-    setTimeout(() => {
-      router.push("/listarPublicacoes");
-    }, 2000);
-  }
-
-  function handleDisabledTp(id) {
-    if (id === 1) {
-      setdisabledTipoPublicacao(true);
+      console.error("Erro ao cadastrar publicação:", error);
+      toast.error("Erro ao cadastrar publicação!", { position: "top-right", autoClose: 5000 });
     }
   }
+
   return (
-    <Container>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       <MenuSuperior usuarios={[]}></MenuSuperior>
 
-      <DivCenter>
-        <DivInstrucoes>
-          <b>{id ? "Edição" : "Cadastro"} de Publicações:</b>
-        </DivInstrucoes>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <label>Titulo</label>
-          <input
-            aria-invalid={errors.name ? "true" : "false"}
-            {...register("titulo", { required: true })}
-            type="text"
-            placeholder="Titulo da Publicacao"
-            name="titulo"
-            defaultValue={publicacao?.titulo}
-          />
-          {errors.titulo && errors.titulo.type && (
-            <span>O campo Titulo é obrigatório!</span>
-          )}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        minHeight: 'calc(100vh - 200px)',
+        padding: '20px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '700px',
+          border: '1px solid #e0e0e0'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '30px'
+          }}>
+            <h1 style={{
+              color: '#333',
+              fontSize: '28px',
+              fontWeight: '600',
+              margin: '0 0 10px 0'
+            }}>
+              {id ? "Editar Publicação" : "Cadastro de Publicação"}
+            </h1>
+            <p style={{
+              color: '#666',
+              fontSize: '16px',
+              margin: '0'
+            }}>
+              {id ? "Atualize as informações da publicação" : "Preencha as informações para criar uma nova publicação"}
+            </p>
+          </div>
 
-          <input {...register("id_categoria")} type="hidden" defaultValue={2} />
+          <form onSubmit={handleSubmit(handleAddPublicacao)} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Título *
+              </label>
+              <input
+                {...register("titulo", { required: true })}
+                type="text"
+                placeholder="Título da publicação"
+                name="titulo"
+                defaultValue={publicacao?.titulo || ""}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.titulo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = errors.titulo ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              {errors.titulo && errors.titulo.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  O campo Título é obrigatório!
+                </span>
+              )}
+            </div>
 
-          <select
-            {...register("id_tipo_publicacao", { required: true })}
-            defaultValue={publicacao?.id_tipo_publicacao}
-          >
-            <option value="">Selecione um Tipo de Publicação</option>
-            {tipoPublicacao.map((tipo) => (
-              <option
-                key={tipo.id_tipo_publicacao}
-                value={tipo.id_tipo_publicacao}
-              >
-                {tipo.nome}
-              </option>
-            ))}
-          </select>
-          {errors.id_tipo_publicacao && errors.id_tipo_publicacao.type && (
-            <span>Selecionar um Tipo de Publicação é obrigatório!</span>
-          )}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Tipo de Publicação *
+                </label>
+                <select
+                  {...register("id_tipo_publicacao", { required: true })}
+                  name="id_tipo_publicacao"
+                  defaultValue={publicacao?.id_tipo_publicacao || ""}
+                  disabled={disabledTipoPublicacao}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_tipo_publicacao ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: disabledTipoPublicacao ? '#f5f5f5' : 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    cursor: disabledTipoPublicacao ? 'not-allowed' : 'pointer'
+                  }}
+                  onFocus={(e) => {
+                    if (!disabledTipoPublicacao) {
+                      (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                      (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!disabledTipoPublicacao) {
+                      (e.target as HTMLSelectElement).style.borderColor = errors.id_tipo_publicacao ? '#e74c3c' : '#e0e0e0';
+                      (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                    }
+                  }}
+                >
+                  <option value="">Selecione o tipo de publicação</option>
+                  {tipoPublicacao?.map((tipo, key) => (
+                    <option key={key} value={tipo.id_tipo_publicacao}>
+                      {tipo.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_tipo_publicacao && errors.id_tipo_publicacao.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o tipo de publicação é obrigatório!
+                  </span>
+                )}
+              </div>
 
-          <select
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("id_municipio", {
-              required: true,
-              disabled: disabledMunicipio,
-            })}
-            name="id_municipio"
-            defaultValue={publicacao?.id_municipio}
-          >
-            <option value="">Selecione um Municipio</option>
-            {municipios.map((municipio) => (
-              <option
-                key={municipio.id_municipio}
-                value={municipio.id_municipio}
-              >
-                {municipio.nome}
-              </option>
-            ))}
-          </select>
-          {errors.id_municipio && errors.id_municipio.type === "required" && (
-            <span>Selecionar um Municipio é obrigatório!</span>
-          )}
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Eixo *
+                </label>
+                <select
+                  {...register("id_eixo", { required: true })}
+                  name="id_eixo"
+                  defaultValue={publicacao?.id_eixo || ""}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_eixo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.id_eixo ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione o eixo</option>
+                  {eixos?.map((eixo, key) => (
+                    <option key={key} value={eixo.id_eixo}>
+                      {eixo.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_eixo && errors.id_eixo.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o eixo é obrigatório!
+                  </span>
+                )}
+              </div>
+            </div>
 
-          <select
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("id_eixo", { required: true })}
-            name="id_eixo"
-            defaultValue={publicacao?.id_eixo}
-          >
-            <option value="">Selecione o eixo</option>
-            {eixos.map((eixo) => (
-              <option key={eixo.id_eixo} value={eixo.id_eixo}>
-                {eixo.nome}
-              </option>
-            ))}
-          </select>
-          {errors.id_eixo && errors.id_eixo.type === "required" && (
-            <span>Selecionar um Eixo é obrigatório!</span>
-          )}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Categoria *
+                </label>
+                <select
+                  {...register("id_categoria", { required: true })}
+                  name="id_categoria"
+                  defaultValue={publicacao?.id_categoria || ""}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_categoria ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.id_categoria ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione a categoria</option>
+                  {categorias?.map((categoria, key) => (
+                    <option key={key} value={categoria.id_categoria}>
+                      {categoria.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_categoria && errors.id_categoria.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar a categoria é obrigatório!
+                  </span>
+                )}
+              </div>
 
-          <label>Arquivo da Publicação {id && "(opcional para edição)"}</label>
-          <input
-            {...register("arquivo", { required: !id })}
-            accept=".pdf, .doc, .docx, .xls, .xlsx"
-            type="file"
-          />
-          {errors.arquivo && errors.arquivo.type && (
-            <span>Selecionar um Arquivo é obrigatório!</span>
-          )}
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Município *
+                </label>
+                <select
+                  {...register("id_municipio", { required: true })}
+                  name="id_municipio"
+                  defaultValue={publicacao?.id_municipio || ""}
+                  disabled={disabledMunicipio}
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_municipio ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: disabledMunicipio ? '#f5f5f5' : 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    cursor: disabledMunicipio ? 'not-allowed' : 'pointer'
+                  }}
+                  onFocus={(e) => {
+                    if (!disabledMunicipio) {
+                      (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                      (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (!disabledMunicipio) {
+                      (e.target as HTMLSelectElement).style.borderColor = errors.id_municipio ? '#e74c3c' : '#e0e0e0';
+                      (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                    }
+                  }}
+                >
+                  <option value="">Selecione o município</option>
+                  {municipios?.map((municipio, key) => (
+                    <option key={key} value={municipio.id_municipio}>
+                      {municipio.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_municipio && errors.id_municipio.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o município é obrigatório!
+                  </span>
+                )}
+              </div>
+            </div>
 
-          <label>
-            Imagem de Rótulo Publicação {id && "(opcional para edição)"}
-          </label>
-          <input
-            {...register("imagem", { required: !id })}
-            type="file"
-            accept="image/*"
-          />
-          {errors.imagem && errors.imagem.type && (
-            <span>Selecionar uma imagem é obrigatório!</span>
-          )}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Imagem (Opcional)
+                </label>
+                <input
+                  {...register("imagem")}
+                  type="file"
+                  name="imagem"
+                  accept="image/*"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                    (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                    (e.target as HTMLInputElement).style.boxShadow = 'none';
+                  }}
+                />
+                <small style={{
+                  color: '#666',
+                  fontSize: '14px',
+                  marginTop: '8px',
+                  display: 'block',
+                  lineHeight: '1.4'
+                }}>
+                  Aceita apenas arquivos de imagem (JPG, PNG, GIF, etc.)
+                </small>
+              </div>
 
-          <SubmitButton type="submit">
-            {id ? "Atualizar" : "Gravar"}
-          </SubmitButton>
-        </Form>
-      </DivCenter>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Arquivo (Opcional)
+                </label>
+                <input
+                  {...register("arquivo")}
+                  type="file"
+                  name="arquivo"
+                  accept=".pdf,.doc,.docx"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                    (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                    (e.target as HTMLInputElement).style.boxShadow = 'none';
+                  }}
+                />
+                <small style={{
+                  color: '#666',
+                  fontSize: '14px',
+                  marginTop: '8px',
+                  display: 'block',
+                  lineHeight: '1.4'
+                }}>
+                  Aceita arquivos PDF, DOC e DOCX
+                </small>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: isSubmitting ? '#95a5a6' : '#3498db',
+                color: 'white',
+                padding: '14px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                marginTop: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#2980b9';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
+                  (e.target as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(52, 152, 219, 0.3)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#3498db';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
+                  (e.target as HTMLButtonElement).style.boxShadow = 'none';
+                }
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  {id ? "Atualizando..." : "Cadastrando..."}
+                </>
+              ) : (
+                id ? "Atualizar Publicação" : "Cadastrar Publicação"
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>
-    </Container>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+          .form-container {
+            padding: 20px;
+            margin: 10px;
+          }
+          
+          .form-title {
+            font-size: 24px;
+          }
+          
+          .form-subtitle {
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipiosProps> = async (
-  ctx
-) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -347,24 +671,42 @@ export const getServerSideProps: GetServerSideProps<MunicipiosProps> = async (
     };
   }
 
-  const resMunicipio = await apiClient.get("/getMunicipios");
-  const municipios = await resMunicipio.data;
+  try {
+    const apiClient = getAPIClient(ctx);
+    
+    // Buscar eixos
+    const eixosResponse = await apiClient.get("/getEixos");
+    const eixos = eixosResponse.data;
 
-  const resTipoPublicacao = await apiClient.get("/listTipoPublicacao");
-  const tipoPublicacao = await resTipoPublicacao.data;
+    // Buscar categorias
+    const categoriasResponse = await apiClient.get("/getCategorias");
+    const categorias = categoriasResponse.data;
 
-  const resEixo = await apiClient.get("/getEixos");
-  const eixos = await resEixo.data;
+    // Buscar municípios
+    const municipiosResponse = await apiClient.get("/getMunicipios");
+    const municipios = municipiosResponse.data;
 
-  const resCategorias = await apiClient.get("/getCategorias");
-  const categorias = await resCategorias.data;
+    // Buscar tipos de publicação
+    const tipoPublicacaoResponse = await apiClient.get("/getTipoPublicacao");
+    const tipoPublicacao = tipoPublicacaoResponse.data;
 
-  return {
-    props: {
-      municipios,
-      tipoPublicacao,
-      eixos,
-      categorias,
-    },
-  };
+    return {
+      props: {
+        eixos: eixos || [],
+        categorias: categorias || [],
+        municipios: municipios || [],
+        tipoPublicacao: tipoPublicacao || [],
+      },
+    };
+  } catch (error) {
+    console.error("Erro ao carregar dados:", error);
+    return {
+      props: {
+        eixos: [],
+        categorias: [],
+        municipios: [],
+        tipoPublicacao: [],
+      },
+    };
+  }
 };

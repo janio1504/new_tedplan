@@ -1,20 +1,11 @@
 import { GetServerSideProps } from "next";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
-import { AuthContext } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
-import {
-  Container,
-  Form,
-  Footer,
-  DivCenter,
-  DivInstrucoes,
-} from "../styles/dashboard";
+import { Footer } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
-import dynamic from "next/dynamic";
-import { SubmitButton } from "../styles/dashboard-original";
 import { useRouter } from "next/router";
 
 interface INorma {
@@ -28,6 +19,7 @@ interface INorma {
   imagem: File;
   arquivo: File;
 }
+
 interface IEixo {
   id_eixo: string;
   nome: string;
@@ -75,7 +67,7 @@ export default function AddNorma({
     handleSubmit,
     reset,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       titulo: "",
@@ -86,214 +78,500 @@ export default function AddNorma({
       arquivo: null,
     },
   });
+
   const [imagem, setImagem] = useState(null);
   const router = useRouter();
   const { id } = router.query;
 
   useEffect(() => {
     if (id) {
-      // Encontrar a norma pelo id no array data
       const normaSelecionada = normas.data.find(
-        (norma) => norma.id_norma === Number(id)
+        (norma) => norma.id_norma === parseInt(id as string)
       );
 
       if (normaSelecionada) {
-        // Encontrar os IDs correspondentes
-        const tipoNormaEncontrado = tipoNorma.find(
-          (tn) => tn.nome.trim() === normaSelecionada.tipo_norma.trim()
-        );
-
-        const eixoEncontrado = eixos.find(
-          (e) => e.nome.trim() === normaSelecionada.eixo.trim()
-        );
-
-        const escalaEncontrada = escalas.find(
-          (e) => e.nome.trim() === normaSelecionada.escala.trim()
-        );
-
-        reset({
-          titulo: normaSelecionada.titulo,
-          id_tipo_norma: tipoNormaEncontrado?.id_tipo_norma || "",
-          id_eixo: eixoEncontrado?.id_eixo || "",
-          id_escala: escalaEncontrada?.id_escala || "",
-        });
+        setValue("titulo", normaSelecionada.titulo);
+        setValue("id_tipo_norma", normaSelecionada.tipo_norma);
+        setValue("id_eixo", normaSelecionada.eixo);
+        setValue("id_escala", normaSelecionada.escala);
       }
     }
-  }, [id, normas, setValue, tipoNorma, eixos, escalas]);
-  async function handleAddNorma(data: INorma) {
-    const formData = new FormData();
+  }, [id, normas.data, setValue]);
 
-    formData.append("imagem", data.imagem[0]);
-    formData.append("arquivo", data.arquivo[0]);
-    formData.append("titulo", data.titulo);
-    formData.append("id_eixo", data.id_eixo);
-    formData.append("id_tipo_norma", data.id_tipo_norma);
-    formData.append("id_escala", data.id_escala);
-    const apiClient = getAPIClient();
-    const response = await apiClient
-      .post("addNorma", formData, {
-        headers: {
-          "Content-Type": `multipart/form-data=${formData}`,
-          "Access-Control-Allow-Origin": "*",
-        },
-      })
-      .then((response) => {
-        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
-      })
-      .catch((error) => {
-        if (error) {
-          toast.error("Erro ao gravar dados!", { position: "top-right", autoClose: 5000 });
-          return error;
-        }
-      });
+  async function handleAddNorma(data) {
+    try {
+      const formData = new FormData();
 
-    reset({
-      imagem: "",
-      arquivo: "",
-      titulo: "",
-      id_eixo: "",
-      id_escala: "",
-      id_tipo_norma: "",
-    });
-    setTimeout(() => {
-      router.push("/listarNormas");
-    }, 2000);
+      formData.append("titulo", data.titulo);
+      formData.append("id_tipo_norma", data.id_tipo_norma);
+      formData.append("id_eixo", data.id_eixo);
+      formData.append("id_escala", data.id_escala);
+
+      if (data.imagem && data.imagem[0]) {
+        formData.append("imagem", data.imagem[0]);
+      }
+
+      if (data.arquivo && data.arquivo[0]) {
+        formData.append("arquivo", data.arquivo[0]);
+      }
+
+      const apiClient = getAPIClient();
+      const response = await apiClient.post("addNorma", formData);
+
+      if (response.data.success) {
+        toast.success("Norma cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        reset();
+        setTimeout(() => {
+          router.push("/listarNormas");
+        }, 2000);
+      } else {
+        toast.error("Erro ao cadastrar norma!", { position: "top-right", autoClose: 5000 });
+      }
+    } catch (error) {
+      console.error("Erro ao cadastrar norma:", error);
+      toast.error("Erro ao cadastrar norma!", { position: "top-right", autoClose: 5000 });
+    }
   }
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
-
-    if (data.imagem?.[0]) {
-      formData.append("imagem", data.imagem[0]);
-    }
-
-    if (data.arquivo?.[0]) {
-      formData.append("arquivo", data.arquivo[0]);
-    }
-
-    formData.append("titulo", data.titulo);
-    formData.append("id_eixo", data.id_eixo);
-    formData.append("id_tipo_norma", data.id_tipo_norma);
-    formData.append("id_escala", data.id_escala);
-
-    const apiClient = getAPIClient();
-
-    try {
-      if (id) {
-        formData.append("id_norma", id as string);
-        await apiClient.post("updateNorma", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success("Norma atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
-      } else {
-        await apiClient.post("addNorma", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        toast.success("Norma criada com sucesso!", { position: "top-right", autoClose: 5000 });
-      }
-
-      setTimeout(() => {
-        router.push("/listarNormas");
-      }, 2000);
-    } catch (error) {
-      console.error("Erro ao salvar norma:", error);
-      toast.error("Erro ao salvar norma!", { position: "top-right", autoClose: 5000 });
-    }
-  };
-
   return (
-    <Container>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       <MenuSuperior usuarios={[]}></MenuSuperior>
-      <DivCenter>
-        <DivInstrucoes>
-          <b>{id ? "Edição" : "Cadastro"} de Norma:</b>
-        </DivInstrucoes>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <label>Titulo</label>
-          <input
-            {...register("titulo", { required: true })}
-            type="text"
-            placeholder="Titulo da Norma"
-          />
-          {errors.titulo && <span>O campo Titulo é obrigatório!</span>}
 
-          <label>Tipo de Norma</label>
-          <select
-            {...register("id_tipo_norma", { required: true })}
-            defaultValue=""
-          >
-            <option value="">Selecione um Tipo</option>
-            {tipoNorma.map((tipo) => (
-              <option key={tipo.id_tipo_norma} value={tipo.id_tipo_norma}>
-                {tipo.nome.trim()}
-              </option>
-            ))}
-          </select>
-          {errors.id_tipo_norma && (
-            <span>Selecionar um Tipo de Norma é obrigatório!</span>
-          )}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        minHeight: 'calc(100vh - 200px)',
+        padding: '20px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '700px',
+          border: '1px solid #e0e0e0'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '30px'
+          }}>
+            <h1 style={{
+              color: '#333',
+              fontSize: '28px',
+              fontWeight: '600',
+              margin: '0 0 10px 0'
+            }}>
+              {id ? "Editar Norma" : "Cadastro de Norma"}
+            </h1>
+            <p style={{
+              color: '#666',
+              fontSize: '16px',
+              margin: '0'
+            }}>
+              {id ? "Atualize as informações da norma" : "Preencha as informações para criar uma nova norma"}
+            </p>
+          </div>
 
-          <label>Escala</label>
-          <select
-            {...register("id_escala", { required: true })}
-            defaultValue=""
-          >
-            <option value="">Selecione uma escala</option>
-            {escalas.map((escala) => (
-              <option key={escala.id_escala} value={escala.id_escala}>
-                {escala.nome.trim()}
-              </option>
-            ))}
-          </select>
-          {errors.id_escala && (
-            <span>Selecionar uma escala é obrigatório!</span>
-          )}
+          <form onSubmit={handleSubmit(handleAddNorma)} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Título *
+              </label>
+              <input
+                {...register("titulo", { required: true })}
+                type="text"
+                placeholder="Título da norma"
+                name="titulo"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.titulo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = errors.titulo ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              {errors.titulo && errors.titulo.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  O campo Título é obrigatório!
+                </span>
+              )}
+            </div>
 
-          <label>Eixo</label>
-          <select {...register("id_eixo", { required: true })} defaultValue="">
-            <option value="">Selecione um eixo</option>
-            {eixos.map((eixo) => (
-              <option key={eixo.id_eixo} value={eixo.id_eixo}>
-                {eixo.nome.trim()}
-              </option>
-            ))}
-          </select>
-          {errors.id_eixo && <span>Selecionar um Eixo é obrigatório!</span>}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Tipo de Norma *
+                </label>
+                <select
+                  {...register("id_tipo_norma", { required: true })}
+                  name="id_tipo_norma"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_tipo_norma ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.id_tipo_norma ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione o tipo de norma</option>
+                  {tipoNorma?.map((tipo, key) => (
+                    <option key={key} value={tipo.id_tipo_norma}>
+                      {tipo.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_tipo_norma && errors.id_tipo_norma.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o tipo de norma é obrigatório!
+                  </span>
+                )}
+              </div>
 
-          <label>Imagem {id && "(opcional para edição)"}</label>
-          <input
-            {...register("imagem", { required: !id })}
-            type="file"
-            accept="image/*"
-          />
-          {errors.imagem && <span>Selecionar uma imagem é obrigatório!</span>}
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Eixo *
+                </label>
+                <select
+                  {...register("id_eixo", { required: true })}
+                  name="id_eixo"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_eixo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.id_eixo ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione o eixo</option>
+                  {eixos?.map((eixo, key) => (
+                    <option key={key} value={eixo.id_eixo}>
+                      {eixo.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_eixo && errors.id_eixo.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o eixo é obrigatório!
+                  </span>
+                )}
+              </div>
+            </div>
 
-          <label>Arquivo {id && "(opcional para edição)"}</label>
-          <input
-            {...register("arquivo", { required: !id })}
-            type="file"
-            accept=".pdf, .doc, .docx, .xls, .xlsx"
-          />
-          {errors.arquivo && <span>Selecionar um Arquivo é obrigatório!</span>}
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Escala *
+              </label>
+              <select
+                {...register("id_escala", { required: true })}
+                name="id_escala"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.id_escala ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                  (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = errors.id_escala ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                }}
+              >
+                <option value="">Selecione a escala</option>
+                {escalas?.map((escala, key) => (
+                  <option key={key} value={escala.id_escala}>
+                    {escala.nome}
+                  </option>
+                ))}
+              </select>
+              {errors.id_escala && errors.id_escala.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  Selecionar a escala é obrigatório!
+                </span>
+              )}
+            </div>
 
-          <SubmitButton type="submit">
-            {id ? "Atualizar" : "Gravar"}
-          </SubmitButton>
-        </Form>
-      </DivCenter>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Imagem (Opcional)
+                </label>
+                <input
+                  {...register("imagem")}
+                  type="file"
+                  name="imagem"
+                  accept="image/*"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                    (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                    (e.target as HTMLInputElement).style.boxShadow = 'none';
+                  }}
+                />
+                <small style={{
+                  color: '#666',
+                  fontSize: '14px',
+                  marginTop: '8px',
+                  display: 'block',
+                  lineHeight: '1.4'
+                }}>
+                  Aceita apenas arquivos de imagem (JPG, PNG, GIF, etc.)
+                </small>
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Arquivo (Opcional)
+                </label>
+                <input
+                  {...register("arquivo")}
+                  type="file"
+                  name="arquivo"
+                  accept=".pdf,.doc,.docx"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                    (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                    (e.target as HTMLInputElement).style.boxShadow = 'none';
+                  }}
+                />
+                <small style={{
+                  color: '#666',
+                  fontSize: '14px',
+                  marginTop: '8px',
+                  display: 'block',
+                  lineHeight: '1.4'
+                }}>
+                  Aceita arquivos PDF, DOC e DOCX
+                </small>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: isSubmitting ? '#95a5a6' : '#3498db',
+                color: 'white',
+                padding: '14px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                marginTop: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#2980b9';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
+                  (e.target as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(52, 152, 219, 0.3)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#3498db';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
+                  (e.target as HTMLButtonElement).style.boxShadow = 'none';
+                }
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  {id ? "Atualizando..." : "Cadastrando..."}
+                </>
+              ) : (
+                id ? "Atualizar Norma" : "Cadastrar Norma"
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+
       <Footer>
         &copy; Todos os direitos reservados
-        
       </Footer>
-    </Container>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+          .form-container {
+            padding: 20px;
+            margin: 10px;
+          }
+          
+          .form-title {
+            font-size: 24px;
+          }
+          
+          .form-subtitle {
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<NormaProps> = async (
-  ctx
-) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -304,24 +582,42 @@ export const getServerSideProps: GetServerSideProps<NormaProps> = async (
     };
   }
 
-  const resNorma = await apiClient.get("/getNormas");
-  const normas = await resNorma.data;
+  try {
+    const apiClient = getAPIClient(ctx);
+    
+    // Buscar normas
+    const normasResponse = await apiClient.get("/getNormas");
+    const normas = normasResponse.data;
 
-  const resEixo = await apiClient.get("/getEixos");
-  const eixos = await resEixo.data;
+    // Buscar eixos
+    const eixosResponse = await apiClient.get("/getEixos");
+    const eixos = eixosResponse.data;
 
-  const resEscala = await apiClient.get("/getEscalas");
-  const escalas = await resEscala.data;
+    // Buscar escalas
+    const escalasResponse = await apiClient.get("/getEscalas");
+    const escalas = escalasResponse.data;
 
-  const resTipoNorma = await apiClient.get("/listTipoNorma");
-  const tipoNorma = await resTipoNorma.data;
+    // Buscar tipos de norma
+    const tipoNormaResponse = await apiClient.get("/getTipoNorma");
+    const tipoNorma = tipoNormaResponse.data;
 
-  return {
-    props: {
-      eixos,
-      normas,
-      escalas,
-      tipoNorma,
-    },
-  };
+    return {
+      props: {
+        normas: normas || { total: "0", perPage: 10, page: 1, lastPage: 1, data: [] },
+        eixos: eixos || [],
+        escalas: escalas || [],
+        tipoNorma: tipoNorma || [],
+      },
+    };
+  } catch (error) {
+    console.error("Erro ao carregar dados:", error);
+    return {
+      props: {
+        normas: { total: "0", perPage: 10, page: 1, lastPage: 1, data: [] },
+        eixos: [],
+        escalas: [],
+        tipoNorma: [],
+      },
+    };
+  }
 };

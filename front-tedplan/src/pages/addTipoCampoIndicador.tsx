@@ -4,16 +4,7 @@ import React, { useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 
-import {
-  Container,
-  Form,
-  Footer,
-  DivCenter,
-  DivInstrucoes,
-} from "../styles/dashboard";
-
-import { SubmitButton } from "../styles/dashboard-original";
-
+import { Footer } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
@@ -38,7 +29,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -98,22 +89,16 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
     }
   }
 
-  async function handleAddTipoCampo({
-    name_campo,
-    type,
-    id_campo,
-    enable,
-    default_value,
-  }) {
+  async function handleAddTipoCampo(data) {
     try {
       const apiClient = getAPIClient();
       
       const tipoCampoData = {
-        name_campo,
-        type,
-        id_campo: id_campo || null,
-        enable: enable || false,
-        default_value: default_value || null,
+        name_campo: data.name_campo,
+        type: data.type,
+        id_campo: data.id_campo,
+        enable: data.enable || false,
+        default_value: data.default_value || "",
       };
 
       if (isEditing && tipoCampoId) {
@@ -130,7 +115,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
         name_campo: "",
         type: "",
         id_campo: "",
-        enable: true,
+        enable: false,
         default_value: "",
       });
 
@@ -144,86 +129,358 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
   }
 
   return (
-    <Container>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       <MenuSuperior usuarios={[]}></MenuSuperior>
 
-      <DivCenter>
-        <DivInstrucoes>
-          <b>{isEditing ? "Editar Tipo de Campo:" : "Cadastro de Tipo de Campo:"}</b>
-        </DivInstrucoes>
-        <Form onSubmit={handleSubmit(handleAddTipoCampo)}>
-          <label>Nome do Campo *</label>
-          <input
-            aria-invalid={errors.name_campo ? "true" : "false"}
-            {...register("name_campo", { required: true })}
-            type="text"
-            placeholder="Nome do campo (ex: Título, Descrição, etc.)"
-            name="name_campo"
-          />
-          {errors.name_campo && errors.name_campo.type === "required" && (
-            <span>O campo Nome do Campo é obrigatório!</span>
-          )}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: 'calc(100vh - 200px)',
+        padding: '20px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '600px',
+          border: '1px solid #e0e0e0',
+          marginTop: '100px'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '30px'
+          }}>
+            <h1 style={{
+              color: '#333',
+              fontSize: '28px',
+              fontWeight: '600',
+              margin: '0 0 10px 0'
+            }}>
+              {isEditing ? "Editar Tipo de Campo" : "Cadastro de Tipo de Campo"}
+            </h1>
+            <p style={{
+              color: '#666',
+              fontSize: '16px',
+              margin: '0'
+            }}>
+              {isEditing ? "Atualize as informações do tipo de campo" : "Preencha as informações para criar um novo tipo de campo"}
+            </p>
+          </div>
 
-          <label>Tipo de Campo *</label>
-          <select
-            aria-invalid={errors.type ? "true" : "false"}
-            {...register("type", { required: true })}
-            name="type"
-          >
-            <option value="">Selecione o tipo de campo</option>
-            {tiposCampo.map((tipo, key) => (
-              <option key={key} value={tipo.value}>
-                {tipo.label}
-              </option>
-            ))}
-          </select>
-          {errors.type && errors.type.type === "required" && (
-            <span>Selecionar o tipo de campo é obrigatório!</span>
-          )}
+          <form onSubmit={handleSubmit(handleAddTipoCampo)} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Nome do Campo *
+              </label>
+              <input
+                {...register("name_campo", { required: true })}
+                type="text"
+                placeholder="Nome que aparecerá no formulário"
+                name="name_campo"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.name_campo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = errors.name_campo ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              {errors.name_campo && errors.name_campo.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  O campo Nome do Campo é obrigatório!
+                </span>
+              )}
+            </div>
 
-          <label>ID do Campo</label>
-          <input
-            {...register("id_campo")}
-            type="text"
-            placeholder="ID único do campo (opcional, será gerado automaticamente se vazio)"
-            name="id_campo"
-          />
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Tipo de Campo *
+              </label>
+              <select
+                {...register("type", { required: true })}
+                name="type"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.type ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                  (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = errors.type ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                }}
+              >
+                <option value="">Selecione o tipo de campo</option>
+                {tiposCampo.map((tipo, key) => (
+                  <option key={key} value={tipo.value}>
+                    {tipo.label}
+                  </option>
+                ))}
+              </select>
+              {errors.type && errors.type.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  Selecionar o tipo de campo é obrigatório!
+                </span>
+              )}
+            </div>
 
-          <label>Valor Padrão</label>
-          {watchType === "textarea" ? (
-            <textarea
-              {...register("default_value")}
-              placeholder="Valor padrão do campo (opcional)"
-              name="default_value"
-              rows={3}
-            />
-          ) : (
-            <input
-              {...register("default_value")}
-              type={watchType === "number" ? "number" : "text"}
-              placeholder="Valor padrão do campo (opcional)"
-              name="default_value"
-            />
-          )}
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                ID do Campo
+              </label>
+              <input
+                {...register("id_campo")}
+                type="text"
+                placeholder="Identificador único do campo (opcional)"
+                name="id_campo"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              <small style={{
+                color: '#666',
+                fontSize: '14px',
+                marginTop: '8px',
+                display: 'block',
+                lineHeight: '1.4'
+              }}>
+                Identificador único para o campo (opcional)
+              </small>
+            </div>
 
-          <label style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <input
-              {...register("enable")}
-              type="checkbox"
-              name="enable"
-              defaultChecked={true}
-            />
-            Campo Ativo
-          </label>
+            <div>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                <input
+                  {...register("enable")}
+                  type="checkbox"
+                  name="enable"
+                  defaultChecked={true}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    accentColor: '#3498db'
+                  }}
+                />
+                Campo ativo
+              </label>
+              <small style={{
+                color: '#666',
+                fontSize: '14px',
+                marginTop: '8px',
+                display: 'block',
+                lineHeight: '1.4'
+              }}>
+                Marque esta opção para ativar o campo no formulário
+              </small>
+            </div>
 
-          <SubmitButton type="submit">
-            {isEditing ? "Atualizar" : "Gravar"}
-          </SubmitButton>
-        </Form>
-      </DivCenter>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Valor Padrão
+              </label>
+              <input
+                {...register("default_value")}
+                type="text"
+                placeholder="Valor inicial do campo (opcional)"
+                name="default_value"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              <small style={{
+                color: '#666',
+                fontSize: '14px',
+                marginTop: '8px',
+                display: 'block',
+                lineHeight: '1.4'
+              }}>
+                Valor que será exibido por padrão no campo
+              </small>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: isSubmitting ? '#95a5a6' : '#3498db',
+                color: 'white',
+                padding: '14px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                marginTop: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#2980b9';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
+                  (e.target as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(52, 152, 219, 0.3)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#3498db';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
+                  (e.target as HTMLButtonElement).style.boxShadow = 'none';
+                }
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  {isEditing ? "Atualizando..." : "Salvando..."}
+                </>
+              ) : (
+                isEditing ? "Atualizar Tipo de Campo" : "Cadastrar Tipo de Campo"
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>
-    </Container>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+          .form-container {
+            padding: 20px;
+            margin: 10px;
+          }
+          
+          .form-title {
+            font-size: 24px;
+          }
+          
+          .form-subtitle {
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
