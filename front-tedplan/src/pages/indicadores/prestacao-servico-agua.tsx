@@ -395,7 +395,7 @@ const CampoIndicador = ({
   }
 };
 
-export default function SinisaAgua() {
+export default function PrestacaoServicoAgua() {
   const { usuario, signOut, anoEditorSimisab, permission, isEditor } =
     useContext(AuthContext);
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio>(null);
@@ -1110,7 +1110,7 @@ export default function SinisaAgua() {
                 <span> / </span>
               </li>
               <li>
-                <Link href="/indicadores/prestacao-servicos-sinisa">
+                                    <Link href="/indicadores/prestacao-servicos">
                   Prestação de Serviços SINISA
                 </Link>
                 <span> / </span>

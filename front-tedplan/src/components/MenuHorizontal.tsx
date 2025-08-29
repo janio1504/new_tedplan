@@ -61,12 +61,15 @@ interface MunicipioProps {
 
 
 export default function MenuHorizontal({municipio}) {
-  const { signOut } = useContext(AuthContext);
+  const { signOut, permission } = useContext(AuthContext);
   async function handleSignOut() {
     signOut();
   }
   async function handleHome() {
     Router.push("/indicadores/home_indicadores");
+  }
+  async function handleDashboard() {
+    Router.push("/dashboard");
   }
   async function handleGestao() {
     Router.push("/indicadores/gestao");
@@ -97,6 +100,7 @@ export default function MenuHorizontal({municipio}) {
         <Municipio>Bem vindos Município de {municipio}</Municipio>
         <MenuMunicipioItem>
           <ul>
+          <li onClick={handleDashboard}> {permission.adminGeral || permission.adminTedPlan ? "Dashboard" : ""}</li>
           <li onClick={handleHome}>Pagina Inicial</li>
             <li onClick={handleGestao}>Gestão</li>
             <li onClick={handleIndicadores}>Indicadores</li>

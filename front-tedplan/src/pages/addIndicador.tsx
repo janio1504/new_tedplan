@@ -472,118 +472,401 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   }
 
   return (
-    <Container>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5',
+      fontFamily: 'Arial, sans-serif'
+    }}>
       <MenuSuperior usuarios={[]}></MenuSuperior>
 
-      <DivCenter>
-        <DivInstrucoes>
-          <b>{isEditing ? "Editar Indicador:" : "Cadastro de Indicador:"}</b>
-        </DivInstrucoes>
-        <Form onSubmit={handleSubmit(handleAddIndicador)}>
-          <label>Código do Indicador *</label>
-          <input
-            aria-invalid={errors.codigo_indicador ? "true" : "false"}
-            {...register("codigo_indicador", { required: true })}
-            type="text"
-            placeholder="Código único do indicador (ex: AG001, ES002)"
-            name="codigo_indicador"
-          />
-          {errors.codigo_indicador && errors.codigo_indicador.type === "required" && (
-            <span>O campo Código do Indicador é obrigatório!</span>
-          )}
-
-          <label>Nome do Indicador *</label>
-          <input
-            aria-invalid={errors.nome_indicador ? "true" : "false"}
-            {...register("nome_indicador", { required: true })}
-            type="text"
-            placeholder="Nome completo do indicador"
-            name="nome_indicador"
-          />
-          {errors.nome_indicador && errors.nome_indicador.type === "required" && (
-            <span>O campo Nome do Indicador é obrigatório!</span>
-          )}
-
-          <label>Grupo do Indicador</label>
-          <select
-            {...register("grupo_indicador")}
-            name="grupo_indicador"
-          >
-            <option value="">Selecione um grupo (opcional)</option>
-            {gruposIndicador.map((grupo, key) => (
-              <option key={key} value={grupo}>
-                {grupo}
-              </option>
-            ))}
-          </select>
-
-          <label>Item de Menu</label>
-          <select
-            {...register("id_menu_item")}
-            name="id_menu_item"
-          >
-            <option value="">Selecione um item de menu (opcional)</option>
-            {menuItemsData?.map((menuItem, key) => (
-              <option key={key} value={menuItem.id_menu_item}>
-                {menuItem.menu?.titulo} - {menuItem.nome_menu_item}
-              </option>
-            ))}
-          </select>
-
-          {/* Seção para configuração do campo de entrada */}
-          <div style={{ 
-            border: "1px solid #ddd", 
-            padding: "20px", 
-            margin: "20px 0", 
-            borderRadius: "5px",
-            backgroundColor: "#f9f9f9"
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        minHeight: 'calc(100vh - 200px)',
+        padding: '20px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: '50px',
+          width: '100%',
+          maxWidth: '800px',
+          border: '1px solid #e0e0e0',
+          marginTop: '100px',
+          boxSizing: 'border-box'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '30px'
           }}>
-            <h3 style={{ marginTop: 0 }}>Configuração do Campo de Entrada</h3>
-            
-            <label>Tipo de Campo *</label>
+            <h1 style={{
+              color: '#333',
+              fontSize: '28px',
+              fontWeight: '600',
+              margin: '0 0 10px 0'
+            }}>
+              {isEditing ? "Editar Indicador" : "Cadastro de Indicador"}
+            </h1>
+            <p style={{
+              color: '#666',
+              fontSize: '16px',
+              margin: '0'
+            }}>
+              {isEditing ? "Atualize as informações do indicador" : "Preencha as informações para criar um novo indicador"}
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit(handleAddIndicador)} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '24px'
+          }}>
+          <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Código do Indicador *
+            </label>
+            <input
+              aria-invalid={errors.codigo_indicador ? "true" : "false"}
+              {...register("codigo_indicador", { required: true })}
+              type="text"
+              placeholder="Código único do indicador (ex: AG001, ES002)"
+              name="codigo_indicador"
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: `1px solid ${errors.codigo_indicador ? '#e74c3c' : '#e0e0e0'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = errors.codigo_indicador ? '#e74c3c' : '#e0e0e0';
+                (e.target as HTMLInputElement).style.boxShadow = 'none';
+              }}
+            />
+            {errors.codigo_indicador && errors.codigo_indicador.type === "required" && (
+              <span style={{
+                color: '#e74c3c',
+                fontSize: '12px',
+                marginTop: '4px',
+                display: 'block'
+              }}>
+                O campo Código do Indicador é obrigatório!
+              </span>
+            )}
+          </div>
+
+          <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Nome do Indicador *
+            </label>
+            <input
+              aria-invalid={errors.nome_indicador ? "true" : "false"}
+              {...register("nome_indicador", { required: true })}
+              type="text"
+              placeholder="Nome completo do indicador"
+              name="nome_indicador"
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: `1px solid ${errors.nome_indicador ? '#e74c3c' : '#e0e0e0'}`,
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = errors.nome_indicador ? '#e74c3c' : '#e0e0e0';
+                (e.target as HTMLInputElement).style.boxShadow = 'none';
+              }}
+            />
+            {errors.nome_indicador && errors.nome_indicador.type === "required" && (
+              <span style={{
+                color: '#e74c3c',
+                fontSize: '12px',
+                marginTop: '4px',
+                display: 'block'
+              }}>
+                O campo Nome do Indicador é obrigatório!
+              </span>
+            )}
+          </div>
+
+          <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Grupo do Indicador
+            </label>
             <select
-              {...register("tipo_campo", { required: true })}
-              name="tipo_campo"
+              {...register("grupo_indicador")}
+              name="grupo_indicador"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLSelectElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLSelectElement).style.boxShadow = 'none';
+              }}
             >
-              <option value="">Selecione o tipo de campo</option>
-              {tiposCampo.map((tipo, key) => (
-                <option key={key} value={tipo.value}>
-                  {tipo.label}
+              <option value="">Selecione um grupo (opcional)</option>
+              {gruposIndicador.map((grupo, key) => (
+                <option key={key} value={grupo}>
+                  {grupo}
                 </option>
               ))}
             </select>
-            {errors.tipo_campo && errors.tipo_campo.type === "required" && (
-              <span>O campo Tipo de Campo é obrigatório!</span>
-            )}
+          </div>
 
-            <label>Nome do Campo *</label>
-            <input
-              {...register("nome_campo", { required: true })}
-              type="text"
-              placeholder="Nome que aparecerá no formulário (ex: 'Volume de Água Tratada')"
-              name="nome_campo"
-            />
-            {errors.nome_campo && errors.nome_campo.type === "required" && (
-              <span>O campo Nome do Campo é obrigatório!</span>
-            )}
-
-            <label>
-              <input
-                {...register("campo_ativo")}
-                type="checkbox"
-                name="campo_ativo"
-                defaultChecked={true}
-              />
-              Campo ativo
+          <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Item de Menu
             </label>
+            <select
+              {...register("id_menu_item")}
+              name="id_menu_item"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLSelectElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLSelectElement).style.boxShadow = 'none';
+              }}
+            >
+              <option value="">Selecione um item de menu (opcional)</option>
+              {menuItemsData?.map((menuItem, key) => (
+                <option key={key} value={menuItem.id_menu_item}>
+                  {menuItem.menu?.titulo} - {menuItem.nome_menu_item}
+                </option>
+              ))}
+            </select>
+          </div>
 
-            <label>Valor Padrão</label>
-            <input
-              {...register("valor_padrao")}
-              type="text"
-              placeholder="Valor inicial do campo (opcional)"
-              name="valor_padrao"
-            />
+          {/* Seção para configuração do campo de entrada */}
+          <div style={{ 
+            border: "1px solid #e0e0e0", 
+            padding: "24px", 
+            margin: "20px 0", 
+            borderRadius: "12px",
+            backgroundColor: "#f8f9fa",
+            boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)"
+          }}>
+            <h3 style={{ 
+              marginTop: 0, 
+              marginBottom: '20px',
+              color: '#333',
+              fontSize: '18px',
+              fontWeight: '600'
+            }}>
+              Configuração do Campo de Entrada
+            </h3>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '600',
+                color: '#333',
+                fontSize: '14px'
+              }}>
+                Tipo de Campo *
+              </label>
+              <select
+                {...register("tipo_campo", { required: true })}
+                name="tipo_campo"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: `1px solid ${errors.tipo_campo ? '#e74c3c' : '#e0e0e0'}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.3s ease',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                  (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = errors.tipo_campo ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                }}
+              >
+                <option value="">Selecione o tipo de campo</option>
+                {tiposCampo.map((tipo, key) => (
+                  <option key={key} value={tipo.value}>
+                    {tipo.label}
+                  </option>
+                ))}
+              </select>
+              {errors.tipo_campo && errors.tipo_campo.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '12px',
+                  marginTop: '4px',
+                  display: 'block'
+                }}>
+                  O campo Tipo de Campo é obrigatório!
+                </span>
+              )}
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '600',
+                color: '#333',
+                fontSize: '14px'
+              }}>
+                Nome do Campo *
+              </label>
+              <input
+                {...register("nome_campo", { required: true })}
+                type="text"
+                placeholder="Nome que aparecerá no formulário (ex: 'Volume de Água Tratada')"
+                name="nome_campo"
+                style={{
+                  width: '95%',
+                  padding: '12px 16px',
+                  border: `1px solid ${errors.nome_campo ? '#e74c3c' : '#e0e0e0'}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.3s ease',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = errors.nome_campo ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              {errors.nome_campo && errors.nome_campo.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '12px',
+                  marginTop: '4px',
+                  display: 'block'
+                }}>
+                  O campo Nome do Campo é obrigatório!
+                </span>
+              )}
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                color: '#333'
+              }}>
+                <input
+                  {...register("campo_ativo")}
+                  type="checkbox"
+                  name="campo_ativo"
+                  defaultChecked={true}
+                  style={{
+                    width: '18px',
+                    height: '18px',
+                    accentColor: '#3498db'
+                  }}
+                />
+                <span style={{ fontWeight: '500' }}>Campo ativo</span>
+              </label>
+            </div>
+
+            <div style={{ marginBottom: '0' }}>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontWeight: '600',
+                color: '#333',
+                fontSize: '14px'
+              }}>
+                Valor Padrão
+              </label>
+              <input
+                {...register("valor_padrao")}
+                type="text"
+                placeholder="Valor inicial do campo (opcional)"
+                name="valor_padrao"
+                style={{
+                  width: '95%',
+                  padding: '12px 16px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  transition: 'all 0.3s ease',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+            </div>
 
             {/* Seção para configurar opções do select */}
             {tipoCampoSelecionado === "select" && (
@@ -722,7 +1005,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                       onChange={(e) => setNewCheckBoxItem({...newCheckBoxItem, descricao: e.target.value})}
                       placeholder="Descrição que aparecerá (ex: 'Sim')"
                       style={{
-                        width: "100%",
+                        width: "95%",
                         padding: "8px",
                         border: "1px solid #ddd",
                         borderRadius: "3px"
@@ -817,54 +1100,223 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             )}
           </div>
 
-          <label>Unidade do Indicador</label>
-          <input
-            {...register("unidade_indicador")}
-            type="text"
-            placeholder="Unidade de medida (ex: %, L/s, R$, etc.)"
-            name="unidade_indicador"
-          />
+          {/* <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Unidade do Indicador
+            </label>
+            <input
+              {...register("unidade_indicador")}
+              type="text"
+              placeholder="Unidade de medida (ex: %, L/s, R$, etc.)"
+              name="unidade_indicador"
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLInputElement).style.boxShadow = 'none';
+              }}
+            />
+          </div> */}
 
-          <label>Palavra-chave</label>
-          <input
-            {...register("palavra_chave")}
-            type="text"
-            placeholder="Palavras-chave para busca (separadas por vírgula)"
-            name="palavra_chave"
-          />
+          {/* <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Palavra-chave
+            </label>
+            <input
+              {...register("palavra_chave")}
+              type="text"
+              placeholder="Palavras-chave para busca (separadas por vírgula)"
+              name="palavra_chave"
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLInputElement).style.boxShadow = 'none';
+              }}
+            />
+          </div> */}
 
-          <label>Fórmula de Cálculo</label>
-          <textarea
-            {...register("formula_calculo_indicador")}
-            placeholder="Fórmula matemática para cálculo do indicador"
-            name="formula_calculo_indicador"
-            rows={3}
-          />
+          {/* <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Fórmula de Cálculo
+            </label>
+            <textarea
+              {...register("formula_calculo_indicador")}
+              placeholder="Fórmula matemática para cálculo do indicador"
+              name="formula_calculo_indicador"
+              rows={3}
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white',
+                resize: 'vertical',
+                fontFamily: 'inherit'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLTextAreaElement).style.borderColor = '#3498db';
+                (e.target as HTMLTextAreaElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLTextAreaElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLTextAreaElement).style.boxShadow = 'none';
+              }}
+            />
+          </div> */}
 
-          <label>Informações do Indicador</label>
-          <textarea
-            {...register("informacoes_indicador")}
-            placeholder="Descrição detalhada, metodologia, fontes de dados, etc."
-            name="informacoes_indicador"
-            rows={4}
-          />
+          {/* <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Informações do Indicador
+            </label>
+            <textarea
+              {...register("informacoes_indicador")}
+              placeholder="Descrição detalhada, metodologia, fontes de dados, etc."
+              name="informacoes_indicador"
+              rows={4}
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white',
+                resize: 'vertical',
+                fontFamily: 'inherit'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLTextAreaElement).style.borderColor = '#3498db';
+                (e.target as HTMLTextAreaElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLTextAreaElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLTextAreaElement).style.boxShadow = 'none';
+              }}
+            />
+          </div> */}
 
-          <label>Indicador Correspondente SNIS</label>
-          <input
-            {...register("indicador_correspondente_ou_similar_snis")}
-            type="text"
-            placeholder="Código do indicador correspondente no SNIS (se aplicável)"
-            name="indicador_correspondente_ou_similar_snis"
-          />
+          {/* <div style={{ marginBottom: '0' }}>
+            <label style={{
+              display: 'block',
+              marginBottom: '8px',
+              fontWeight: '600',
+              color: '#333',
+              fontSize: '14px'
+            }}>
+              Indicador Correspondente SNIS
+            </label>
+            <input
+              {...register("indicador_correspondente_ou_similar_snis")}
+              type="text"
+              placeholder="Código do indicador correspondente no SNIS (se aplicável)"
+              name="indicador_correspondente_ou_similar_snis"
+              style={{
+                width: '95%',
+                padding: '12px 16px',
+                border: '1px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                backgroundColor: 'white'
+              }}
+              onFocus={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+              }}
+              onBlur={(e) => {
+                (e.target as HTMLInputElement).style.borderColor = '#e0e0e0';
+                (e.target as HTMLInputElement).style.boxShadow = 'none';
+              }}
+            />
+          </div> */}
 
-          <SubmitButton type="submit">
-            {isEditing ? "Atualizar" : "Gravar"}
-          </SubmitButton>
-        </Form>
-      </DivCenter>
-      <Footer>
-        &copy; Todos os direitos reservados
-      </Footer>
-    </Container>
+          <button
+            type="submit"
+            style={{
+              backgroundColor: '#3498db',
+              color: 'white',
+              padding: '14px 24px',
+              fontSize: '16px',
+              fontWeight: '600',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              marginTop: '10px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '10px'
+            }}
+            onMouseEnter={(e) => {
+              (e.target as HTMLButtonElement).style.backgroundColor = '#2980b9';
+              (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
+              (e.target as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(52, 152, 219, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLButtonElement).style.backgroundColor = '#3498db';
+              (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
+              (e.target as HTMLButtonElement).style.boxShadow = 'none';
+            }}
+          >
+            {isEditing ? "Atualizar Indicador" : "Cadastrar Indicador"}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <Footer>
+      &copy; Todos os direitos reservados
+    </Footer>
+  </div>
   );
 }
