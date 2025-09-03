@@ -168,11 +168,11 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Itens de Menu</h2>
-          {(permission.adminGeral || permission.adminTedPlan) && (
-            <BotaoAdicionar onClick={handleAddMenuItem}>
+          {/* {(permission.adminGeral || permission.adminTedPlan) && ( */}
+            <BotaoAdicionar onClick={handleAddMenuItem} style={{marginLeft: '15px'}}>
               + Novo Item de Menu
             </BotaoAdicionar>
-          )}
+          {/* )} */}
         </div>
 
         <div style={{ marginBottom: "20px" }}>

@@ -1257,13 +1257,12 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 // `;
 
 
-export const Sidebar = styled.div`
-   width: 250px;
+export const Sidebar = styled.div<{ isCollapsed: boolean }>`
+  width: ${(props) => (props.isCollapsed ? "0": "250px")};
   background-color: white;
-  padding: 1rem;
+  padding: ${(props) => (props.isCollapsed ? "0" : "20px")};
   bottom: -600px;
   position: absolute;
-  left: 0;
   top: 255px;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -1283,6 +1282,7 @@ export const Sidebar = styled.div`
   &::-webkit-scrollbar-track {
     background-color: #f1f1f1;
   }
+
 `;
 
 export const MainContent = styled.div`

@@ -161,6 +161,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   const { usuario, signOut } = useContext(AuthContext);
   const [content, setContent] = useState("");
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>("");
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     setDadosMunicipio(municipio[0]);
@@ -601,7 +602,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <Sidebar>
+      <Sidebar isCollapsed={isCollapsed}>
         <SidebarItem
           active={activeForm === "dadosMunicipio"}
           onClick={() => setActiveForm("dadosMunicipio")}
@@ -645,7 +646,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
           Dados Demográficos
         </SidebarItem>
       </Sidebar>
-      <MainContent>
+      <MainContent isCollapsed={isCollapsed}>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivFormCadastro active={activeForm === "dadosMunicipio"}>

@@ -259,6 +259,9 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
   margin-left: auto;
@@ -512,6 +515,7 @@ export const DivForm = styled.div`
   width: 95%;
   display: flex;
   flex-direction: column;
+  min-width: 1300px;
   background-color: #fff;
   text-align: left;
   padding: 0;
@@ -859,6 +863,7 @@ export const Form = styled.form`
   background-color: #f3f4f6;
   font-size: 14px; 
   justify-content: center;
+  flex-direction: column;
   input {
     border: 1px solid #4B4B4B;
     border-radius: 5px;
@@ -1351,8 +1356,8 @@ export const Sidebar = styled.div`
   }
 `;
 
-export const MainContent = styled.div`
-  margin-left: 270px;
+export const MainContent = styled.div<{ isCollapsed: boolean }>`
+  margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
   z-index: -1000;
@@ -1380,6 +1385,9 @@ export const SidebarItem = styled.div<{ active?: boolean }>`
 
   &:last-child {
     margin-bottom: 0;
+  }
+  &:first-child {
+    margin-top: 40px;
   }
 `;
 

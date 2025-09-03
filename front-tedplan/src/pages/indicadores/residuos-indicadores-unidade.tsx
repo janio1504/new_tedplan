@@ -120,6 +120,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [disabledProximo, setDisabledProximo] = useState(false);
   const [idMunicipio, setIdMunicipio] = useState(null);
   const [dadosMunicipio, setDadosMunicipio] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     if (anoEditorSimisab) {
@@ -384,7 +385,9 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ width: '25%', marginTop: '10px'}}>
+      
+      <DivCenter>
+        <BreadCrumbStyle isCollapsed={isCollapsed}>
                               <nav>
                                 <ol>
                                   <li>
@@ -392,7 +395,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                     <span> / </span>
                                   </li>
                                   <li>
-                                    <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                    <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                                     <span> / </span>
                                   </li>
                                   <li>
@@ -401,7 +404,6 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                 </ol>
                               </nav>
         </BreadCrumbStyle>
-      <DivCenter>
         <DivFormResiduo>
           <DivTituloFormResiduo>Resíduos Sólidos</DivTituloFormResiduo>
           <DivCenter>

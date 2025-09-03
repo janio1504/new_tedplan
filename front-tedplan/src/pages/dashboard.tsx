@@ -139,7 +139,7 @@ export default function DashboardIndicadores() {
       <BodyDashboard>
         <Sidebar />
         
-        {/* {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ?  DESCOMENTAR AO FINALIZAR*/} 
+        {/* {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ? */}
         <DivMunicipios>          
           <Form onSubmit={handleSubmit(handleSetMunicipio)}>
             <DivTituloForm>Municipios</DivTituloForm>
@@ -156,8 +156,8 @@ export default function DashboardIndicadores() {
             <SubmitButton type="submit">Acessar dados do Municipio</SubmitButton>
           </Form>
         </DivMunicipios>
-        {/* : '' */}
-        {/* } */}
+      {/* //    : '' */}
+      {/* //  } */}
         
       </BodyDashboard>
      

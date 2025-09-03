@@ -39,7 +39,9 @@ import { Sidebar,
   StepperWrapper,
   StepperContainer,
   StepButton,
-  StepperButton} from "@/styles/indicadores";
+  StepperButton,
+  ExpandButton,
+  CollapseButton} from "@/styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
 import { LineSideBar } from "@/styles/drenagem-indicadores";
@@ -74,7 +76,7 @@ import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { anosSelect } from "../../util/util";
 import ajuda from "../../img/ajuda.png";
-import BreadCrumb from "./componentes/breadCrumb";
+import { FaBars } from "react-icons/fa";
 import { BreadCrumbStyle } from "@/styles/indicadores";
 
 interface IMunicipio {
@@ -113,10 +115,11 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [modalAddConssionaria, setModalAddConssionaria] = useState(false);
   const [anoSelected, setAnoSelected] = useState(null);
   const [activeForm, setActiveForm] = useState("AguaEsgotoSanitario");
-  
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-
-
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   useEffect(() => {
     if (usuario?.id_municipio){
@@ -390,7 +393,16 @@ const handleNext = () => {
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+      
+      {isCollapsed ? (
+              <ExpandButton  onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+          ) : (
+            <Sidebar isCollapsed={isCollapsed}>
+              <CollapseButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </CollapseButton>
         <SidebarItem
         active={activeForm === "AguaEsgotoSanitario"}
         onClick = {() => setActiveForm("AguaEsgotoSanitario")}>
@@ -406,17 +418,20 @@ const handleNext = () => {
           Resíduos Sólidos
         </SidebarItem>
       </Sidebar>
-      <MainContent>
-        <>
-      <BreadCrumbStyle style={{ width: '25%'}}>
+       )}
+      <MainContent isCollapsed={isCollapsed}>
+      <DivCenter>
+      
+        <Form onSubmit={handleSubmit(handleCadastro)}>
+          <BreadCrumbStyle isCollapsed={isCollapsed}>
         <nav>
           <ol>
             <li>
-                              <Link href="/indicadores/home_indicadores">Home</Link>
+                <Link href="/indicadores/home_indicadores">Home</Link>
               <span> / </span>
             </li>
             <li>
-              <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+              <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
               <span> / </span>
             </li>
             <li>
@@ -424,19 +439,9 @@ const handleNext = () => {
             </li>
           </ol>
         </nav>
-      </BreadCrumbStyle>
-   
-    </>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-
-
-
+          </BreadCrumbStyle>
           <DivForm>
-
             <DivTituloForm>Geral</DivTituloForm>
-
-            
               {activeForm === 'AguaEsgotoSanitario' && (
                 <StepperContainer style={{width: '90%', alignItems: 'center', margin: '20px auto'}}>
                 <StepperWrapper>
@@ -2199,8 +2204,6 @@ const handleNext = () => {
               
 
           </DivForm>
-
-          
         </Form>
       </DivCenter>
 

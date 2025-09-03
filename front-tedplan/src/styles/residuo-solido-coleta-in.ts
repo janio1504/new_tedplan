@@ -1426,18 +1426,18 @@ export const SidebarSection = styled.div`
   }
 `;
 
-export const Sidebar = styled.div`
-  width: 250px;
-  background-color: #f0f0f0;
-  padding: 1rem;
+export const Sidebar = styled.div<{ isCollapsed: boolean }>`
+  width: ${(props) => (props.isCollapsed ? "0": "250px")};
+  background-color: white;
+  padding: ${(props) => (props.isCollapsed ? "0" : "20px")};
   bottom: -600px;
   position: absolute;
-  left: 0;
-  top: 246px;
+  top: 255px;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  border-bottom: none;
 
   &::-webkit-scrollbar {
     width: 8px;

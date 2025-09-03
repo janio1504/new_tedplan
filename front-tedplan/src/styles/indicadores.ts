@@ -201,6 +201,8 @@ export const DivCenter = styled.div`
   text-align: left;
   padding: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
 `;
 
@@ -866,6 +868,9 @@ export const Form = styled.form`
   background-color: #f3f4f6;
   width: 100%;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   input {
     border: 2px solid #ccc;
     border-radius: 5px;
@@ -1352,13 +1357,12 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 //   width: 100%;
 // `;
 
-export const Sidebar = styled.div`
-   width: 250px;
+export const Sidebar = styled.div<{ isCollapsed: boolean }>`
+  width: ${(props) => (props.isCollapsed ? "0": "250px")};
   background-color: white;
-  padding: 1rem;
+  padding: ${(props) => (props.isCollapsed ? "0" : "20px")};
   bottom: -600px;
   position: absolute;
-  left: 0;
   top: 255px;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -1378,10 +1382,47 @@ export const Sidebar = styled.div`
   &::-webkit-scrollbar-track {
     background-color: #f1f1f1;
   }
+
 `;
 
-export const MainContent = styled.div`
-  margin-left: 270px;
+export const ExpandButton = styled.button`
+  width: 50px;
+  height: 50px;
+  background: white;
+  color: rgb(102, 102, 102);
+  border: none;
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  postition: relative;
+  margin: 10px 0 0 10px;
+  z-index: 1000;
+
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #f3f4f6;  
+  }
+
+  
+  
+`;
+
+export const CollapseButton = styled.button`
+  background: transparent;
+  color: rgb(102, 102, 102);
+  border: none;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-bottom: 16px;
+`;
+
+export const MainContent = styled.div<{ isCollapsed: boolean }>`
+  margin-left: ${(props) => (props.isCollapsed ? "50px" : "270px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
 `;
@@ -1408,6 +1449,9 @@ export const SidebarItem = styled.div<{ active?: boolean }>`
 
   &:last-child {
     margin-bottom: 0;
+  }
+  &:first-child {
+    margin-top: 40px;
   }
 `;
 
@@ -2031,16 +2075,18 @@ export const ModalStepContent = styled.div<{ active?: boolean }>`
   }
 `;
 
-export const BreadCrumbStyle = styled.div`
-  color: black;
+export const BreadCrumbStyle = styled.div<{ isCollapsed: boolean }>`
   font-size: 15px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 12%;
+  justify-content: flex-start;
+  width: 90%;
+  margin-top: 20px;
   padding: 10px;
-  border-radius: 5px;
   color: #666;
+  
+  
+  
   
   nav {
     margin-bottom: 2px;
@@ -2078,5 +2124,6 @@ export const BreadCrumbStyle = styled.div`
 
   span{
   margin: 5px;
+  color: #666 !important;
   }
 `;

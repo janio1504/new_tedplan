@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import {FaBars} from "react-icons/fa";
 import {
   Container,
   DivInput,
@@ -54,7 +54,7 @@ import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
 import CurrencyInput from "react-currency-masked-input";
-import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import {
@@ -98,6 +98,11 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   const [content, setContent] = useState("");
   const [activeForm, setActiveForm] = useState("tarifa");
   const [anoSelected, setAnoSelected] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   useEffect(() => {
     getMunicipio();
@@ -169,7 +174,15 @@ export default function Tarifa({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+       {isCollapsed ? (
+                <ExpandButton  style={{position: 'absolute', marginTop: '20px'}} onClick={toggleSidebar}>
+                  <FaBars /> 
+                </ExpandButton>
+                      ) : (
+              <Sidebar isCollapsed={isCollapsed}>
+                  <CollapseButton onClick={toggleSidebar}>
+                    <FaBars /> 
+                  </CollapseButton>
         <SidebarItem
           active={activeForm === "tarifa"}
           onClick={() => setActiveForm("tarifa")}
@@ -189,8 +202,13 @@ export default function Tarifa({ municipio }: MunicipioProps) {
           Observações
         </SidebarItem>
       </Sidebar>
-      <MainContent>
-        <BreadCrumbStyle style={{ width: '25%'}}>
+        )}
+      <MainContent isCollapsed={isCollapsed}>
+        
+        <DivCenter>
+          
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+          <BreadCrumbStyle isCollapsed={isCollapsed}>
                                       <nav>
                                         <ol>
                                           <li>
@@ -198,7 +216,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                                             <span> / </span>
                                           </li>
                                           <li>
-                                            <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                            <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                                             <span> / </span>
                                           </li>
                                           <li>
@@ -207,9 +225,8 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                                         </ol>
                                       </nav>
           </BreadCrumbStyle>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm>
+              
               <DivTituloForm>Tarifa</DivTituloForm>
 
               {/* <DivTituloEixo>Água e Esgoto Sanitário</DivTituloEixo> */}

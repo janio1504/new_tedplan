@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import {FaBars} from "react-icons/fa"
 import {
   InputP,
   InputM,
@@ -48,7 +49,7 @@ import { toast } from "react-toastify";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
 import { bold } from "@uiw/react-md-editor/lib/commands";
 import Link from "next/link";
@@ -78,6 +79,11 @@ export default function Agua() {
   const [dadosAgua, setDadosAgua] = useState(null);
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("ligacoes");
+  const [isCollapsed, setIsCollapsed] = useState (false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   useEffect(() => {
     getMunicipio();
@@ -151,7 +157,16 @@ export default function Agua() {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+     
+         {isCollapsed ? (
+              <ExpandButton  onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+                ) : (
+        <Sidebar isCollapsed={isCollapsed}>
+              <CollapseButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </CollapseButton>
         <SidebarItem
           active={activeForm === "ligacoes"}
           onClick={() => setActiveForm("ligacoes")}
@@ -183,8 +198,14 @@ export default function Agua() {
           Observações, esclarecimentos ou sugestões
         </SidebarItem>
       </Sidebar>
-      <MainContent>
-        <BreadCrumbStyle style={{ width: '25%'}}>
+      )}
+      <MainContent isCollapsed={isCollapsed}>
+        
+        <DivCenter>
+          
+          <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
+            
+             <BreadCrumbStyle isCollapsed={isCollapsed} style={{ width: '25%'}}>
                         <nav>
                           <ol>
                             <li>
@@ -192,7 +213,7 @@ export default function Agua() {
                               <span> / </span>
                             </li>
                             <li>
-                              <Link href="/indicadores/prestacao-servicos">Prestação de Serviços</Link>
+                              <Link href="/indicadores/prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                               <span> / </span>
                             </li>
                             <li>
@@ -200,9 +221,8 @@ export default function Agua() {
                             </li>
                           </ol>
                         </nav>
-                  </BreadCrumbStyle>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
+            </BreadCrumbStyle>
+            
             <DivForm style={{ borderColor: "#12B2D5" }}>
               <DivTituloForm>Água</DivTituloForm>
               <DivFormEixo>

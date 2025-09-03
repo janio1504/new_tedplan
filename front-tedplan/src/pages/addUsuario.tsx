@@ -1,15 +1,18 @@
 import {} from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
-
-import { Footer } from "../styles/dashboard";
+import Sidebar from "@/components/Sidebar";
+import { DivMenuTitulo, Footer, MenuMunicipioItem } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
 import Router from "next/router";
 import api from "../services/api";
+import HeadIndicadores from "@/components/headIndicadores";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IUsuario {
   id_usuario: string;
@@ -44,6 +47,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
   const [visibleMunicipiosSistemas, setVisibleMunicipiosSistemas] =
     useState(false);
   const router = useRouter();
+  const {signOut} = useContext(AuthContext)
 
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
@@ -122,20 +126,48 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
     }
   }
 
+  async function handleSignOut() {
+        signOut();
+      }
+    
+    function handleSimisab() {
+            Router.push("/indicadores/home_indicadores");
+      }
+
   return (
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#f5f5f5',
       fontFamily: 'Arial, sans-serif'
     }}>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+      <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left',
+                            
+                            }}>
+                              Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+                    </DivMenuTitulo>
+
+          <BodyDashboard>
+            <Sidebar />
+                    
 
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         minHeight: 'calc(100vh - 200px)',
-        padding: '20px'
+        padding: '20px',
+        marginLeft: '100px'        
       }}>
         <div style={{
           backgroundColor: 'white',
@@ -568,7 +600,7 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
           </form>
         </div>
       </div>
-
+          </BodyDashboard>
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>

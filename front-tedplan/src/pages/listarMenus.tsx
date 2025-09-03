@@ -145,11 +145,14 @@ export default function ListarMenus({ menus }: MenuProps) {
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Menus</h2>
-          {(permission.adminGeral || permission.adminTedPlan) && (
-            <BotaoAdicionar onClick={handleAddMenu}>
+          {/* {(permission.adminGeral || permission.adminTedPlan) && ( */}
+            
+            <BotaoAdicionar onClick={handleAddMenu}
+            style={{marginLeft: '10px'}}
+            >
               + Novo Menu
             </BotaoAdicionar>
-          )}
+          {/* )} */}
         </div>
 
         <div style={{ marginBottom: "20px" }}>

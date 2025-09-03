@@ -31,7 +31,10 @@ import {
   ButtonAdicionarPresidente,
   Tooltip,
   TooltipText,
+  ExpandButton,
+  CollapseButton
 } from "../../styles/indicadores";
+import { FaBars } from "react-icons/fa";
 import Link from "next/link";
 import Editar from "../../img/editar.png";
 import ajuda from "../../img/ajuda.png";
@@ -196,6 +199,11 @@ export default function GestaoIndicadores({
   const [isClient, setIsClient] = useState(null);
   const [updatePresidente, setUpdatePresidente] = useState(null);
   const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   const {
     register,
@@ -1186,27 +1194,21 @@ export default function GestaoIndicadores({
 
   return (
     <Container>
-      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ 
-        width: '25%', marginTop: '20px',
-        marginLeft: '140px', marginBottom: '-20px'
-        }}>
-                    <nav>
-                      <ol>
-                        <li>
-                          <Link href="/indicadores/home_indicadores">Home</Link>
-                          <span> / </span>
-                        </li>
-                        <li>
-                          <span>Gestão</span>
-                        </li>
-                      </ol>
-                    </nav>
-        </BreadCrumbStyle>
-      <Sidebar>
+      
+       
+
+    {isCollapsed ? (
+              <ExpandButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+          ) : (
+      <Sidebar isCollapsed={isCollapsed}>
+              <CollapseButton onClick={toggleSidebar}>
+                          <FaBars /> 
+              </CollapseButton>
         <SidebarItem
           active={activeForm === "gestaoAssociada"}
           onClick={() => setActiveForm("gestaoAssociada")}
@@ -1249,11 +1251,25 @@ export default function GestaoIndicadores({
         >
           Comunidades Tradicionais
         </SidebarItem>
+      
       </Sidebar>
-
-      <MainContent>
+      )}
+      <MainContent isCollapsed={isCollapsed}>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
+             <BreadCrumbStyle isCollapsed={isCollapsed}>
+                    <nav>
+                      <ol>
+                        <li>
+                          <Link href="/indicadores/home_indicadores">Home</Link>
+                          <span> / </span>
+                        </li>
+                        <li>
+                          <span>Gestão</span>
+                        </li>
+                      </ol>
+                    </nav>
+              </BreadCrumbStyle>
             <DivFormCadastro active={activeForm === "gestaoAssociada"}>
               <DivTituloForm>Gestão Associada</DivTituloForm>
 

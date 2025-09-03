@@ -912,6 +912,11 @@ export const DivEixo = styled.div`
 
 export const Form = styled.form`
   font-size: 14px;
+  background-color: #f3f4f6;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   input {
     border: 2px solid #666666;
     border-radius: 5px;

@@ -462,11 +462,11 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Indicadores</h2>
-          {(permission?.adminGeral || permission?.adminTedPlan) && (
-            <BotaoAdicionar onClick={handleAddIndicador}>
+          {/* {(permission?.adminGeral || permission?.adminTedPlan) && ( */}
+            <BotaoAdicionar onClick={handleAddIndicador} style={{marginLeft: '15px'}}>
               + Novo Indicador
             </BotaoAdicionar>
-          )}
+          {/* )} */}
         </div>
 
         <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>

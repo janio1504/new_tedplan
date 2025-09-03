@@ -1,24 +1,28 @@
 import {} from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { parseCookies } from "nookies";
+import { AuthContext } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
-
+import Sidebar from "@/components/Sidebar";
 import {
   Container,
   Form,
   Footer,
   DivCenter,
   DivInstrucoes,
+  MenuMunicipioItem,
+  DivMenuTitulo,
 } from "../styles/dashboard";
 
-import { SubmitButton } from "../styles/dashboard-original";
+import { BodyDashboard, SubmitButton } from "../styles/dashboard-original";
 
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
 import Router from "next/router";
 import api from "@/services/api";
+import HeadIndicadores from "@/components/headIndicadores";
 
 interface IIndicador {
   id_indicador: string;
@@ -97,7 +101,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     valor: false
   });
   const router = useRouter();
-
+  const {signOut} = useContext(AuthContext);
   // Observar o campo tipo para mostrar/ocultar opções de select
   const tipoCampoSelecionado = watch("tipo_campo");
 
@@ -471,20 +475,51 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     }
   }
 
+   async function handleSignOut() {
+              signOut();
+            }
+          
+            function handleSimisab() {
+                  Router.push("/indicadores/home_indicadores");
+                }
+    
+
   return (
     <div style={{
-      minHeight: '100vh',
+      maxHeight: '100vh',
       backgroundColor: '#f5f5f5',
       fontFamily: 'Arial, sans-serif'
     }}>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+                                      <DivMenuTitulo> 
+                                            <text style={{
+                                              fontSize: '20px',
+                                              fontWeight: 'bold',
+                                              padding: '15px 20px',
+                                              float: 'left',
+                                              
+                                              }}>
+                                               Painel de Edição 
+                                              </text>
+                                            <ul style={{}}>
+                                            <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                                            <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                                            </ul>
+                                      </DivMenuTitulo>
+
+                  <BodyDashboard>
+                    <Sidebar />
+                  
 
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
-        minHeight: 'calc(100vh - 200px)',
-        padding: '20px'
+        height: 'calc(100vh - 200px)',
+        marginLeft: '100px',
+        padding: '20px',
+        marginTop: '-70px'
       }}>
         <div style={{
           backgroundColor: 'white',
@@ -1313,7 +1348,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         </form>
       </div>
     </div>
-
+    
+            </BodyDashboard>
     <Footer>
       &copy; Todos os direitos reservados
     </Footer>

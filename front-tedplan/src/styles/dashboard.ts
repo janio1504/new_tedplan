@@ -307,12 +307,14 @@ export const DivMenuTitulo = styled.div`
   float: left;
   width: 100%;
   background: #0085bd;
+  color: #ffffff;
 `;
 
 export const MenuMunicipioItem = styled.div`
   padding: 20px;
   float: right;
   font-size: 15px;
+  color: #ffffff;
   font-weight: bold;
   cursor: pointer;
 

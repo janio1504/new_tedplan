@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import {FaBars} from "react-icons/fa";
 import {
   DivInput,
   InputP,
@@ -60,6 +60,8 @@ import {
   SubmitButtonModal,
   DivBotaoAdicionar,
   BreadCrumbStyle,
+  ExpandButton,
+  CollapseButton,
 } from "../../styles/indicadores";
 import api from "../../services/api";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
@@ -69,6 +71,7 @@ import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { anosSelect } from "../../util/util";
 import Link from "next/link";
+import { faRandom } from "@fortawesome/free-solid-svg-icons";
 
 interface IMunicipio {
   id_municipio: string;
@@ -93,6 +96,11 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [dadosQualidade, setDadosQualidade] = useState(null);
   const [content, setContent] = useState("");
   const [activeForm, setActiveForm] = useState("agua");
+  const [isCollapsed, setIsCollapsed] = useState (false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   useEffect(() => {
     getMunicipio();
@@ -168,7 +176,16 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+      
+      {isCollapsed ? (
+          <ExpandButton style={{position: 'absolute', marginTop: '20px'}}  onClick={toggleSidebar}>
+            <FaBars /> 
+          </ExpandButton>
+                ) : (
+        <Sidebar isCollapsed={isCollapsed}>
+            <CollapseButton onClick={toggleSidebar}>
+              <FaBars /> 
+            </CollapseButton>
         <SidebarItem
           active={activeForm === "agua"}
           onClick={() => setActiveForm("agua")}
@@ -213,8 +230,12 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
           Observações
         </SidebarItem>
       </Sidebar>
-      <MainContent>
-        <BreadCrumbStyle style={{ width: '27%'}}>
+        )}
+      <MainContent isCollapsed={isCollapsed}>
+        
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
+            <BreadCrumbStyle isCollapsed={isCollapsed} >
                                       <nav>
                                         <ol>
                                           <li>
@@ -222,7 +243,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                             <span> / </span>
                                           </li>
                                           <li>
-                                            <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                            <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                                             <span> / </span>
                                           </li>
                                           <li>
@@ -230,9 +251,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
                                           </li>
                                         </ol>
                                       </nav>
-          </BreadCrumbStyle>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
+      </BreadCrumbStyle>
             <DivForm>
               <DivTituloForm>Qualidade</DivTituloForm>
               {/* <DivFormEixo>

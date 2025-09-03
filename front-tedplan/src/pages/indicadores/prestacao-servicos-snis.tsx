@@ -152,7 +152,7 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
                     <span> / </span>
                   </li>
                   <li>
-                    <span>Prestação de Serviços</span>
+                    <span>Prestação de Serviços SNIS</span>
                   </li>
                 </ol>
               </nav>

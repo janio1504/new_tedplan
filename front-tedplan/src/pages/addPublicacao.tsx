@@ -1,13 +1,18 @@
 import { GetServerSideProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { parseCookies } from "nookies";
+import { AuthContext } from "@/contexts/AuthContext";
 import { toast } from "react-toastify";
-import { Footer } from "../styles/dashboard";
+import { DivMenuTitulo, Footer, MenuMunicipioItem} from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
+import Sidebar from "@/components/Sidebar";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
 import { useRouter } from "next/router";
 import api from "@/services/api";
+import Router from "next/router";
+import HeadIndicadores from "@/components/headIndicadores";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IPublicacao {
   id_posts: string;
@@ -63,6 +68,7 @@ export default function AddPublicacao({
   const [disabledTipoPublicacao, setDisabledTipoPublicacao] = useState(false);
   const [disabledMunicipio, setDisabledMunicipio] = useState(false);
   const router = useRouter();
+  const {signOut} = useContext(AuthContext);
   const { id } = router.query;
 
   const [publicacao, setPublicacao] = useState(null);
@@ -147,6 +153,13 @@ export default function AddPublicacao({
       toast.error("Erro ao cadastrar publicação!", { position: "top-right", autoClose: 5000 });
     }
   }
+   async function handleSignOut() {
+        signOut();
+      }
+    
+    function handleSimisab() {
+            Router.push("/indicadores/home_indicadores");
+      }
 
   return (
     <div style={{
@@ -154,14 +167,35 @@ export default function AddPublicacao({
       backgroundColor: '#f5f5f5',
       fontFamily: 'Arial, sans-serif'
     }}>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+                    <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left',
+                            
+                            }}>
+                              Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+                    </DivMenuTitulo>
+
+      <BodyDashboard>
+        <Sidebar />
+                  
 
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'flex-start',
         minHeight: 'calc(100vh - 200px)',
-        padding: '20px'
+        padding: '20px',
+        marginLeft: '100px',
+
       }}>
         <div style={{
           backgroundColor: 'white',
@@ -629,7 +663,7 @@ export default function AddPublicacao({
           </form>
         </div>
       </div>
-
+      </BodyDashboard>    
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>
