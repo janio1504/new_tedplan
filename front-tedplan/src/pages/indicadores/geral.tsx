@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import {  
   DivInput,
-  Form,
   InputP,
   InputM,
   InputG,
@@ -41,7 +40,9 @@ import { Sidebar,
   StepButton,
   StepperButton,
   ExpandButton,
-  CollapseButton} from "@/styles/indicadores";
+  CollapseButton,
+  Form,
+} from "@/styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
 import { LineSideBar } from "@/styles/drenagem-indicadores";
@@ -116,6 +117,19 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [anoSelected, setAnoSelected] = useState(null);
   const [activeForm, setActiveForm] = useState("AguaEsgotoSanitario");
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -417,7 +431,7 @@ const handleNext = () => {
         onClick={() => setActiveForm("ResiduosSolidos")}>
           Resíduos Sólidos
         </SidebarItem>
-      </Sidebar>
+            </Sidebar>
        )}
       <MainContent isCollapsed={isCollapsed}>
       <DivCenter>
@@ -460,7 +474,6 @@ const handleNext = () => {
                       </div>
                     ))}
                   </StepperWrapper>
-
                   </StepperContainer>
               )}
 
@@ -556,7 +569,7 @@ const handleNext = () => {
             <DivFormEixo>
 
               <StepContent active={activeStep === 0}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '160px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>Municípios atendidos</DivTituloConteudo>
                 </DivTitulo>
@@ -616,12 +629,12 @@ const handleNext = () => {
                                               Próximo
                                             </StepperButton>
                                           )}
-                                        </StepperNavigation>
+                </StepperNavigation>
               </DivFormConteudo>
               </StepContent>
 
               <StepContent active={activeStep === 1}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '400px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>Sedes e localidades atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -744,7 +757,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 2}>
-                <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '280px'}}>
+                <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                   <DivTitulo>
                     <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
                   </DivTitulo>
@@ -839,7 +852,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 3}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '280px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>População existente</DivTituloConteudo>
                 </DivTitulo>
@@ -934,7 +947,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 4}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '100px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -998,7 +1011,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 5}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '290px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações, esclarecimentos ou sugestões</DivTituloConteudo>
                 </DivTitulo>
@@ -1163,7 +1176,7 @@ const handleNext = () => {
                                               Próximo
                                             </StepperButton>
                                           )}
-                                        </StepperNavigation>
+                </StepperNavigation>
               </DivFormConteudo>
               </StepContent>
 

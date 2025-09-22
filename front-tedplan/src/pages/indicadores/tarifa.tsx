@@ -99,7 +99,18 @@ export default function Tarifa({ municipio }: MunicipioProps) {
   const [activeForm, setActiveForm] = useState("tarifa");
   const [anoSelected, setAnoSelected] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };
@@ -175,7 +186,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
        {isCollapsed ? (
-                <ExpandButton  style={{position: 'absolute', marginTop: '20px'}} onClick={toggleSidebar}>
+                <ExpandButton   onClick={toggleSidebar}>
                   <FaBars /> 
                 </ExpandButton>
                       ) : (

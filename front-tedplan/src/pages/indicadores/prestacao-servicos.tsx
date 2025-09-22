@@ -21,7 +21,7 @@ import {
   Ps3ImageEsquerda,
   Ps3ImageDireita,
   TitlePsOnMouse,
-  BreadCrumbStyle
+  BreadCrumbStyle,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -63,6 +63,7 @@ interface MunicipioProps {
 export default function PrestacaoServicos({ Imunicipio }: MunicipioProps) {
   const { usuario, signOut, isAuthenticated } = useContext(AuthContext);
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false)
   
 useEffect(() => {
     if (usuario?.id_municipio) {
@@ -126,12 +127,17 @@ useEffect(() => {
 
    const CircularContainer = styled.div`
   position: relative;
-  width: 600px;
+  width: 100%;
   height: 350px;
   margin: 0 auto;
+  top: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media(max-width: 768px) {
+    
+  }
 `;
 
 const CenterIcon = styled.div`
@@ -166,7 +172,7 @@ const ServiceIcon = styled.div<{ rotation: number }>`
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ width: '25%', position: 'absolute', marginTop: '20px'}}>
+      <BreadCrumbStyle isCollapsed={isCollapsed}>
               <nav>
                 <ol>
                   <li>
@@ -179,114 +185,174 @@ const ServiceIcon = styled.div<{ rotation: number }>`
                 </ol>
               </nav>
         </BreadCrumbStyle>
-      <div style={{marginTop:"150px"}}>
-      </div>
+      
 
       <CircularContainer>
 
-        
-          <CenterIcon onClick={handleInstitucional}>
-          
-          <Image 
-            src={Institucional} 
-            onMouseOver={titleOnMouse} 
-            onMouseOut={() => setShow(false)} 
-            width={150}
-            height={150}
-            alt="Institucional" />
-            {title === 'Institucional' && show && (<TitlePsOnMouse>
+  <CenterIcon>
+    <Image
+      onClick={handleInstitucional}
+      src={Institucional}
+      width={120}
+      onMouseOver={titleOnMouse}
+      onMouseOut={() => setShow(false)} 
+      height={120}
+      alt="Institucional"/>
+      {title === 'Institucional' && show && (<TitlePsOnMouse>
             {title} 
           </TitlePsOnMouse>)}
-
-          </CenterIcon>
-
-          <ServiceIcon onClick={handleEsgoto}
-          rotation={0}>
-            <Image 
-              src={Esgoto} 
-              onMouseOver={titleOnMouse} 
-              onMouseOut={() => setShow(false)} 
-              width={100}
-              height={100}
-              alt="Esgoto"
-              />
-            {title === 'Esgoto' && show && (<TitlePsOnMouse>
-            {title} 
-            </TitlePsOnMouse>)}
-          </ServiceIcon>
-
-          <ServiceIcon onClick={handleResiduosUnidade}
-          rotation={90}>
-            <Image 
-              src={Residuos} 
-              onMouseOver={titleOnMouse} 
-              onMouseOut={() => setShow(false)} 
-              width={100}
-              height={100}
-              alt="Residuos"
-              />
-            {title === 'Residuos' && show && (<TitlePsOnMouse>
-            {title} 
-            </TitlePsOnMouse>)}
-          </ServiceIcon>
-
-          <ServiceIcon onClick={handleAgua}
-          rotation={180}>
-            <Image 
-              src={Agua} 
-              onMouseOver={titleOnMouse} 
-              onMouseOut={() => setShow(false)} 
-              width={100}
-              height={100}
-              alt="Água"
-              />
-            {title === 'Água' && show && (<TitlePsOnMouse>
-            {title} 
-            </TitlePsOnMouse>)}
-          </ServiceIcon>
-
-          <ServiceIcon rotation={270} onClick={handleDrenagem} >
-            <Image 
-              src={Drenagem} 
-              onMouseOver={titleOnMouse} 
-              onMouseOut={() => setShow(false)} 
-              width={100}
-              height={100}
-              alt="Drenagem"
-              />
-            {title === 'Drenagem' && show && (<TitlePsOnMouse>
-            {title} 
-            </TitlePsOnMouse>)}
-          </ServiceIcon>
-          <ServiceIcon rotation={270} onClick={handleDrenagem} >
-            <Image 
-              src={Drenagem} 
-              onMouseOver={titleOnMouse} 
-              onMouseOut={() => setShow(false)} 
-              width={100}
-              height={100}
-              alt="Drenagem"
-              />
-            {title === 'Drenagem' && show && (<TitlePsOnMouse>
-            {title} 
-            </TitlePsOnMouse>)}
-          </ServiceIcon>
       
+  </CenterIcon>
+
+  <div style={{ position: "relative", width: 500, height: 500 }}>
+  <Image 
+  src={Modelo} 
+  width={500} 
+  height={500} 
+  alt="Logo" 
+  />
+  
+           
+  <div
+  style={{
+    position: "absolute",
+    left: 20,
+    top: 20,
+    width: 100,
+    height: 100,
+    cursor: "pointer",
+    background: "rgba(0,0,0,0.0)"
+  }}
+  onClick={handleAgua}
+  onMouseOver={() => { setTitle('Água'); setShow(true); }}
+  onMouseOut={() => setShow(false)}
+>
+  {title === 'Água' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+
+
+
+  <div
+    style={{
+      position: "absolute",
+      left: 380,
+      top: 380,
+      width: 100,
+      height: 100,
+      cursor: "pointer",
+      background: "rgba(0,0,0,0.0)"
+    }}
+    onClick={handleEsgoto}
+    onMouseOver={() => { setTitle('Esgoto'), setShow(true); }}
+    onMouseOut={() => setShow(false)}> 
+
+      {title === 'Esgoto' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+      
+
+ 
+  <div
+    style={{
+      position: "absolute",
+      left: 380,
+      top: 20,
+      width: 100,
+      height: 100,
+      cursor: "pointer",
+      background: "rgba(0,0,0,0.0)"
+    }}
+    onClick={handleDrenagem}
+    onMouseOver={() => { setTitle('Drenagem'); setShow(true); }}
+    onMouseOut={() => setShow(false)} >
+    {title === 'Drenagem' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+  
+  <div
+    style={{
+      position: "absolute",
+      left: 20,
+      top: 380,
+      width: 100,
+      height: 100,
+      cursor: "pointer",
+      background: "rgba(0,0,0,0.0)"
+    }}
+    onClick={handleResiduosUnidade}
+    onMouseOver={() => { setTitle('Resíduos'); setShow(true); }}
+    onMouseOut={() => setShow(false)} >
+
+      {title === 'Resíduos' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+</div>
       </CircularContainer>
-          
-            <Image 
-              src={Modelo} 
-              onMouseOver={titleOnMouse} 
-              onMouseOut={() => setShow(false)} 
-              width={500}
-              height={500}
-              alt="Drenagem"
-              
-              />
-          
-         
-         
-              
     </Container>
   );
 }

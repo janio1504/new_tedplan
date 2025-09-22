@@ -147,6 +147,7 @@ export default function HomeIndicadores() {
   })
   const [loading, setLoading] = useState(true)
   
+  
   useEffect(()=>{
    getMunicipio()
    getEstatisticas()
@@ -238,7 +239,7 @@ export default function HomeIndicadores() {
         }
       `}</style>
       <Container>
-        <HeadIndicadores usuarios={[]}></HeadIndicadores>
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={nomeMunicipio}></MenuHorizontal>
       <StatusMunicipio>
         Relatório SIMISAB correspondente ao ano {new Date().getFullYear()} - Estado PENDENTE
@@ -318,7 +319,7 @@ export default function HomeIndicadores() {
         gap: '30px',
         padding: '20px',
         flexWrap: 'wrap',
-        width: '100%',
+        width: 'auto',
         maxWidth: '1200px',
         margin: '0 auto'
       }}>

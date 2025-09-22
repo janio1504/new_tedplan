@@ -1427,17 +1427,17 @@ export const SidebarSection = styled.div`
 `;
 
 export const Sidebar = styled.div<{ isCollapsed: boolean }>`
-  width: ${(props) => (props.isCollapsed ? "0": "250px")};
-  background-color: white;
-  padding: ${(props) => (props.isCollapsed ? "0" : "20px")};
-  bottom: -600px;
+  width: ${(props) => (props.isCollapsed ? "0": "270px")};
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  padding: ${(props) => (props.isCollapsed ? "0" : "32px 24px")};
   position: absolute;
-  top: 255px;
-  overflow-y: auto;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: 1000px;
   display: flex;
   flex-direction: column;
-  border-bottom: none;
+  height: 100vh;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -1450,6 +1450,19 @@ export const Sidebar = styled.div<{ isCollapsed: boolean }>`
 
   &::-webkit-scrollbar-track {
     background-color: #f1f1f1;
+  }
+
+  @media (max-width: 768px) {
+    position: relative;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    z-index: 1000;
+    margin-bottom: 16px;
   }
 `;
 

@@ -424,6 +424,19 @@ export default function PrestacaoServicoInstitucional() {
   const [loadingDados, setLoadingDados] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 1000) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   }
@@ -1079,11 +1092,12 @@ export default function PrestacaoServicoInstitucional() {
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       {isCollapsed ? (
-                    <ExpandButton onClick={toggleSidebar}>
-                      <FaBars /> 
-                    </ExpandButton>
-                ) : (
-            <Sidebar isCollapsed={isCollapsed}>
+          <ExpandButton onClick={toggleSidebar}>
+            <FaBars /> 
+          </ExpandButton>
+      ) : (
+      
+      <Sidebar isCollapsed={isCollapsed}>
                     <CollapseButton onClick={toggleSidebar}>
                                 <FaBars /> 
                     </CollapseButton>
@@ -1114,6 +1128,7 @@ export default function PrestacaoServicoInstitucional() {
           </div>
         ))}
       </Sidebar>
+       
       )}
       <MainContent isCollapsed={isCollapsed}>
         <DivCenter>

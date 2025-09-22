@@ -98,6 +98,20 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
   const [activeForm, setActiveForm] = useState("agua");
   const [isCollapsed, setIsCollapsed] = useState (false);
 
+
+  useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 768) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   }
@@ -178,7 +192,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
       
       {isCollapsed ? (
-          <ExpandButton style={{position: 'absolute', marginTop: '20px'}}  onClick={toggleSidebar}>
+          <ExpandButton onClick={toggleSidebar}>
             <FaBars /> 
           </ExpandButton>
                 ) : (

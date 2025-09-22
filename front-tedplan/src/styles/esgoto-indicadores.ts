@@ -1,7 +1,8 @@
 import styled, { keyframes } from "styled-components";
 
 export const Container = styled.div`
-  color: #fff;
+ 
+color: #fff;
   font-family: Arial, Helvetica, sans-serif;
   height: 100%;
   max-width: 100%;
@@ -259,16 +260,14 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 100%;
   height: 100%;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
-  padding: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
 `;
 
@@ -512,10 +511,11 @@ export const BotaoResiduos = styled.div`
 `;
 
 export const DivForm = styled.div`
-  width: 95%;
+  width: 100%;
+  margin-left: auto;
   display: flex;
   flex-direction: column;
-  min-width: 1300px;
+  
   background-color: #fff;
   text-align: left;
   padding: 0;
@@ -837,6 +837,7 @@ export const InputG = styled.div`
     margin-left: 20px;
     padding: 22px 0;
   }
+ 
 `;
 
 export const DivEixo = styled.div`
@@ -859,15 +860,17 @@ export const DivEixo = styled.div`
 `;
 
 export const Form = styled.form`
-  display: flex;
+  display: flex;  
   background-color: #f3f4f6;
-  font-size: 14px; 
-  justify-content: center;
+  width: 100%;
+  font-size: 14px;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   input {
-    border: 1px solid #4B4B4B;
+    border: 2px solid #ccc;
     border-radius: 5px;
-    padding: 10px 15px;
+    padding: 15px 15px;
     margin: 10px;
     color: #666;
     float: left;
@@ -883,15 +886,16 @@ export const Form = styled.form`
     padding: 10px 15px;
     margin: 10px;
     height: 200px;
-    border: 2px solid #2dd9d0;
+    border: 2px solid #ccc;
   }
   label {
     color: #666;
     margin: 10px 0 0 15px;
+    font-size: 14px;
   }
 
   select {
-    border: 1px solid #4B4B4B;
+    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -1361,6 +1365,13 @@ export const MainContent = styled.div<{ isCollapsed: boolean }>`
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
   z-index: -1000;
+
+  @media (max-width: 1000px) {
+    margin: 20px 0 0 0;
+    min-height: auto;
+    padding: 30px;
+    
+  }
 `;
 
 export const SidebarItem = styled.div<{ active?: boolean }>`
@@ -1750,6 +1761,20 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
       transform: translateY(0.95px);
     }
   }
+
+    @media (max-width: 1000px) {
+    width: 95%;
+    margin: 0;
+
+    td  {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 95%;
+    }
+
+    }
+}
 `;
 
 export const StepperContainer = styled.div`
@@ -1774,6 +1799,9 @@ export const StepperWrapper = styled.div`
     left: 0;
     z-index: 1;
   }
+
+  
+
 `;
 
 export const StepButton = styled.div<{ active?: boolean; completed?: boolean }>`

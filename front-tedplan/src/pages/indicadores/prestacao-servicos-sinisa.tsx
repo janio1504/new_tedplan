@@ -39,7 +39,6 @@ import Esgoto from "../../img/esgoto.png"
 import Residuos from "../../img/residuos.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { set } from "react-hook-form";
-import BreadCrumb from "./componentes/breadCrumb";
 import Link from "next/link";
 import { styled } from "styled-components";
 
@@ -65,6 +64,7 @@ interface MunicipioProps {
 export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   const { usuario, signOut, isAuthenticated } = useContext(AuthContext);
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
  useEffect(() => {
     if (usuario?.id_municipio) {
@@ -164,7 +164,7 @@ const ServiceIcon = styled.div<{ rotation: number }>`
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ width: '25%', position: 'absolute', marginTop: '20px'}}>
+      <BreadCrumbStyle isCollapsed={isCollapsed}>
               <nav>
                 <ol>
                   <li>

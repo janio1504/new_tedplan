@@ -133,13 +133,17 @@ export default function DashboardIndicadores() {
           </text>
         <ul style={{}}>
         <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+        {permission.editorSimisab? 
         <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+        : "" }
         </ul>
       </DivMenuTitulo>
+
+      
       <BodyDashboard>
         <Sidebar />
         
-        {/* {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ? */}
+        {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ?
         <DivMunicipios>          
           <Form onSubmit={handleSubmit(handleSetMunicipio)}>
             <DivTituloForm>Municipios</DivTituloForm>
@@ -156,8 +160,8 @@ export default function DashboardIndicadores() {
             <SubmitButton type="submit">Acessar dados do Municipio</SubmitButton>
           </Form>
         </DivMunicipios>
-      {/* //    : '' */}
-      {/* //  } */}
+           : '' 
+         } 
         
       </BodyDashboard>
      

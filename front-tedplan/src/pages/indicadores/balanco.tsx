@@ -157,7 +157,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
       
       
       <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
+        <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
         <BreadCrumbStyle isCollapsed={isCollapsed} >
                                     <nav>
                                       <ol>
@@ -175,7 +175,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                                       </ol>
                                     </nav>
       </BreadCrumbStyle>
-          <DivForm >
+          <DivForm>
             <DivTituloForm>Balanço</DivTituloForm>
             <DivFormEixo>
               <DivFormContent>
@@ -549,6 +549,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
           </DivForm>
         </Form>
       </DivCenter>
+      
       
     </Container>
   );

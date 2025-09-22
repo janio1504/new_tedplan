@@ -29,6 +29,19 @@ const SidebarContainer = styled.div`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease-in-out;
+
+  @media (max-width: 768px) {
+    position: absolute;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    z-index: 1000;
+    margin-bottom: 16px;
+  }
 `;
 
 // Título do menu
@@ -128,6 +141,12 @@ const ExpandButton = styled.button`
     background-color: #f3f4f6;  
   }
 
+  @media (max-width: 768px) {
+    width: 100%;
+    position: absolute;
+    border-radius: 0;
+    margin: 0; 
+  }
   
 `;
 
@@ -146,6 +165,19 @@ const Sidebar = () => {
   const { signOut, usuario, permission } = useContext(AuthContext);
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+        const handleResize = () => {
+          if (window.innerWidth <= 768) {
+            setIsCollapsed(true);
+          } else {
+            setIsCollapsed(false);
+          }
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+      }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -277,12 +309,12 @@ const Sidebar = () => {
     <>
     {isCollapsed ? (
         <ExpandButton onClick={toggleSidebar}>
-          <FaBars /> {/* Ícone do botão */}
+          <FaBars /> 
         </ExpandButton>
       ) : (
     <SidebarContainer>
       <CollapseButton onClick={toggleSidebar}>
-            <FaBars /> {/* Ícone para recolher */}
+            <FaBars /> 
           </CollapseButton>
       <MenuTitle>{usuario?.permissao_usuario}</MenuTitle>
       {safePermission.adminGeral || safePermission.adminTedPlan || safePermission.editorTedPlan ? (
@@ -336,17 +368,17 @@ const Sidebar = () => {
        ) : (
         ""
       )} 
-      {/* {safePermission.adminGeral ? (         */}
+      {safePermission.adminGeral ? (        
           <MenuItem 
           onClick={handleUsuarios}
           $isActive={isMenusUsuarios()}
           >
             <FaUsers /> Lista de Usuários
           </MenuItem>        
-      {/* ) : (
+       ) : (
         ""
-      )}  */}
-      {/* {safePermission.adminGeral || safePermission.adminTedPlan ? ( */}
+      )}  
+       {safePermission.adminGeral || safePermission.adminTedPlan ? ( 
         <>
           <MenuItem 
           onClick={handlePublicacoes}
@@ -364,19 +396,9 @@ const Sidebar = () => {
             <FaCamera /> Galerias
           </MenuItem>
         </>
-      {/* ) : (
+       ) : (
         ""
-      )}  */}
-      {/* {permission.editorSimisab ? ( */}
-        {/* <MenuItem onClick={handleSimisab}>
-          <FaSignInAlt /> SIMISAB
-        </MenuItem> */}
-      {/* ) : (
-        ""
-      )} */}
-      {/* <MenuItem onClick={handleSignOut}>
-        <FaSignOutAlt /> Sair
-      </MenuItem> */}
+      )}  
     </SidebarContainer>
       )}
     </>

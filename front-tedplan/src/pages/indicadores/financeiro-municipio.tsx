@@ -91,6 +91,19 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   const [activeForm, setActiveForm] = useState("receitas1");
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   }

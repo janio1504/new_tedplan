@@ -201,6 +201,20 @@ export default function GestaoIndicadores({
   const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   }
@@ -1192,6 +1206,20 @@ export default function GestaoIndicadores({
       });
   }
 
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth <= 768) {
+  //       setIsCollapsed(true);
+  //     } else {
+  //       setIsCollapsed(false);
+  //     }
+  //   };
+  //   handleResize();
+  //   window.addEventListener("resize", handleResize);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
+
+
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
@@ -1272,7 +1300,6 @@ export default function GestaoIndicadores({
               </BreadCrumbStyle>
             <DivFormCadastro active={activeForm === "gestaoAssociada"}>
               <DivTituloForm>Gestão Associada</DivTituloForm>
-
               <table>
                 <tr>
                   <td>
@@ -1366,7 +1393,6 @@ export default function GestaoIndicadores({
                   </tbody>
                 </table>
               </Tabela>
-
               <SubmitButtonContainer
                 style={{
                   bottom: "-50px",
@@ -1394,13 +1420,14 @@ export default function GestaoIndicadores({
                 >
                   Situação da Política Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
                   <label
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "5px",
                       cursor: "pointer",
+                     
                     }}
                   >
                     <input
@@ -1417,6 +1444,7 @@ export default function GestaoIndicadores({
                       alignItems: "center",
                       gap: "5px",
                       cursor: "pointer",
+                      
                     }}
                   >
                     <input
@@ -1634,7 +1662,7 @@ export default function GestaoIndicadores({
                 >
                   Situação do Plano Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
                   <label
                     style={{
                       display: "flex",
@@ -1862,7 +1890,7 @@ export default function GestaoIndicadores({
                 >
                   Situação do Conselho Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
                   <label
                     style={{
                       display: "flex",
@@ -2241,8 +2269,11 @@ export default function GestaoIndicadores({
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "saneamentoRural"}
-            style={{minWidth: "1045px", minHeight: "380px"}}>
-              <DivTituloForm style={{display: "flex",alignItems: "center", gap: "10px"}}>
+            style={{minWidth: innerWidth <= 1000 ? "95%" : "1045px", minHeight: "380px",}}>
+              <DivTituloForm style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"}}>
                 Saneamento Rural
                 <Actions>
                   <Tooltip>
@@ -2280,7 +2311,7 @@ export default function GestaoIndicadores({
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "comunidadesTradicionais"}
-            style={{minWidth: "1045px", height: "658px"}}
+            style={{minWidth: innerWidth <= 1000 ? "95%" : "1045px", height: "658px"}}
            >
             <DivTituloForm style={{display: "flex", alignItems: "center", gap: "10px"}}>Comunidades Tradicionais
               <Actions>
@@ -2318,6 +2349,7 @@ export default function GestaoIndicadores({
                   // required
                 ></textarea>
               </DivTextArea>
+              
               <SubmitButtonContainer style={{
                 bottom: "-50px",
                 right: "-10px"

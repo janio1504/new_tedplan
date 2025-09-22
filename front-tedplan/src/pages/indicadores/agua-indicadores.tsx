@@ -80,7 +80,18 @@ export default function Agua() {
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("ligacoes");
   const [isCollapsed, setIsCollapsed] = useState (false);
-
+  useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 768) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   }
@@ -205,7 +216,7 @@ export default function Agua() {
           
           <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
             
-             <BreadCrumbStyle isCollapsed={isCollapsed} style={{ width: '25%'}}>
+             <BreadCrumbStyle isCollapsed={isCollapsed} >
                         <nav>
                           <ol>
                             <li>

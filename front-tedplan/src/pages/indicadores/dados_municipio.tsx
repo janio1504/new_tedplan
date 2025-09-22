@@ -69,6 +69,19 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   const [copiaParaEsgoto, setCopiaParaEsgoto] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth <= 1000) {
+      setIsCollapsed(true);
+    } else {
+      setIsCollapsed(false);
+    }
+  };
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
   const popUrbana = watch("dd_populacao_urbana");
   const popRural = watch("dd_populacao_rural");
 
@@ -261,6 +274,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   const [activeTab, setActiveTab] = useState("controleSocial");
 
+
   const TabContainer = styled.div`
     display: flex;
     gap: 10px;
@@ -351,6 +365,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     setIsCollapsed(!isCollapsed);
   }
 
+  
+
   return (
     <Container>
       {loading && <Loading />}
@@ -413,9 +429,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       </Sidebar>
       )}
       <MainContent isCollapsed={isCollapsed}>
-        
         <DivCenter >
-          
           <Form onSubmit={handleSubmit(handleCadastro)}>
             <BreadCrumbStyle isCollapsed={isCollapsed}>
                           <nav>
@@ -710,11 +724,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                 </tbody>
               </table>
+
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
                   <SubmitButton type="submit">Gravar</SubmitButton>
                 )}
               </SubmitButtonContainer>
+
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "titularServicos"}>
@@ -2951,7 +2967,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         color: "#fff",
                         fontSize: "16px",
                         backgroundColor: "#0085bd",
-                        padding: "15px"
+                        padding: "15px",
+                        width: '100%',
+                       
                        }}
                     >
                       Gerais
@@ -3164,7 +3182,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       style={{ fontWeight: "bold", textAlign: "center", color: "#fff",
                         backgroundColor: "#0085bd", fontSize: "16px", 
                         borderRadius: "10px 10px 0 0",
-                        padding: "15px"
+                        padding: "15px",
+                        width: '100%',
                        }}
                     >
                       Cotas topográficas, bacias hidrográficas e cursos d'água
@@ -3247,7 +3266,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         backgroundColor: "#0085bd", fontSize: "16px", 
                         borderRadius: "10px 10px 0 0",
                         padding: "15px", color: "#ffffff",
-                        position: "relative"
+                        position: "relative",
+                        width: '100%',
                        }}
                     >
                       Comunidades especiais existentes no município
