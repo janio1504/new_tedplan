@@ -461,7 +461,7 @@ export default function PrestacaoServicoEsgoto() {
 
   async function getMenus() {
     const res = await api
-      .get("menus/"+3)
+      .get("menus/eixo/"+3)
       .then((response) => {
         setMenus(response.data);
       });

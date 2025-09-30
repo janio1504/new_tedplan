@@ -1135,7 +1135,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             )}
           </div>
 
-          {/* <div style={{ marginBottom: '0' }}>
+          <div style={{ marginBottom: '0' }}>
             <label style={{
               display: 'block',
               marginBottom: '8px',
@@ -1168,7 +1168,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                 (e.target as HTMLInputElement).style.boxShadow = 'none';
               }}
             />
-          </div> */}
+          </div>
 
           {/* <div style={{ marginBottom: '0' }}>
             <label style={{
