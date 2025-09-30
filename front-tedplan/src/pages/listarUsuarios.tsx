@@ -6,7 +6,9 @@ import { getAPIClient } from "../services/axios";
 import api from "../services/api";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import HeadIndicadores from "../components/headIndicadores";
+import { toast } from "react-toastify";
+import Sidebar from "../components/Sidebar";
 import {
   Container,
   NewButton,
@@ -27,9 +29,16 @@ import {
   ImagemModal,
   TextoModal,
   SubmitButton,
+  BotaoAdicionar,
+  BotaoPermissao,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { InputP } from "../styles/financeiro";
+import { anosSelect } from "@/util/util";
+import { permissionByYear } from "@/services/auth";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IUsuario {
   id_usuario: string;
@@ -74,6 +83,10 @@ export default function Postagens({
     formState: { errors },
   } = useForm();
 
+  const { permission } = useContext(AuthContext);
+
+  const [isModalEditorVisible, setModalEditorVisible] = useState(false);
+  const { signOut} = useContext(AuthContext);
   const [isModalVisible, setModalVisible] = useState(false);
   const [usuarioModal, setUsuarioModal] = useState(null);
   const [isModalConfirm, setModalConfirm] = useState(false);
@@ -106,9 +119,35 @@ export default function Postagens({
     setModalVisible(true);
   }
 
+  async function handleEditorSimisabShowModal(usuario: IUsuario) {  
+
+    if(Number(usuario.id_permissao) !== 4) {
+      toast.error("O usuário deve ser revisor!", { position: "top-right", autoClose: 5000 });
+      return;
+    }
+    setUsuarioModal(usuario);
+
+    const editorSimisabPorAno = await permissionByYear(usuario.id_usuario);
+
+    setValue("editor_ativo", editorSimisabPorAno?.ativo ? "true" : "false");
+
+    setValue("id_editor_simisab", editorSimisabPorAno?.id_editor_simisab || "");
+
+    setValue("ano_editor_simisab", editorSimisabPorAno?.ano || "");
+
+    setValue("id_usuario", usuario.id_usuario);
+
+    setModalEditorVisible(true);
+  }
+
   function handleCloseModal() {
     Router.reload();
     setModalVisible(false);
+  }
+
+  function handleEditorSimisabCloseModal() {
+    Router.reload();
+    setModalEditorVisible(false);
   }
 
   function handleOpenConfirm(usuario: IUsuario) {
@@ -119,7 +158,7 @@ export default function Postagens({
   function handleCloseConfirm() {
     setModalConfirm(false);
   }
-
+  
   async function getPermissoes() {
     const permissoes = await api.get("/get-permissoes").then((response) => {
       return response.data;
@@ -139,11 +178,7 @@ export default function Postagens({
       .delete("removerUsuario", { params: { id_usuario: id_usuario } })
       .then((response) => {})
       .catch((error) => {
-        toast.notify("Não foi possivel remover o usuário!", {
-          title: "Aconteceu o seguinte erro",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Não foi possivel remover o usuário!", { position: "top-right", autoClose: 5000 });
       });
 
     setModalConfirm(false);
@@ -165,11 +200,7 @@ export default function Postagens({
         senha: data.senha,
       })
       .then((response) => {
-        toast.notify("Dados atualizados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados atualizados com sucesso!", { position: "top-right", autoClose: 5000 });
       })
       .catch((error) => {
         console.log(error);
@@ -181,177 +212,278 @@ export default function Postagens({
     }, 2000);
   }
 
-  const setOptions = {
-    attributesWhitelist: {
-      all: "data-id|data-type",
-    },
-    defaultTag: "p",
-  };
+  async function handleEditorSimisabPorAno(data: any) {    
+        
+    if (!data.ano_editor_simisab) {
+      toast.warning("Selecione um ano para editar!", { position: "top-right", autoClose: 5000 });
+      return;
+    }
+    await api.post("create-editor-simisab-por-ano", {
+        id_editor_simisab: data.id_editor_simisab,
+        id_usuario: data.id_usuario,
+        ano: data.ano_editor_simisab,
+        ativo: data.editor_ativo,
+      })
+      .then((response) => {
+        toast.success("Permissão atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    setTimeout(() => {
+      setModalEditorVisible(false);
+      Router.push("/listarUsuarios");
+    }, 2000);
+  }
 
-  const { usuario } = useContext(AuthContext);
+    async function handleSignOut() {
+    signOut();
+  }
+
+  function handleSimisab() {
+        Router.push("/indicadores/home_indicadores");
+      }
+
+ 
+  
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+      {/* <MenuSuperior usuarios={[]}></MenuSuperior> */}
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+        <DivMenuTitulo> 
+              <text style={{
+                fontSize: '20px',
+                fontWeight: 'bold',
+                padding: '15px 20px',
+                float: 'left'
+                }}>
+                 Painel de Edição 
+                </text>
+              <ul style={{}}>
+              <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+              <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+              </ul>
+        </DivMenuTitulo>
 
-      <DivCenter>
-        <NewButton onClick={handleAddUsuario}>Adicionar Usuário</NewButton>
-        <ListPost>
-          <thead>
-            <tr>
-              <th>Login</th>
-              <th>Permissão Usuário</th>
-              <th>Ativo</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          {usuarios.map((usuario) => {
-            return (
-              <tbody key={usuario.id_usuario}>
-                <tr>
-                  <td>{usuario.login}</td>
-                  <td>{usuario.permissao_usuario}</td>
-                  <td>{usuario.ativo ? "Sim" : "Não"}</td>
-                  <td>
-                    <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
-                      Remover
-                    </BotaoRemover>
-                    <BotaoEditar onClick={() => handleShowModal(usuario)}>
-                      Editar Permissões
-                    </BotaoEditar>
+        <BodyDashboard>
+          <Sidebar />
+            
+              <DivCenter>
+                <NewButton onClick={handleAddUsuario}>Adicionar Usuário</NewButton>
+                <ListPost>
+                  <thead>
+                    <tr>
+                      <th>Login</th>
+                      <th>Permissão Usuário</th>
+                      <th>Ativo</th>
+                      <th style={{ textAlign: "center" }}>Ações</th>
+                    </tr>
+                  </thead>
+                  {usuarios.map((usuario) => {
+                    return (
+                      <tbody key={usuario.id_usuario}>
+                        <tr>
+                          <td>{usuario.login}</td>
+                          <td>{usuario.permissao_usuario}</td>
+                          <td>{usuario.ativo ? "Sim" : "Não"}</td>
+                          <td style={{ width: "450px" }}>
+                            <BotaoEditar onClick={() => handleShowModal(usuario)}>
+                              Editar Permissões
+                            </BotaoEditar>
+                            <BotaoPermissao
+                              onClick={() => handleEditorSimisabShowModal(usuario)}
+                            >
+                              Permissão de edição por ano
+                            </BotaoPermissao>
+                            <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
+                              Remover
+                            </BotaoRemover>
 
-                    {isModalConfirm && (
-                      <ContainerModal>
-                        <Modal>
-                          <ConteudoModal>
-                            <TituloModal>
-                              <h3>
-                                <b>Você confirma a exclusão!</b>
-                              </h3>
-                            </TituloModal>
-                            <TextoModal>
-                              <CancelButton onClick={handleCloseConfirm}>
-                                <b>Cancelar</b>
-                              </CancelButton>
-                              <ConfirmButton
-                                onClick={() =>
-                                  handleRemoverUsuario(usuarioModal.id_usuario)
-                                }
-                              >
-                                <b>Confirmar</b>
-                              </ConfirmButton>
-                            </TextoModal>
-                          </ConteudoModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
+                            {isModalConfirm && (
+                              <ContainerModal>
+                                <Modal>
+                                  <ConteudoModal>
+                                    <TituloModal>
+                                      <h3>
+                                        <b>Você confirma a exclusão!</b>
+                                      </h3>
+                                    </TituloModal>
+                                    <TextoModal>
+                                      <CancelButton onClick={handleCloseConfirm}>
+                                        <b>Cancelar</b>
+                                      </CancelButton>
+                                      <ConfirmButton
+                                        onClick={() =>
+                                          handleRemoverUsuario(usuarioModal.id_usuario)
+                                        }
+                                      >
+                                        <b>Confirmar</b>
+                                      </ConfirmButton>
+                                    </TextoModal>
+                                  </ConteudoModal>
+                                </Modal>
+                              </ContainerModal>
+                            )}
 
-                    {isModalVisible && (
-                      <ContainerModal>
-                        <Modal>
-                          <FormModal
-                            onSubmit={handleSubmit(handleUpdateUsuario)}
-                          >
-                            <TextoModal>
-                              <CloseModalButton onClick={handleCloseModal}>
-                                Fechar
-                              </CloseModalButton>
-                              <SubmitButton type="submit">Gravar</SubmitButton>
+                            {isModalVisible && (
+                              <ContainerModal>
+                                <Modal>
+                                  <FormModal
+                                    onSubmit={handleSubmit(handleUpdateUsuario)}
+                                  >
+                                    <TextoModal>
+                                      <CloseModalButton onClick={handleCloseModal}>
+                                        Fechar
+                                      </CloseModalButton>
+                                      <SubmitButton type="submit">Gravar</SubmitButton>
 
-                              <ConteudoModal>
-                                <input
-                                  type="hidden"
-                                  {...register("id_usuario")}
-                                  value={usuarioModal.id_usuario}
-                                />
-                                <p>Nome: {usuarioModal.nome}</p>
-                                <p>Login: {usuarioModal.login}</p>
-                                <label>Status Usuário</label>
-                                <select {...register("ativo")} name="ativo">
-                                  <option value="true">Ativo</option>
-                                  <option value="false">Inativo</option>
-                                </select>
+                                      <ConteudoModal>
+                                        <input
+                                          type="hidden"
+                                          {...register("id_usuario")}
+                                          value={usuarioModal.id_usuario}
+                                        />
+                                        <p>Nome: {usuarioModal.nome}</p>
+                                        <p>Login: {usuarioModal.login}</p>
+                                        <label>Status Usuário</label>
+                                        <select {...register("ativo")} name="ativo">
+                                          <option value="true">Ativo</option>
+                                          <option value="false">Inativo</option>
+                                        </select>
 
-                                <label>Permissões</label>
-                                <select
-                                  {...register("id_permissao")}
-                                  name="id_permissao"
-                                >
-                                  <option value="">
-                                    Selecione uma permissão
-                                  </option>
-                                  {permissoes?.map((permissao, key) => (
-                                    <option
-                                      key={key}
-                                      value={permissao.id_permissao}
-                                    >
-                                      {permissao.nome}
-                                    </option>
-                                  ))}
-                                </select>
-                                {visibleMunicipiosSistemas && (
-                                  <>
-                                    <label>Sistemas</label>
-                                    <select
-                                      {...register("id_sistema", {
-                                        required: true,
-                                      })}
-                                      name="id_sistema"
-                                    >
-                                      <option value="">
-                                        Selecione um Sistema
-                                      </option>
-                                      <option value="1">Sou Tedplan</option>
-                                      <option value="2">Sou Municipio</option>
-                                    </select>
-                                    {errors.id_sistema && (
-                                      <span>
-                                        Selecionar um Sistema é obrigatório!
-                                      </span>
-                                    )}
-                                    <label>Municipios</label>
-                                    <select
-                                      {...register("id_municipio")}
-                                      name="id_municipio"
-                                    >
-                                      <option value="">
-                                        Selecione um Municipio
-                                      </option>
-                                      {municipios?.map((municipio, key) => (
-                                        <option
-                                          key={key}
-                                          value={municipio.id_municipio}
+                                        <label>Permissões</label>
+                                        <select
+                                          {...register("id_permissao")}
+                                          name="id_permissao"
                                         >
-                                          {municipio.nome}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </>
-                                )}
-                                <label>Senha</label>
-                                <InputP>
-                                  <input
-                                    {...register("senha")}
-                                    type="password"
-                                  />
-                                </InputP>
-                              </ConteudoModal>
-                            </TextoModal>
-                          </FormModal>
-                        </Modal>
-                      </ContainerModal>
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            );
-          })}
-        </ListPost>
-      </DivCenter>
-      <Footer>
-        &copy; Todos os direitos reservados{" "}
-        <ToastContainer align={"center"} position={"button"} />
-      </Footer>
+                                          <option value="">
+                                            Selecione uma permissão
+                                          </option>
+                                          {permissoes?.map((permissao, key) => (
+                                            <option
+                                              key={key}
+                                              value={permissao.id_permissao}
+                                            >
+                                              {permissao.nome}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        {visibleMunicipiosSistemas && (
+                                          <>
+                                            <label>Sistemas</label>
+                                            <select
+                                              {...register("id_sistema", {
+                                                required: true,
+                                              })}
+                                              name="id_sistema"
+                                            >
+                                              <option value="">
+                                                Selecione um Sistema
+                                              </option>
+                                              <option value="1">Sou Tedplan</option>
+                                              <option value="2">Sou Municipio</option>
+                                            </select>
+                                            {errors.id_sistema && (
+                                              <span>
+                                                Selecionar um Sistema é obrigatório!
+                                              </span>
+                                            )}
+                                            <label>Municipios</label>
+                                            <select
+                                              {...register("id_municipio")}
+                                              name="id_municipio"
+                                            >
+                                              <option value="">
+                                                Selecione um Municipio
+                                              </option>
+                                              {municipios?.map((municipio, key) => (
+                                                <option
+                                                  key={key}
+                                                  value={municipio.id_municipio}
+                                                >
+                                                  {municipio.nome}
+                                                </option>
+                                              ))}
+                                            </select>
+                                          </>
+                                        )}
+                                        <label>Senha</label>
+                                        <InputP>
+                                          <input
+                                            {...register("senha")}
+                                            type="password"
+                                          />
+                                        </InputP>
+                                      </ConteudoModal>
+                                    </TextoModal>
+                                  </FormModal>
+                                </Modal>
+                              </ContainerModal>
+                            )}
+
+                            {isModalEditorVisible && (
+                              <ContainerModal>
+                                <Modal>
+                                  <FormModal
+                                    onSubmit={handleSubmit(handleEditorSimisabPorAno)}
+                                  >
+                                    <TextoModal>
+                                      <CloseModalButton
+                                        onClick={handleEditorSimisabCloseModal}
+                                      >
+                                        Fechar
+                                      </CloseModalButton>
+                                      <SubmitButton type="submit">Gravar</SubmitButton>
+
+                                      <ConteudoModal>
+                                        <input
+                                          type="hidden"
+                                          {...register("id_usuario")}
+                                          value={usuarioModal.id_usuario}
+                                        />
+                                          <input
+                                          type="hidden"
+                                          {...register("id_editor_simisab")}
+                                          name="id_editor_simisab"
+                                        />
+                                        <p>Nome: {usuarioModal.nome}</p>
+                                        <p>Login: {usuarioModal.login}</p>
+
+                                        <label>Status Permissão</label>
+                                        <select {...register("editor_ativo")} name="editor_ativo">
+                                          <option value="true">Ativo</option>
+                                          <option value="false">Inativo</option>
+                                        </select>
+
+                                        <label>Selecione o ano que será editado.</label>
+                                        <select
+                                          {...register("ano_editor_simisab")}
+                                          name="ano_editor_simisab"
+                                        >
+                                          <option value="">Selecione um ano</option>
+                                          {anosSelect().map((ano) => (
+                                            <option value={ano}>{ano}</option>
+                                          ))}
+                                        </select>
+                                      </ConteudoModal>
+                                    </TextoModal>
+                                  </FormModal>
+                                </Modal>
+                              </ContainerModal>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    );
+                  })}
+                </ListPost>
+              </DivCenter>
+            </BodyDashboard>
+                    <Footer>
+                      &copy; Todos os direitos reservados{" "}
+                    </Footer>
+            
     </Container>
   );
 }

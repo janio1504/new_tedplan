@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { parseCookies } from "nookies";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { useInfoIndicador } from "../contexts/InfoIndicadorContext";
+import { AuthContext } from "@/contexts/AuthContext";
+import Sidebar from "@/components/Sidebar";
 import {
   Container,
   NewButton,
@@ -23,9 +25,13 @@ import {
   TituloModal,
   TextoModal,
   SubmitButton,
+  DivMenuTitulo,
+  MenuMunicipioItem,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 import { InfoIndicador } from "../types/InfoIndicador";
+import HeadIndicadores from "@/components/headIndicadores";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 export default function ListarIndicadores() {
   const {
@@ -49,6 +55,7 @@ export default function ListarIndicadores() {
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [indicadorModal, setIndicadorModal] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
+  const {signOut} = useContext(AuthContext);
 
   const [previewImage, setPreviewImage] = useState<string | null>(null);
 
@@ -64,9 +71,9 @@ export default function ListarIndicadores() {
 
   useEffect(() => {
     if (error) {
-      toast.notify(error, {
-        type: "error",
-        duration: 7,
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 7000,
       });
       clearError();
     }
@@ -118,18 +125,12 @@ export default function ListarIndicadores() {
   async function handleRemoverIndicador(id: number, id_imagem?: number) {
     try {
       await deleteInfoIndicador(id, id_imagem);
-      toast.notify("Indicador removido com sucesso!", {
-        type: "success",
-        duration: 7,
-      });
+      toast.success("Indicador removido com sucesso!", { position: "top-right", autoClose: 5000 });
       setModalConfirm(false);
       loadInfoIndicadores();
       Router.push("/listarInfoIndicador");
     } catch (error) {
-      toast.notify("Erro ao remover indicador!", {
-        type: "error",
-        duration: 7,
-      });
+      toast.error("Erro ao remover indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -148,23 +149,41 @@ export default function ListarIndicadores() {
 
     try {
       await updateInfoIndicador(formData);
-      toast.notify("Indicador atualizado com sucesso!", {
-        type: "success",
-        duration: 7,
-      });
+      toast.success("Indicador atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
       handleCloseModal();
       loadInfoIndicadores();
     } catch (error) {
-      toast.notify("Erro ao atualizar indicador!", {
-        type: "error",
-        duration: 7,
-      });
+      toast.error("Erro ao atualizar indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
+   async function handleSignOut() {
+          signOut();
+        }
+      
+        function handleSimisab() {
+              Router.push("/indicadores/home_indicadores");
+            }
 
   return (
     <Container>
-      <MenuSuperior usuarios={[]} />
+      {/* <MenuSuperior usuarios={[]} /> */}
+       <HeadIndicadores usuarios={[]}></HeadIndicadores>
+                    <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left'
+                            }}>
+                             Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+                    </DivMenuTitulo>
+      <BodyDashboard>
+        <Sidebar />
       <DivCenter>
         <NewButton onClick={handleAddIndicador}>Adicionar Indicador</NewButton>
         <ListPost>
@@ -340,9 +359,10 @@ export default function ListarIndicadores() {
           </ContainerModal>
         )}
       </DivCenter>
+      </BodyDashboard>
       <Footer>
         &copy; Todos os direitos reservados
-        <ToastContainer align={"center"} position={"button"} />
+        
       </Footer>
     </Container>
   );

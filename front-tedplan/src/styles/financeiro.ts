@@ -132,12 +132,11 @@ export const UsuarioLogado = styled.div`
 
 export const DivCenter = styled.div`
   display: flex;
-  max-width: 85%;
+  max-width: 95%;
   min-width: 1280px;
   width: 100%;
   height: 100%;
   min-height: 1000px;
-  //background: #fff;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -145,6 +144,19 @@ export const DivCenter = styled.div`
   align-items: left;
   padding: 0px;
   flex-direction: column;
+
+   @media (max-width: 1000px) {
+   margin: 10px;
+   justify-content: center;
+   align-items: center;
+   max-width: 100%;
+   margin: 2%;
+   width: 90%;
+   min-heigth: 0;
+   min-width: 0;
+   
+   }
+
 `;
 
 export const DivMenu = styled.div`
@@ -240,29 +252,31 @@ export const DivColRelatorios = styled.div`
 `;
 
 export const DivFormEixo = styled.div`
-  float: left;
-  width: 97%;
-  min-width: 1000px;
-  padding: 10px 8px 10px 15px;
-
-  margin-top: 30px;
+  width: 98%;
+  padding: 10px 8px 10px 0;
+  margin: 30px 0 20px 0;
   color: #667778;
-
   margin-left: 5px;
 `;
 
-export const DivFormConteudo = styled.div`
-  float: left;
-  width: 97%;
-  max-width: 1320;
-  min-width: 1090px;
-  padding: 10px 10px 10px 15px;
-
-  margin-top: 30px;
-  color: #667778;
+export const DivFormConteudo = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>` 
+  display: ${(props) => (props.active ? "block" : "none")};
+  background-color: white;
+  padding: 0 1.9rem 1.9rem;
+  border-radius: 7.6px;
+  box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  z-index: 1;
+  margin: 0px auto;
+  position: relative;
+  color: #333;
+  overflow: hidden;
   table {
     width: 100%;
     margin-bottom: 20px;
+    
   }
   th {
     padding: 0 10px 0 0px;
@@ -300,16 +314,88 @@ export const DivFormConteudo = styled.div`
     }
   }
 `;
+
+
+// Mesma DIV de cima porém sem o atributo hidden
+
+export const DivFormContent = styled.div` 
+  float: left;
+  width: 97%;
+  max-width: 1320;
+  min-width: 1090px;
+  padding: 10px 10px 10px 15px;
+
+  color: #667778;
+  table {
+    width: 100%;
+    margin-bottom: 20px;
+    
+  }
+  th {
+    padding: 0 10px 0 0px;
+    span {
+      text-align: center;
+      color: blue;
+    }
+    p {
+      padding: 10px;
+      background: #2dd9d0;
+      color: #008080;
+      font-weight: bolder;
+      border-radius: 5px;
+      cursor: pointer;
+      width: auto;
+      width: 70px;
+    }
+    button {
+      border: none;
+      background: #2dd9d0;
+      color: #008080;
+      padding: 10px;
+      text-align: center;
+      font-weight: bolder;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  }
+  td {
+  }
+  select {
+    font-size: 14px;
+    option {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 1500px) {
+  max-width: 90%;
+  float: none;
+  min-width: 90%;
+  width: 90%;
+  margin: 0 auto;
+
+  table{
+  flex-direction: column;
+  }
+  }
+`;
 export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   width: 97%;
-  min-width: 600px;
+  min-width: auto;
   padding: 10px 12px 10px 10px;
-
   border-radius: 5px;
   margin-top: 20px;
   background-color: #ffff;
+
+  @media (max-width: 1000px) {
+    width: 95%;
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0 0 0 7% ;
+  }
+ 
 `;
 
 export const TabsList = styled.div`
@@ -605,10 +691,12 @@ export const DivSeparadora = styled.div`
 `;
 
 export const DivTituloFormResiduo = styled.div`
-  width: auto;
-  padding: 10px;
-  margin: -11px -13px 0 -11px;
-  background-color: #0085bd;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  margin: -25px 0 10px -25px;
+  background-color: #0085bd;  
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   font-weight: bolder;
@@ -625,6 +713,7 @@ export const DivTituloForm = styled.div`
   border-top-right-radius: 6px;
   font-weight: bolder;
   color: #fff;
+
 `;
 
 export const DivTituloFormDrenagem = styled.div`
@@ -664,15 +753,13 @@ export const DivTituloEixoDrenagem = styled.div`
 `;
 
 export const DivTituloConteudo = styled.div`
-  display: flex;
   padding: 10px 40px;
   width: auto;
   max-width: 100%;
   margin: -30px 10px 0 0px;
   border-bottom: 2px solid #0085bd;
-  //border-radius: 5px;
   font-weight: bolder;
-  text-align: center;
+  text-align: start;
   color: #4a5568;
 `;
 
@@ -685,7 +772,7 @@ export const SubmitButton = styled.button`
   padding: 10px 15px;
   margin: 30px 10px;
   color: #fff;
-  border: 0px;
+  border: 0;
   background: #0085bd;
   border-radius: 5px;
   flex-direction: row;
@@ -697,9 +784,8 @@ export const SubmitButton = styled.button`
   justify-content: center;
   align-items: center;
   float: right;
-  svg {
     margin-right: 8px;
-  }
+  
 `;
 
 export const DivInput = styled.div`
@@ -857,17 +943,75 @@ export const DivEixo = styled.div`
 `;
 
 export const Form = styled.form`
+  // font-size: 14px;
+  // background-color: #f3f4f6;
+  // width: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+  // input {
+  //   border: 2px solid #666666;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   color: #666;
+  //   float: left;
+  // }
+  // input:focus-within {
+  //   border-color: 2px solid #666666;
+  // }
+
+  // textarea {
+  //   border: 1px solid #eee;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   min-width: 400px;
+  //   height: 200px;
+  // }
+  // label {
+  //   color: #666;
+  //   margin: 10px 0 0 15px;
+  // }
+
+  // select {
+  //   border: 2px solid #666666;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   background: #fff;
+  // }
+  // option {
+  //   border: 1px solid #666666;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   width: 500px;
+  //   background: #fff;
+  // }
+  // span {
+  //   color: #666;
+  //   //font-weight: bold;
+  // }
+
+   display: flex;  
+  background-color: #f3f4f6;
+  width: 100%;
   font-size: 14px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   input {
-    border: 2px solid #666666;
+    border: 2px solid #ccc;
     border-radius: 5px;
-    padding: 10px 15px;
+    padding: 15px 15px;
     margin: 10px;
     color: #666;
     float: left;
   }
+
   input:focus-within {
-    border-color: 2px solid #666666;
+    border-color: 2px solid #008080;
   }
 
   textarea {
@@ -875,23 +1019,24 @@ export const Form = styled.form`
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
-    min-width: 400px;
     height: 200px;
+    border: 2px solid #ccc;
   }
   label {
     color: #666;
     margin: 10px 0 0 15px;
+    font-size: 14px;
   }
 
   select {
-    border: 2px solid #666666;
+    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #666666;
+    border: 1px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -899,8 +1044,8 @@ export const Form = styled.form`
     background: #fff;
   }
   span {
-    color: #666;
-    //font-weight: bold;
+    color: red;
+    font-weight: bold;
   }
 `;
 

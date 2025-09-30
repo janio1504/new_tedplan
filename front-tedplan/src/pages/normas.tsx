@@ -24,7 +24,7 @@ import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Router from "next/router";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 
 type INorma = {
   id_norma: string;
@@ -106,11 +106,7 @@ export default function Normas({
     });
     const normas = resBusca.data;
     if (normas.length == 0) {
-      toast.notify("Nenhum resultado encontrado para a busca!", {
-        title: "Atenção",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
 
       return;
     }
@@ -136,22 +132,14 @@ export default function Normas({
       const normas = resBusca.data;
 
       if (!normas.data || normas.data.length === 0) {
-        toast.notify("Nenhum resultado encontrado para a busca!", {
-          title: "Atenção",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
         return;
       }
 
       getNormas(normas);
       pagination(normas);
     } catch (error) {
-      toast.notify("Erro ao buscar normas", {
-        title: "Erro",
-        duration: 7,
-        type: "error",
-      });
+      toast.error("Erro ao buscar normas", { position: "top-right", autoClose: 5000 });
       console.error(error);
     }
   }
@@ -479,7 +467,7 @@ export default function Normas({
         </DivFormConteudo>
       </DivCenter>
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
     </Container>
   );

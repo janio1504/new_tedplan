@@ -16,7 +16,7 @@ import {
 } from "../../styles/views";
 import { getAPIClient } from "../../services/axios";
 import HeadPublico from "../../components/headPublico";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast } from 'react-toastify'
 import MenuPublicoLateral from "../../components/MenuPublicoLateral";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -74,11 +74,7 @@ export default function Manuais({
       return response.data
     }).catch((error)=>{
       console.log(error);
-      toast.notify('Nenhum resultado encontrado para a busca!',{
-        title: "Atenção",
-        duration: 7,
-        type: "error",
-      })
+      toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 })
     });  
   }
 
@@ -169,7 +165,7 @@ export default function Manuais({
           ))}
         </DivFormConteudo>
       </DivCenter>
-      <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
+      <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );
 }

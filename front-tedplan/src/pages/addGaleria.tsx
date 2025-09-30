@@ -1,23 +1,17 @@
 import { GetServerSideProps } from "next";
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { parseCookies } from "nookies";
-import { toast, ToastContainer } from "react-nextjs-toast";
-
-import {
-  Container,
-  Form,
-  Footer,
-  DivCenter,
-  DivInstrucoes,
-} from "../styles/dashboard";
-
-import { SubmitButton } from "../styles/dashboard-original";
-
+import { toast } from "react-toastify";
+import Sidebar from "@/components/Sidebar";
+import Router from "next/router";
+import { AuthContext } from "@/contexts/AuthContext";
+import { DivMenuTitulo, Footer, MenuMunicipioItem } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
-import Textarea from "@uiw/react-md-editor/lib/components/TextArea/Textarea";
 import { useRouter } from "next/router";
+import HeadIndicadores from "@/components/headIndicadores";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IGaleria {
   id_galeria: string;
@@ -37,6 +31,7 @@ interface IMes {
 interface IAno {
   ano: string;
 }
+
 interface IMunicipios {
   id_municipio: string;
   nome: string;
@@ -55,280 +50,620 @@ interface GaleriaProps {
   eixos: IEixos[];
 }
 
-interface MunicipiosProps {
-  municipios: IMunicipios[];
-}
-
 export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm();
 
-  const [contentForEditor, setContentForEditor] = useState(null);
   const [content, setContent] = useState("");
-  const editor = useRef(null);
-  let txtArea = useRef();
-  const firstRender = useRef(true);
-  const editorContent = useMemo(() => contentForEditor, [contentForEditor]);
   const router = useRouter();
+  const {signOut} = useContext(AuthContext);
 
-  // async function handleAddGaleria({
-  //   titulo,
-  //   mes,
-  //   ano,
-  //   imagem,
-  //   id_municipio,
-  //   id_eixo,
-  // }) {
-  //   const descricao = content.toString();
-  //   const formData = new FormData();
-
-  //   formData.append("imagem", imagem[0]);
-  //   formData.append("titulo", titulo);
-  //   formData.append("descricao", descricao);
-  //   formData.append("mes", mes);
-  //   formData.append("ano", ano);
-  //   formData.append("id_municipio", id_municipio);
-  //   formData.append("id_eixo", id_eixo);
-  //   const apiClient = getAPIClient();
-  //   const response = await apiClient
-  //     .post("addGaleria", formData, {
-  //       headers: {
-  //         "Content-Type": `multipart/form-data=${formData}`,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       toast.notify('Dados gravados com sucesso!',{
-  //         title: "Sucesso!",
-  //         duration: 7,
-  //         type: "success",
-  //       })
-  //       reset({
-  //         imagem: "",
-  //         titulo: "",
-  //         descricao: "",
-  //         mes: "",
-  //         ano: "",
-  //         eixo: "",
-  //         id_municipio: "",
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       if (error) {
-  //         toast.notify('Erro ao gravar dados!',{
-  //           title: "Erro!",
-  //           duration: 7,
-  //           type: "error",
-  //         })
-  //         return error;
-  //       }
-  //     });
-  // }
-
-  const onSubmit = async (data) => {
-    // const descricao = content.toString();
-    const formData = new FormData();
-
-    formData.append("imagem", data.imagem[0]);
-    formData.append("titulo", data.titulo);
-    formData.append("descricao", data.descricao);
-    formData.append("mes", data.mes);
-    formData.append("ano", data.ano);
-    formData.append("id_municipio", data.id_municipio);
-    formData.append("id_eixo", data.id_eixo);
-
-    const apiClient = getAPIClient();
-
-    try {
-      await apiClient.post("addGaleria", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      toast.notify("Galeria criada com sucesso!", {
-        title: "Sucesso!",
-        duration: 7,
-        type: "success",
-      });
-
-      // Adicionar redirecionamento
-      setTimeout(() => {
-        router.push("/listarGalerias");
-      }, 2000);
-    } catch (error) {
-      console.error("Erro ao criar galeria:", error);
-      toast.notify("Erro ao criar galeria!", {
-        title: "Erro!",
-        duration: 7,
-        type: "error",
-      });
-    }
-  };
-  const anos = [
-    { ano: "2015" },
-    { ano: "2016" },
-    { ano: "2017" },
-    { ano: "2018" },
-    { ano: "2019" },
-    { ano: "2020" },
-    { ano: "2021" },
-    { ano: "2022" },
-    { ano: "2023" },
-    { ano: "2024" },
-    { ano: "2025" },
-    { ano: "2026" },
-  ];
-
+  // Meses disponíveis
   const meses = [
-    { mes: "Janeiro" },
-    { mes: "Fevereiro" },
-    { mes: "Março" },
-    { mes: "Abril" },
-    { mes: "Maio" },
-    { mes: "Junho" },
-    { mes: "Julho" },
-    { mes: "Agosto" },
-    { mes: "Setembro" },
-    { mes: "Outubro" },
-    { mes: "Novenbro" },
-    { mes: "Dezembro" },
+    { value: "01", label: "Janeiro" },
+    { value: "02", label: "Fevereiro" },
+    { value: "03", label: "Março" },
+    { value: "04", label: "Abril" },
+    { value: "05", label: "Maio" },
+    { value: "06", label: "Junho" },
+    { value: "07", label: "Julho" },
+    { value: "08", label: "Agosto" },
+    { value: "09", label: "Setembro" },
+    { value: "10", label: "Outubro" },
+    { value: "11", label: "Novembro" },
+    { value: "12", label: "Dezembro" }
   ];
 
-  function handleOnChange(content) {
-    setContent(content);
+  // Anos disponíveis (últimos 10 anos)
+  const anos = Array.from({ length: 10 }, (_, i) => {
+    const ano = new Date().getFullYear() - i;
+    return { value: ano.toString(), label: ano.toString() };
+  });
+
+  async function handleAddGaleria({
+    titulo,
+    mes,
+    ano,
+    imagem,
+    id_municipio,
+    id_eixo,
+  }) {
+    try {
+      const descricao = content.toString();
+      const formData = new FormData();
+
+      formData.append("imagem", imagem[0]);
+      formData.append("titulo", titulo);
+      formData.append("descricao", descricao);
+      formData.append("mes", mes);
+      formData.append("ano", ano);
+      formData.append("id_municipio", id_municipio);
+      formData.append("id_eixo", id_eixo);
+
+      const apiClient = getAPIClient();
+      const response = await apiClient
+        .post("addGaleria", formData)
+        .then((response) => {
+          return response.data;
+        });
+
+      if (response.success) {
+        toast.success("Galeria cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        reset({
+          titulo: "",
+          mes: "",
+          ano: "",
+          id_municipio: "",
+          id_eixo: "",
+        });
+        setContent("");
+        setTimeout(() => {
+          router.push("/listarGalerias");
+        }, 2000);
+      } else {
+        toast.error("Erro ao cadastrar galeria!", { position: "top-right", autoClose: 5000 });
+      }
+    } catch (error) {
+      console.error("Erro ao cadastrar galeria:", error);
+      toast.error("Erro ao cadastrar galeria!", { position: "top-right", autoClose: 5000 });
+    }
   }
 
+   async function handleSignOut() {
+        signOut();
+      }
+    
+    function handleSimisab() {
+            Router.push("/indicadores/home_indicadores");
+      }
+  
+
   return (
-    <Container>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#f5f5f5',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+          <DivMenuTitulo> 
+                <text style={{
+                  fontSize: '20px',
+                  fontWeight: 'bold',
+                  padding: '15px 20px',
+                  float: 'left',
+                  
+                  }}>
+                    Painel de Edição 
+                  </text>
+                <ul style={{}}>
+                <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                </ul>
+          </DivMenuTitulo>
 
-      <DivCenter>
-        <DivInstrucoes>
-          <b>Cadastro de galeria: </b>
-          <p>
-            Adicione uma galeria com os dados solicitados abaixo, escolha uma
-            imagem de capa que será mostrada no portal galerias, e se desejar,
-            escreva uma <b>Descrição</b>.
-          </p>
-          <p>
-            Após gravar a galeria clique no menu galerias e na lista clique no
-            botão Adicionar imagens!
-          </p>
-        </DivInstrucoes>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <label>Titulo</label>
-          <input
-            aria-invalid={errors.name ? "true" : "false"}
-            {...register("titulo", { required: true })}
-            type="text"
-            placeholder="Titulo da Galeria"
-            name="titulo"
-          />
-          {errors.titulo && errors.titulo.type && (
-            <span>O campo Titulo é obrigatório!</span>
-          )}
-          <select
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("mes", { required: true })}
-            name="mes"
-          >
-            <option value="">Selecione o mês</option>
-            {meses.map((mes) => (
-              <option key={mes.mes} value={mes.mes}>
-                {mes.mes}
-              </option>
-            ))}
-          </select>
-          {errors.mes && errors.mes.type && (
-            <span>Selecionar um mês é obrigatório!</span>
-          )}
+      <BodyDashboard>
+        <Sidebar/>
+      
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        minHeight: 'calc(100vh - 200px)',
+        padding: '20px',
+        marginLeft: '100px'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+          padding: '40px',
+          width: '100%',
+          maxWidth: '700px',
+          border: '1px solid #e0e0e0'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '30px'
+          }}>
+            <h1 style={{
+              color: '#333',
+              fontSize: '28px',
+              fontWeight: '600',
+              margin: '0 0 10px 0'
+            }}>
+              Cadastro de Galeria
+            </h1>
+            <p style={{
+              color: '#666',
+              fontSize: '16px',
+              margin: '0'
+            }}>
+              Preencha as informações para criar uma nova galeria
+            </p>
+          </div>
 
-          <select
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("ano", { required: true })}
-            name="ano"
-          >
-            <option value="">Selecione um ano</option>
-            {anos.map((ano, key) => (
-              <option key={key} value={ano.ano}>
-                {ano.ano}
-              </option>
-            ))}
-          </select>
-          {errors.ano && errors.ano.type && (
-            <span>Selecionar um ano é obrigatório!</span>
-          )}
+          <form onSubmit={handleSubmit(handleAddGaleria)} style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Título *
+              </label>
+              <input
+                {...register("titulo", { required: true })}
+                type="text"
+                placeholder="Título da galeria"
+                name="titulo"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.titulo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = errors.titulo ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              {errors.titulo && errors.titulo.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  O campo Título é obrigatório!
+                </span>
+              )}
+            </div>
 
-          <select
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("id_municipio", { required: true })}
-            name="id_municipio"
-          >
-            <option value="">Selecione um Municipio</option>
-            {municipios.map((municipio) => (
-              <option
-                key={municipio.id_municipio}
-                value={municipio.id_municipio}
-              >
-                {municipio.nome}
-              </option>
-            ))}
-          </select>
-          {errors.id_municipio && errors.id_municipio.type && (
-            <span>Selecionar um Municipio é obrigatório!</span>
-          )}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Mês *
+                </label>
+                <select
+                  {...register("mes", { required: true })}
+                  name="mes"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.mes ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.mes ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione o mês</option>
+                  {meses.map((mes, key) => (
+                    <option key={key} value={mes.value}>
+                      {mes.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.mes && errors.mes.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o mês é obrigatório!
+                  </span>
+                )}
+              </div>
 
-          <select
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("id_eixo", { required: true })}
-            name="id_eixo"
-          >
-            <option value="">Selecione o eixo</option>
-            {eixos.map((eixo, key) => (
-              <option key={key} value={eixo.id_eixo}>
-                {eixo.nome}
-              </option>
-            ))}
-          </select>
-          {errors.id_eixo && errors.id_eixo.type && (
-            <span>Selecionar um Eixo é obrigatório!</span>
-          )}
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Ano *
+                </label>
+                <select
+                  {...register("ano", { required: true })}
+                  name="ano"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.ano ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.ano ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione o ano</option>
+                  {anos.map((ano, key) => (
+                    <option key={key} value={ano.value}>
+                      {ano.label}
+                    </option>
+                  ))}
+                </select>
+                {errors.ano && errors.ano.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar o ano é obrigatório!
+                  </span>
+                )}
+              </div>
+            </div>
 
-          <label>Imagem de Rótulo da Galeria</label>
-          <input
-            aria-invalid={errors.value ? "true" : "false"}
-            {...register("imagem", { required: true })}
-            type="file"
-            name="imagem"
-          />
-          {errors.imagem && errors.imagem.type && (
-            <span>Selecionar uma imagem é obrigatório!</span>
-          )}
-          <label>Descricão</label>
-          <textarea
-            {...register("descricao")}
-            onChange={handleOnChange}
-          ></textarea>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '20px'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Município *
+                </label>
+                <select
+                  {...register("id_municipio", { required: true })}
+                  name="id_municipio"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_municipio ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.id_municipio ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione um município</option>
+                  {municipios?.map((municipio, key) => (
+                    <option key={key} value={municipio.id_municipio}>
+                      {municipio.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_municipio && errors.id_municipio.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar um município é obrigatório!
+                  </span>
+                )}
+              </div>
 
-          <SubmitButton type="submit">Gravar</SubmitButton>
-        </Form>
-      </DivCenter>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '8px',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: '#333'
+                }}>
+                  Eixo *
+                </label>
+                <select
+                  {...register("id_eixo", { required: true })}
+                  name="id_eixo"
+                  style={{
+                    width: '100%',
+                    padding: '12px 16px',
+                    fontSize: '16px',
+                    border: errors.id_eixo ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    transition: 'all 0.3s ease',
+                    outline: 'none'
+                  }}
+                  onFocus={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                    (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    (e.target as HTMLSelectElement).style.borderColor = errors.id_eixo ? '#e74c3c' : '#e0e0e0';
+                    (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                  }}
+                >
+                  <option value="">Selecione um eixo</option>
+                  {eixos?.map((eixo, key) => (
+                    <option key={key} value={eixo.id_eixo}>
+                      {eixo.nome}
+                    </option>
+                  ))}
+                </select>
+                {errors.id_eixo && errors.id_eixo.type === "required" && (
+                  <span style={{
+                    color: '#e74c3c',
+                    fontSize: '14px',
+                    marginTop: '5px',
+                    display: 'block'
+                  }}>
+                    Selecionar um eixo é obrigatório!
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Imagem *
+              </label>
+              <input
+                {...register("imagem", { required: true })}
+                type="file"
+                name="imagem"
+                accept="image/*"
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: errors.imagem ? '2px solid #e74c3c' : '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = '#3498db';
+                  (e.target as HTMLInputElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLInputElement).style.borderColor = errors.imagem ? '#e74c3c' : '#e0e0e0';
+                  (e.target as HTMLInputElement).style.boxShadow = 'none';
+                }}
+              />
+              {errors.imagem && errors.imagem.type === "required" && (
+                <span style={{
+                  color: '#e74c3c',
+                  fontSize: '14px',
+                  marginTop: '5px',
+                  display: 'block'
+                }}>
+                  Selecionar uma imagem é obrigatório!
+                </span>
+              )}
+              <small style={{
+                color: '#666',
+                fontSize: '14px',
+                marginTop: '8px',
+                display: 'block',
+                lineHeight: '1.4'
+              }}>
+                Aceita apenas arquivos de imagem (JPG, PNG, GIF, etc.)
+              </small>
+            </div>
+
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Descrição
+              </label>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Descrição da galeria (opcional)"
+                name="descricao"
+                rows={6}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  resize: 'vertical',
+                  fontFamily: 'inherit'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLTextAreaElement).style.borderColor = '#3498db';
+                  (e.target as HTMLTextAreaElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLTextAreaElement).style.borderColor = '#e0e0e0';
+                  (e.target as HTMLTextAreaElement).style.boxShadow = 'none';
+                }}
+              />
+              <small style={{
+                color: '#666',
+                fontSize: '14px',
+                marginTop: '8px',
+                display: 'block',
+                lineHeight: '1.4'
+              }}>
+                Descrição detalhada da galeria (opcional)
+              </small>
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                backgroundColor: isSubmitting ? '#95a5a6' : '#3498db',
+                color: 'white',
+                padding: '14px 24px',
+                fontSize: '16px',
+                fontWeight: '600',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                transition: 'all 0.3s ease',
+                marginTop: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px'
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#2980b9';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
+                  (e.target as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(52, 152, 219, 0.3)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubmitting) {
+                  (e.target as HTMLButtonElement).style.backgroundColor = '#3498db';
+                  (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
+                  (e.target as HTMLButtonElement).style.boxShadow = 'none';
+                }
+              }}
+            >
+              {isSubmitting ? (
+                <>
+                  <div style={{
+                    width: '20px',
+                    height: '20px',
+                    border: '2px solid #ffffff',
+                    borderTop: '2px solid transparent',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                  }}></div>
+                  Cadastrando...
+                </>
+              ) : (
+                "Cadastrar Galeria"
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
+      </BodyDashboard>        
       <Footer>
-        &copy; Todos os direitos reservados<ToastContainer></ToastContainer>
+        &copy; Todos os direitos reservados
       </Footer>
-    </Container>
+
+      <style jsx>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+          .form-container {
+            padding: 20px;
+            margin: 10px;
+          }
+          
+          .form-title {
+            font-size: 24px;
+          }
+          
+          .form-subtitle {
+            font-size: 14px;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<MunicipiosProps> = async (
-  ctx
-) => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const { ["tedplan.token"]: token } = parseCookies(ctx);
-  const apiClient = getAPIClient(ctx);
 
   if (!token) {
     return {
@@ -339,16 +674,36 @@ export const getServerSideProps: GetServerSideProps<MunicipiosProps> = async (
     };
   }
 
-  const resMunicipio = await apiClient.get("/getMunicipios");
-  const municipios = await resMunicipio.data;
+  try {
+    const apiClient = getAPIClient(ctx);
+    
+    // Buscar municípios
+    const municipiosResponse = await apiClient.get("/getMunicipios");
+    const municipios = municipiosResponse.data;
 
-  const resEixo = await apiClient.get("/getEixos");
-  const eixos = await resEixo.data;
+    // Buscar eixos
+    const eixosResponse = await apiClient.get("/getEixos");
+    const eixos = eixosResponse.data;
 
-  return {
-    props: {
-      municipios,
-      eixos,
-    },
-  };
+    return {
+      props: {
+        galeria: [],
+        mes: [],
+        ano: [],
+        municipios: municipios || [],
+        eixos: eixos || [],
+      },
+    };
+  } catch (error) {
+    console.error("Erro ao carregar dados:", error);
+    return {
+      props: {
+        galeria: [],
+        mes: [],
+        ano: [],
+        municipios: [],
+        eixos: [],
+      },
+    };
+  }
 };

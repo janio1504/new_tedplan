@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import {FaBars} from "react-icons/fa";
 import {
   DivInput,
   MenuMunicipio,
@@ -38,10 +38,11 @@ import {
   StepperWrapper,
   StepperContainer,
   StepperButton,
+  Table,
 } from "../../styles/esgoto-indicadores";
 
 import HeadIndicadores from "../../components/headIndicadores";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -54,8 +55,9 @@ import MenuHorizontal from "../../components/MenuHorizontal";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -68,7 +70,8 @@ interface MunicipioProps {
 }
 
 export default function Esgoto({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, isAuthenticated, anoEditorSimisab, permission } =
+    useContext(AuthContext);
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio | any>(
     municipio
   );
@@ -83,10 +86,30 @@ export default function Esgoto({ municipio }: MunicipioProps) {
   const [content, setContent] = useState("");
   const [dadosEsgoto, setDadosEsgoto] = useState(null);
   const [activeForm, setActiveForm] = useState("ligacoes");
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 768) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed)
+  }
 
   useEffect(() => {
     getMunicipio();
-  }, [municipio]);
+    if (anoEditorSimisab) {
+      getDadosEsgoto(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [municipio, anoEditorSimisab]);
 
   async function getMunicipio() {
     const res = await api
@@ -94,15 +117,14 @@ export default function Esgoto({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        const res = response.data;
-        setDadosMunicipio(res[0]);
+        setDadosMunicipio(response.data);
       });
   }
 
   async function handleCadastro(data) {
-
-    if(usuario?.id_permissao === 4){
-      return
+    if (!isEditor) {
+      toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
+      return;
     }
 
     data.id_esgoto = dadosEsgoto?.id_esgoto;
@@ -111,19 +133,11 @@ export default function Esgoto({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-esgoto", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         return response.data;
       })
       .catch((error) => {
-        toast.notify("Erro ao gravar os dados!", {
-          title: "Erro!",
-          duration: 7,
-          type: "error",
-        });
+        toast.error("Erro ao gravar os dados!", { position: "top-right", autoClose: 5000 });
         console.log(error);
       });
     getDadosEsgoto(anoSelected);
@@ -162,13 +176,22 @@ export default function Esgoto({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+      
+      {isCollapsed ? (
+                    <ExpandButton  onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </ExpandButton>
+                ) : (
+                  <Sidebar isCollapsed={isCollapsed}>
+                    <CollapseButton onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </CollapseButton>
         <SidebarItem
           active={activeForm === "ligacoes"}
           onClick={() => setActiveForm("ligacoes")}
@@ -200,9 +223,28 @@ export default function Esgoto({ municipio }: MunicipioProps) {
           Observações, esclarecimentos ou sugestões
         </SidebarItem>
       </Sidebar>
-      <MainContent>
+        )}
+      <MainContent isCollapsed={isCollapsed}>
+        
         <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
+          <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
+        <BreadCrumbStyle isCollapsed={isCollapsed} >
+                  <nav>
+                    <ol>
+                      <li>
+                        <Link href="/indicadores/home_indicadores">Home</Link>
+                        <span> / </span>
+                      </li>
+                      <li>
+                        <Link href="/indicadores/prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
+                        <span> / </span>
+                      </li>
+                      <li>
+                        <span>Esgoto</span>
+                      </li>
+                    </ol>
+                  </nav>
+        </BreadCrumbStyle>
             <DivForm>
               <DivTituloForm style={{ borderColor: "#0085bd" }}>
                 Esgoto
@@ -220,247 +262,328 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                   <DivTitulo>
                     <DivTituloConteudo>Ano</DivTituloConteudo>
                   </DivTitulo>
-                  <label>Selecione o ano desejado:</label>
-                  <select
-                    name="ano"
-                    id="ano"
-                    onChange={(e) => seletcAno(e.target.value)}
-                  >
-                    <option>Selecionar</option>
-                    {anosSelect().map((ano) => (
-                      <option value={ano}>{ano}</option>
-                    ))}
-                  </select>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
                 </DivFormConteudo>
               </DivFormEixo>
               <DivFormEixo>
-              <DivFormConteudo active={activeForm === "ligacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
-                </DivTitulo>
-                <div style={{ display: "flex", flexDirection: "column" }}>
+                <DivFormConteudo active={activeForm === "ligacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Ligações e economias</DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <th>Ano: {anoSelected}</th>
+                          <th></th>
+                        </tr>
+                        <tr>
+                          <td>ES009</td>
+                          <td>Quantidade de ligações totais de esgoto</td>
+                          <td>
+                            <input
+                              {...register("ES009")}
+                              defaultValue={dadosEsgoto?.es009}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+
+                        <tr>
+                          <td>ES002</td>
+                          <td>Quantidade de ligações ativas de esgoto</td>
+                          <td>
+                            <input
+                              {...register("ES002")}
+                              defaultValue={dadosEsgoto?.es002}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+
+                        <tr>
+                          <td>ES003</td>
+                          <td>Quantidade de economias ativas de esgoto</td>
+                          <td>
+                            <input
+                              {...register("ES003")}
+                              defaultValue={dadosEsgoto?.es003}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+
+                        <tr>
+                          <td>ES008</td>
+                          <td>
+                            Quantidade de economias residenciais ativas de
+                            esgoto
+                          </td>
+                          <td>
+                            <input
+                              {...register("ES008")}
+                              defaultValue={dadosEsgoto?.es008}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>ligação</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "volumes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Volumes</DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <th>Ano: {anoSelected}</th>
+                          <th></th>
+                        </tr>
+                        <tr>
+                          <td>ES005</td>
+                          <td>Volume de esgoto coletado</td>
+                          <td>
+                            <input
+                              {...register("ES005")}
+                              defaultValue={dadosEsgoto?.es005}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES006</td>
+                          <td>Volume de esgoto tratado</td>
+                          <td>
+                            <input
+                              {...register("ES006")}
+                              defaultValue={dadosEsgoto?.es006}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES007</td>
+                          <td>Volume de esgoto faturado</td>
+                          <td>
+                            <input
+                              {...register("ES007")}
+                              defaultValue={dadosEsgoto?.es007}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES012</td>
+                          <td>Volume de esgoto bruto exportado</td>
+                          <td>
+                            <input
+                              {...register("ES012")}
+                              defaultValue={dadosEsgoto?.es012}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                        <tr>
+                          <td>ES015</td>
+                          <td>
+                            Volume de esgoto bruto tratado nas instalações do
+                            importador
+                          </td>
+                          <td>
+                            <input
+                              {...register("ES015")}
+                              defaultValue={dadosEsgoto?.es015}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000m³/ano</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "extencao"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Extenção da rede</DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <td>Ano: {anoSelected}</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>ES004</td>
+                          <td>Extenção da rede</td>
+                          <td>
+                            <input
+                              {...register("ES004")}
+                              defaultValue={dadosEsgoto?.es004}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>KM</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "consumo"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Consumo de energia elétrica
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <table>
+                      <tbody>
+                        <tr>
+                          <th>Código SNIS</th>
+                          <th>Descrição</th>
+                          <td>Ano: {anoSelected}</td>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td>ES028</td>
+                          <td>
+                            Consumo total de energia elétrica nos sistemas de
+                            esgoto
+                          </td>
+                          <td>
+                            <input
+                              {...register("ES028")}
+                              defaultValue={dadosEsgoto?.es028}
+                              onChange={handleOnChange}
+                              type="text"
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            ></input>
+                          </td>
+                          <td>1.000kWh/ano</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "observacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Observações, esclarecimentos ou sugestões
+                    </DivTituloConteudo>
+                  </DivTitulo>
                   <table>
-                    <tbody>
-                      <tr>
-                        <th>Código SNIS</th>
-                        <th>Descrição</th>
-                        <th>Ano: {anoSelected}</th>
-                        <th></th>
-                      </tr>
-                      <tr>
-                        <td>ES009</td>
-                        <td>Quantidade de ligações totais de esgoto</td>
-                        <td>
-                          <input
-                            {...register("ES009")}
-                            defaultValue={dadosEsgoto?.es009}
-                            onChange={handleOnChange}
-                            type="text"
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-
-                      <tr>
-                        <td>ES002</td>
-                        <td>Quantidade de ligações ativas de esgoto</td>
-                        <td>
-                          <input
-                            {...register("ES002")}
-                            defaultValue={dadosEsgoto?.es002}
-                            onChange={handleOnChange}
-                            type="text"
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-
-                      <tr>
-                        <td>ES003</td>
-                        <td>Quantidade de economias ativas de esgoto</td>
-                        <td>
-                          <input
-                            {...register("ES003")}
-                            defaultValue={dadosEsgoto?.es003}
-                            onChange={handleOnChange}
-                            type="text"
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-
-                      <tr>
-                        <td>ES008</td>
-                        <td>
-                          Quantidade de economias residenciais ativas de esgoto
-                        </td>
-                        <td>
-                          <input
-                            {...register("ES008")}
-                            defaultValue={dadosEsgoto?.es008}
-                            onChange={handleOnChange}
-                            type="text"
-                          ></input>
-                        </td>
-                        <td>ligação</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </DivFormConteudo>
-             
-              <DivFormConteudo active={activeForm === "volumes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Volumes</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>ES005</td>
-                      <td>Volume de esgoto coletado</td>
-                      <td>
-                        <input
-                          {...register("ES005")}
-                          defaultValue={dadosEsgoto?.es005}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES006</td>
-                      <td>Volume de esgoto tratado</td>
-                      <td>
-                        <input
-                          {...register("ES006")}
-                          defaultValue={dadosEsgoto?.es006}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES007</td>
-                      <td>Volume de esgoto faturado</td>
-                      <td>
-                        <input
-                          {...register("ES007")}
-                          defaultValue={dadosEsgoto?.es007}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES012</td>
-                      <td>Volume de esgoto bruto exportado</td>
-                      <td>
-                        <input
-                          {...register("ES012")}
-                          defaultValue={dadosEsgoto?.es012}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                    <tr>
-                      <td>ES015</td>
-                      <td>
-                        Volume de esgoto bruto tratado nas instalações do
-                        importador
-                      </td>
-                      <td>
-                        <input
-                          {...register("ES015")}
-                          defaultValue={dadosEsgoto?.es015}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>1.000m³/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
-             
-              <DivFormConteudo active={activeForm === "extencao"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Extenção da rede</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <td>Ano: {anoSelected}</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>ES004</td>
-                      <td>Extenção da rede</td>
-                      <td>
-                        <input
-                          {...register("ES004")}
-                          defaultValue={dadosEsgoto?.es004}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>KM</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
-              
-              <DivFormConteudo active={activeForm === "consumo"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Consumo de energia elétrica
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <td>Ano: {anoSelected}</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>ES028</td>
-                      <td>Consumo total de energia elétrica nos sistemas de esgoto</td>
-                      <td>
-                        <input
-                          {...register("ES028")}
-                          defaultValue={dadosEsgoto?.es028}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </td>
-                      <td>1.000kWh/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-               
-              </DivFormConteudo>
-             
-              <DivFormConteudo active={activeForm === "observacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Observações, esclarecimentos ou sugestões
-                  </DivTituloConteudo>
-                </DivTitulo>
-                  <table >
                     <tbody>
                       <tr>
                         <th>Código SNIS</th>
@@ -471,35 +594,37 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                       <tr>
                         <td>ES098</td>
                         <td>Campo de justificativa</td>
-                        <td >
-                          <textarea style={{ width: "500px" }}
-                              {...register("ES098")}
-                              defaultValue={dadosEsgoto?.es098}
-                              onChange={handleOnChange}
-                            />
+                        <td>
+                          <textarea
+                            style={{ width: "500px" }}
+                            {...register("ES098")}
+                            defaultValue={dadosEsgoto?.es098}
+                            onChange={handleOnChange}
+                          />
                         </td>
-                        <td ></td>
+                        <td></td>
                       </tr>
                       <tr>
                         <td>ES099</td>
                         <td>Observações</td>
                         <td>
-                          <textarea style={{ width: "500px" }}
-                              {...register("ES099")}
-                              defaultValue={dadosEsgoto?.es099}
-                              onChange={handleOnChange}
-                            />
+                          <textarea
+                            style={{ width: "500px" }}
+                            {...register("ES099")}
+                            defaultValue={dadosEsgoto?.es099}
+                            onChange={handleOnChange}
+                          />
                         </td>
                         <td></td>
                       </tr>
                     </tbody>
-                  </table>          
-
-              </DivFormConteudo>
+                  </table>
+                </DivFormConteudo>
+                {anoSelected && isEditor && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
               </DivFormEixo>
             </DivForm>
-
-            {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
           </Form>
         </DivCenter>
       </MainContent>

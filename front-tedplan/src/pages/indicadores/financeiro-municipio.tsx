@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import {FaBars} from "react-icons/fa"
 import {
   Form,
   InputP,
@@ -19,7 +19,7 @@ import {
   InputAno,
 } from "../../styles/financeiro";
 
-import {  
+import {
   DivTituloForm,
   DivForm,
   Container,
@@ -37,15 +37,13 @@ import {
   StepperButton,
 } from "../../styles/esgoto-indicadores";
 
-
-
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
 import "suneditor/dist/css/suneditor.min.css";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
-import { toast, ToastContainer } from "react-nextjs-toast";
+import { toast } from "react-toastify";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -55,10 +53,12 @@ import api from "../../services/api";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { log } from "console";
-import { MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, CollapseButton, ExpandButton} from "../../styles/indicadores";
+import { MainContent } from "../../styles/esgoto-indicadores";
 import { SidebarItem, Sidebar } from "../../styles/residuo-solido-coleta-in";
 import { LineSideBar } from "../../styles/drenagem-indicadores";
 import { anosSelect } from "../../util/util";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -71,7 +71,8 @@ interface MunicipioProps {
 }
 
 export default function Financeiro({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, isAuthenticated, anoEditorSimisab, permission } =
+    useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
@@ -88,17 +89,38 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
   const [anoSelected, setAnoSelected] = useState(null);
   const [activeForm, setActiveForm] = useState("receitas1");
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   useEffect(() => {
     getDadosMunicipio();
-  }, [municipio, usuario]);
+    if (anoEditorSimisab) {
+      getFinaceiroMunicipio(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [municipio, usuario, anoEditorSimisab]);
 
   async function getDadosMunicipio() {
     const res = await api.get("getMunicipio", {
       params: { id_municipio: usuario?.id_municipio },
     });
-    const municipio = await res.data;
-    setDadosMunicipio(municipio[0]);
+    setDadosMunicipio(res.data);
   }
 
   function handleOnChange(content) {
@@ -108,17 +130,17 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   function seletcAno(ano: any) {
     if (ano) {
       setAnoSelected(ano);
-      getFinaceiroMunicipio(ano);      
+      getFinaceiroMunicipio(ano);
     } else {
       setAnoSelected("");
       setDadosFinanceiros([]);
     }
   }
 
-  async function handleCadastro(data) {  
-    
-    if(usuario?.id_permissao === 4){
-      return
+  async function handleCadastro(data) {
+    if (!isEditor) {
+      toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
+      return;
     }
     // CALCULO DA FORMULAS DO SNIS
     // AGUA E ESGOTO
@@ -572,16 +594,10 @@ export default function Financeiro({ municipio }: MunicipioProps) {
         ? dadosFinanceiros.id_fn_agua_esgoto_sanitario
         : null;
 
-   
-
     const resCad = await api
       .post("addPsFinanceiro", data)
       .then((response) => {
-        toast.notify("Dados gravados com sucesso!", {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        });
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 });
         getFinaceiroMunicipio(anoSelected);
         return response;
       })
@@ -592,21 +608,6 @@ export default function Financeiro({ municipio }: MunicipioProps) {
     return resCad;
   }
 
-  async function handleSignOut() {
-    signOut();
-  }
-  function handleHome() {
-    Router.push("/indicadores/home_indicadores");
-  }
-  function handleGestao() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleIndicadores() {
-    Router.push("/indicadores/gestao");
-  }
-  function handleReporte() {
-    Router.push("/indicadores/gestao");
-  }
   async function getFinaceiroMunicipio(ano: any) {
     await api
       .post("get-ps-financeiro-por-ano", {
@@ -614,8 +615,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
         ano: ano,
       })
       .then((response) => {
-        
-      console.log(response.data[0]);
+        console.log(response.data[0]);
         setDadosFinanceiros(response.data[0]);
       })
       .catch((error) => {
@@ -625,11 +625,21 @@ export default function Financeiro({ municipio }: MunicipioProps) {
 
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+       {isCollapsed ? (
+                    <ExpandButton onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </ExpandButton>
+                ) : (
+      <Sidebar isCollapsed={isCollapsed}>
+                    <CollapseButton onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </CollapseButton>
         <LineSideBar>Água e Esgoto Sanitário</LineSideBar>
         <SidebarItem
           active={activeForm === "receitas1"}
@@ -736,1837 +746,2483 @@ export default function Financeiro({ municipio }: MunicipioProps) {
           Observações, esclarecimentos e sugestões
         </SidebarItem>
       </Sidebar>
-      <MainContent>
+      )}
+      <MainContent isCollapsed={isCollapsed}>
+        
         <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-          <DivForm>
-            <DivTituloForm>Informações Financeiras</DivTituloForm>
-            <DivFormEixo>
-              <DivFormConteudo active={activeForm === "receitas1" || activeForm === "arrecadacao" || activeForm === "despesas1" || activeForm === "investimentos" || activeForm === "investimentosMunicipio" || activeForm === "investimentosEstado" || activeForm === "observacoes"
-              || activeForm === "cobranca" || activeForm === "receitas" || activeForm === "despesas" || activeForm === "investimentoDesembolsos" || activeForm === "observacoes2"
-              || activeForm === "cobranca2" || activeForm === "despesas2" || activeForm === "receitas2" || activeForm === "investimentoUniao" || activeForm === "observacoes3"
-              
-              }>
-                <DivTitulo>
-                  <DivTituloConteudo>Ano</DivTituloConteudo>
-                </DivTitulo>
-                 <label>Selecione o ano desejado:</label>
-                                 <select
-                                   name="ano"
-                                   id="ano"
-                                   onChange={(e) => seletcAno(e.target.value)}
-                                 >
-                                   <option>Selecionar</option>
-                                   {anosSelect().map((ano) => (
-                                     <option value={ano}>{ano}</option>
-                                   ))}
-                                 </select>
-              </DivFormConteudo>
-            </DivFormEixo>
-            <DivFormEixo>
-              <DivFormConteudo active={activeForm === "receitas1"}>
-                <DivTitulo>
-                  <DivTituloConteudo>Receitas</DivTituloConteudo>
-                </DivTitulo>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <BreadCrumbStyle isCollapsed={isCollapsed}>
+                <nav>
+                  <ol>
+                    <li>
+                      <Link href="/indicadores/home_indicadores">Home</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <span>Financeiro</span>
+                    </li>
+                  </ol>
+                </nav>
+          </BreadCrumbStyle>
+            <DivForm>
+              <DivTituloForm>Informações Financeiras</DivTituloForm>
+              <DivFormEixo>
+                <DivFormConteudo
+                  active={
+                    activeForm === "receitas1" ||
+                    activeForm === "arrecadacao" ||
+                    activeForm === "despesas1" ||
+                    activeForm === "investimentos" ||
+                    activeForm === "investimentosMunicipio" ||
+                    activeForm === "investimentosEstado" ||
+                    activeForm === "observacoes" ||
+                    activeForm === "cobranca" ||
+                    activeForm === "receitas" ||
+                    activeForm === "despesas" ||
+                    activeForm === "investimentoDesembolsos" ||
+                    activeForm === "observacoes2" ||
+                    activeForm === "cobranca2" ||
+                    activeForm === "despesas2" ||
+                    activeForm === "receitas2" ||
+                    activeForm === "investimentoUniao" ||
+                    activeForm === "observacoes3"
+                  }
+                >
+                  <DivTitulo>
+                    <DivTituloConteudo>Ano</DivTituloConteudo>
+                  </DivTitulo>
+                  {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                  {!anoEditorSimisab && (
+                    <>
+                      <label>Selecione o ano desejado:</label>
+                      <select
+                        name="ano"
+                        id="ano"
+                        onChange={(e) => seletcAno(e.target.value)}
+                      >
+                        <option>Selecionar</option>
+                        {anosSelect().map((ano) => (
+                          <option value={ano}>{ano}</option>
+                        ))}
+                      </select>
+                    </>
+                  )}
+                </DivFormConteudo>
+              </DivFormEixo>
+              <DivFormEixo>
+                <DivFormConteudo active={activeForm === "receitas1"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Receitas</DivTituloConteudo>
+                  </DivTitulo>
 
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN002</td>
-                      <td>Receita operacional direta de Água</td>
-                      <td>
-                      <input
-                    {...register("FN002")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn002}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN003</td>
-                      <td>Receita operacional direta de Esgoto</td>
-                      <td>
-                      <input
-                    {...register("AES_FN003")}
-                    defaultValue={dadosFinanceiros?.aes_fn003}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN007</td>
-                      <td>Receita operacional direta de Água exportada (Bruta ou
-                        Tratada)</td>
-                      <td>
-                      <input
-                    {...register("FN007")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn007}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN038</td>
-                      <td>Receita operacional direta - Esgoto bruto importado</td>
-                      <td>
-                      <input
-                    {...register("FN038")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn038}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN001</td>
-                      <td>Receita operacional direta Total</td>
-                      <td>
-                      <input
-                    {...register("FN001")}
-                    disabled={true}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn001}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN004</td>
-                      <td>Receita operacional indireta</td>
-                      <td>
-                      <input
-                    {...register("AES_FN004")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn004}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN005</td>
-                      <td>Receita operacional Total (Direta + Indireta)</td>
-                      <td>
-                      <input
-                    {...register("AES_FN005")}
-                    disabled={true}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn005}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>          
-             
-              </DivFormConteudo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{width: '120px'}}>Código SNIS</th>
+                        <th style={{width: '600px'}}>Descrição</th>
+                        <th style={{width: '100px'}}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN002</td>
+                        <td>Receita operacional direta de Água</td>
+                        <td>
+                          <input
+                            {...register("FN002")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn002}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN003</td>
+                        <td>Receita operacional direta de Esgoto</td>
+                        <td>
+                          <input
+                            {...register("AES_FN003")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn003}
+                            onChange={handleOnChange}
+                            
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN007</td>
+                        <td>
+                          Receita operacional direta de Água exportada (Bruta ou
+                          Tratada)
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN007")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn007}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN038</td>
+                        <td>
+                          Receita operacional direta - Esgoto bruto importado
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN038")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn038}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN001</td>
+                        <td>Receita operacional direta Total</td>
+                        <td>
+                          <input
+                            {...register("FN001")}
+                            disabled={true}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn001}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN004</td>
+                        <td>Receita operacional indireta</td>
+                        <td>
+                          <input
+                            {...register("AES_FN004")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn004}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN005</td>
+                        <td>Receita operacional Total (Direta + Indireta)</td>
+                        <td>
+                          <input
+                            {...register("AES_FN005")}
+                            disabled={true}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn005}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-              <DivFormConteudo active={activeForm === "arrecadacao"}>
+                <DivFormConteudo active={activeForm === "arrecadacao"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Arrecadação e crédito a receber
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                         <th style={{ width: "600px" }}>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN006</td>
+                        <td>Arrecadação total operacional indireta</td>
+                        <td>
+                          <input
+                            {...register("FN006")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn006}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN008</td>
+                        <td>Créditos de contas a receber</td>
+                        <td>
+                          <input
+                            {...register("AES_FN008")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn008}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Arrecadação e crédito a receber
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN006</td>
-                      <td>Arrecadação total operacional indireta</td>
-                      <td>
-                      <input
-                    {...register("FN006")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn006}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN008</td>
-                      <td>Créditos de contas a receber</td>
-                      <td>
-                      <input
-                    {...register("AES_FN008")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn008}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-         
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "despesas1"}>
-
-                <DivTitulo>
-                  <DivTituloConteudo>Despesas</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN010</td>
-                      <td>Despesa com pessoal próprio</td>
-                      <td>
-                      <input
-                    {...register("FN010")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn010}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN011</td>
-                      <td>Despesa com produtos químicos</td>
-                      <td>                            
-                      <input
-                        {...register("FN011")}
-                        type="text"
-                        defaultValue={dadosFinanceiros?.fn011}
-                        onChange={handleOnChange}
-                      ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN013</td>
-                      <td>Despesa com energia elétrica</td>
-                      <td>
-                      <input
-                    {...register("AES_FN013")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn013}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN014</td>
-                      <td>Despesa com serviços de terceiros</td>
-                      <td>
-                      <input
-                    {...register("FN014")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn014}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN020</td>
-                      <td>Despesa com água importada (Bruta ou tratada)</td>
-                      <td>
-                      <input
-                    {...register("AES_FN020")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn020}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN039</td>
-                      <td>Despesa com esgoto exportado</td>
-                      <td>
-                      <input
-                    {...register("FN039")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn039}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>                 
-                    <tr>
-                      <td>FN021</td>
-                      <td>Despesas fiscais ou tributarias computadas na dex</td>
-                      <td>
-                      <input
-                    {...register("AES_FN021")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn021}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN027</td>
-                      <td>Outras despesas de exploração</td>
-                      <td>
-                      <input
-                    {...register("FN027")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn027}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN015</td>
-                      <td>Despesas de exploração (DEX)</td>
-                      <td>
-                      <input
-                    {...register("AES_FN015")}
-                    disabled={true}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn015}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN035</td>
-                      <td>DDespesas com juros e encargos do serviço da divida</td>
-                      <td>
-                      <input
-                    {...register("FN035")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn035}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN036</td>
-                      <td>Despesas com variações monetárias e cambiais das dividas</td>
-                      <td>
-                      <input
-                    {...register("FN036")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn036}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN016</td>
-                      <td>Despesas com juros e encargos do serviço da divida</td>
-                      <td>
-                      <input
-                    type="text"
-                    disabled={true}
-                    defaultValue={dadosFinanceiros?.aes_fn016}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN019</td>
-                      <td>Despesas com depreciação, amortização do ativo deferido</td>
-                      <td>
-                          
-                  <input
-                    {...register("AES_FN019")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn019}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN022</td>
-                      <td>Despesas fiscais ou tributarias não computadas na dex</td>
-                      <td>
-                      <input
-                    {...register("AES_FN022")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn022}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN028</td>
-                      <td>Outras depesas com os servicos</td>
-                      <td>
-                      <input
-                    {...register("FN028")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn028}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN017</td>
-                      <td>Despesas totais com os serviços (DTS)</td>
-                      <td>
-                      <input
-                          {...register("AES_FN017")}
-                          type="text"
-                          disabled={true}
-                          defaultValue={dadosFinanceiros?.aes_fn017}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN034</td>
-                      <td>Despesa com amortização do serviço da dívida</td>
-                      <td>
-                      <input
-                          {...register("FN034")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn034}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN037</td>
-                      <td>Despesas totais com o serviço da dívida</td>
-                      <td>  
+                <DivFormConteudo active={activeForm === "despesas1"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Despesas</DivTituloConteudo>
+                  </DivTitulo>
+                  
+                  <table>
+                    <tbody>
+                      <tr>
+                       <th style={{ width: "120px" }}>Código SNIS</th>
+                         <th style={{ width: "600px" }}>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN010</td>
+                        <td>Despesa com pessoal próprio</td>
+                        <td>
+                          <input
+                            {...register("FN010")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn010}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN011</td>
+                        <td>Despesa com produtos químicos</td>
+                        <td>
+                          <input
+                            {...register("FN011")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn011}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN013</td>
+                        <td>Despesa com energia elétrica</td>
+                        <td>
+                          <input
+                            {...register("AES_FN013")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn013}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN014</td>
+                        <td>Despesa com serviços de terceiros</td>
+                        <td>
+                          <input
+                            {...register("FN014")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn014}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN020</td>
+                        <td>Despesa com água importada (Bruta ou tratada)</td>
+                        <td>
+                          <input
+                            {...register("AES_FN020")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn020}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN039</td>
+                        <td>Despesa com esgoto exportado</td>
+                        <td>
+                          <input
+                            {...register("FN039")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn039}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN021</td>
+                        <td>
+                          Despesas fiscais ou tributarias computadas na dex
+                        </td>
+                        <td>
+                          <input
+                            {...register("AES_FN021")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn021}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN027</td>
+                        <td>Outras despesas de exploração</td>
+                        <td>
+                          <input
+                            {...register("FN027")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn027}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN015</td>
+                        <td>Despesas de exploração (DEX)</td>
+                        <td>
+                          <input
+                            {...register("AES_FN015")}
+                            disabled={true}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn015}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN035</td>
+                        <td>
+                          Despesas com juros e encargos do serviço da dívida
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN035")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn035}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN036</td>
+                        <td>
+                          Despesas com variações monetárias e cambiais das
+                          dividas
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN036")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn036}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN016</td>
+                        <td>
+                          Despesas com juros e encargos do serviço da dívida
+                        </td>
+                        <td>
+                          <input
+                            type="text"
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            disabled={true}
+                            defaultValue={dadosFinanceiros?.aes_fn016}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN019</td>
+                        <td>
+                          Despesas com depreciação, amortização do ativo
+                          deferido
+                        </td>
+                        <td>
+                          <input
+                            {...register("AES_FN019")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn019}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN022</td>
+                        <td>
+                          Despesas fiscais ou tributarias não computadas na dex
+                        </td>
+                        <td>
+                          <input
+                            {...register("AES_FN022")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn022}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN028</td>
+                        <td>Outras depesas com os serviços</td>
+                        <td>
+                          <input
+                            {...register("FN028")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn028}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN017</td>
+                        <td>Despesas totais com os serviços (DTS)</td>
+                        <td>
+                          <input
+                            {...register("AES_FN017")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            disabled={true}
+                            defaultValue={dadosFinanceiros?.aes_fn017}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN034</td>
+                        <td>Despesas com amortização do serviço da dívida</td>
+                        <td>
+                          <input
+                            {...register("FN034")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn034}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN037</td>
+                        <td>Despesas totais com o serviço da dívida</td>
+                        <td>
                           <input
                             {...register("FN037")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn037}
                             onChange={handleOnChange}
-                          ></input></td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-               
-               
-            
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "investimentos"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Investimentos realizados pelo prestador de serviços
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN018</td>
-                      <td> Despesas capitalizáveis realizadas pelo prestador de
-                      serviços</td>
-                      <td> <input
-                    {...register("AES_FN018")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn018}
-                    onChange={handleOnChange}
-                  ></input></td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN023</td>
-                      <td> Investimentos realizados em abastecimento de água pelo
-                      prestador de serviços</td>
-                      <td>
-                      <input
-                    {...register("AES_FN023")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn023}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN024</td>
-                      <td>Despesa com água importada (Bruta ou Tratada)</td>
-                      <td>
-                      <input
-                    {...register("AES_FN024")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.aes_fn024}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN025</td>
-                      <td>Outros investimentos realizados pelo prestador de serviços</td>
-                      <td>
-                      <input
-                    {...register("FN025")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn025}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN030</td>
-                      <td>Investimento com recursos próprios realizado pelo prestador
-                      de serviços</td>
-                      <td>
-                      <input
-                    {...register("FN030")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn030}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN031</td>
-                      <td>Investimento com recursos onerosos realizado pelo prestador de serviços</td>
-                      <td>
-                      <input
-                    {...register("FN031")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn031}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN032</td>
-                      <td>Investimento com recursos não onerosos realizado pelo prestador de serviços</td>
-                      <td>
-                      <input
-                    {...register("FN032")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn032}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN033</td>
-                      <td>Investimentos totais realizados pelo prestador de serviços</td>
-                      <td>
-                      <input
-                    {...register("FN033")}
-                    type="text"
-                    disabled={true}
-                    defaultValue={dadosFinanceiros?.fn033}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "investimentosMunicipio"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Investimentos realizados pelo município
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN041</td>
-                      <td>Despesas capitalizáveis realizadas pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN041")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn041}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN042</td>
-                      <td>Investimentos realizados em abastecimento de água pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN042")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn042}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN043</td>
-                      <td>Investimentos realizados em esgotamento sanitário pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN043")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn043}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN044</td>
-                      <td>Outros investimentos realizados pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN044")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn044}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN045</td>
-                      <td>Investimento com recursos próprios realizado pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN045")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn045}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN046</td>
-                      <td>Investimento com recursos onerosos realizado pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN046")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn046}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN047</td>
-                      <td>Investimento com recursos não onerosos realizado pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN047")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn047}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN048</td>
-                      <td>Investimentos totais realizados pelo munícipio</td>
-                      <td>
-                      <input
-                    {...register("FN048")}
-                    type="text"
-                    disabled={true}
-                    defaultValue={dadosFinanceiros?.fn048}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>            
-            
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "investimentosEstado"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Investimentos realizados pelo estado
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN051</td>
-                      <td>Despesas capitalizáveis realizadas pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN051")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn051}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN052</td>
-                      <td>Investimentos realizados em abastecimento de água pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN052")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn052}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN053</td>
-                      <td>Investimentos realizados em esgotamento sanitário pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN053")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn053}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN054</td>
-                      <td>Outros investimentos realizados pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN054")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn054}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN055</td>
-                      <td>Investimento com recursos próprios realizado pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN055")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn055}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN056</td>
-                      <td>Investimento com recursos onerosos realizado pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN056")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn056}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN057</td>
-                      <td>Investimento com recursos não onerosos realizado pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN057")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn057}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN058</td>
-                      <td>Investimentos totais realizados pelo estado</td>
-                      <td>
-                      <input
-                    {...register("FN058")}
-                    type="text"
-                    disabled={true}
-                    defaultValue={dadosFinanceiros?.fn058}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>  
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "observacoes"}>
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Observações, esclarecimentos ou sugestões
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN098</td>
-                      <td>Campo de justificativa</td>
-                      <td>
-                      <textarea
-                    {...register("FN098")}
-                    defaultValue={dadosFinanceiros?.fn098}
-                    onChange={handleOnChange}
-                  />
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>FN099</td>
-                      <td>Observações</td>
-                      <td colSpan={2}>
-                      <textarea
-                        {...register("FN099")}
-                        defaultValue={dadosFinanceiros?.fn099}
-                        onChange={handleOnChange}
-                        ></textarea>
-                      </td>
-                      
-                    </tr>
-                  </tbody>
-                </table>
-            
-              </DivFormConteudo>
-
-              {/* Drenagem e Águas Pluviais */}
-              <DivFormConteudo active={activeForm === "cobranca"}>
-
-                <DivTitulo>
-                  <DivTituloConteudo>Cobrança</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th style={{width: "120px"}}>Código SNIS</th>
-                      <th >Descrição</th>
-                      <th style={{width: "100px"}}>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>CB001</td>
-                      <td>Existe alguma forma de cobrança pelos serviços de drenagem e manejo das APU</td>
-                      <td>
-                      <select {...register("CB001")}>
-                          <option value="">
-                            {dadosFinanceiros?.cb001}
-                          </option>
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>CB002</td>
-                      <td>Qual é a forma de cobrança adotada?</td>
-                      <td>
-                        <select {...register("CB002")}>
-                          <option value="">
-                            {dadosFinanceiros?.cb002
-                              ? dadosFinanceiros?.cb002
-                              : "Opções"}
-                          </option>
-                          <option value="Cobrança de taxa específica">
-                            Cobrança de taxa específica
-                          </option>
-                          <option value="Cobrança de tarifa">
-                            Cobrança de tarifa
-                          </option>
-                          <option value="Outra">Outra</option>
-                        </select>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>CB002A</td>
-                      <td>Especifique qual é a forma de cobrança adotada</td>
-                      <td>
-                      <input
-                          {...register("CB002A")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.cb002a}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>CB003</td>
-                      <td>Quantidade total de imóveis urbanos tributados pelos serviços de drenagem das APU</td>
-                      <td>
-                      <input
-                    {...register("CB003")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.cb003}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>Imóveis</td>
-                    </tr>
-                    <tr>
-                      <td>CB004</td>
-                      <td>Valor cobrado pelos serviços de Drenagem e Manejo das APU por ímovel urbano</td>
-                      <td>
-                      <input
-                        {...register("CB004")}
-                        type="text"
-                        defaultValue={dadosFinanceiros?.cb004}
-                        onChange={handleOnChange}
-                      ></input>
-                      </td>
-                      <td>R$/unid./mês</td>
-                    </tr>
-                    <tr>
-                      <td>CB999</td>
-                      <td>Observações, esclarecimentos ou sugestões</td>
-                      <td colSpan={2}>
-                      <textarea 
-                        {...register("CB999")}
-                        defaultValue={dadosFinanceiros?.cb999}
-                        onChange={handleOnChange}
-                      />
-                      </td>
-                      
-                      
-                    </tr>
-                  </tbody>
-                </table>
-           
-                <InputGG>
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
                   
-                </InputGG>
-              </DivFormConteudo>
+                </DivFormConteudo>
 
-              <DivFormConteudo active={activeForm === "receitas"}>
+                <DivFormConteudo active={activeForm === "investimentos"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Investimentos realizados pelo prestador de serviços
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                       <th style={{ width: "120px" }}>Código SNIS</th>
+                         <th style={{ width: "600px" }}>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN018</td>
+                        <td>
+                          {" "}
+                          Despesas capitalizáveis realizadas pelo prestador de
+                          serviços
+                        </td>
+                        <td>
+                          {" "}
+                          <input
+                            {...register("AES_FN018")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn018}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN023</td>
+                        <td>
+                          {" "}
+                          Investimentos realizados em abastecimento de água pelo
+                          prestador de serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("AES_FN023")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn023}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN024</td>
+                        <td>Despesas com água importada (Bruta ou Tratada)</td>
+                        <td>
+                          <input
+                            {...register("AES_FN024")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.aes_fn024}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN025</td>
+                        <td>
+                          Outros investimentos realizados pelo prestador de
+                          serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN025")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn025}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN030</td>
+                        <td>
+                          Investimento com recursos próprios realizado pelo
+                          prestador de serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN030")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn030}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN031</td>
+                        <td>
+                          Investimento com recursos onerosos realizado pelo
+                          prestador de serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN031")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn031}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN032</td>
+                        <td>
+                          Investimento com recursos não onerosos realizado pelo
+                          prestador de serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN032")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn032}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN033</td>
+                        <td>
+                          Investimentos totais realizados pelo prestador de
+                          serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN033")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            disabled={true}
+                            defaultValue={dadosFinanceiros?.fn033}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                <DivTitulo>
-                  <DivTituloConteudo>Receitas</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th style={{width: "120px"}}>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th style={{width: "100px"}}>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN003</td>
-                      <td>Receita total (Saúde, Educação, Pagamento de pessoal, etc...)</td>
-                      <td>
-                      <input
-                          {...register("FN003")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn003}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN004</td>
-                      <td>Fontes de recursos para custeio dos serviços de drenagem e manejo de APU</td>
-                      <td colSpan={2}>
-                      <select {...register("FN004")}>
-                        <option value="">
-                          {dadosFinanceiros?.dap_fn004}
-                        </option>
-                        <option value="Não existe forma de custeio">
-                          Não existe forma de custeio
-                        </option>
-                        <option value="Receitas de taxas">Receitas de taxas</option>
-                        <option value="Receitas de contribuição de melhoria">
-                          Receitas de contribuição de melhoria
-                        </option>
-                        <option value="Recursos do orçamento geral do município">
-                          Recursos do orçamento geral do município
-                        </option>
-                        <option value="Outra">Outra</option>
-                      </select>
-                      </td>
-                      
-                    </tr>
-                    <tr>
-                      <td>FN004A</td>
-                      <td>Especifique qual é a outra fonte de recursos para custeio dos serviços</td>
-                      <td>
-                      <input
-                          {...register("FN004A")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn004a}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>FN005</td>
-                      <td>Receita operacional total dos serviços de drenagem e manejo de APU</td>
-                      <td>
-                        <input
+                <DivFormConteudo
+                  active={activeForm === "investimentosMunicipio"}
+                >
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Investimentos realizados pelo município
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                       <th style={{ width: "120px" }}>Código SNIS</th>
+                         <th style={{ width: "600px" }}>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN041</td>
+                        <td>
+                          Despesas capitalizáveis realizadas pelo munícipio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN041")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn041}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN042</td>
+                        <td>
+                          Investimentos realizados em abastecimento de água pelo
+                          munícipio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN042")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn042}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN043</td>
+                        <td>
+                          Investimentos realizados em esgotamento sanitário pelo
+                          munícipio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN043")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn043}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN044</td>
+                        <td>Outros investimentos realizados pelo munícipio</td>
+                        <td>
+                          <input
+                            {...register("FN044")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn044}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN045</td>
+                        <td>
+                          Investimento com recursos próprios realizado pelo
+                          munícipio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN045")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn045}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN046</td>
+                        <td>
+                          Investimento com recursos onerosos realizado pelo
+                          munícipio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN046")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn046}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN047</td>
+                        <td>
+                          Investimento com recursos não onerosos realizado pelo
+                          munícipio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN047")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn047}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN048</td>
+                        <td>Investimentos totais realizados pelo munícipio</td>
+                        <td>
+                          <input
+                            {...register("FN048")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            disabled={true}
+                            defaultValue={dadosFinanceiros?.fn048}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "investimentosEstado"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Investimentos realizados pelo estado
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                       <th style={{ width: "120px" }}>Código SNIS</th>
+                         <th style={{ width: "600px" }}>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN051</td>
+                        <td>Despesas capitalizáveis realizadas pelo estado</td>
+                        <td>
+                          <input
+                            {...register("FN051")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn051}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN052</td>
+                        <td>
+                          Investimentos realizados em abastecimento de água pelo
+                          estado
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN052")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn052}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN053</td>
+                        <td>
+                          Investimentos realizados em esgotamento sanitário pelo
+                          estado
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN053")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn053}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN054</td>
+                        <td>Outros investimentos realizados pelo estado</td>
+                        <td>
+                          <input
+                            {...register("FN054")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn054}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN055</td>
+                        <td>
+                          Investimento com recursos próprios realizado pelo
+                          estado
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN055")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn055}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN056</td>
+                        <td>
+                          Investimento com recursos onerosos realizado pelo
+                          estado
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN056")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn056}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN057</td>
+                        <td>
+                          Investimento com recursos não onerosos realizado pelo
+                          estado
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN057")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn057}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN058</td>
+                        <td>Investimentos totais realizados pelo estado</td>
+                        <td>
+                          <input
+                            {...register("FN058")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            disabled={true}
+                            defaultValue={dadosFinanceiros?.fn058}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "observacoes"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Observações, esclarecimentos ou sugestões
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN098</td>
+                        <td>Campo de justificativa</td>
+                        <td>
+                          <textarea
+                            {...register("FN098")}
+                            defaultValue={dadosFinanceiros?.fn098}
+                            onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>FN099</td>
+                        <td>Observações</td>
+                        <td colSpan={2}>
+                          <textarea
+                            {...register("FN099")}
+                            defaultValue={dadosFinanceiros?.fn099}
+                            onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></textarea>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
+
+                {/* Drenagem e Águas Pluviais */}
+                <DivFormConteudo active={activeForm === "cobranca"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Cobrança</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>CB001</td>
+                        <td>
+                          Existe alguma forma de cobrança pelos serviços de
+                          drenagem e manejo das APU
+                        </td>
+                        <td>
+                          <select {...register("CB001")}>
+                            <option value="">{dadosFinanceiros?.cb001}</option>
+                            <option value="Sim">Sim</option>
+                            <option value="Não">Não</option>
+                          </select>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>CB002</td>
+                        <td>Qual é a forma de cobrança adotada?</td>
+                        <td>
+                          <select {...register("CB002")}>
+                            <option value="">
+                              {dadosFinanceiros?.cb002
+                                ? dadosFinanceiros?.cb002
+                                : "Opções"}
+                            </option>
+                            <option value="Cobrança de taxa específica">
+                              Cobrança de taxa específica
+                            </option>
+                            <option value="Cobrança de tarifa">
+                              Cobrança de tarifa
+                            </option>
+                            <option value="Outra">Outra</option>
+                          </select>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>CB002A</td>
+                        <td>Especifique qual é a forma de cobrança adotada</td>
+                        <td>
+                          <input
+                            {...register("CB002A")}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.cb002a}
+                            onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>CB003</td>
+                        <td>
+                          Quantidade total de imóveis urbanos tributados pelos
+                          serviços de drenagem das APU
+                        </td>
+                        <td>
+                          <input
+                            {...register("CB003")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.cb003}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>Imóveis</td>
+                      </tr>
+                      <tr>
+                        <td>CB004</td>
+                        <td>
+                          Valor cobrado pelos serviços de Drenagem e Manejo das
+                          APU por ímovel urbano
+                        </td>
+                        <td>
+                          <input
+                            {...register("CB004")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.cb004}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/unid./mês</td>
+                      </tr>
+                      <tr>
+                        <td>CB999</td>
+                        <td>Observações, esclarecimentos ou sugestões</td>
+                        <td colSpan={2}>
+                          <textarea
+                            {...register("CB999")}
+                            defaultValue={dadosFinanceiros?.cb999}
+                            onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          />  
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <InputGG></InputGG>
+                </DivFormConteudo>
+
+                <DivFormConteudo active={activeForm === "receitas"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Receitas</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN003</td>
+                        <td>
+                          Receita total (Saúde, Educação, Pagamento de pessoal,
+                          etc...)
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN003")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn003}
+                            onChange={handleOnChange}
+
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN004</td>
+                        <td>
+                          Fontes de recursos para custeio dos serviços de
+                          drenagem e manejo de APU
+                        </td>
+                        <td colSpan={2}>
+                          <select {...register("FN004")}>
+                            <option value="">
+                              {dadosFinanceiros?.dap_fn004}
+                            </option>
+                            <option value="Não existe forma de custeio">
+                              Não existe forma de custeio
+                            </option>
+                            <option value="Receitas de taxas">
+                              Receitas de taxas
+                            </option>
+                            <option value="Receitas de contribuição de melhoria">
+                              Receitas de contribuição de melhoria
+                            </option>
+                            <option value="Recursos do orçamento geral do município">
+                              Recursos do orçamento geral do município
+                            </option>
+                            <option value="Outra">Outra</option>
+                          </select>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>FN004A</td>
+                        <td>
+                          Especifique qual é a outra fonte de recursos para
+                          custeio dos serviços
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN004A")}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn004a}
+                            onChange={handleOnChange}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                          ></input>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>FN005</td>
+                        <td>
+                          Receita operacional total dos serviços de drenagem e
+                          manejo de APU
+                        </td>
+                        <td>
+                          <input
                             {...register("FN005")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             defaultValue={dadosFinanceiros?.fn005}
                             onChange={handleOnChange}
                           ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN008</td>
-                      <td>Receita não operacional total dos serviços de drenagem e manejo de APU</td>
-                      <td>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN008</td>
+                        <td>
+                          Receita não operacional total dos serviços de drenagem
+                          e manejo de APU
+                        </td>
+                        <td>
                           <input
-                              {...register("FN008")}
-                              type="text"
-                              defaultValue={dadosFinanceiros?.fn008}
-                              onChange={handleOnChange}
-                            ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN009</td>
-                      <td>Receita total serviços de drenagem e manejo de APU</td>
-                      <td>
-                        <input
+                            {...register("FN008")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn008}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN009</td>
+                        <td>
+                          Receita total serviços de drenagem e manejo de APU
+                        </td>
+                        <td>
+                          <input
                             {...register("FN009")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.fn009}
                             onChange={handleOnChange}
                           ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-             
-              </DivFormConteudo>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-              <DivFormConteudo active={activeForm === "despesas"}>
+                <DivFormConteudo active={activeForm === "despesas"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Despesas</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN012</td>
+                        <td>
+                          Despesa total do município (Saúde, Educação, pagamento
+                          de pessoal, etc...)
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN012")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn012}
+                            onChange={handleOnChange}
+ 
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN013</td>
+                        <td>
+                          Despesas de Exploração(DEX) diretas ou de custeio
+                          total dos serviços de Drenagem e Manejo de APU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN013")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn013}
+                            onChange={handleOnChange}
 
-                <DivTitulo>
-                  <DivTituloConteudo>Despesas</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN012</td>
-                      <td>Despesa total do município (Saúde, Educação, pagamento de pessoal, etc...)</td>
-                      <td>
-                      <input
-                          {...register("FN012")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn012}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN013</td>
-                      <td>Despesas de Exploração(DEX) diretas ou de custeio total dos serviços de Drenagem e Manejo de APU</td>
-                      <td>
-                      <input
-                          {...register("FN013")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn013}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN015</td>
-                      <td>Despesa total com serviço da dívida para os serviços de drenagem e Manejo de APU</td>
-                      <td>
-                      <input
-                          {...register("FN015")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn015}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN016</td>
-                      <td>Despesa total com serviços de Drenagem e Manejo de APU</td>
-                      <td>
-                      <input
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN015</td>
+                        <td>
+                          Despesa total com serviço da dívida para os serviços
+                          de drenagem e Manejo de APU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN015")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn015}
+                            onChange={handleOnChange}
+
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN016</td>
+                        <td>
+                          Despesa total com serviços de Drenagem e Manejo de APU
+                        </td>
+                        <td>
+                          <input
                             {...register("FN016")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
                             disabled={true}
                             defaultValue={dadosFinanceiros?.dap_fn016}
                             onChange={handleOnChange}
                           ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>      
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-             
-              </DivFormConteudo>
+                <DivFormConteudo
+                  active={activeForm === "investimentoDesembolsos"}
+                >
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Investimentos e desembolsos
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
 
-              <DivFormConteudo active={activeForm === "investimentoDesembolsos"}>
+                      <tr>
+                        <td>FN024</td>
+                        <td>
+                          Investimento com recursos próprios em Drenagem e
+                          Manejo das APU contratados pelo município no ano de
+                          referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN024")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn024}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN018</td>
+                        <td>
+                          Investimento com recursos onerosos em Drenagem e
+                          Manejo das APU contratados pelo município no ano de
+                          referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN018")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn018}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN020</td>
+                        <td>
+                          Investimento com recursos não onerosos em Drenagem e
+                          Manejo das APU contratados pelo município no ano de
+                          referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN020")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn020}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN022</td>
+                        <td>
+                          Investimento total em Drenagem das APU contratado pelo
+                          município no ano de referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN022")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn022}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN017</td>
+                        <td>
+                          Desembolsos de investimentos com recursos próprios em
+                          Drenagem e Manejo das APU realizados pelo município no
+                          ano de referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN017")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn017}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN019</td>
+                        <td>
+                          Desembolsos de investimentos com recursos onerosos em
+                          Drenagem e Manejo das APU realizados pelo município no
+                          ano de referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN019")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn019}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN021</td>
+                        <td>
+                          Desembolsos de investimentos com recursos não onerosos
+                          em Drenagem e Manejo das APU realizados pelo município
+                          no ano de referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN021")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn021}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN023</td>
+                        <td>
+                          Desembolsos total de investimentos em Drenagem e
+                          Manejo das APU realizados pelo município no ano de
+                          referência
+                        </td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN023")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn023}
+                              disabled
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Investimentos e desembolsos
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                <tbody>
-                    <tr>
-                      <th style={{width: "120px"}}>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>    
-                 
-                    <tr>
-                      <td>FN024</td>
-                      <td>
-                        Investimento com recursos próprios em Drenagem e Manejo
-                        das APU contratados pelo município no ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN024")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn024}
+                <DivFormConteudo active={activeForm === "observacoes2"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Observações, esclarecimentos ou sugestões
+                    </DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                      </tr>
+                      <tr>
+                        <td>FN999</td>
+                        <td>Observações, esclarecimentos ou sugestões</td>
+                        <td>
+                          <textarea
+                            {...register("DRENAGEM_FN999")}
+                            defaultValue={dadosFinanceiros?.drenagem_fn999}
                             onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN018</td>
-                      <td>
-                        Investimento com recursos onerosos em Drenagem e Manejo
-                        das APU contratados pelo município no ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN018")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn018}
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN020</td>
-                      <td>
-                        Investimento com recursos não onerosos em Drenagem e
-                        Manejo das APU contratados pelo município no ano de
-                        referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN020")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn020}
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN022</td>
-                      <td>
-                        Investimento total em Drenagem das APU contratado pelo
-                        município no ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN022")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn022}
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN017</td>
-                      <td>
-                        Desembolsos de investimentos com recursos próprios em
-                        Drenagem e Manejo das APU realizados pelo Município no
-                        ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN017")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn017}
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN019</td>
-                      <td>
-                        Desembolsos de investimentos com recursos onerosos em
-                        Drenagem e Manejo das APU realizados pelo Município no
-                        ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN019")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn019}
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN021</td>
-                      <td>
-                        Desembolsos de investimentos com recursos não onerosos
-                        em Drenagem e Manejo das APU realizados pelo Município
-                        no ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN021")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn021}
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN023</td>
-                      <td>
-                        Desembolsos total de investimentos em Drenagem e Manejo
-                        das APU realizados pelo Município no ano de referência
-                      </td>
-                      <td>
-                        <InputP>
-                          <input
-                            {...register("FN023")}
-                            type="text"
-                            defaultValue={dadosFinanceiros?.fn023}
-                            disabled
-                            onChange={handleOnChange}
-                          ></input>
-                        </InputP>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-              <DivFormConteudo active={activeForm === "observacoes2"}>
+                {/* Resíduos Sólidos */}
 
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Observações, esclarecimentos ou sugestões
-                  </DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                    </tr>
-                    <tr>
-                      <td>FN999</td>
-                      <td>Observações, esclarecimentos ou sugestões</td>
-                      <td>
-                      <textarea
-                    {...register("DRENAGEM_FN999")}
-                    defaultValue={dadosFinanceiros?.drenagem_fn999}
-                    onChange={handleOnChange}
-                  />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>            
-              </DivFormConteudo>
-
-              {/* Resíduos Sólidos */}
-
-              <DivFormConteudo active={activeForm === "cobranca2"}>
-
-                <DivTitulo>
-                  <DivTituloConteudo>Cobrança</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th style={{width: "120px"}}>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN201</td>
-                      <td>A prefeitura (prestadora) cobra pelos serviços de coleta regular, transporte e destinação final de RSU?</td>
-                      <td>
-                      <select {...register("FN201")} name="FN201">
-                          <option value="">
-                            {dadosFinanceiros?.fn201}
-                          </option>
-                          <option>Sim</option>
-                          <option>Não</option>
-                        </select>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>FN202</td>
-                      <td>Principal forma adotada</td>
-                      <td>
-                      <select {...register("FN202")}>
-                          <option value="">
-                            {dadosFinanceiros?.fn202}
-                          </option>
-                          <option value="Taxa específica no boleto do IPTU">
-                            Taxa específica no boleto do IPTU
-                          </option>
-                          <option value="Taxa em boleto exclusivo">
-                            Taxa em boleto exclusivo
-                          </option>
-                          <option value="Tarifa">Tarifa</option>
-                          <option value="Taxa específica no boleto de água">
-                            Taxa específica no boleto de água
-                          </option>
-                          <option value="outra forma.">outra forma.</option>
-                        </select>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>FN203</td>
-                      <td>Descrição da outra forma adotada</td>
-                      <td>
-                      <input
-                          {...register("FN203")}
-                          type="text"
-                          defaultValue={dadosFinanceiros?.fn203}
-                          onChange={handleOnChange}
-                        ></input>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>FN204</td>
-                      <td>Unidade adotada para a cobrança (No caso de tarifa)</td>
-                      <td>
-                      <select {...register("FN204")}>
-                          <option value="">
-                            {dadosFinanceiros?.fn204}
-                          </option>
-                          <option value="Peso">Peso</option>
-                          <option value="Volume">Volume</option>
-                        </select>
-                      </td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>FN205</td>
-                      <td>A prefeitura cobra pela prestação de serviços especiais ou eventuais de manejo de RSU?</td>
-                      <td>
-                      <select {...register("FN205")}>
-                          <option value="">
-                            {dadosFinanceiros?.fn205}
-                          </option>
-                          <option value="Sim">Sim</option>
-                          <option value="Não">Não</option>
-                        </select>
-                      </td>
-                      <td></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
-              <DivFormConteudo active={activeForm === "despesas2"}>
-
-                <DivTitulo>
-                  <DivTituloConteudo>Despesas</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th style={{width: "120px"}}>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN206</td>
-                      <td>Despesa dos agentes públicos com o serviço de coleta de RDO e RPU</td>
-                      <td>
-                      <input
-                    {...register("FN206")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn206}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN207</td>
-                      <td>Despesa com agentes privados para execução do serviço de coleta de RDO e RPU</td>
-                      <td>
-                      <input
-                    {...register("FN207")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn207}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN208</td>
-                      <td>Despesa com o serviço de coleta de RDO e RPU</td>
-                      <td>
-                      <input
-                    {...register("FN208")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn208}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN209</td>
-                      <td>Despesa com agentes públicos com a coleta RSS</td>
-                      <td>
-                      <input
-                    {...register("FN209")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn209}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN210</td>
-                      <td>Despesa com empresas contratadas para coleta RSS</td>
-                      <td>
-                      <input
-                    {...register("FN210")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn210}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN211</td>
-                      <td>Despesa total com a coleta RSS</td>
-                      <td>
-                      <input
-                    {...register("FN211")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn211}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN212</td>
-                      <td>Despesa dos agentes públicos com o serviço de varrição</td>
-                      <td>
-                      <input
-                    {...register("FN212")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn212}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN213</td>
-                      <td>Despesa com empresas contratadas para o serviço de varrição</td>
-                      <td>
-                      <input
-                    {...register("FN213")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn213}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN214</td>
-                      <td>Despesa total com serviço de varrição</td>
-                      <td>
-                      <input
-                    {...register("FN214")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn214}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN215</td>
-                      <td>Despesas com agentes públicos executores dos demais serviços quando não especificado sem campo próprio</td>
-                      <td>
-                      <input
-                    {...register("FN215")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn215}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN216</td>
-                      <td>Despesas com agentes privados executores dos demais serviços quando não especificado sem campo próprio</td>
-                      <td>
-                      <input
-                    {...register("FN216")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn216}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN217</td>
-                      <td>Despesas total com todos os agentes executores dos demais serviços quando não especificado sem campo próprio</td>
-                      <td>
-                      <input
-                    {...register("FN217")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn217}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN218</td>
-                      <td>Despesa dos agentes públicos executores de serviços de manejo de RSU</td>
-                      <td>
-                      <input
-                    {...register("FN218")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn218}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN219</td>
-                      <td>Despesa dos agentes privados executores de serviços de manejo de RSU</td>
-                      <td>
-                      <input
-                    {...register("FN219")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn219}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN220</td>
-                      <td>Despesa total com os serviços de manejo de RSU</td>
-                      <td>
-                      <input
-                    {...register("FN220")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn220}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN223</td>
-                      <td>Despesa corrente da prefeitura durante o ano com todos os serviços do município (Saúde, educação, pagamento de pessoal, etc...)</td>
-                      <td>
-                      <input
-                    {...register("FN223")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn223}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-           
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "receitas2"}>
-
-                <DivTitulo>
-                  <DivTituloConteudo>Receitas</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                  <tbody>
-                    <tr>
-                      <th style={{ width: "120px" }}>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr>
-                    <tr>
-                      <td>FN221</td>
-                      <td>Receita orçada com a cobrança de taxas e tarifas referentes
-                      á getão e manejo de RSU</td>
-                      <td>
-                      <input
-                    {...register("FN221")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn221}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                    <tr>
-                      <td>FN222</td>
-                      <td>Receita arrecadada com taxas e tarifas referentes á gestão e
-                      manejo de RSU</td>
-                      <td>
-                      <input
-                    {...register("FN222")}
-                    type="text"
-                    defaultValue={dadosFinanceiros?.fn222}
-                    onChange={handleOnChange}
-                  ></input>
-                      </td>
-                      <td>R$/ano</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
-
-              <DivFormConteudo active={activeForm === "investimentoUniao"}>
-
-                <DivTitulo>
-                  <DivTituloConteudo>Investimentos da União</DivTituloConteudo>
-                </DivTitulo>
-
-                <table>
-                <tbody>
-                    <tr>
-                      <th style={{ width: "120px" }}>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
-                      <th></th>
-                    </tr> 
-                    <tr>
-                      <td>FN224</td>
-                      <td>
-                        A prefeitura recebeu algum recurso federal para
-                        aplicação no setor de manejo de RSU?
-                      </td>
-                      <td>
-                        <InputP>
-                          {" "}
-                          <select {...register("FN224")}>
-                            <option value="">
-                              {dadosFinanceiros?.fn224}
+                <DivFormConteudo active={activeForm === "cobranca2"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Cobrança</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN201</td>
+                        <td>
+                          A prefeitura (prestadora) cobra pelos serviços de
+                          coleta regular, transporte e destinação final de RSU?
+                        </td>
+                        <td>
+                          <select {...register("FN201")} name="FN201">
+                            <option value="">{dadosFinanceiros?.fn201}</option>
+                            <option>Sim</option>
+                            <option>Não</option>
+                          </select>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>FN202</td>
+                        <td>Principal forma adotada</td>
+                        <td>
+                          <select {...register("FN202")}>
+                            <option value="">{dadosFinanceiros?.fn202}</option>
+                            <option value="Taxa específica no boleto do IPTU">
+                              Taxa específica no boleto do IPTU
                             </option>
+                            <option value="Taxa em boleto exclusivo">
+                              Taxa em boleto exclusivo
+                            </option>
+                            <option value="Tarifa">Tarifa</option>
+                            <option value="Taxa específica no boleto de água">
+                              Taxa específica no boleto de água
+                            </option>
+                            <option value="outra forma.">outra forma.</option>
+                          </select>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>FN203</td>
+                        <td>Descrição da outra forma adotada</td>
+                        <td>
+                          <input
+                            {...register("FN203")}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn203}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>FN204</td>
+                        <td>
+                          Unidade adotada para a cobrança (No caso de tarifa)
+                        </td>
+                        <td>
+                          <select {...register("FN204")}>
+                            <option value="">{dadosFinanceiros?.fn204}</option>
+                            <option value="Peso">Peso</option>
+                            <option value="Volume">Volume</option>
+                          </select>
+                        </td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>FN205</td>
+                        <td>
+                          A prefeitura cobra pela prestação de serviços
+                          especiais ou eventuais de manejo de RSU?
+                        </td>
+                        <td>
+                          <select {...register("FN205")}>
+                            <option value="">{dadosFinanceiros?.fn205}</option>
                             <option value="Sim">Sim</option>
                             <option value="Não">Não</option>
                           </select>
-                        </InputP>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>FN225</td>
-                      <td>Valor repassado</td>
-                      <td>
-                        <InputP>
+                        </td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
+                <DivFormConteudo active={activeForm === "despesas2"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Despesas</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN206</td>
+                        <td>
+                          Despesa dos agentes públicos com o serviço de coleta
+                          de RDO e RPU
+                        </td>
+                        <td>
                           <input
-                            {...register("FN225")}
+                            {...register("FN206")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
                             type="text"
-                            defaultValue={dadosFinanceiros?.fn225}
+                            defaultValue={dadosFinanceiros?.fn206}
                             onChange={handleOnChange}
                           ></input>
-                        </InputP>
-                      </td>
-                      <td>R$</td>
-                    </tr>
-                    <tr>
-                      <td>FN226</td>
-                      <td>Tipo de recurso</td>
-                      <td>
-                        <InputP>
-                          <select {...register("FN226")}>
-                            <option value="">
-                              {dadosFinanceiros?.fn226}
-                            </option>
-                            <option value="Oneroso">Oneroso</option>
-                            <option value="Não oneroso">Não oneroso</option>
-                          </select>
-                        </InputP>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>FN227</td>
-                      <td>Em que foi aplicado o recurso?</td>
-                      <td colSpan={4}>
-                        <textarea
-                          {...register("FN227")}
-                          defaultValue={dadosFinanceiros?.fn227}
-                          onChange={handleOnChange}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN207</td>
+                        <td>
+                          Despesa com agentes privados para execução do serviço
+                          de coleta de RDO e RPU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN207")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn207}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN208</td>
+                        <td>Despesa com o serviço de coleta de RDO e RPU</td>
+                        <td>
+                          <input
+                            {...register("FN208")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn208}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN209</td>
+                        <td>Despesa com agentes públicos com a coleta RSS</td>
+                        <td>
+                          <input
+                            {...register("FN209")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn209}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN210</td>
+                        <td>
+                          Despesa com empresas contratadas para coleta RSS
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN210")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn210}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN211</td>
+                        <td>Despesa total com a coleta RSS</td>
+                        <td>
+                          <input
+                            {...register("FN211")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn211}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN212</td>
+                        <td>
+                          Despesa dos agentes públicos com o serviço de varrição
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN212")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn212}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN213</td>
+                        <td>
+                          Despesa com empresas contratadas para o serviço de
+                          varrição
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN213")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                              }
+                            }}
+                            type="text"
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN214</td>
+                        <td>Despesa total com serviços de varrição</td>
+                        <td>
+                          <input
+                            {...register("FN214")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn214}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN215</td>
+                        <td>
+                          Despesas com agentes públicos executores dos demais
+                          serviços quando não especificado sem campo próprio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN215")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn215}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN216</td>
+                        <td>
+                          Despesas com agentes privados executores dos demais
+                          serviços quando não especificado sem campo próprio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN216")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn216}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN217</td>
+                        <td>
+                          Despesas total com todos os agentes executores dos
+                          demais serviços quando não especificado sem campo
+                          próprio
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN217")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn217}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN218</td>
+                        <td>
+                          Despesa dos agentes públicos executores de serviços de
+                          manejo de RSU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN218")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn218}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN219</td>
+                        <td>
+                          Despesa dos agentes privados executores de serviços de
+                          manejo de RSU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN219")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn219}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN220</td>
+                        <td>Despesa total com os serviços de manejo de RSU</td>
+                        <td>
+                          <input
+                            {...register("FN220")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn220}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN223</td>
+                        <td>
+                          Despesa corrente da prefeitura durante o ano com todos
+                          os serviços do município (Saúde, educação, pagamento
+                          de pessoal, etc...)
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN223")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn223}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-              <DivFormConteudo active={activeForm === "observacoes3"}>
+                <DivFormConteudo active={activeForm === "receitas2"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Receitas</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN221</td>
+                        <td>
+                          Receita orçada com a cobrança de taxas e tarifas
+                          referentes à getão e manejo de RSU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN221")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn221}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                      <tr>
+                        <td>FN222</td>
+                        <td>
+                          Receita arrecadada com taxas e tarifas referentes à
+                          gestão e manejo de RSU
+                        </td>
+                        <td>
+                          <input
+                            {...register("FN222")}
+                            onKeyPress={(e) => {
+                              if (!/[0-9]/.test(e.key)) {
+                                e.preventDefault();
+                              }
+                            }}
+                            type="text"
+                            defaultValue={dadosFinanceiros?.fn222}
+                            onChange={handleOnChange}
+                          ></input>
+                        </td>
+                        <td>R$/ano</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                <DivTitulo>
-                  <DivTituloConteudo>
-                    Observações, esclarecimentos ou sugestões
-                  </DivTituloConteudo>
-                </DivTitulo>
+                <DivFormConteudo active={activeForm === "investimentoUniao"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Investimentos da União
+                    </DivTituloConteudo>
+                  </DivTitulo>
 
-                <table>
-                <tbody>
-                    <tr>
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano: {anoSelected}</th>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th style={{ width: "120px" }}>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th style={{ width: "100px" }}>Ano: {anoSelected}</th>
+                        <th></th>
+                      </tr>
+                      <tr>
+                        <td>FN224</td>
+                        <td>
+                          A prefeitura recebeu algum recurso federal para
+                          aplicação no setor de manejo de RSU?
+                        </td>
+                        <td>
+                          <InputP>
+                            {" "}
+                            <select {...register("FN224")}>
+                              <option value="">
+                                {dadosFinanceiros?.fn224}
+                              </option>
+                              <option value="Sim">Sim</option>
+                              <option value="Não">Não</option>
+                            </select>
+                          </InputP>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>FN225</td>
+                        <td>Valor repassado</td>
+                        <td>
+                          <InputP>
+                            <input
+                              {...register("FN225")}
+                              onKeyPress={(e) => {
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              type="text"
+                              defaultValue={dadosFinanceiros?.fn225}
+                              onChange={handleOnChange}
+                            ></input>
+                          </InputP>
+                        </td>
+                        <td>R$</td>
+                      </tr>
+                      <tr>
+                        <td>FN226</td>
+                        <td>Tipo de recurso</td>
+                        <td>
+                          <InputP>
+                            <select {...register("FN226")}>
+                              <option value="">
+                                {dadosFinanceiros?.fn226}
+                              </option>
+                              <option value="Oneroso">Oneroso</option>
+                              <option value="Não oneroso">Não oneroso</option>
+                            </select>
+                          </InputP>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>FN227</td>
+                        <td>Em que foi aplicado o recurso?</td>
+                        <td colSpan={4}>
+                          <textarea
+                            {...register("FN227")}
+                            defaultValue={dadosFinanceiros?.fn227}
+                            onChange={handleOnChange}
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
 
-                      <th></th>
-                    </tr>
-                  
-                  
-                    <tr>
-                      <td>FN999</td>
-                      <td>Observações, esclarecimentos ou sugestões</td>
-                      <td colSpan={4}>
-                        <textarea
-                          {...register("RESIDUOS_FN999")}
-                          defaultValue={dadosFinanceiros?.residuos_fn999}
-                          onChange={handleOnChange}
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <DivFormConteudo active={activeForm === "observacoes3"}>
+                  <DivTitulo>
+                    <DivTituloConteudo>
+                      Observações, esclarecimentos ou sugestões
+                    </DivTituloConteudo>
+                  </DivTitulo>
 
-                <table></table>
-              </DivFormConteudo>
+                  <table>
+                    <tbody>
+                      <tr>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano: {anoSelected}</th>
+
+                        <th></th>
+                      </tr>
+
+                      <tr>
+                        <td>FN999</td>
+                        <td>Observações, esclarecimentos ou sugestões</td>
+                        <td colSpan={4}>
+                          <textarea
+                            {...register("RESIDUOS_FN999")}
+                            defaultValue={dadosFinanceiros?.residuos_fn999}
+                            onChange={handleOnChange}
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </DivFormConteudo>
               </DivFormEixo>
-          </DivForm>
+            </DivForm>
 
-          {anoSelected && usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-        </Form>
-      </DivCenter>
+            {anoSelected && usuario?.id_permissao !== 4 && (
+              <SubmitButton type="submit">Gravar</SubmitButton>
+            )}
+          </Form>
+        </DivCenter>
       </MainContent>
     </Container>
   );
 }
-
-

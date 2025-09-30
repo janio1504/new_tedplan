@@ -1,7 +1,8 @@
 import styled, { keyframes } from "styled-components";
 
 export const Container = styled.div`
-  color: #fff;
+ 
+color: #fff;
   font-family: Arial, Helvetica, sans-serif;
   height: 100%;
   max-width: 100%;
@@ -78,6 +79,93 @@ export const IconeColeta = styled.div`
     }
   }
 `;
+
+export const Table = styled.table`
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  height: 100%;
+  margin-bottom: 30px;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+
+  table {
+    
+    flex: 1;
+    border-spacing: 0;
+    min-width: 600px;
+
+    th { 
+      flex: 1;
+      color: #667778;;
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+
+
+    td {
+      white-space: nowrap;
+      padding: 16px 20px;
+      color: #4a5568;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 15px;
+      line-height: 1.5;
+      transition: all 0.2s ease;
+
+      &:first-child {
+        padding-left: 24px;
+        font-weight: 500;
+      }
+
+      &:last-child {
+        padding-right: 24px;
+      }
+
+      &.status {
+        font-weight: 500;
+
+        &.active {
+          color: #059669;
+        }
+
+        &.inactive {
+          color: #dc2626;
+        }
+
+        &.pending {
+          color: #d97706;
+        }
+      }
+
+      &.numeric {
+        font-family: "IBM Plex Mono", monospace;
+        text-align: right;
+      }
+    }
+
+    tr {
+
+      transition: all 0.2s ease;
+
+      &:hover td {
+        background: #f8fafc;
+      }
+
+      &:last-child td {
+        border-bottom: none;
+
+      
+      }
+    }
+  }
+}`;
 
 export const Logout = styled.button`
   width: 80px;
@@ -172,16 +260,15 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  max-width: 75%;
   width: 100%;
   height: 100%;
-
   margin-left: auto;
   margin-right: auto;
   text-align: left;
-  justify-content: center;
-  padding: 0px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 `;
 
 export const MenuMunicipio = styled.div`
@@ -424,19 +511,17 @@ export const BotaoResiduos = styled.div`
 `;
 
 export const DivForm = styled.div`
+  width: 100%;
+  margin-left: auto;
   display: flex;
   flex-direction: column;
-  justify-content: left;
+  
   background-color: #fff;
   text-align: left;
   padding: 0;
   border-radius: 5px;
   font-size: 17px;
-  margin-top: 50px;
   color: #fff;
-  table {
-    
-  }
 `;
 
 export const DivTituloForm = styled.div`
@@ -454,8 +539,7 @@ export const DivTituloForm = styled.div`
 
 export const Tabela = styled.div`
   width: 100%;
-  margin-bottom: 30px;
-  overflow: hidden;
+  // overflow: hidden;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -483,10 +567,12 @@ export const Tabela = styled.div`
 
       &:first-child {
         padding-left: 24px;
+        border-top-left-radius: 12px;
       }
 
       &:last-child {
         padding-right: 24px;
+        border-top-right-radius: 12px;
       }
     }
 
@@ -688,6 +774,8 @@ export const SubmitButton = styled.button`
   justify-content: center;
   align-items: center;
   float: right;
+  font-size: 16px;
+  font-weight: 600;
   svg {
     margin-right: 8px;
   }
@@ -749,6 +837,7 @@ export const InputG = styled.div`
     margin-left: 20px;
     padding: 22px 0;
   }
+ 
 `;
 
 export const DivEixo = styled.div`
@@ -771,12 +860,17 @@ export const DivEixo = styled.div`
 `;
 
 export const Form = styled.form`
+  display: flex;  
   background-color: #f3f4f6;
+  width: 100%;
   font-size: 14px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   input {
-    border: 1px solid #4B4B4B;
-  border-radius: 5px;
-    padding: 10px 15px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    padding: 15px 15px;
     margin: 10px;
     color: #666;
     float: left;
@@ -792,15 +886,16 @@ export const Form = styled.form`
     padding: 10px 15px;
     margin: 10px;
     height: 200px;
-    border: 2px solid #2dd9d0;
+    border: 2px solid #ccc;
   }
   label {
     color: #666;
     margin: 10px 0 0 15px;
+    font-size: 14px;
   }
 
   select {
-    border: 1px solid #4B4B4B;
+    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -877,6 +972,8 @@ export const ContainerModal = styled.div`
   padding: 20px;
   z-index: 1000;
   animation: ${fadeIn} 0.3s ease;
+
+
 `;
 
 export const Modal = styled.div`
@@ -894,10 +991,12 @@ export const Modal = styled.div`
 export const ModalForm = styled(Modal)`
   margin-top: 40px;
   max-height: 90vh;
+
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -947,6 +1046,7 @@ export const ConteudoModal = styled.div`
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  
 
   input,
   select,
@@ -1260,10 +1360,18 @@ export const Sidebar = styled.div`
   }
 `;
 
-export const MainContent = styled.div`
-  margin-left: 270px;
+export const MainContent = styled.div<{ isCollapsed: boolean }>`
+  margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
+  z-index: -1000;
+
+  @media (max-width: 1000px) {
+    margin: 20px 0 0 0;
+    min-height: auto;
+    padding: 30px;
+    
+  }
 `;
 
 export const SidebarItem = styled.div<{ active?: boolean }>`
@@ -1288,6 +1396,9 @@ export const SidebarItem = styled.div<{ active?: boolean }>`
 
   &:last-child {
     margin-bottom: 0;
+  }
+  &:first-child {
+    margin-top: 40px;
   }
 `;
 
@@ -1336,143 +1447,143 @@ export const SidebarSection = styled.div`
 
 export const FormCadastro = styled.form`
   background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 2rem;
-  animation: fadeIn 0.5s ease forwards;
-
-  &::before {
-    content: "Cadastro de Unidades";
-    display: block;
-    font-size: 1.25rem;
-    color: #212121;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #2196f3;
-    font-weight: 500;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin: 1.5rem 0;
-  }
-
-  th {
-    padding: 1rem;
-    text-align: left;
-
-    label {
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: #212121;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    animation: fadeIn 0.5s ease forwards;
+  
+    &::before {
+      content: "Cadastro de Unidades";
       display: block;
-      margin-bottom: 0.5rem;
+      font-size: 1.25rem;
+      color: #212121;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #2196f3;
+      font-weight: 500;
     }
-  }
-
-  td {
-    padding: 0.5rem 1rem;
-    vertical-align: top;
-
-    input {
+  
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  
+    table {
       width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1.5px solid #e0e0e0;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 1.5rem 0;
+    }
+  
+    th {
+      padding: 1rem;
+      text-align: left;
+  
+      label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #212121;
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
+  
+    td {
+      padding: 0.5rem 1rem;
+      vertical-align: top;
+  
+      input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+  
+        &:focus {
+          border-color: #2196f3;
+          box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+          outline: none;
+          background: white;
+        }
+  
+        &:hover {
+          border-color: #bdbdbd;
+        }
+  
+        &[aria-invalid="true"] {
+          border-color: #f44336;
+          background: #fff5f5;
+        }
+      }
+    }
+  
+    ${InputM}, ${InputG} {
+      margin: 0;
+  
+      span {
+        color: #f44336;
+        font-size: 0.75rem;
+        margin-top: 0.5rem;
+        display: block;
+        font-weight: 500;
+      }
+    }
+  
+    ${SubmitButtonModal} {
+      background: #2196f3;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
       border-radius: 6px;
       font-size: 0.9rem;
-      transition: all 0.3s ease;
-      background: #f8f9fa;
-
-      &:focus {
-        border-color: #2196f3;
-        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
-        outline: none;
-        background: white;
-      }
-
-      &:hover {
-        border-color: #bdbdbd;
-      }
-
-      &[aria-invalid="true"] {
-        border-color: #f44336;
-        background: #fff5f5;
-      }
-    }
-  }
-
-  ${InputM}, ${InputG} {
-    margin: 0;
-
-    span {
-      color: #f44336;
-      font-size: 0.75rem;
-      margin-top: 0.5rem;
-      display: block;
       font-weight: 500;
-    }
-  }
-
-  ${SubmitButtonModal} {
-    background: #2196f3;
-    color: white;
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: block;
-    width: 100%;
-    max-width: 200px;
-    margin: 1.5rem auto 0;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-
-    &:hover {
-      background: #1976d2;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    }
-  }
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-
-    &::before {
-      font-size: 1.1rem;
-    }
-
-    td {
+      cursor: pointer;
+      transition: all 0.3s ease;
       display: block;
-      padding: 0.5rem;
+      width: 100%;
+      max-width: 200px;
+      margin: 1.5rem auto 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+  
+      &:hover {
+        background: #1976d2;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+  
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      }
     }
-
-    th {
-      display: block;
-      padding: 0.5rem;
+  
+    @media (max-width: 768px) {
+      padding: 1.5rem;
+  
+      &::before {
+        font-size: 1.1rem;
+      }
+  
+      td {
+        display: block;
+        padding: 0.5rem;
+      }
+  
+      th {
+        display: block;
+        padding: 0.5rem;
+      }
     }
-  }
 `;
 
 //     input, select, textarea {
@@ -1510,10 +1621,9 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
   padding: 0 1.9rem 1.9rem;
   border-radius: 7.6px;
   box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
-  width: 95%;
-  max-width: 1140px;
+  width: 90%;
   z-index: 1;
-  margin: 19px auto;
+  margin: 0px auto;
   position: relative;
   color: #333;
   overflow: hidden;
@@ -1651,6 +1761,20 @@ export const DivFormCadastro = styled.div<{ active?: boolean }>`
       transform: translateY(0.95px);
     }
   }
+
+    @media (max-width: 1000px) {
+    width: 95%;
+    margin: 0;
+
+    td  {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 95%;
+    }
+
+    }
+}
 `;
 
 export const StepperContainer = styled.div`
@@ -1675,6 +1799,9 @@ export const StepperWrapper = styled.div`
     left: 0;
     z-index: 1;
   }
+
+  
+
 `;
 
 export const StepButton = styled.div<{ active?: boolean; completed?: boolean }>`

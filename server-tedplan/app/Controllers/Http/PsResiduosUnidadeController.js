@@ -23,6 +23,37 @@ class PsResiduosUnidadeController {
       return unidades
   }
 
+   async getResiduosUnidadesProcessamento({ request }){
+    const dados = request.all()
+    const dadosRuc = await PsFinanceiro.query()
+        .from('tedplan.unidades_processamento_residuo_solido')
+        .where('id_municipio', dados.id_municipio)
+        .fetch()       
+
+        const unidades = await Promise.all(dadosRuc.toJSON().map(async (value) => {
+          const res = await PsFinanceiro.query()
+          .from('tedplan.municipios')
+          .where('id_municipio', value.id_municipio_unidade_processamento)
+          .fetch()
+
+        const rsu = await PsFinanceiro.query()
+        .from('tedplan.residuos_unidade_processamento')
+        .where('id_unidade_processamento', value.id_unidade_processamento)
+        .where('ano', dados.ano)
+        .fetch()
+
+          if(rsu.toJSON().length !== 0){
+            return {
+              ...value,
+              nome: res.toJSON()[0].nome,
+              residuosUnidade: rsu.toJSON(),
+          }          
+            }
+
+        }))
+      return unidades
+  }
+
   async getUnidadesProcessamentoPorTipo({ request }){
     const dados = request.all()
     const dadosRuc = await PsFinanceiro.query()
@@ -143,6 +174,8 @@ class PsResiduosUnidadeController {
 
   async createDadosUnidadeProcessamento({ request }){
     const dados = request.all()
+    console.log(dados);
+   
     try {
       if(!dados.id_residuos_unidade_processamento){
         const res = await PsFinanceiro.query()

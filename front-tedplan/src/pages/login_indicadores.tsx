@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../contexts/AuthContext";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast } from 'react-toastify'
 import logo from "../img/user_mun.png";
 import {
   Footer,
@@ -32,19 +32,11 @@ export default function LoginIndicadores() {
     })
     .catch((error)=>{ 
       if(error.message == 'Network Error'){
-        toast.notify('Sem conexão com a internet.',{
-          title: "Aconteceu o seguinte erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Sem conexão com a internet.", { position: "top-right", autoClose: 5000 })
         return
       }
         
-      toast.notify('Usuário ou senha inválido!',{
-        title: "Aconteceu o seguinte erro",
-        duration: 7,
-        type: "error",
-      })    
+      toast.error("Usuário ou senha inválido!", { position: "top-right", autoClose: 5000 })    
       reset({
         senha: ''
       })
@@ -84,7 +76,7 @@ export default function LoginIndicadores() {
 
           <SubmitButton type="submit">Acessar</SubmitButton>
         </Form>
-        <Footer>&copy; Todos os direitos reservados<ToastContainer></ToastContainer></Footer>
+        <Footer>&copy; Todos os direitos reservados</Footer>
       </DivLogin>
      
     </Container>

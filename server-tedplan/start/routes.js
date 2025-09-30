@@ -23,6 +23,10 @@ Route.get("getMunicipio", "MunicipioController.getMunicipio");
 Route.post("addMunicipio", "MunicipioController.store");
 Route.get("getEscalas", "EscalaController.index");
 
+Route.get("pdf/:id", "FileController.getPdf");
+
+
+
 Route.get("getFile", "FileController.showFile");
 Route.get("getImagem", "FileController.showImagem");
 Route.get("getImagens", "FileController.show");
@@ -42,24 +46,61 @@ Route.post(
   "addRepresentanteServicos",
   "GestaoIndicadoresController.addRepresentanteServicos"
 );
+Route.put(
+  "updateRepresentanteServicos",
+  "GestaoIndicadoresController.addRepresentanteServicos"
+);
 Route.get(
   "getRepresentantesServicos",
   "GestaoIndicadoresController.getRepresentantesServicos"
 );
 
-Route.get("get-all-presidencia-conselho-municipal/:id", "GestaoIndicadoresController.getAllPresidenciaConselhoMunicipal");
-Route.post("create-presidencia-conselho-municipal", "GestaoIndicadoresController.addPresidenciaConselhoMunicipal");
-Route.put("update-presidencia-conselho-municipal", "GestaoIndicadoresController.updatePresidenciaConselhoMunicipal");
-Route.delete("delete-presidencia-conselho-municipal/:id", "GestaoIndicadoresController.destroyPresidenciaConselhoMunicipal");
-Route.get("get-presidencia-conselho-municipal/:id", "GestaoIndicadoresController.getPresidenciaConselhoMunicipal");
+Route.get(
+  "get-all-presidencia-conselho-municipal/:id",
+  "GestaoIndicadoresController.getAllPresidenciaConselhoMunicipal"
+);
+Route.post(
+  "create-presidencia-conselho-municipal",
+  "GestaoIndicadoresController.addPresidenciaConselhoMunicipal"
+);
+Route.put(
+  "update-presidencia-conselho-municipal",
+  "GestaoIndicadoresController.updatePresidenciaConselhoMunicipal"
+);
+Route.delete(
+  "delete-presidencia-conselho-municipal/:id",
+  "GestaoIndicadoresController.destroyPresidenciaConselhoMunicipal"
+);
+Route.get(
+  "get-presidencia-conselho-municipal/:id",
+  "GestaoIndicadoresController.getPresidenciaConselhoMunicipal"
+);
 
-Route.get("get-conselhos-municipais/:id", "GestaoIndicadoresController.getConselhosMunicipais");
-Route.post("create-conselho-municipal", "GestaoIndicadoresController.addConselhoMunicipal");
-Route.put("update-conselho-municipal", "GestaoIndicadoresController.updateConselhoMunicipal");
-Route.delete("delete-conselho-municipal/:id", "GestaoIndicadoresController.destroyConselhoMunicipal");
-Route.get("get-conselho-municipal/:id", "GestaoIndicadoresController.getConselhoMunicipal");
+Route.get(
+  "get-conselhos-municipais/:id",
+  "GestaoIndicadoresController.getConselhosMunicipais"
+);
+Route.post(
+  "create-conselho-municipal",
+  "GestaoIndicadoresController.addConselhoMunicipal"
+);
+Route.put(
+  "update-conselho-municipal",
+  "GestaoIndicadoresController.updateConselhoMunicipal"
+);
+Route.delete(
+  "delete-conselho-municipal/:id",
+  "GestaoIndicadoresController.destroyConselhoMunicipal"
+);
+Route.get(
+  "get-conselho-municipal/:id",
+  "GestaoIndicadoresController.getConselhoMunicipal"
+);
 
-Route.delete("remover-representante", "GestaoIndicadoresController.destroyRepresentante");
+Route.delete(
+  "remover-representante",
+  "GestaoIndicadoresController.destroyRepresentante"
+);
 Route.delete("remover-politica", "GestaoIndicadoresController.destroyPolitica");
 Route.delete("remover-plano", "GestaoIndicadoresController.destroyPlano");
 Route.delete(
@@ -70,6 +111,7 @@ Route.post("addGestaoIndicadores", "GestaoIndicadoresController.store");
 Route.get("getGestao", "GestaoIndicadoresController.getGestaoAssociada");
 Route.get("getPlanos", "GestaoIndicadoresController.getPlanos");
 Route.get("getPoliticas", "GestaoIndicadoresController.getPoliticas");
+Route.put("updatePoliticaMunicipal", "GestaoIndicadoresController.store");
 Route.get(
   "getParticipacaoControleSocial",
   "GestaoIndicadoresController.getParticipacaoCS"
@@ -79,27 +121,70 @@ Route.post("addDadosFinanceiros", "FinanceiroController.store");
 
 Route.post("addPsResiduosColeta", "PsResiduosColetaController.store");
 Route.post("get-ps-residuos-coleta", "PsResiduosColetaController.getRsc");
-Route.post("get-ps-residuos-coleta-por-ano", "PsResiduosColetaController.getRscPorAno");
+Route.post(
+  "get-ps-residuos-coleta-por-ano",
+  "PsResiduosColetaController.getRscPorAno"
+);
 
 Route.post("create-unidade-rsc", "PsResiduosColetaController.createUnidadeRsc");
 Route.post("list-unidades-rsc", "PsResiduosColetaController.getUnidadesRsc");
-Route.delete("remover-unidade-rsc", "PsResiduosColetaController.removerUnidadeRsc");
+Route.delete(
+  "remover-unidade-rsc",
+  "PsResiduosColetaController.removerUnidadeRsc"
+);
 
 Route.post("create-unidade-rss", "PsResiduosColetaController.createUnidadeRss");
 Route.post("list-unidades-rss", "PsResiduosColetaController.getUnidadesRss");
-Route.delete("remover-unidade-rss", "PsResiduosColetaController.removerUnidadeRss");
+Route.delete(
+  "remover-unidade-rss",
+  "PsResiduosColetaController.removerUnidadeRss"
+);
 
-Route.post("create-cooperativa-catadores", "PsResiduosColetaController.createCooperativaCatadores");
-Route.post("list-cooperativas-catadores", "PsResiduosColetaController.getCooperativasCatadores");
-Route.delete("delete-cooperativa-catadores", "PsResiduosColetaController.destroyCAC");
+Route.post(
+  "create-cooperativa-catadores",
+  "PsResiduosColetaController.createCooperativaCatadores"
+);
+Route.post(
+  "list-cooperativas-catadores",
+  "PsResiduosColetaController.getCooperativasCatadores"
+);
+Route.delete(
+  "delete-cooperativa-catadores",
+  "PsResiduosColetaController.destroyCAC"
+);
 
-Route.post("create-unidade-processamento", "PsResiduosUnidadeController.createUnidadeProcessamento");
-Route.post("create-dados-unidade-processamento", "PsResiduosUnidadeController.createDadosUnidadeProcessamento");
-Route.post("list-unidades-processamento", "PsResiduosUnidadeController.getUnidadesProcessamento");
-Route.post("list-unidades-processamento-por-tipo", "PsResiduosUnidadeController.getUnidadesProcessamento");
-Route.post("get-unidade-processamento", "PsResiduosUnidadeController.getUnidadeProcessamento");
-Route.post("get-dados-unidade-processamento", "PsResiduosUnidadeController.getDadosUnidadeProcessamento");
-Route.delete("detete-unidade-processamento/:id", "PsResiduosUnidadeController.destroy");
+Route.post(
+  "create-unidade-processamento",
+  "PsResiduosUnidadeController.createUnidadeProcessamento"
+);
+Route.post(
+  "create-dados-unidade-processamento",
+  "PsResiduosUnidadeController.createDadosUnidadeProcessamento"
+);
+Route.post(
+  "list-unidades-processamento",
+  "PsResiduosUnidadeController.getUnidadesProcessamento"
+);
+Route.post(
+  "list-unidades-processamento-por-tipo",
+  "PsResiduosUnidadeController.getUnidadesProcessamento"
+);
+Route.post(
+  "get-unidade-processamento",
+  "PsResiduosUnidadeController.getUnidadeProcessamento"
+);
+Route.post(
+  "get-dados-unidade-processamento",
+  "PsResiduosUnidadeController.getDadosUnidadeProcessamento"
+);
+Route.post(
+  "get-residuos-unidades-processamento",
+  "PsResiduosUnidadeController.getResiduosUnidadesProcessamento"
+);
+Route.delete(
+  "detete-unidade-processamento/:id",
+  "PsResiduosUnidadeController.destroy"
+);
 
 Route.post("create-geral", "GeralController.store");
 Route.post("get-geral", "GeralController.getDadosGerais");
@@ -127,39 +212,74 @@ Route.post("get-esgoto-por-ano", "EsgotoController.getEsgotoPorAno");
 Route.post("create-tarifa", "TarifaController.createTarifa");
 Route.post("get-tarifa", "TarifaController.getTarifa");
 
-Route.get("get-concessionaria/:id", "ConcessionariaController.getConcessionaria");
-Route.post("get-concessionarias", "ConcessionariaController.getConcessionarias");
+Route.get(
+  "get-concessionaria/:id",
+  "ConcessionariaController.getConcessionaria"
+);
+Route.post(
+  "get-concessionarias",
+  "ConcessionariaController.getConcessionarias"
+);
 Route.post("create-concessionaria", "ConcessionariaController.store");
 
-
-Route.post("create-residuos-recebidos", "PsQuantResiduosRecebidoController.createResiduosRecebidos");
-Route.post("list-residuos-recebidos", "PsQuantResiduosRecebidoController.getResiduosRecebidos");
+Route.post(
+  "create-residuos-recebidos",
+  "PsQuantResiduosRecebidoController.createResiduosRecebidos"
+);
+Route.post(
+  "list-residuos-recebidos",
+  "PsQuantResiduosRecebidoController.getResiduosRecebidos"
+);
 
 Route.post("addPsFinanceiro", "PsFinanceiroController.store");
 Route.post("get-ps-financeiro", "PsFinanceiroController.getDadosFinanceiros");
-Route.post("get-ps-financeiro-por-ano", "PsFinanceiroController.getDadosFinanceirosPorAno");
+Route.post(
+  "get-ps-financeiro-por-ano",
+  "PsFinanceiroController.getDadosFinanceirosPorAno"
+);
 
 Route.get("getUsuario", "UsuariosController.getUsuario");
+Route.get(
+  "get-editor-simisab-por-ano/:id",
+  "UsuariosController.getEditorSimisabPorAno"
+);
 
-Route.post("create-descricao-indicador", "IndicadorController.createDescricaoIndicador");
+Route.post(
+  "create-editor-simisab-por-ano",
+  "UsuariosController.createEditorSimisabPorAno"
+);
+
+Route.post(
+  "create-descricao-indicador",
+  "IndicadorController.createDescricaoIndicador"
+);
 Route.get("get-indicador/:id", "IndicadorController.getIndicador");
-Route.post("get-indicador-por-codigo", "IndicadorController.getIndicadorPorCodigo");
+Route.post(
+  "get-indicador-por-codigo",
+  "IndicadorController.getIndicadorPorCodigo"
+);
 Route.get("get-indicadores", "IndicadorController.getIndicadores");
 Route.put("update-descricao-indicador", "IndicadorController.updateIndicador");
-Route.delete("delete-descricao-indicador/:id", "IndicadorController.deleteIndicador");
+Route.delete(
+  "delete-descricao-indicador/:id",
+  "IndicadorController.deleteIndicador"
+);
 
 Route.get("getNormas", "NormaController.index");
 Route.get("getNorma", "NormaController.getNorma");
 Route.get("getPorFiltroNormas", "NormaController.buscaPorFiltro");
 Route.get("listTipoNorma", "NormaController.listTipoNormas");
 
-Route.get('codigo-snis', 'CodigoSnisController.getAll');
-Route.get('codigo-snis/:id', 'CodigoSnisController.getById');
-Route.post('codigo-snis', 'CodigoSnisController.create');
-Route.put('codigo-snis/:id', 'CodigoSnisController.update');
-Route.delete('codigo-snis/:id', 'CodigoSnisController.delete');
+Route.get("codigo-snis", "CodigoSnisController.getAll");
+Route.get("codigo-snis/:id", "CodigoSnisController.getById");
+Route.post("codigo-snis", "CodigoSnisController.create");
+Route.put("codigo-snis/:id", "CodigoSnisController.update");
+Route.delete("codigo-snis/:id", "CodigoSnisController.delete");
 
-Route.get("get-responsaveis-simisab/:id", "UsuariosController.getResponsaveisSimisab");
+Route.get(
+  "get-responsaveis-simisab/:id",
+  "UsuariosController.getResponsaveisSimisab"
+);
 
 // Rotas autenticadas ------------------------------- //
 Route.group(() => {
@@ -177,7 +297,7 @@ Route.group(() => {
   Route.get("getSistemas", "UsuariosController.getSistemas");
   Route.post("updatePermissoes", "UsuariosController.updatePermissoesUsuario");
   Route.get("listGalerias", "GaleriaController.index");
-  
+
   Route.get("get-permissoes", "UsuariosController.getPermissoes");
 
   Route.post("addImagensGaleria", "GaleriaController.storeImagens");
@@ -194,9 +314,90 @@ Route.group(() => {
   Route.post("updateImagemNorma", "NormaController.updateImagem");
   Route.delete("deleteNorma", "NormaController.destroy");
 
-
-
   Route.post("addFile", "FileController.store");
   Route.post("addGaleria", "GaleriaController.store");
   Route.delete("deleteGaleria", "GaleriaController.destroy");
+
+  // Rotas para Menu
+  Route.get("menus", "MenuController.index");
+  Route.get("menus/:id", "MenuController.show");
+  Route.post("menus", "MenuController.store");
+  Route.put("menus/:id", "MenuController.update");
+  Route.delete("menus/:id", "MenuController.destroy");
+  Route.get("menus/modulo/:id_modulo", "MenuController.getMenusByModulo");
+  Route.get("menus/eixo/:id_eixo", "MenuController.getMenusByEixo");
+  Route.get("menus/search", "MenuController.search");
+
+  // Rotas para MenuItem
+  Route.get("menu-items", "MenuItemController.index");
+  Route.get("menu-items/:id", "MenuItemController.show");
+  Route.post("menu-items", "MenuItemController.store");
+  Route.put("menu-items/:id", "MenuItemController.update");
+  Route.delete("menu-items/:id", "MenuItemController.destroy");
+  Route.get("menu-items/menu/:id_menu", "MenuItemController.getMenuItemsByMenu");
+  Route.get("menu-items/search", "MenuItemController.search");
+
+  // Rotas para TipoCampoIndicador
+  Route.get("tipos-campo", "TipoCampoIndicadorController.index");
+  Route.get("tipos-campo/:id", "TipoCampoIndicadorController.show");
+  Route.post("tipos-campo", "TipoCampoIndicadorController.store");
+  Route.put("tipos-campo/:id", "TipoCampoIndicadorController.update");
+  Route.delete("tipos-campo/:id", "TipoCampoIndicadorController.destroy");
+  Route.get("tipos-campo/ativos", "TipoCampoIndicadorController.getTiposAtivos");
+  Route.get("tipos-campo/tipo/:tipo", "TipoCampoIndicadorController.getTiposPorTipo");
+  Route.get("tipos-campo/indicador/:indicadorId", "TipoCampoIndicadorController.getTiposPorIndicador");
+  Route.delete("tipos-campo/indicador/:indicadorId", "TipoCampoIndicadorController.deleteTiposPorIndicador");
+  Route.patch("tipos-campo/:id/toggle-status", "TipoCampoIndicadorController.toggleStatus");
+  Route.get("tipos-campo/search", "TipoCampoIndicadorController.search");
+
+  // Rotas para SelectOptions
+  Route.get("select-options", "SelectOptionController.index");
+  Route.get("select-options/:id", "SelectOptionController.show");
+  Route.post("select-options", "SelectOptionController.store");
+  Route.put("select-options/:id", "SelectOptionController.update");
+  Route.delete("select-options/:id", "SelectOptionController.destroy");
+  Route.get("select-options/tipo-campo/:tipoCampoId", "SelectOptionController.getOptionsByTipoCampo");
+  Route.delete("select-options/tipo-campo/:tipoCampoId", "SelectOptionController.deleteOptionsByTipoCampo");
+
+  // Rotas para ItemCheckBox
+  Route.get("item-check-box", "ItemCheckBoxController.index");
+  Route.post("item-check-box", "ItemCheckBoxController.store");
+  Route.get("item-check-box/indicador/:indicadorId", "ItemCheckBoxController.getItemsByIndicador");
+  Route.delete("item-check-box/indicador/:indicadorId", "ItemCheckBoxController.deleteItemsByIndicador");
+  Route.get("item-check-box/:id", "ItemCheckBoxController.show");
+  Route.put("item-check-box/:id", "ItemCheckBoxController.update");
+  Route.delete("item-check-box/:id", "ItemCheckBoxController.destroy");
+
+  // Rotas para IndicadorNovo
+  Route.get("indicadores-novo", "IndicadorNovoController.index");
+  Route.get("indicadores-novo/:id", "IndicadorNovoController.show");
+  Route.post("indicadores-novo", "IndicadorNovoController.store");
+  Route.put("indicadores-novo/:id", "IndicadorNovoController.update");
+  Route.delete("indicadores-novo/:id", "IndicadorNovoController.destroy");
+  Route.get("indicadores-novo/menu-item/:id_menu_item", "IndicadorNovoController.getIndicadoresByMenuItem");
+  Route.get("indicadores-novo/grupo/:grupo", "IndicadorNovoController.getIndicadoresByGrupo");
+  Route.get("indicadores-novo/codigo/:codigo", "IndicadorNovoController.getIndicadorByCodigo");
+  Route.get("indicadores-novo/search", "IndicadorNovoController.search");
+
+  // Rotas para IndicadorMunicipio
+  Route.get("indicadores-municipio", "IndicadorMunicipioController.index");
+  Route.get("indicadores-municipio/:id", "IndicadorMunicipioController.show");
+  Route.post("indicadores-municipio", "IndicadorMunicipioController.store");
+  Route.put("indicadores-municipio/:id", "IndicadorMunicipioController.update");
+  Route.delete("indicadores-municipio/:id", "IndicadorMunicipioController.destroy");
+  Route.get("indicadores-municipio/municipio/:id_municipio", "IndicadorMunicipioController.getIndicadoresByMunicipio");
+  Route.get("indicadores-municipio/indicador/:id_indicador", "IndicadorMunicipioController.getIndicadoresByIndicador");
+  Route.get("indicadores-municipio/ano/:ano", "IndicadorMunicipioController.getIndicadoresByAno");
+  Route.get("indicadores-municipio/buscar", "IndicadorMunicipioController.getIndicadorByCodigoMunicipioAno");
+  Route.post("indicadores-municipio/bulk-insert", "IndicadorMunicipioController.bulkInsert");
+  Route.put("indicadores-municipio/bulk-update", "IndicadorMunicipioController.bulkUpdate");
+  Route.get("menus", "MenuController.index");
+  Route.get("menus/:id", "MenuController.show");
+  Route.post("menus", "MenuController.store");
+  Route.put("menus/:id", "MenuController.update");
+  Route.delete("menus/:id", "MenuController.destroy");
+  Route.get("menus/modulo/:id_modulo", "MenuController.getMenusByModulo");
+  Route.get("menus/eixo/:id_eixo", "MenuController.getMenusByEixo");
+  Route.get("menus/search", "MenuController.search");
+
 }).middleware(["auth"]);

@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import {  
   DivInput,
-  Form,
   InputP,
   InputM,
   InputG,
@@ -19,7 +18,6 @@ import {
   DivTitulo,
   DivFormEixo,
   DivTituloEixo,
-  DivFormConteudo,
   DivTituloConteudo,
   InputGG,
   DivSeparadora,
@@ -29,11 +27,25 @@ import {
   DivBorder,
   LabelCenter,
   DivChekbox,
+  DivFormConteudo,
   CheckBox,
   DivTituloEixoDrenagem,
 } from "../../styles/financeiro";
+import { Sidebar,
+  StepContent,
+  StepLabel,
+  StepperNavigation,
+  StepperWrapper,
+  StepperContainer,
+  StepButton,
+  StepperButton,
+  ExpandButton,
+  CollapseButton,
+  Form,
+} from "@/styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
+import { LineSideBar } from "@/styles/drenagem-indicadores";
 import "suneditor/dist/css/suneditor.min.css";
 import Image from "next/image";
 import MenuIndicadores from "../../components/MenuIndicadores";
@@ -53,12 +65,20 @@ import {
   TabelaModal,
   ModalForm,
 } from "../../styles/esgoto-indicadores";
+import Link from "next/link";
+import { Tooltip, TooltipText } from "@/styles/indicadores";
+import styled from "styled-components";
+import { DivFormCadastro, MainContent, SidebarItem} from "@/styles/esgoto-indicadores";
 import { BotaoAdicionar, BotaoEditar } from "../../styles/dashboard";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast } from 'react-toastify'
 import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
+import { anosSelect } from "../../util/util";
+import ajuda from "../../img/ajuda.png";
+import { FaBars } from "react-icons/fa";
+import { BreadCrumbStyle } from "@/styles/indicadores";
 
 interface IMunicipio {
   id_municipio: string;
@@ -71,13 +91,20 @@ interface MunicipioProps {
 }
 
 export default function Geral({ municipio }: MunicipioProps) {
-  const { usuario, signOut } = useContext(AuthContext);
+  const { usuario, isEditor, anoEditorSimisab } = useContext(AuthContext);
   const [isMunicipio, setMunicipio] = useState<IMunicipio | any>(municipio);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
+  } = useForm();
+
+  const {
+    register: registerConcessionaria,
+    handleSubmit: handleSubmitConcessionaria,
+    reset: resetConcessionaria,
+    formState: { errors: errorsConcessionaria },
   } = useForm();
 
   const [dadosMunicipio, setDadosMunicipio] = useState(null)
@@ -88,13 +115,35 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [concessionarias, setConcessionarias] = useState(null);
   const [modalAddConssionaria, setModalAddConssionaria] = useState(false);
   const [anoSelected, setAnoSelected] = useState(null);
-
-
-
+  const [activeForm, setActiveForm] = useState("AguaEsgotoSanitario");
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
-    getMunicipio()
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
+
+  useEffect(() => {
+    if (usuario?.id_municipio){
+    getMunicipio()
+  }
+  if (anoEditorSimisab) {
+      getDadosGerais(anoEditorSimisab);
+      setAnoSelected(anoEditorSimisab);
+    }
+  }, [usuario, anoEditorSimisab]);
 
   async function getMunicipio() {
     const res = await api
@@ -102,7 +151,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data[0]);
+        setDadosMunicipio(response.data);
       });
   }
 
@@ -135,11 +184,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         setDadosGeral(response.data[0])
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -152,11 +197,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         setConcessionarias(response.data)
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -170,11 +211,7 @@ export default function Geral({ municipio }: MunicipioProps) {
         setDadosConcessionaria(res[0])
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -183,9 +220,11 @@ export default function Geral({ municipio }: MunicipioProps) {
     getConcessionaria(id)
     setModalAddConssionaria(true);
   }
+
   async function handleCadastro(data) {
 
-    if(usuario?.id_permissao === 4){
+    if(!isEditor){
+       toast.error("Você não tem permissão para editar!", { position: "top-right", autoClose: 5000 });
       return
     }
 
@@ -217,18 +256,10 @@ export default function Geral({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-geral", data)
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!', {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        })
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 })
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
@@ -240,22 +271,119 @@ export default function Geral({ municipio }: MunicipioProps) {
     const resCad = await api
       .post("create-concessionaria", data)
       .then((response) => {
-        toast.notify('Dados gravados com sucesso!', {
-          title: "Sucesso!",
-          duration: 7,
-          type: "success",
-        })
+        toast.success("Dados gravados com sucesso!", { position: "top-right", autoClose: 5000 })
         getConcessionarias(anoSelected)
       })
       .catch((error) => {
-        toast.notify('Aconteceu o seguinte erro: ', {
-          title: "Erro",
-          duration: 7,
-          type: "error",
-        })
+        toast.error("Aconteceu o seguinte erro: ", { position: "top-right", autoClose: 5000 })
         console.log(error);
       });
   }
+
+// --- Funções para formSteps ---
+
+const steps = [
+              "Municípios Atendidos",
+              "Sedes e Localidades Atendidas",
+              "Populações Atendidas",
+              "População Existente",
+              "Empregados",
+              "Observações, Esclarecimentos ou Sugestões"
+            ];
+const [activeStep, setActiveStep] = useState(0);
+
+const handleNext = () => {
+    if (activeStep === 0) {
+      setActiveStep(1);
+    } else {
+      setActiveStep((prevStep) => prevStep + 1);
+    }
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
+  };
+
+  const handleStepClick = (step: number) => {
+    setActiveStep(step);
+  };
+  
+    const TabContainer = styled.div`
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    `;
+  
+    const TabButton = styled.button<{ active: boolean }>`
+      padding: 10px 20px;
+      border: none;
+      background: ${(props) => (props.active ? "#007bff" : "#e9ecef")};
+      color: ${(props) => (props.active ? "white" : "black")};
+      cursor: pointer;
+      border-radius: 4px;
+    `;
+
+    // --- Step Eixo 2 ----
+    const stepsDrenagem = [
+        "Geografia e urbanismo",
+        "Dados Hidrográficos",
+        "Empregados",
+        "Infraestrutura",
+        "Operacional",
+        "Gestão de Risco",
+        "Observações, Esclarecimentos ou Sugestões"
+        ];
+
+        const [activeStepDrenagem, setActiveStepDrenagem] = useState(0);
+
+      const handleStepClickDrenagem = (step: number) => {
+        setActiveStepDrenagem(step);
+      }
+
+    const handleNextDrenagem = () => {
+    if (activeStepDrenagem === 0) {
+      setActiveStepDrenagem(1);
+    } else {
+      setActiveStepDrenagem((prevStep) => prevStep + 1);
+    }
+    };
+
+  const handleBackDrenagem = () => {
+    setActiveStepDrenagem((prevStep) => prevStep - 1);
+  };
+    // --------------------
+
+    // --- Step Eixo 3 ----
+    const stepsResiduos = [
+        "Informações Gerais",
+        "Concessionárias",
+        "População Atendida",
+        "Valor contratual",
+        "Observações, Esclarecimentos ou Sugestões"
+        ];
+
+        const [activeStepResiduos, setActiveStepResiduos] = useState(0);
+
+      const handleStepClickResiduos = (step: number) => {
+        setActiveStepResiduos(step);
+      }
+
+      const handleNextResiduos = () => {
+    if (activeStepResiduos === 0) {
+      setActiveStepResiduos(1);
+    } else {
+      setActiveStepResiduos((prevStep) => prevStep + 1);
+    }
+  };
+
+  const handleBackResiduos = () => {
+    setActiveStepResiduos((prevStep) => prevStep - 1);
+  };
+
+    // --------------------
+
+
+// ------------------------------
 
 
   function seletcAno(ano: any) {
@@ -267,38 +395,181 @@ export default function Geral({ municipio }: MunicipioProps) {
     
   }
 
+  const onlyAllowNumber = (e) =>{
+    if (!/[0-9]/.test(e.key)){
+      e.preventDefault();
+    };
+  }
+
   return (
     <Container>
-      <ToastContainer></ToastContainer>
+      
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      
+      {isCollapsed ? (
+              <ExpandButton  onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+          ) : (
+            <Sidebar isCollapsed={isCollapsed}>
+              <CollapseButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </CollapseButton>
+        <SidebarItem
+        active={activeForm === "AguaEsgotoSanitario"}
+        onClick = {() => setActiveForm("AguaEsgotoSanitario")}>
+          Água e esgoto sanitário
+        </SidebarItem>
+        <SidebarItem
+        active={activeForm === "DrenagemAguasPluviais"}
+        onClick = {() => setActiveForm("DrenagemAguasPluviais")}>
+          Drenagens e Águas Pluviais
+        </SidebarItem>
+        <SidebarItem active={activeForm === "ResiduosSolidos"}
+        onClick={() => setActiveForm("ResiduosSolidos")}>
+          Resíduos Sólidos
+        </SidebarItem>
+            </Sidebar>
+       )}
+      <MainContent isCollapsed={isCollapsed}>
       <DivCenter>
+      
         <Form onSubmit={handleSubmit(handleCadastro)}>
+          <BreadCrumbStyle isCollapsed={isCollapsed}>
+        <nav>
+          <ol>
+            <li>
+                <Link href="/indicadores/home_indicadores">Home</Link>
+              <span> / </span>
+            </li>
+            <li>
+              <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
+              <span> / </span>
+            </li>
+            <li>
+              <span>Geral</span>
+            </li>
+          </ol>
+        </nav>
+          </BreadCrumbStyle>
           <DivForm>
             <DivTituloForm>Geral</DivTituloForm>
+              {activeForm === 'AguaEsgotoSanitario' && (
+                <StepperContainer style={{width: '90%', alignItems: 'center', margin: '20px auto'}}>
+                <StepperWrapper>
+                    {steps.map((label, index) => (
+                      <div key={label} style={{ position: "relative" }}>
+                        <StepButton
+                          active={activeStep === index}
+                          completed={activeStep > index}
+                          onClick={() => handleStepClick(index)}
+                        >
+                          {index + 1}
+                        </StepButton>
+                        <StepLabel active={activeStep === index}>
+                          {label}
+                        </StepLabel>
+                      </div>
+                    ))}
+                  </StepperWrapper>
+                  </StepperContainer>
+              )}
+
+              {activeForm === "DrenagemAguasPluviais" && (
+                <StepperContainer  style={{width: '90%', alignItems: 'center', margin: '20px auto'}}>
+                   <StepperWrapper>
+                    {stepsDrenagem.map((label, index) => (
+                      <div key={label} style={{ position: "relative" }}>
+                        <StepButton
+                          active={activeStepDrenagem === index}
+                          completed={activeStepDrenagem > index}
+                          onClick={() => handleStepClickDrenagem(index)}
+                        >
+                          {index + 1}
+                        </StepButton>
+                        <StepLabel active={activeStepDrenagem === index}>
+                          {label}
+                          </StepLabel>
+                      </div>
+                    ))}
+                  </StepperWrapper>
+                  </StepperContainer>
+                 )}
+
+              {activeForm === "ResiduosSolidos" && (
+                     
+                      <StepperContainer style={{width: '90%', alignItems: 'center', margin: '20px auto'}}>
+                        <StepperWrapper>
+                          {stepsResiduos.map((label, index) => (
+                            <div key={label} style={{ position: "relative" }}>
+                              <StepButton
+                                active={activeStepResiduos === index}
+                                completed={activeStepResiduos > index}
+                                onClick={() => handleStepClickResiduos(index)}
+                              >
+                                {index + 1}
+                              </StepButton>
+                              <StepLabel active={activeStepResiduos === index}>
+                                {label}
+                              </StepLabel>
+                            </div>
+                          ))}
+                        </StepperWrapper>
+                      </StepperContainer>
+                    
+                  )}
+
+              
+
             <DivFormEixo>
-              <DivFormConteudo>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'
+              || activeForm === 'DrenagemAguasPluviais'
+              || activeForm === "ResiduosSolidos"
+              }>
                 <DivTitulo>
                   <DivTituloConteudo>Ano</DivTituloConteudo>
                 </DivTitulo>
-                <label>Selecione o ano desejado:</label>
-                <select name="ano" id="ano" onChange={(e) => seletcAno(e.target.value)}>
-                  <option >Selecionar</option>
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                  <option value="2023">2023</option>
-                  <option value="2022">2022</option>
-                  <option value="2021">2021</option>
-                  <option value="2020">2020</option>
-                  <option value="2019">2019</option>                  
-                  
-                </select>
+                {anoEditorSimisab ? (
+                    <div
+                      style={{
+                        marginLeft: 40,
+                        fontSize: 18,
+                        fontWeight: "bolder",
+                      }}
+                    >
+                      {anoEditorSimisab}
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                {!anoEditorSimisab && (
+                                    <>
+                                      <label>Selecione o ano desejado:</label>
+                                      <select
+                                        name="ano"
+                                        id="ano"
+                                        onChange={(e) => seletcAno(e.target.value)}
+                                      >
+                                        <option>Selecionar</option>
+                                        {anosSelect().map((ano) => (
+                                          <option value={ano}>{ano}</option>
+                                        ))}
+                                      </select>
+                                    </>
+                                  )}
               </DivFormConteudo>
             </DivFormEixo>
+            
+            
 
+          {activeForm === 'AguaEsgotoSanitario' && (
+          <StepperContainer>
             <DivFormEixo>
-              <DivFormConteudo>
+
+              <StepContent active={activeStep === 0}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>Municípios atendidos</DivTituloConteudo>
                 </DivTitulo>
@@ -319,8 +590,11 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE05A')}
                         defaultValue={dadosGeral?.ge05a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Municipios</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        </InputP></td>
+                      <td>municípios</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE05B</InputSNIS></td>
@@ -328,14 +602,39 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE05B')}
                         defaultValue={dadosGeral?.ge05b}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Municipios</td>
+                        type="text"
+                         onKeyPress={onlyAllowNumber}
+                         ></input></InputP></td>
+                      <td>municípios</td>
                     </tr>
                   </tbody>
                 </table>
+                <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBack}
+                                      disabled={activeStep === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStep === steps.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNext}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStep === 1}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>Sedes e localidades atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -356,7 +655,10 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE008AE')}
                         defaultValue={dadosGeral?.ge008ae}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        </InputP></td>
                       <td>Sede</td>
                     </tr>
                     <tr>
@@ -365,7 +667,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE009')}
                         defaultValue={dadosGeral?.ge009}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Sede</td>
                     </tr>
                     <tr>
@@ -374,7 +678,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE010AE')}
                         defaultValue={dadosGeral?.ge010ae}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Localidades</td>
                     </tr>
                     <tr>
@@ -383,7 +689,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GE011AE')}
                         defaultValue={dadosGeral?.ge011ae}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Localidades</td>
                     </tr>
                     <tr>
@@ -424,63 +732,127 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBack}
+                                      disabled={activeStep === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStep === steps.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNext}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
-                <DivTitulo>
-                  <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
-                </DivTitulo>
-                <table>
-                <tbody>
-                    <tr>
+              <StepContent active={activeStep === 2}>
+                <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
+                  <DivTitulo>
+                    <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
+                  </DivTitulo>
+                  <table>
+                  <tbody>
+                      <tr>
 
-                      <th>Código SNIS</th>
-                      <th>Descrição</th>
-                      <th>Ano {anoSelected}</th>
+                        <th>Código SNIS</th>
+                        <th>Descrição</th>
+                        <th>Ano {anoSelected}</th>
 
-                    </tr>
-                                    
-                    <tr>
-                      <td><InputSNIS>AG026</InputSNIS></td>
-                      <td>População urbana atendida com abastecimento de água</td>
-                      <td><InputP><input {...register('AG026')}
-                        defaultValue={dadosGeral?.ag026}
-                        onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Habitantes</td>
-                    </tr>
-                    <tr>
-                      <td><InputSNIS>AG001</InputSNIS></td>
-                      <td>População total atendida com abastecimento de água</td>
-                      <td><InputP><input {...register('AG001')}
-                        defaultValue={dadosGeral?.ag001}
-                        onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Habitantes</td>
-                    </tr>
-                    <tr>
-                      <td><InputSNIS>ES026</InputSNIS></td>
-                      <td>População urbana atendida com esgotamento sanitário</td>
-                      <td><InputP><input {...register('ES026')}
-                        defaultValue={dadosGeral?.es026}
-                        onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Habitantes</td>
-                    </tr>
-                    <tr>
-                      <td><InputSNIS>ES001</InputSNIS></td>
-                      <td>População total atendida com esgotamento sanitário</td>
-                      <td><InputP><input {...register('ES001')}
-                        defaultValue={dadosGeral?.es001}
-                        onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Habitantes</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </DivFormConteudo>
+                      </tr>
+                                      
+                      <tr>
+                        <td><InputSNIS>AG026</InputSNIS></td>
+                        <td>População urbana atendida com abastecimento de água</td>
+                        <td><InputP><input {...register('AG026')}
+                          defaultValue={dadosGeral?.ag026}
+                          onChange={handleOnChange}
+                          type="text"
+                          onKeyPress={onlyAllowNumber}
+                          ></input></InputP></td>
+                        <td>Habitantes</td>
+                      </tr>
+                      <tr>
+                        <td><InputSNIS>AG001</InputSNIS></td>
+                        <td>População total atendida com abastecimento de água</td>
+                        <td><InputP><input {...register('AG001',
+                          {required: "Campo obrigatório"}
+                        )}
+                          defaultValue={dadosGeral?.ag001}
+                          onChange={handleOnChange}
+                          type="text"
+                          onKeyPress={onlyAllowNumber}
+                          ></input>
+                          {errors.AG001 && (
+                          <span style={{color: "red"}}>{errors.AG001.message}</span>
+                        )}</InputP></td>
+                        <td>Habitantes</td>
+                      </tr>
+                      <tr>
+                        <td><InputSNIS>ES026</InputSNIS></td>
+                        <td>População urbana atendida com esgotamento sanitário</td>
+                        <td><InputP><input {...register('ES026')}
+                          defaultValue={dadosGeral?.es026}
+                          onChange={handleOnChange}
+                          type="text"
+                          onKeyPress={onlyAllowNumber}
+                          ></input></InputP></td>
+                        <td>Habitantes</td>
+                      </tr>
+                      <tr>
+                        <td><InputSNIS>ES001</InputSNIS></td>
+                        <td>População total atendida com esgotamento sanitário</td>
+                        <td><InputP><input {...register('ES001',
+                          {required: "Campo obrigatório"}
+                        )}
+                          defaultValue={dadosGeral?.es001}
+                          onChange={handleOnChange}
+                          type="text"
+                          onKeyPress={onlyAllowNumber}
+                          ></input>
+                          {errors.ES001 && (
+                          <span style={{color: "red"}}>{errors.ES001.message}</span>
+                        )}</InputP></td>
+                        <td>Habitantes</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <StepperNavigation>
+                                      <StepperButton
+                                        type="button"
+                                        secondary
+                                        onClick={handleBack}
+                                        disabled={activeStep === 0}
+                                      >
+                                        Voltar
+                                      </StepperButton>
+                                      {activeStep === steps.length - 1 ? (
+                                              isEditor && (
+                                                <StepperButton type="submit">
+                                                  Gravar
+                                                </StepperButton>
+                                              )
+                                            ) : (
+                                              <StepperButton type="button" onClick={handleNext}>
+                                                Próximo
+                                              </StepperButton>
+                                            )}
+                                          </StepperNavigation>
+                </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStep === 3}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>População existente</DivTituloConteudo>
                 </DivTitulo>
@@ -500,7 +872,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GD06A')}
                         defaultValue={dadosGeral?.gd06a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
@@ -509,32 +883,71 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('GD06B')}
                         defaultValue={dadosGeral?.gd06b}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GD12A</InputSNIS></td>
                       <td>População total residente no(s) município(s) com abastecimento de água (Fonte: IBGE)</td>
-                      <td><InputP><input {...register('GD12A')}
+                      <td><InputP><input {...register('GD12A',
+                        {required: "Campo obrigatório"}
+                      )}
                         defaultValue={dadosGeral?.gd12a}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        {errors.GD12A && (
+                          <span style={{color: "red"}}>{errors.GD12A.message}</span>
+                        )}</InputP></td>
                       <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GD12B</InputSNIS></td>
                       <td>População total residente no(s) município(s) com esgotamento sanitário (Fonte: IBGE)</td>
-                      <td><InputP><input {...register('GD12B')}
-                        defaultValue={dadosGeral?.gd12a}
+                      <td><InputP><input {...register('GD12B',
+                        {required: "Campo obrigatório"}
+                      )}
+                        defaultValue={dadosGeral?.gd12b}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        {errors.GD12B && (
+                          <span style={{color: "red"}}>{errors.GD12B.message}</span>
+                        )}</InputP></td>
                       <td>Habitantes</td>
                     </tr>
                   </tbody>
                 </table>
+                <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBack}
+                                      disabled={activeStep === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStep === steps.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNext}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStep === 4}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -550,19 +963,55 @@ export default function Geral({ municipio }: MunicipioProps) {
                   
                     <tr>
                       <td><InputSNIS>FN026</InputSNIS></td>
-                      <td>Quantidade de empregados próprios</td>
+                      <td>
+                        Quantidade de empregados próprios
+                        <Actions style={{ marginLeft: '2px', verticalAlign: 'middle', width: '30px', height: '30px',
+                          display: 'inline-flex', alignItems: 'center',
+                          justifyContent: 'center' }}>
+                          <Tooltip>
+                            <Image
+                              src={ajuda}
+                              alt="Ajuda"
+                              width={15}
+                              height={15}
+                              style={{ cursor: "pointer" }}
+                            />
+                            <TooltipText>
+                              Inclua todos os empregados.
+                            </TooltipText>
+                          </Tooltip>
+                        </Actions>
+                      </td>
                       <td><InputP><input {...register('FN026')}
                         defaultValue={dadosGeral?.fn026}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></InputP></td>
                       <td>Empregados</td>
                     </tr>
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBack}
+                                      disabled={activeStep === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                  
+                                            <StepperButton type="button" onClick={handleNext}>
+                                              Próximo
+                                            </StepperButton>
+      
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-
-              <DivFormConteudo>
+              <StepContent active={activeStep === 5}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações, esclarecimentos ou sugestões</DivTituloConteudo>
                 </DivTitulo>
@@ -588,11 +1037,35 @@ export default function Geral({ municipio }: MunicipioProps) {
                   </tbody>
                 </table>
             
+             <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBack}
+                                      disabled={activeStep === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    <StepperButton
+                                      type="button"
+                                      onClick={() => {
+                                        setActiveForm('DrenagemAguasPluviais');
+                                        setActiveStepDrenagem(0);
+                                      }}
+                                    >
+                                      Próximo
+                                    </StepperButton>
+                                        </StepperNavigation>
               </DivFormConteudo>
-            </DivFormEixo>
+              </StepContent>
 
-            <DivFormEixo>
-              <DivFormConteudo>
+            </DivFormEixo>
+              </StepperContainer>
+            )}     
+
+              <DivFormEixo>
+              <StepContent active={activeStepDrenagem === 0}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Geografia e urbanismo</DivTituloConteudo>
                 </DivTitulo>
@@ -607,43 +1080,71 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>                  
                     <tr>
                       <td><InputSNIS>GE001</InputSNIS></td>
-                      <td>Área territorial total do município (Fonte IBGE) </td>
-                      <td><InputP><input {...register('GE001')}
+                      <td>Área territorial total do município (Fonte: IBGE) </td>
+                      <td><InputP><input {...register('GE001',
+                    {required: "Campo obrigatório"}  
+                    )}
                         defaultValue={dadosGeral?.ge001}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        {errors.GE001 && (
+                          <span style={{color: "red"}}>{errors.GE001.message}</span>
+                        )}</InputP></td>
                       <td>km²</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE002</InputSNIS></td>
                       <td>Área urbana total, incluido áreas urbanas isoladas </td>
-                      <td><InputP><input {...register('GE002')}
+                      <td><InputP><input {...register('GE002',
+                        {required: "Campo obrigatório"}
+                      )}
                         defaultValue={dadosGeral?.ge002}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        {errors.GE002 && (
+                          <span style={{color: "red"}}>{errors.GE002.message}</span>
+                        )}</InputP></td>
                       <td>km²</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE007</InputSNIS></td>
                       <td>Quantidade total de imóveis existentes na área urbana do município </td>
-                      <td><InputP><input {...register('GE007')}
+                      <td><InputP><input {...register('GE007',
+                        {required: "Campo obrigatório"}
+                      )}
                         defaultValue={dadosGeral?.ge007}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        {errors.GE007 && (
+                          <span style={{color: "red"}}>{errors.GE007.message}</span>
+                        )}</InputP></td>
                       <td>Imóveis</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE008</InputSNIS></td>
-                      <td>Quantidade total de domicilios urbanos existentes no município </td>
-                      <td><InputP><input {...register('GE008DA')}
+                      <td>Quantidade total de domicílios urbanos existentes no município </td>
+                      <td><InputP><input {...register('GE008DA',
+                        {required: "Campo obrigatório"}
+                      )}
                         defaultValue={dadosGeral?.ge008da}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input>
+                        {errors.GE008DA && (
+                          <span style={{color: "red"}}>{errors.GE008DA.message}</span>
+                        )}</InputP></td>
                       <td>Domicílios</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE016</InputSNIS></td>
-                      <td>Município Crítico (Fonte: CPRM) </td>
+                      <td>Município crítico em sanemento básico (Fonte: CPRM) </td>
                       <td><InputP><select {...register('GE016')}
                         defaultValue={dadosGeral?.ge016}
                         onChange={handleOnChange} >
@@ -655,10 +1156,32 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+                <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepDrenagem === stepsDrenagem.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextDrenagem}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-
-              <DivFormConteudo>
+              <StepContent active={activeStepDrenagem === 1}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Dados hidrográficos</DivTituloConteudo>
                 </DivTitulo>
@@ -672,14 +1195,14 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td><InputSNIS>GE010</InputSNIS></td>
-                      <td>Região Hidrográfica em que se encontra o município (Fonte:ANA)</td>
+                      <td>Região hidrográfica em que se encontra o município (Fonte: ANA)</td>
                       <td><InputP><input {...register('GE010')}
                         defaultValue={dadosGeral?.ge010}
                         onChange={handleOnChange}></input></InputP></td>
                     </tr>
                     <tr>
                       <td><InputSNIS>GE011</InputSNIS></td>
-                      <td>Nome da(s) bacia(s) hidrografica(s) a que pertence o município (Fonte: ANA) </td>
+                      <td>Nome da(s) bacia(s) hidrográfica(s) a que pertence o município (Fonte: ANA) </td>
                       <td>
                         <input {...register('GE011')} type="text"
                           defaultValue={dadosGeral?.ge011}
@@ -688,7 +1211,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td><InputSNIS>GE012</InputSNIS></td>
-                      <td>Existe Comitê de Bacia ou Sob-bacia Hidrográfica organizada?</td>
+                      <td>Existe comitê de bacia ou sub-bacia hidrográfica organizada?</td>
                       <td><InputP><select {...register('GE012')} >
                         <option value="">{dadosGeral?.ge012 ? dadosGeral?.ge012 : 'Opções'}</option>
                         <option value="Sim">Sim</option>
@@ -698,9 +1221,32 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                   </tbody>
                 </table>
+                <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepDrenagem === stepsDrenagem.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextDrenagem}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepDrenagem === 2}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -736,17 +1282,46 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <tr>
                       <td><InputSNIS>AD004</InputSNIS></td>
                       <td>Quantidade total de pessoal alocado </td>
-                      <td><InputP><input {...register('AD004')}
+                      <td><InputP><input {...register('AD004',
+                        {required: "Campo obrigatório"}
+                      )}
                         defaultValue={dadosGeral?.ad004}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"></input>
+                        {errors.AD004 && (
+                          <span style={{color: "red"}}>{errors.AD004.message}</span>
+                        )}
+                        </InputP></td>
                       <td>Pessoas</td>
                     </tr>
                   </tbody>
                 </table>
+                <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepDrenagem === stepsDrenagem.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextDrenagem}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepDrenagem === 3}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Infraestrutura</DivTituloConteudo>
                 </DivTitulo>
@@ -814,7 +1389,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                         defaultValue={dadosGeral?.ie016}
                         onChange={handleOnChange}
                       >
-                        <option value="Unitário(misto com esgotamento sanitário)">Unitário(misto com esgotamento sanitário)</option>
+                        <option value="Unitário(misto com esgotamento sanitário)">Unitário (misto com esgotamento sanitário)</option>
                         <option value="Exclusivo para drenagem">Exclusivo para drenagem</option>
                         <option value="Não existe">Não existe</option>
                         <option value="Outro">Outro</option>
@@ -831,9 +1406,32 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+                <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepDrenagem === stepsDrenagem.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextDrenagem}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepDrenagem === 4}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Operacional</DivTituloConteudo>
                 </DivTitulo>
@@ -882,9 +1480,32 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepDrenagem === stepsDrenagem.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextDrenagem}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepDrenagem === 5}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Gestão de risco</DivTituloConteudo>
                 </DivTitulo>
@@ -907,7 +1528,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                             defaultChecked={dadosGeral?.ri001_1}
                             type="checkbox"
                             name="RI001_1" />
-                            <span>Não há instituições relacionadas com à gestão de riscos ou respostas a desastres</span></CheckBox>
+                            <span>Não há instituições relacionadas com a gestão de riscos ou respostas a desastres</span></CheckBox>
                           <CheckBox><input {...register('RI001_2')}
                             defaultChecked={dadosGeral?.ri001_2}
                             type="checkbox" />
@@ -945,7 +1566,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                           <CheckBox><input {...register('RI002_3')}
                             defaultChecked={dadosGeral?.ri002_3}
                             type="checkbox" />
-                            <span>Retificações de cursos de água naturais</span></CheckBox>
+                            <span>Retificações de cursos d'água naturais</span></CheckBox>
                         </DivChekbox>
                       </td>
 
@@ -961,7 +1582,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                     <tr>
                       <td><InputSNIS>RI003</InputSNIS></td>
-                      <td>Instrumento de controle e monitoramento hidrlólicos existentes</td>
+                      <td>Instrumento de controle e monitoramento hidrológicos existentes</td>
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI003_1')}
@@ -990,21 +1611,21 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                     <tr>
                       <td><InputSNIS>RI004</InputSNIS></td>
-                      <td>Dados hidrolólicos monitorados e metodologia de monitoramento</td>
+                      <td>Dados hidrológicos monitorados e metodologia de monitoramento</td>
                       <td>
                         <DivChekbox>
                           <CheckBox><input {...register('RI004_1')}
                             defaultChecked={dadosGeral?.ri004_1}
                             type="checkbox" />
-                            <span>Quantidade chuva por registro auto..</span></CheckBox>
+                            <span>Quantidade de chuva por registro auto..</span></CheckBox>
                           <CheckBox><input {...register('RI004_2')}
                             defaultChecked={dadosGeral?.ri004_2}
                             type="checkbox" />
-                            <span>Quantidade chuva por frequência diária</span></CheckBox>
+                            <span>Quantidade de chuva por frequência diária</span></CheckBox>
                           <CheckBox><input {...register('RI004_3')}
                             defaultChecked={dadosGeral?.ri004_3}
                             type="checkbox" />
-                            <span>Quantidade chuva por frequência hora..</span></CheckBox>
+                            <span>Quantidade de chuva por frequência hora..</span></CheckBox>
                         </DivChekbox>
                       </td>
                     </tr>
@@ -1019,7 +1640,7 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                     <tr>
                       <td><InputSNIS>RI005</InputSNIS></td>
-                      <td>Existem sistemas de alerta de riscos hidrológicos(alagamentos, enxurradas, inundaçoẽs)? </td>
+                      <td>Existem sistemas de alerta de riscos hidrológicos (alagamentos, enxurradas, inundaçoẽs)? </td>
                       <td><InputP><select {...register('RI005')}
                         defaultValue={dadosGeral?.ri005}
                         onChange={handleOnChange}
@@ -1045,7 +1666,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                     <tr>
                       <td><InputSNIS>RI009</InputSNIS></td>
-                      <td>Existe mapeamento de áreas de risco de inundações dos cursos de água urbana? </td>
+                      <td>Existe mapeamento de áreas de risco de inundações dos cursos d'água urbana? </td>
                       <td><InputP><select {...register('RI009')}
                         defaultValue={dadosGeral?.ri009}
                         onChange={handleOnChange}
@@ -1064,7 +1685,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                       >
                         <option > {(dadosGeral?.ri010 == 1) ? "Integral" : "Parcial"}  </option>
                         <option value="1">Integral </option>
-                        <option value="0">Parcial</option>
+                        {/* <option value="0">Parcial</option> */}
                       </select></InputP></td>
                     </tr>
                     <tr>
@@ -1096,7 +1717,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                           {...register('RI012')}
                           defaultValue={dadosGeral?.ri012}
                           onChange={handleOnChange}
-                          type="text">
+                          type="text"
+                          onKeyPress={onlyAllowNumber}
+                          >
                         </input>
                       </td>
 
@@ -1108,15 +1731,34 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td colSpan={4}><input {...register('RI013')}
                         defaultValue={dadosGeral?.ri013}
                         onChange={handleOnChange}
-                        type="text"></input></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}
+                        ></input></td>
                       <td>Domicílios</td>
                     </tr>
 
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    
+                                            <StepperButton type="button" onClick={handleNextDrenagem}>
+                                              Próximo
+                                            </StepperButton>
+                         
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepDrenagem === 6}>
+              <DivFormConteudo active={activeForm === 'DrenagemAguasPluviais'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
@@ -1140,15 +1782,34 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackDrenagem}
+                                      disabled={activeStepDrenagem === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    <StepperButton
+                                      type="button"
+                                      onClick={() => {
+                                        setActiveForm('ResiduosSolidos');
+                                        setActiveStepResiduos(0);
+                                      }}
+                                    >
+                                      Próximo
+                                    </StepperButton>
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
+              </DivFormEixo>
 
-            </DivFormEixo>
-
-
-            <DivFormEixo>
-              
-              <DivFormConteudo>
+              <DivFormEixo style={{marginTop: '-41px'}}>
+              <StepContent active={activeStepResiduos === 0}>
+                
+              <DivFormConteudo active={activeForm === "ResiduosSolidos"}>
                 <DivTitulo>
                   <DivTituloConteudo>Informações gerais</DivTituloConteudo>
                 </DivTitulo>
@@ -1183,9 +1844,32 @@ export default function Geral({ municipio }: MunicipioProps) {
 
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackResiduos}
+                                      disabled={activeStepResiduos === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepResiduos === stepsResiduos.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextResiduos}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepResiduos === 1}>
+              <DivFormConteudo active={activeForm === "ResiduosSolidos"}>
                 <DivTitulo>
                   <DivTituloConteudo>Concesionárias</DivTituloConteudo>
                 </DivTitulo>
@@ -1221,10 +1905,11 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+                
                 <Tabela>
                   <table cellSpacing={0} >
                   <tbody >
-                      <tr>
+                      <tr> 
                         <th>Concessionária</th>
                         <th>Ano de inicio</th>
                         <th>Duração(em anos)</th>
@@ -1269,9 +1954,33 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tbody>
                   </table>
                   </Tabela>
+                  
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackResiduos}
+                                      disabled={activeStepResiduos === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepResiduos === stepsResiduos.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextResiduos}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepResiduos === 2}>
+              <DivFormConteudo active={activeForm === "ResiduosSolidos"}>
                 <DivTitulo>
                   <DivTituloConteudo>População atendida</DivTituloConteudo>
                 </DivTitulo>
@@ -1288,11 +1997,18 @@ export default function Geral({ municipio }: MunicipioProps) {
                     <tr>
                       <td><InputSNIS>CO164</InputSNIS></td>
                       <td>População total atendida no município</td>
-                      <td><InputP><input {...register('CO164')}
+                      <td><InputP><input {...register('CO164',
+                        {required: "Campo obrigatório"}
+                      )}
                         defaultValue={dadosGeral?.co164}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input>
+                        {errors.CO164 && (
+                          <span style={{color: 'red'}}>{errors.CO164.message}</span>
+                        )}
+                        </InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO050</InputSNIS></td>
@@ -1300,8 +2016,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO050')}
                         defaultValue={dadosGeral?.co050}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO165</InputSNIS></td>
@@ -1309,8 +2026,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO165')}
                         defaultValue={dadosGeral?.co165}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO147</InputSNIS></td>
@@ -1318,8 +2036,9 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO147')}
                         defaultValue={dadosGeral?.co147}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>Habitantes</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO134</InputSNIS></td>
@@ -1327,7 +2046,8 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO134')}
                         defaultValue={dadosGeral?.co134}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>%</td>
                     </tr>
                     <tr>
@@ -1336,16 +2056,18 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CO135')}
                         defaultValue={dadosGeral?.co135}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>%</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO136</InputSNIS></td>
-                      <td>Percentual da população atendida com frequência de 1 veze por semana </td>
+                      <td>Percentual da população atendida com frequência de 1 vezes por semana </td>
                       <td><InputP><input {...register('CO136')}
                         defaultValue={dadosGeral?.co136}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>%</td>
                     </tr>
                     <tr>
@@ -1354,14 +2076,38 @@ export default function Geral({ municipio }: MunicipioProps) {
                       <td><InputP><input {...register('CS050')}
                         defaultValue={dadosGeral?.cs050}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
-                      <td>Pessoas</td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
+                      <td>%</td>
                     </tr>
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackResiduos}
+                                      disabled={activeStepResiduos === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepResiduos === stepsResiduos.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextResiduos}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepResiduos === 3}>
+              <DivFormConteudo active={activeForm === "ResiduosSolidos"}>
                 <DivTitulo>
                   <DivTituloConteudo>Valor contratual</DivTituloConteudo>
                 </DivTitulo>
@@ -1378,28 +2124,48 @@ export default function Geral({ municipio }: MunicipioProps) {
                   
                     <tr>
                       <td><InputSNIS>CO162</InputSNIS></td>
-                      <td>Valor contratual (Preço unitario) do serviço de aterramento de RDO e RDU</td>
+                      <td>Valor contratual (Preço unitário) do serviço de aterramento de RDO e RDU</td>
                       <td><InputP><input {...register('CO162')}
                         defaultValue={dadosGeral?.co162}
                         onChange={handleOnChange}
-                        type="text"></input></InputP></td>
+                        type="text"
+                        onKeyPress={onlyAllowNumber}></input></InputP></td>
                       <td>R$/Toneladas</td>
                     </tr>
                     <tr>
                       <td><InputSNIS>CO178</InputSNIS></td>
-                      <td>Valor contratual (Preço unitario) do serviço de coleta e transporte e destinação final de RDO e RPU</td>
+                      <td>Valor contratual (Preço unitário) do serviço de coleta e transporte e destinação final de RDO e RPU</td>
                       <td><InputP><input {...register('CO178')}
                         defaultValue={dadosGeral?.co178}
                         onChange={handleOnChange}
+                        onKeyPress={onlyAllowNumber}
                       ></input></InputP></td>
                       <td>R$/Toneladas</td>
                     </tr>
 
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackResiduos}
+                                      disabled={activeStepResiduos === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    
+                                            <StepperButton type="button" onClick={handleNextResiduos}>
+                                              Próximo
+                                            </StepperButton>
+                                        
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-              <DivFormConteudo>
+              <StepContent active={activeStepResiduos === 4}>
+              <DivFormConteudo active={activeForm === "ResiduosSolidos"}>
+
                 <DivTitulo>
                   <DivTituloConteudo>Observações</DivTituloConteudo>
                 </DivTitulo>
@@ -1422,32 +2188,52 @@ export default function Geral({ municipio }: MunicipioProps) {
                     </tr>
                   </tbody>
                 </table>
+              <StepperNavigation>
+                                    <StepperButton
+                                      type="button"
+                                      secondary
+                                      onClick={handleBackResiduos}
+                                      disabled={activeStepResiduos === 0}
+                                    >
+                                      Voltar
+                                    </StepperButton>
+                                    {activeStepResiduos === stepsResiduos.length - 1 ? (
+                                            isEditor && (
+                                              <StepperButton type="submit">
+                                                Gravar
+                                              </StepperButton>
+                                            )
+                                          ) : (
+                                            <StepperButton type="button" onClick={handleNextResiduos}>
+                                              Próximo
+                                            </StepperButton>
+                                          )}
+                                        </StepperNavigation>
               </DivFormConteudo>
+              </StepContent>
 
-
-            </DivFormEixo>
-
+              {/* {isEditor &&  <SubmitButton type="submit">Gravar</SubmitButton>} */}
+              </DivFormEixo>
+              
 
           </DivForm>
-
-          {usuario?.id_permissao !== 4 &&  <SubmitButton type="submit">Gravar</SubmitButton>}
         </Form>
       </DivCenter>
 
       {modalAddConssionaria && (
         <ContainerModal>
-          <ModalForm>
+          <ModalForm   style={{overflowX:"hidden"}}>
             <DivFormResiduo>
               <DivTituloFormResiduo>Edição de cadastro de Concessionária</DivTituloFormResiduo>
-              <Form onSubmit={handleSubmit(handleCadastroConcessionaria)}>
-                <CloseModalButton
+              <Form onSubmit={handleSubmitConcessionaria(handleCadastroConcessionaria)}>
+                <CloseModalButton style={{'top': '11px'}}
                   onClick={() => {
                     handleCloseModalAddConcesionaria();
                   }}
                 >
-                  Fechar
+                  X
                 </CloseModalButton>
-                <DivFormConteudo>
+                <DivFormConteudo style={{'marginLeft': '-20px' }} active={activeForm === "ResiduosSolidos"}>
                   <DivTituloConteudo>Dados cadastrais</DivTituloConteudo>
                   <TabelaModal>
                     <table>
@@ -1461,12 +2247,13 @@ export default function Geral({ municipio }: MunicipioProps) {
                         </tr>
                       </thead>
                       <tbody> 
-                        <input type="hidden" {...register('id_concessionaria')} defaultValue={dadosConcessionaria?.id_concessionaria}></input>
+                        <input type="hidden" {...registerConcessionaria('id_concessionaria')} defaultValue={dadosConcessionaria?.id_concessionaria}></input>
                         <tr>
 
                           <td><InputGG>CNPJ da Concessionária</InputGG></td>
-                          <td><InputP><input 
-                            {...register('cnpj')}
+                          <td><InputP>
+                          <input 
+                            {...registerConcessionaria('cnpj')}
                             defaultValue={dadosConcessionaria?.cnpj}
                             type="text"
                             onChange={handleOnChange}
@@ -1475,28 +2262,28 @@ export default function Geral({ municipio }: MunicipioProps) {
                         <tr>
 
                           <td><InputGG>Razão Social Concessionária</InputGG></td>
-                          <td><InputP><input {...register('razao_social')}
+                          <td><InputP><input {...registerConcessionaria('razao_social')}
                             defaultValue={dadosConcessionaria?.razao_social}
                             onChange={handleOnChange}
                           ></input></InputP></td>
                         </tr>
                         <tr>
                           <td><InputGG>Ano de inicio</InputGG></td>
-                          <td><InputP><input {...register('ano_inicio')}
+                          <td><InputP><input {...registerConcessionaria('ano_inicio')}
                             defaultValue={dadosConcessionaria?.ano_inicio}
                             onChange={handleOnChange}
                           ></input></InputP></td>
                         </tr>
                         <tr>
                           <td><InputGG>Duração(em anos)</InputGG></td>
-                          <td><InputP><input {...register('duracao')}
+                          <td><InputP><input {...registerConcessionaria('duracao')}
                             defaultValue={dadosConcessionaria?.duracao}
                             onChange={handleOnChange}
                           ></input></InputP></td>
                         </tr>
                         <tr>
                           <td><InputGG>Vigente?</InputGG></td>
-                          <td><InputP><select {...register('vigente')}
+                          <td><InputP><select {...registerConcessionaria('vigente')}
                             defaultValue={dadosConcessionaria?.vigente}
                             onChange={handleOnChange}
                           >
@@ -1509,67 +2296,67 @@ export default function Geral({ municipio }: MunicipioProps) {
                           <td>Serviços concedidos</td>
                           <td>
                             <DivChekbox>
-                              <CheckBox><input {...register('capina_e_rocada')}
+                              <CheckBox><input {...registerConcessionaria('capina_e_rocada')}
                                 defaultChecked={dadosConcessionaria?.capina_e_rocada}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Capina e roçada</span></CheckBox>
-                              <CheckBox><input {...register('coleta_res_construcao_civil')}
+                              <CheckBox><input {...registerConcessionaria('coleta_res_construcao_civil')}
                                 defaultChecked={dadosConcessionaria?.coleta_res_construcao_civil}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. contrucão civil</span></CheckBox>
-                              <CheckBox><input {...register('coteta_res_domiciliar')}
+                              <CheckBox><input {...registerConcessionaria('coteta_res_domiciliar')}
                                 defaultChecked={dadosConcessionaria?.coteta_res_domiciliar}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. Domiciliar</span></CheckBox>
-                              <CheckBox><input {...register('coleta_res_servicos_saude')}
+                              <CheckBox><input {...registerConcessionaria('coleta_res_servicos_saude')}
                                 defaultChecked={dadosConcessionaria?.coleta_res_servicos_saude}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. dos Serviços da Saúde</span></CheckBox>
-                              <CheckBox><input {...register('coleta_res_publico')}
+                              <CheckBox><input {...registerConcessionaria('coleta_res_publico')}
                                 defaultChecked={dadosConcessionaria?.coleta_res_publico}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Coleta de res. Público</span></CheckBox>
-                              <CheckBox><input {...register('operacao_aterro_sanitario')}
+                              <CheckBox><input {...registerConcessionaria('operacao_aterro_sanitario')}
                                 defaultChecked={dadosConcessionaria?.operacao_aterro_sanitario}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de aterro sanitário</span></CheckBox>
-                              <CheckBox><input {...register('operacao_incinerador')}
+                              <CheckBox><input {...registerConcessionaria('operacao_incinerador')}
                                 defaultChecked={dadosConcessionaria?.operacao_incinerador}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de incinerador</span></CheckBox>
-                              <CheckBox><input {...register('operacao_outras_unidades_processamento')}
+                              <CheckBox><input {...registerConcessionaria('operacao_outras_unidades_processamento')}
                                 defaultChecked={dadosConcessionaria?.operacao_outras_unidades_processamento}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de outras unidades de processamento</span></CheckBox>
-                              <CheckBox><input {...register('operacao_unidade_compostagem')}
+                              <CheckBox><input {...registerConcessionaria('operacao_unidade_compostagem')}
                                 defaultChecked={dadosConcessionaria?.operacao_unidade_compostagem}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de unidade de compostagem</span></CheckBox>
-                              <CheckBox><input {...register('operacao_triagem')}
+                              <CheckBox><input {...registerConcessionaria('operacao_triagem')}
                                 defaultChecked={dadosConcessionaria?.operacao_triagem}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Operação de triagem</span></CheckBox>
-                              <CheckBox><input {...register('outros')}
+                              <CheckBox><input {...registerConcessionaria('outros')}
                                 defaultChecked={dadosConcessionaria?.outros}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Outros</span></CheckBox>
-                              <CheckBox><input {...register('tipo_desconhecido')}
+                              <CheckBox><input {...registerConcessionaria('tipo_desconhecido')}
                                 defaultChecked={dadosConcessionaria?.tipo_desconhecido}
                                 onChange={handleOnChange}
                                 type="checkbox" />
                                 <span>Tipo desconhecido</span></CheckBox>
-                              <CheckBox><input {...register('varricao_logradouros_publicos')}
+                              <CheckBox><input {...registerConcessionaria('varricao_logradouros_publicos')}
                                 defaultChecked={dadosConcessionaria?.varricao_logradouros_publicos}
                                 onChange={handleOnChange}
                                 type="checkbox" />
@@ -1579,7 +2366,7 @@ export default function Geral({ municipio }: MunicipioProps) {
                         </tr>
                         <tr>
                           <td><InputGG>Unidade relacionada</InputGG></td>
-                          <td><InputP><select {...register('unidade_relacionada')}
+                          <td><InputP><select {...registerConcessionaria('unidade_relacionada')}
                             defaultValue={dadosConcessionaria?.unidade_relacionada}
                             onChange={handleOnChange}>
                             <option >Opcões</option>
@@ -1591,13 +2378,19 @@ export default function Geral({ municipio }: MunicipioProps) {
                       </tbody>
                     </table>
                   </TabelaModal>
+                
                 </DivFormConteudo>
-                <SubmitButton type="submit">Gravar</SubmitButton>
+                <SubmitButton
+                style={{'position' : 'relative', 'left': '-35px','top': '35px'}}
+                type="submit">Gravar</SubmitButton>
               </Form>
             </DivFormResiduo>
           </ModalForm>
+       
         </ContainerModal>
+        
       )}
+      </MainContent>
     </Container>
   );
 }
@@ -1635,4 +2428,3 @@ export default function Geral({ municipio }: MunicipioProps) {
 //     },
 //   };
 // };
-

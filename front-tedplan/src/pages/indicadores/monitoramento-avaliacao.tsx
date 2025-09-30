@@ -7,6 +7,7 @@ import {
   BaixarRelatorio,
   TituloRelatorios,
 } from "../../styles/indicadores";
+import { BreadCrumbStyle } from "../../styles/indicadores";
 import Image from "next/image";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -26,6 +27,8 @@ import Cadastro from "../../img/icone_cadastro.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { useMunicipio } from "@/contexts/MunicipioContext";
 import { get } from "http";
+import { log } from "console";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -59,11 +62,13 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [dadosEsgoto, setDadosEsgoto] = useState(null);
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [dadosResiduosColeta, setDadosResiduosColeta] = useState(null);
+  const [residuosUnidadesProcessamento, setResiduosUnidadesProcessamento] = useState(null);
+  const [residuosRecebidos, setResiduosRecebidos] = useState(null);
   const [unidadesRsc, setDadosUnidadesRsc] = useState(null);
   const [unidadesRss, setDadosUnidadesRss] = useState(null);
   const [associacoes, setAssociacoes] = useState(null);
   const [anoSelected, setAnoSelected] = useState(null);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [ listPoliticas, setPoliticas] = useState(null)
   const [ listPlanos, setPlanos] = useState(null)
   const [ listParticipacoes, setListParticipacoes]= useState(null)
@@ -81,6 +86,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
     getDadosEsgoto()
     getDadosDrenagem()
     getDadosResiduosColeta()
+    getResiduosUnidadesProcessamento();
+    getResiduosRecebidos();
 
     getPoliticas();
     getPlanos();
@@ -158,15 +165,36 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   async function getDadosResiduosColeta() {  
     const id_municipio = usuario?.id_municipio
     const ano = new Date().getFullYear(); // Pega o ano atual 
-    const res = await api
-      .post("get-ps-residuos-coleta-por-ano", {id_municipio: id_municipio, ano: ano})
+    
+    const res = await api.post("get-ps-residuos-coleta-por-ano", {id_municipio: id_municipio, ano: ano})
       .then((response) => {        
         return response.data;
       })
       .catch((error) => {
         console.log(error);
+      });      
+      setDadosResiduosColeta(res[0])
+  }
+    async function getResiduosUnidadesProcessamento() {  
+    const id_municipio = usuario?.id_municipio
+    const ano = new Date().getFullYear(); // Pega o ano atual 
+    
+    const res = await api.post("get-residuos-unidades-processamento", {id_municipio: id_municipio, ano: ano})
+      .then((response) => {        
+        return response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+      });      
+      setResiduosUnidadesProcessamento(res)
+  }
+
+   async function getResiduosRecebidos() {    
+    const res = await api
+      .post("list-residuos-recebidos", { ano: new Date().getFullYear() })
+      .then((response) => {
+        setResiduosRecebidos(response.data);
       });
-      setDadosResiduosColeta(res.data)
   }
 
 
@@ -303,10 +331,22 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <div style={{marginTop:"50px"}}>
-
-      </div>
+      
       <DivCenter>
+        <BreadCrumbStyle isCollapsed={isCollapsed}>
+                <nav>
+                  <ol>
+                    <li>
+                      <Link href="/indicadores/home_indicadores">Home</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <span>Monitoramento e Avaliação</span>
+                    </li>
+                  </ol>
+                </nav>
+        </BreadCrumbStyle>
+        
         <DivForm>
           <DivTituloForm>Relatórios Atuais</DivTituloForm>
             
@@ -335,7 +375,8 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
           </TituloRelatorios>
           <Image src={PrestacaoServicos} alt='Prestação de Serviços' />
           <BaixarRelatorio onClick={()=>prestacaoServicos(dadosGeral,
-             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem, dadosResiduosColeta)}>Baixar</BaixarRelatorio>
+             concessionarias, financeiro, dadosAgua, dadosEsgoto, dadosDrenagem, dadosResiduosColeta,
+              residuosUnidadesProcessamento, residuosRecebidos)}>Baixar</BaixarRelatorio>
         </DivColRelatorios>
         
         </DivRelatorios>

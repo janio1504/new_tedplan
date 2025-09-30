@@ -21,6 +21,7 @@ import {
   Ps3ImageEsquerda,
   Ps3ImageDireita,
   TitlePsOnMouse,
+  BreadCrumbStyle,
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -30,17 +31,15 @@ import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
-import Geral from "../../img/geral.png"
-import Financeiro from "../../img/financeiro.png"
 import Agua from "../../img/agua.png"
 import Drenagem from "../../img/drenagem.png"
 import Esgoto from "../../img/esgoto.png"
+import Modelo from "../../img/modelo_home_prestacao_servicoes.png"
 import Residuos from "../../img/residuos.png"
-import Qualidade from "../../img/qualidade.png"
-import Balanco from "../../img/balanco.png"
-import Tarifas from "../../img/tarifas.png"
+import Institucional from "../../img/user_mun.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
-import { set } from "react-hook-form";
+import Link from "next/link";
+import { styled } from "styled-components";
 
 interface IMunicipio {
   id_municipio: string;
@@ -61,25 +60,24 @@ interface MunicipioProps {
   Imunicipio: IMunicipio[];
 }
 
-
-
-export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
+export default function PrestacaoServicos({ Imunicipio }: MunicipioProps) {
   const { usuario, signOut, isAuthenticated } = useContext(AuthContext);
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false)
   
-  useEffect(() => {
-    getMunicipio()  
-  
-  }, [municipio]);
+useEffect(() => {
+    if (usuario?.id_municipio) {
+      getMunicipio();
+    }
+  }, [usuario]);
 
   async function getMunicipio(){
     const res = await api.get("getMunicipio", {
       params: { id_municipio: usuario.id_municipio },
     }).then(response =>{
-      setMunicipio(response.data[0])
+      setMunicipio(response.data)
       return response.data;
     })
- 
   }
 
   async function handleSignOut() {
@@ -98,31 +96,22 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
     Router.push("/indicadores/financeiro-municipio");
   }
   async function handleAgua() {
-    Router.push("/indicadores/agua-indicadores");
+    Router.push("/indicadores/prestacao-servico-agua");
   }
   async function handleEsgoto() {
-    Router.push("/indicadores/esgoto-indicadores");
+    Router.push("/indicadores/prestacao-servico-esgoto");
   }
   async function handleDrenagem() {
-    Router.push("/indicadores/drenagem-indicadores");
+    Router.push("/indicadores/prestacao-servico-drenagem");
   }
   async function handleResiduosColeta() {
     Router.push("/indicadores/residuos-indicadores-coleta");
   }
   async function handleResiduosUnidade() {
-    Router.push("/indicadores/residuos-indicadores-unidade");
+    Router.push("/indicadores/prestacao-servico-residuos");
   }
-  async function handleBalanco() {
-    Router.push("/indicadores/balanco");
-  }
-  async function handleQualidade() {
-    Router.push("/indicadores/qualidade");
-  }
-  async function handleGeral() {
-    Router.push("/indicadores/geral");
-  }
-  async function handleTarifa() {
-    Router.push("/indicadores/tarifa");
+  async function handleInstitucional() {
+    Router.push("/indicadores/prestacao-servico-institucional");
   }
   async function handleManuais() {
     Router.push("/indicadores/Manuais");
@@ -135,6 +124,47 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
     setTitle(e.target.alt);
     setShow(true);    
   };
+
+   const CircularContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 350px;
+  margin: 0 auto;
+  top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  @media(max-width: 768px) {
+    
+  }
+`;
+
+const CenterIcon = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+  
+`;
+
+
+const ServiceIcon = styled.div<{ rotation: number }>`
+  position: absolute; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transform: rotate(${props => props.rotation}deg) translateX(250px) rotate(-${props => props.rotation}deg);
+  transition: transform 0.3s ease;
+
+  
+`;
+
   
 
   return (
@@ -142,111 +172,219 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <div style={{marginTop:"150px"}}>
-      </div>
-      <ContainerPs>
-        <Ps1>
-          <PsImage>
-          <Image src={Geral} onClick={handleGeral} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Geral" />
-          {title === 'Geral' && show && (<TitlePsOnMouse>
-          {title}
+      <BreadCrumbStyle isCollapsed={isCollapsed}>
+              <nav>
+                <ol>
+                  <li>
+                    <Link href="/indicadores/home_indicadores">Home</Link>
+                    <span> / </span>
+                  </li>
+                  <li>
+                    <span>Prestação de Serviços</span>
+                  </li>
+                </ol>
+              </nav>
+        </BreadCrumbStyle>
+      
+
+      <CircularContainer>
+
+  <CenterIcon>
+    <Image
+      onClick={handleInstitucional}
+      src={Institucional}
+      width={120}
+      onMouseOver={titleOnMouse}
+      onMouseOut={() => setShow(false)} 
+      height={120}
+      alt="Institucional"/>
+      {title === 'Institucional' && show && (<TitlePsOnMouse>
+            {title} 
           </TitlePsOnMouse>)}
-          </PsImage>
-        </Ps1>
-        <Ps2>
-         
-          <Ps5>
-          <PsImage>
-          <Image src={Financeiro} onClick={handleFinaceiro} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)}  alt="Financeiro" />
-          {title === 'Financeiro' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}
-          </PsImage>
-          </Ps5>
-          <PsImageEsquerda>
-            <Image src={Agua} onClick={handleAgua} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Água" />
-            {title === 'Água' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}
-          </PsImageEsquerda>
-          <PsImageDireita>
-          <Image src={Residuos} onClick={handleResiduosUnidade} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Residuos" />
-          {title === 'Residuos' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}            
-          </PsImageDireita>
-          <Ps3>  
-            <Ps3ImageEsquerda>
-            <Image src={Esgoto} onClick={handleEsgoto} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Esgoto" />
-            {title === 'Esgoto' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}               
-            </Ps3ImageEsquerda>
-            <Ps3ImageDireita>
-            <Image src={Drenagem} onClick={handleDrenagem} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Drenagem" />
-            {title === 'Drenagem' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)} 
-            </Ps3ImageDireita>    
-          </Ps3>          
-        </Ps2>
-        <Ps1></Ps1>
-        <Ps4>
-        <Ps3ImageEsquerda>
-              <Image src={Qualidade} onClick={handleQualidade} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Qualidade" />
-              {title === 'Qualidade' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)} 
-            </Ps3ImageEsquerda>
-            <Ps3ImageDireita>
-              <Image src={Balanco} onClick={handleBalanco} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Balanco" />
-              {title === 'Balanco' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)} 
-            </Ps3ImageDireita>
-        </Ps4>
-        <Ps1>
-          <PsImage>
-            <Image src={Tarifas} onClick={handleTarifa} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Tarifas" />
-            {title === 'Tarifas' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)} 
-            </PsImage>
-          </Ps1>
-      </ContainerPs>
+      
+  </CenterIcon>
+
+  <div style={{ position: "relative", width: 500, height: 500 }}>
+  <Image 
+  src={Modelo} 
+  width={500} 
+  height={500} 
+  alt="Logo" 
+  />
   
+           
+  <div
+  style={{
+    position: "absolute",
+    left: 20,
+    top: 20,
+    width: 100,
+    height: 100,
+    cursor: "pointer",
+    background: "rgba(0,0,0,0.0)"
+  }}
+  onClick={handleAgua}
+  onMouseOver={() => { setTitle('Água'); setShow(true); }}
+  onMouseOut={() => setShow(false)}
+>
+  {title === 'Água' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+
+
+
+  <div
+    style={{
+      position: "absolute",
+      left: 380,
+      top: 380,
+      width: 100,
+      height: 100,
+      cursor: "pointer",
+      background: "rgba(0,0,0,0.0)"
+    }}
+    onClick={handleEsgoto}
+    onMouseOver={() => { setTitle('Esgoto'), setShow(true); }}
+    onMouseOut={() => setShow(false)}> 
+
+      {title === 'Esgoto' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+      
+
+ 
+  <div
+    style={{
+      position: "absolute",
+      left: 380,
+      top: 20,
+      width: 100,
+      height: 100,
+      cursor: "pointer",
+      background: "rgba(0,0,0,0.0)"
+    }}
+    onClick={handleDrenagem}
+    onMouseOver={() => { setTitle('Drenagem'); setShow(true); }}
+    onMouseOut={() => setShow(false)} >
+    {title === 'Drenagem' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+  
+  <div
+    style={{
+      position: "absolute",
+      left: 20,
+      top: 380,
+      width: 100,
+      height: 100,
+      cursor: "pointer",
+      background: "rgba(0,0,0,0.0)"
+    }}
+    onClick={handleResiduosUnidade}
+    onMouseOver={() => { setTitle('Resíduos'); setShow(true); }}
+    onMouseOut={() => setShow(false)} >
+
+      {title === 'Resíduos' && show && (
+    <div style={{
+      position: "absolute",
+      top: -28,
+      left: "50%",
+      transform: "translateX(-50%)",
+      background: "#f9f9f9",
+      boxShadow: "0px 8px 16px 0px rgba(0, 0, 0, 0.2)",
+      padding: "12px 16px",
+      borderRadius: "5px",
+      color: '#053d68',
+      fontSize: '16px',
+      textAlign: 'left',
+      zIndex: 10
+    }}>
+      {title}
+    </div>
+  )}
+  </div>
+</div>
+      </CircularContainer>
     </Container>
   );
 }
 
-// export const getServerSideProps: GetServerSideProps<MunicipioProps> = async (
-//   ctx
-// ) => {
-//   const apiClient = getAPIClient(ctx);
-//   const { ["tedplan.token"]: token } = parseCookies(ctx);
-//   const { ["tedplan.id_usuario"]: id_usuario } = parseCookies(ctx);
-//   if (!token) {
-//     return {
-//       redirect: {
-//         destination: "/login_indicadores",
-//         permanent: false,
-//       },
-//     };
-//   }
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const apiClient = getAPIClient(ctx);
+  const { ["tedplan.token"]: token } = parseCookies(ctx);
 
-//   const resUsuario = await apiClient.get("getUsuario", {
-//     params: { id_usuario: id_usuario },
-//   });
-//   const usuario = await resUsuario.data;
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
 
-//   const res = await apiClient.get("getMunicipio", {
-//     params: { id_municipio: usuario[0].id_municipio },
-//   });
-//   const municipio = await res.data;
+  try {
+    const response = await apiClient.get("getMunicipio", {
+      params: { id_municipio: ctx.query.id_municipio },
+    });
 
-//   return {
-//     props: {
-//       municipio,
-//     },
-//   };
-// };
+    return {
+      props: {
+        Imunicipio: response.data,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        Imunicipio: [],
+      },
+    };
+  }
+};

@@ -600,9 +600,12 @@ export const DivFormResiduo = styled.div`
   padding: 24px;
   margin-bottom: 24px;
   width: 100%;
+  overflow: none;
   display: flex;
+  border: 0;
   flex-direction: column;
   gap: 20px;
+  
 
   @media (max-width: 768px) {
     padding: 16px;

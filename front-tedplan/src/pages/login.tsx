@@ -12,7 +12,7 @@ import {
   Brasao,
 } from "../styles/login";
 import { destroyCookie } from "nookies";
-import { toast, ToastContainer } from 'react-nextjs-toast'
+import { toast } from 'react-toastify'
 
 export default function Login() {
   const { register, handleSubmit } = useForm();
@@ -29,18 +29,14 @@ export default function Login() {
     .then((response)=>{     
     })
     .catch((error)=>{   
-      toast.notify('Usuário ou senha inválido!',{
-        title: "Aconteceu o seguinte erro",
-        duration: 7,
-        type: "error",
-      })      
+      toast.error("Usuário ou senha inválido!", { position: "top-right", autoClose: 5000 })      
    
     });
   }
 
   return (
     <Container>
-       <ToastContainer align={"center"} position={"button"}  />
+       
       <DivLogin>
         <Brasao>
           <Image src={logo} alt="Logo Tedplan" />

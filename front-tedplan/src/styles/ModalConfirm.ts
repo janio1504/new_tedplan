@@ -25,7 +25,7 @@ export const Modal = styled.div`
 
 export const ConteudoModal = styled.div`
     width: 100%;
-    float: left;
+    float: rig;
     
     
     
@@ -75,7 +75,7 @@ export const TextoModal = styled.div`
     
 `;
 export const FormModal = styled.form`
-  
+
 `;
 
 export const CloseModalButton = styled.button`

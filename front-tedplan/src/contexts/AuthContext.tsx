@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { recoverUserInformation, signInRequest } from "../services/auth";
-import { setCookie, parseCookies, destroyCookie } from "nookies";
 import Router from "next/router";
+import { destroyCookie, parseCookies, setCookie } from "nookies";
+import { createContext, useContext, useEffect, useState } from "react";
 import api from "../services/api";
+import { permissionByYear, recoverUserInformation, signInRequest } from "../services/auth";
 
 type SignInData = {
   login: string;
@@ -21,8 +21,20 @@ type Usuario = {
   id_municipio: string;
 };
 
+type Permission = {
+  adminGeral: boolean;
+  adminTedPlan: boolean;
+  editorTedPlan: boolean;
+  editorSimisab: boolean;
+  revisorTedPlan: boolean;
+  supervisorTedPlan: boolean;
+};
+
 type AuthContextType = {
+  isEditor: boolean;
   isAuthenticated: boolean;
+  anoEditorSimisab: number;
+  permission: Permission;
   usuario: Usuario;
   signIn: (data: SignInData) => Promise<void>;
   signOut: () => Promise<void>;
@@ -32,7 +44,14 @@ type AuthContextType = {
 export const AuthContext = createContext({} as AuthContextType);
 
 export function AuthProvider({ children }) {
-  // const [usuario, setUser] = useState<Usuario | null>(null);
+  const [userPermission, setUserPermission] = useState<Permission>({
+    adminGeral: false,
+    adminTedPlan: false,
+    editorTedPlan: false,
+    editorSimisab: false,
+    revisorTedPlan: false,
+    supervisorTedPlan: false,
+  })
 
   const [usuario, setUser] = useState(() => {
     if (typeof window !== "undefined") {
@@ -40,24 +59,68 @@ export function AuthProvider({ children }) {
       return savedUsuario !== null ? JSON.parse(savedUsuario) : 0;
     }
   });
+  
+  const [ano, setAno] = useState(null)
+  const [editor, setEditor] = useState(false);
 
   const isAuthenticated = !!usuario;
+
+  const permission = userPermission || {
+    adminGeral: false,
+    adminTedPlan: false,
+    editorTedPlan: false,
+    editorSimisab: false,
+    revisorTedPlan: false,
+    supervisorTedPlan: false,
+  }
+  const anoEditorSimisab = ano;
+  const isEditor = editor;
 
   useEffect(() => {
     const { "tedplan.token": token } = parseCookies();
 
     const { "tedplan.id_usuario": id_usuario } = parseCookies();
 
+    hasPermission();    
+
     if (!usuario && token && id_usuario) {
       recoverUserInformation(id_usuario).then((response) => {
         setUser(response[0]);
       });
     }
-
-    // if(!token){
-    //   Router.push('/')
-    // }
   }, [usuario]);
+
+  useEffect(() => {
+    if (
+      permission?.adminGeral ||
+      permission?.adminTedPlan ||
+      permission?.editorSimisab ||
+      permission?.revisorTedPlan ||
+      permission?.supervisorTedPlan
+    ) {
+      setEditor(true);
+    }
+  }, [permission]);
+
+  async function hasPermission() { 
+      let editorSimisab = false;
+      const editorSimisabPorAno = await permissionByYear(usuario?.id_usuario); 
+      if(editorSimisabPorAno && editorSimisabPorAno?.id_usuario === usuario?.id_usuario) {
+        editorSimisab = true;
+        setAno(editorSimisabPorAno?.ano);
+      }
+   
+      const permissao = {
+        adminGeral: usuario?.id_permissao === 1 ? true : false,
+        adminTedPlan: usuario?.id_permissao === 2 ? true : false,
+        editorTedPlan: usuario?.id_permissao === 3 && usuario?.id_sistema === 1 ? true : false,
+        editorSimisab: usuario?.id_permissao === 3 && usuario?.id_sistema === 2 ? true : false,
+        revisorTedPlan: usuario?.id_permissao === 4 ? editorSimisab : false,
+        supervisorTedPlan: usuario?.id_permissao === 5 ? true : false,
+      }
+      setUserPermission(permissao);
+      return permissao;
+    }
 
   async function signIn({ login, senha, id_sistema }: SignInData) {
     const data = await signInRequest({
@@ -112,7 +175,7 @@ export function AuthProvider({ children }) {
         Router.push("/indicadores/home_indicadores");
       }
       // Revisor de plataforma Município
-      if (user.id_permissao === 4 && user.id_sistema === 2) {
+      if (user.id_permissao === 4 && user.id_municipio && user.id_sistema === 2) {
         Router.push("/indicadores/home_indicadores");
       }
       // Administrador Geral
@@ -148,7 +211,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ usuario, isAuthenticated, signIn, signOut, setMunicipioUser }}
+      value={{ usuario, isAuthenticated, permission, anoEditorSimisab, isEditor, signIn, signOut, setMunicipioUser }}
     >
       {children}
     </AuthContext.Provider>

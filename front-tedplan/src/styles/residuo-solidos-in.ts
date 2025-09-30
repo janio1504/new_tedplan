@@ -1257,18 +1257,18 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 // `;
 
 
-export const Sidebar = styled.div`
-  width: 250px;
-  background-color: #f0f0f0;
-  padding: 1rem;
-  bottom: -600px;
+export const Sidebar = styled.div<{ isCollapsed: boolean }>`
+  width: ${(props) => (props.isCollapsed ? "0": "270px")};
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  padding: ${(props) => (props.isCollapsed ? "0" : "32px 24px")};
   position: absolute;
-  left: 0;
-  top: 246px;
-  overflow-y: auto;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: 1000px;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -1282,15 +1282,32 @@ export const Sidebar = styled.div`
   &::-webkit-scrollbar-track {
     background-color: #f1f1f1;
   }
+
+  @media (max-width: 768px) {
+    position: relative;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    z-index: 1000;
+    margin-bottom: 16px;
+  }
 `;
 
 export const MainContent = styled.div`
   margin-left: 270px;
-  padding: 1.25rem;
+  margin-top: -40px;
+  padding: 20px;
   min-height: calc(100vh - 160px);
+
 `;
 
-export const SidebarItem = styled.div<{ active?: boolean }>`
+export const SidebarItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'active',
+})<{ active?: boolean }>`
   cursor: pointer;
   padding: 0.75rem 1rem;
   margin-bottom: 0.25rem;
