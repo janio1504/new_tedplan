@@ -27,6 +27,7 @@ export default function Estatistica() {
   
 
   const [active, setActive ] = useState("agua")
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   function handleActive(e: string){
     setActive(e)
@@ -35,7 +36,7 @@ export default function Estatistica() {
   return (
     <Container>
       <HeadPublico></HeadPublico>
-      <BreadCrumbStyle style={{ width: '25%', marginBottom: '-20px'}}>
+      <BreadCrumbStyle isCollapsed={isCollapsed} style={{ width: '25%', marginBottom: '-20px'}}>
               <nav>
                 <ol>
                   <li>

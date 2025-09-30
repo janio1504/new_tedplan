@@ -211,17 +211,33 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  max-width: 90%;
+  max-width: 97%;
   width: 100%;
   height: 100%;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
   background: #fff;
   margin-left: auto;
   margin-right: auto;
   margin-bottom: 50px;
   text-align: left;
-  padding: 10px;
+  padding: 0 ;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+
+
+ 
+  padding: 1.25rem;
+  min-height: calc(100vh - 160px);
+  z-index: -1000;
+
+  @media (max-width: 1000px) {
+    margin: 20px 0 0 0;
+    min-height: auto;
+    padding: 30px;
+    
+  }
+  
 `;
 
 export const MenuLateral = styled.div`
@@ -253,21 +269,27 @@ export const MenuLateral = styled.div`
 export const DivFormConteudo = styled.div`
   width: 100%;
   height: 100%;
-  margin-left: 10px;
+  margin-left: 0px;
+  background: #ffffff;
   padding: 10px 0px 10px 0px;
   color: #666;
   display: flex;
   justify-content: center;
   flex-direction: column;
+  
+  @media (max-width: 1000px) {
+  margin-top: 16px;
+  }
 `;
 
 export const Lista = styled.div`
   color: #666;
-  width: 100%;
+  width: auto;
   float: left;
   margin-top: 20px;
+  padding: 15px;
   display: flex;
-  border-top: solid 3px #2dd9d0;
+  border-top: solid 3px rgba(189, 189, 189, 0.77);
   text-align: left;
   justify-content: left;
   align-items: left;
@@ -426,11 +448,14 @@ export const DivInstrucoes = styled.div`
   width: 100%;
   height: 100px;
   color: #666;
+   flex-wrap: wrap;
 `;
 
 export const Form = styled.form`
   margin: 10px 10px 10px 0px;
   border-radius: 3px;
+  padding: 15px;
+  display: flex;
   font-size: 14px;
   input {
     border: 2px solid #2dd9d0;
@@ -476,6 +501,10 @@ export const Form = styled.form`
   }
   span {
   }
+
+  @media (max-width: 1200px) {
+  flex-wrap: wrap;
+  }
 `;
 
 export const DivInput = styled.div`
@@ -483,6 +512,9 @@ export const DivInput = styled.div`
   flex-direction: column;
   display: flex;
   margin-right: 10px;
+  
+
+  
 `;
 export const SubmitButton = styled.button`
   padding: 10px 15px;
