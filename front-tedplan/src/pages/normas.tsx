@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { GetServerSideProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Container,
   Form,
@@ -20,11 +20,28 @@ import {
   LimparFiltro,
 } from "../styles/views";
 import { getAPIClient } from "../services/axios";
+import { AuthContext } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Router from "next/router";
 import { toast } from "react-toastify";
+import { BodyDashboard, DivMenuTitulo, MenuMunicipioItem } from "@/styles/dashboard";
+import { MainContent } from "@/styles/esgoto-indicadores";
+import styled from "styled-components";
+
+const Titulo = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  width: auto;
+  margin-top: -10px;
+  padding: 15px;
+  color: #fff;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  font-weight: bolder;
+`;
 
 type INorma = {
   id_norma: string;
@@ -79,7 +96,22 @@ export default function Normas({
   const [titulo, setTitulo] = useState(null);
   const [idEixo, setIdEixo] = useState(null);
   const [idTipoNorma, setIdTipoNorma] = useState(null);
+  const {signOut} = useContext(AuthContext);
   const [idEscala, setIdEscala] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+    useEffect(() => {
+        const handleResize = () => {
+          if (window.innerWidth <= 1000) {
+            setIsCollapsed(true);
+          } else {
+            setIsCollapsed(false);
+          }
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+      }, []);
 
   useEffect(() => {
     if (normas) {
@@ -344,16 +376,42 @@ export default function Normas({
     getNormas(normas);
   }
 
+  async function handleSignOut() {
+      signOut();
+    }
+  
+  function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+    }
+
   return (
     <Container>
       <HeadPublico></HeadPublico>
-      <DivCenter>
-        <MenuLateral>
-          <MenuPublicoLateral></MenuPublicoLateral>
-        </MenuLateral>
+      <DivMenuTitulo> 
+                                <text style={{
+                                  fontSize: '20px',
+                                  fontWeight: 'bold',
+                                  padding: '15px 20px',
+                                  float: 'left',
+                                  
+                                  }}>
+                                    Painel de Edição 
+                                  </text>
+                                <ul style={{}}>
+                                <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                                <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                                </ul>
+      </DivMenuTitulo>
+      
+      <BodyDashboard>
+      <MenuPublicoLateral isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}  />
+      </BodyDashboard>
 
+
+      <MainContent isCollapsed={isCollapsed}>
+      
         <DivFormConteudo>
-          <h3>Normas</h3>
+          <Titulo>Normas</Titulo>
 
           <Form onSubmit={handleSubmit(handlebuscaFiltrada)}>
             <DivInput>
@@ -434,6 +492,9 @@ export default function Normas({
               <PaginationButton
                 onClick={() => handlegetNormPaginate(paginacao.primeiraPagina)}
                 disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
+                 style={{
+                 display: innerWidth < 1000 ? 'none' : 'inline-block'
+                }}
               >
                 Primeiro
               </PaginationButton>
@@ -459,13 +520,17 @@ export default function Normas({
               <PaginationButton
                 onClick={() => handlegetNormPaginate(paginacao.ultimaPagina)}
                 disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
+                 style={{
+                 display: innerWidth < 1000 ? 'none' : 'inline-block'
+                }}
               >
                 Último
               </PaginationButton>
             </PaginationContainer>
           )}
         </DivFormConteudo>
-      </DivCenter>
+     
+      </MainContent>
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>

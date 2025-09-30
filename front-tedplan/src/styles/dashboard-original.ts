@@ -245,10 +245,7 @@ export const BodyDashboard = styled.div`
   margin-right: auto;
   text-align: left;
   display: flex;
-  flex-direction: row;
-
-  
-
+  flex-direction: collumn;
 `;
 export const DivInstrucoes = styled.div`
   justify-content: left;

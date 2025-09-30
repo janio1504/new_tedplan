@@ -7,7 +7,6 @@ color: #fff;
   height: 100%;
   max-width: 100%;
   background-color: #f3f4f6;
-
   max-height: 100%;
   padding: 0;
   margin: 0;
@@ -1365,6 +1364,7 @@ export const MainContent = styled.div<{ isCollapsed: boolean }>`
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
   z-index: -1000;
+  
 
   @media (max-width: 1000px) {
     margin: 20px 0 0 0;
