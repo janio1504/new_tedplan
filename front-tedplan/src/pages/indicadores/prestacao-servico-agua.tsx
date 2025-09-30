@@ -58,6 +58,7 @@ interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
   municipio_nome: string;
+  natureza_juridica?: string;
 }
 
 interface ISelectOption {
@@ -119,7 +120,8 @@ const CampoIndicador = ({
   campoEnabled,
   fieldStates,
   setFieldStates,
-  setValue
+  setValue,
+  dadosMunicipio
 }: { 
   indicador: IIndicador, 
   register: any, 
@@ -127,7 +129,8 @@ const CampoIndicador = ({
   campoEnabled?: boolean,
   fieldStates?: {[key: string]: any},
   setFieldStates?: (states: {[key: string]: any}) => void,
-  setValue?: any
+  setValue?: any,
+  dadosMunicipio?: IMunicipio
 }) => {
   // Verificações de segurança
   if (!indicador || !anoSelected) {
@@ -288,22 +291,20 @@ const CampoIndicador = ({
     }
     
     // Mapeamento de códigos e suas condições de habilitação
-    const fieldConditions = {
+    const fieldConditions: { [key: string]: () => boolean } = {
       "CAD2002": () => {
-        // CAD2002 só é habilitado quando CAD1002 tem valor válido
-        const cad1002Value = fieldStates.cad1002Value;
-        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-      },
-      "TEDGTA001": () => fieldStates.hasColeta === false,
-      "CAD2001": () => {
-        // CAD2001 só é habilitado quando CAD1002 tem valor válido
-        const cad1002Value = fieldStates.cad1002Value;
-        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+        // CAD2002 só é habilitado quando CAD2001 tem o valor específico "COLETA"
+        const cad2001Value = fieldStates.cad2001Value;
+        return cad2001Value === "COLETA" || cad2001Value === "coleta" || cad2001Value === "Coleta";
       },
       "CAD2004": () => {
         // CAD2004 só é habilitado quando CAD1002 tem valor válido
         const cad1002Value = fieldStates.cad1002Value;
         return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+      },
+      "TEDGTA001": () => {
+        // TEDGTA001 só é habilitado quando NÃO há coleta
+        return fieldStates.hasColeta === false;
       },
       // Adicione outros códigos aqui conforme necessário
       // "CODIGO3": () => fieldStates.outraCondicao === true,
@@ -321,91 +322,27 @@ const CampoIndicador = ({
   
   const isDisabled = !isFieldEnabled(indicador.codigo_indicador);
   
-  // Debug: Log para verificar se a lógica está funcionando
-  const fieldConditions = {
-    "CAD2002": () => {
-      const cad1002Value = fieldStates?.cad1002Value;
-      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-    },
-    "TEDGTA001": () => fieldStates?.hasColeta === false,
-    "CAD2001": () => {
-      const cad1002Value = fieldStates?.cad1002Value;
-      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-    },
-    "CAD2004": () => {
-      const cad1002Value = fieldStates?.cad1002Value;
-      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-    },
-    // Adicione outros códigos aqui conforme necessário
-  };
-  
-  if (fieldConditions[indicador.codigo_indicador]) {
-    const debugInfo: any = {
-      fieldStates: fieldStates,
-      isFieldEnabled: isFieldEnabled(indicador.codigo_indicador),
-      isDisabled: isDisabled
-    };
-    
-    // Informações específicas para CAD2001
-    if (indicador.codigo_indicador === "CAD2001") {
-      const cad1002Value = fieldStates?.cad1002Value;
-      const naturezaJuridica = fieldStates?.naturezaJuridica;
-      const validOptions = getValidOptionsForCAD2001(cad1002Value, naturezaJuridica);
-      
-      debugInfo.cad1002Value = cad1002Value;
-      debugInfo.naturezaJuridica = naturezaJuridica;
-      debugInfo.validOptions = validOptions;
-    }
-    
-    // Informações específicas para CAD2002
-    if (indicador.codigo_indicador === "CAD2002") {
-      const cad1002Value = fieldStates?.cad1002Value;
-      const naturezaJuridica = fieldStates?.naturezaJuridica;
-      const validOptions = getValidOptionsForCAD2002(cad1002Value, naturezaJuridica);
-      
-      debugInfo.cad1002Value = cad1002Value;
-      debugInfo.naturezaJuridica = naturezaJuridica;
-      debugInfo.validOptions = validOptions;
-    }
-    
-    // Informações específicas para CAD2004
-    if (indicador.codigo_indicador === "CAD2004") {
-      const cad1002Value = fieldStates?.cad1002Value;
-      const naturezaJuridica = fieldStates?.naturezaJuridica;
-      const validOptions = getValidOptionsForCAD2004(cad1002Value, naturezaJuridica);
-      
-      debugInfo.cad1002Value = cad1002Value;
-      debugInfo.naturezaJuridica = naturezaJuridica;
-      debugInfo.validOptions = validOptions;
-    }
-    
-    console.log(`Campo ${indicador.codigo_indicador}:`, debugInfo);
-  }
-  
   function onChangeEnabled(value: any, codigoIndicador: string) {
     if (setFieldStates && fieldStates) {
       const newStates = { ...fieldStates };
       
       // Mapeamento de códigos e como atualizar o estado baseado no valor
-      const fieldUpdateRules = {
-        // Códigos que afetam hasColeta
+      const fieldUpdateRules: { [key: string]: () => void } = {
+        // CAD1002 afeta CAD2001 e CAD2004
+        "CAD1002": () => {
+          newStates.cad1002Value = value;
+        },
+        // CAD2001 afeta CAD2002
+        "CAD2001": () => {
+          newStates.cad2001Value = value;
+        },
+        // Códigos que afetam hasColeta (exemplo para uso futuro)
         "CODIGO_COLETA": () => {
           if (value === "coleta") {
             newStates.hasColeta = true;
           } else {
             newStates.hasColeta = false;
           }
-        },
-        // CAD1002 afeta CAD2001
-        "CAD1002": () => {
-          newStates.cad1002Value = value;
-        },
-        // Natureza jurídica afeta CAD2001
-        "CAD1001": () => {
-          newStates.naturezaJuridica = value;
-        },
-        "NATUREZA_JURIDICA": () => {
-          newStates.naturezaJuridica = value;
         },
         // Adicione outros códigos e suas regras aqui
         // "CODIGO_OUTRO": () => {
@@ -416,16 +353,9 @@ const CampoIndicador = ({
       // Verificar se o código tem regra de atualização específica
       if (fieldUpdateRules[codigoIndicador]) {
         fieldUpdateRules[codigoIndicador]();
-      } else {
-        // Regra padrão para códigos que afetam hasColeta
-        if (value === "coleta") {
-          newStates.hasColeta = true;
-        } else {
-          newStates.hasColeta = false;
-        }
+        setFieldStates(newStates);
       }
-      
-      setFieldStates(newStates);
+      // Se não há regra específica, não atualiza nada (evita comportamentos inesperados)
     }
   }
   
@@ -529,7 +459,7 @@ const CampoIndicador = ({
       // Para CAD2001, filtrar opções baseado no CAD1002 e natureza jurídica
       if (indicador.codigo_indicador === "CAD2001") {
         const cad1002Value = fieldStates?.cad1002Value;
-        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        const naturezaJuridica = dadosMunicipio?.natureza_juridica || "Município";
         
         if (cad1002Value) {
           const validOptions = getValidOptionsForCAD2001(cad1002Value, naturezaJuridica);
@@ -542,7 +472,7 @@ const CampoIndicador = ({
       // Para CAD2002, filtrar opções baseado no CAD1002 e natureza jurídica
       if (indicador.codigo_indicador === "CAD2002") {
         const cad1002Value = fieldStates?.cad1002Value;
-        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        const naturezaJuridica = dadosMunicipio?.natureza_juridica || "Município";
         
         if (cad1002Value) {
           const validOptions = getValidOptionsForCAD2002(cad1002Value, naturezaJuridica);
@@ -555,7 +485,7 @@ const CampoIndicador = ({
       // Para CAD2004, filtrar opções baseado no CAD1002 e natureza jurídica
       if (indicador.codigo_indicador === "CAD2004") {
         const cad1002Value = fieldStates?.cad1002Value;
-        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        const naturezaJuridica = dadosMunicipio?.natureza_juridica || "Município";
         
         if (cad1002Value) {
           const validOptions = getValidOptionsForCAD2004(cad1002Value, naturezaJuridica);
@@ -729,7 +659,7 @@ export default function PrestacaoServicoAgua() {
   const [fieldStates, setFieldStates] = useState<{[key: string]: any}>({
     hasColeta: false,
     cad1002Value: null,
-    naturezaJuridica: "Município" // Valor padrão
+    cad2001Value: null
   });
 
   const [dadosCarregados, setDadosCarregados] = useState([]);
@@ -1308,26 +1238,26 @@ export default function PrestacaoServicoAgua() {
       // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
     
-    // Verificar se há algum campo com valor "coleta" para inicializar o estado
+    // Verificar e capturar valores dos campos que afetam validação
     let hasCodigoValue = false;
     let cad1002Value = null;
-    let naturezaJuridica = "Município"; // Valor padrão
+    let cad2001Value = null;
     
     dados.forEach(dado => {
+      // Capturar hasColeta
       if (dado.valor_indicador === "coleta" || 
           (typeof dado.valor_indicador === 'string' && dado.valor_indicador.toLowerCase().includes('coleta'))) {
         hasCodigoValue = true;
       }
       
-      // Capturar valor do CAD1002
+      // Capturar valor do CAD1002 (afeta CAD2004)
       if (dado.codigo_indicador === "CAD1002") {
         cad1002Value = dado.valor_indicador;
       }
       
-      // Capturar natureza jurídica (assumindo que existe um campo para isso)
-      // Você pode ajustar o código do campo conforme necessário
-      if (dado.codigo_indicador === "CAD1001" || dado.codigo_indicador === "NATUREZA_JURIDICA") {
-        naturezaJuridica = dado.valor_indicador;
+      // Capturar valor do CAD2001 (afeta CAD2002)
+      if (dado.codigo_indicador === "CAD2001") {
+        cad2001Value = dado.valor_indicador;
       }
     });
     
@@ -1336,7 +1266,7 @@ export default function PrestacaoServicoAgua() {
       ...prev,
       hasColeta: hasCodigoValue,
       cad1002Value: cad1002Value,
-      naturezaJuridica: naturezaJuridica
+      cad2001Value: cad2001Value
     }));
     
     // Agrupar dados por código do indicador para processar checkboxes
@@ -1697,6 +1627,7 @@ export default function PrestacaoServicoAgua() {
                                         fieldStates={fieldStates}
                                         setFieldStates={setFieldStates}
                                         setValue={setValue}
+                                        dadosMunicipio={dadosMunicipio}
                                       />
                                     </div>
                                   ) : (
@@ -1794,6 +1725,7 @@ export default function PrestacaoServicoAgua() {
                                     fieldStates={fieldStates}
                                     setFieldStates={setFieldStates}
                                     setValue={setValue}
+                                    dadosMunicipio={dadosMunicipio}
                                   />
                                 ) : (
                                   <input 
