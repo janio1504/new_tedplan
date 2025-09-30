@@ -5,7 +5,6 @@ import { useForm } from "react-hook-form";
 
 import {  
   DivInput,
-  Form,
   InputP,
   InputM,
   InputG,
@@ -39,7 +38,11 @@ import { Sidebar,
   StepperWrapper,
   StepperContainer,
   StepButton,
-  StepperButton} from "@/styles/indicadores";
+  StepperButton,
+  ExpandButton,
+  CollapseButton,
+  Form,
+} from "@/styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import dynamic from "next/dynamic";
 import { LineSideBar } from "@/styles/drenagem-indicadores";
@@ -74,7 +77,7 @@ import { Actions } from "../../styles/residuo-solido-coleta-in";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import { anosSelect } from "../../util/util";
 import ajuda from "../../img/ajuda.png";
-import BreadCrumb from "./componentes/breadCrumb";
+import { FaBars } from "react-icons/fa";
 import { BreadCrumbStyle } from "@/styles/indicadores";
 
 interface IMunicipio {
@@ -113,10 +116,24 @@ export default function Geral({ municipio }: MunicipioProps) {
   const [modalAddConssionaria, setModalAddConssionaria] = useState(false);
   const [anoSelected, setAnoSelected] = useState(null);
   const [activeForm, setActiveForm] = useState("AguaEsgotoSanitario");
-  
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   useEffect(() => {
     if (usuario?.id_municipio){
@@ -390,7 +407,16 @@ const handleNext = () => {
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+      
+      {isCollapsed ? (
+              <ExpandButton  onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+          ) : (
+            <Sidebar isCollapsed={isCollapsed}>
+              <CollapseButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </CollapseButton>
         <SidebarItem
         active={activeForm === "AguaEsgotoSanitario"}
         onClick = {() => setActiveForm("AguaEsgotoSanitario")}>
@@ -405,18 +431,21 @@ const handleNext = () => {
         onClick={() => setActiveForm("ResiduosSolidos")}>
           Resíduos Sólidos
         </SidebarItem>
-      </Sidebar>
-      <MainContent>
-        <>
-      <BreadCrumbStyle style={{ width: '25%'}}>
+            </Sidebar>
+       )}
+      <MainContent isCollapsed={isCollapsed}>
+      <DivCenter>
+      
+        <Form onSubmit={handleSubmit(handleCadastro)}>
+          <BreadCrumbStyle isCollapsed={isCollapsed}>
         <nav>
           <ol>
             <li>
-                              <Link href="/indicadores/home_indicadores">Home</Link>
+                <Link href="/indicadores/home_indicadores">Home</Link>
               <span> / </span>
             </li>
             <li>
-              <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+              <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
               <span> / </span>
             </li>
             <li>
@@ -424,19 +453,9 @@ const handleNext = () => {
             </li>
           </ol>
         </nav>
-      </BreadCrumbStyle>
-   
-    </>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
-
-
-
+          </BreadCrumbStyle>
           <DivForm>
-
             <DivTituloForm>Geral</DivTituloForm>
-
-            
               {activeForm === 'AguaEsgotoSanitario' && (
                 <StepperContainer style={{width: '90%', alignItems: 'center', margin: '20px auto'}}>
                 <StepperWrapper>
@@ -455,7 +474,6 @@ const handleNext = () => {
                       </div>
                     ))}
                   </StepperWrapper>
-
                   </StepperContainer>
               )}
 
@@ -551,7 +569,7 @@ const handleNext = () => {
             <DivFormEixo>
 
               <StepContent active={activeStep === 0}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '160px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>Municípios atendidos</DivTituloConteudo>
                 </DivTitulo>
@@ -611,12 +629,12 @@ const handleNext = () => {
                                               Próximo
                                             </StepperButton>
                                           )}
-                                        </StepperNavigation>
+                </StepperNavigation>
               </DivFormConteudo>
               </StepContent>
 
               <StepContent active={activeStep === 1}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '400px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>Sedes e localidades atendidas</DivTituloConteudo>
                 </DivTitulo>
@@ -739,7 +757,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 2}>
-                <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '280px'}}>
+                <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                   <DivTitulo>
                     <DivTituloConteudo>Populações atendidas</DivTituloConteudo>
                   </DivTitulo>
@@ -834,7 +852,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 3}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '280px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} >
                 <DivTitulo>
                   <DivTituloConteudo>População existente</DivTituloConteudo>
                 </DivTitulo>
@@ -929,7 +947,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 4}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '100px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                 <DivTitulo>
                   <DivTituloConteudo>Empregados</DivTituloConteudo>
                 </DivTitulo>
@@ -993,7 +1011,7 @@ const handleNext = () => {
               </StepContent>
 
               <StepContent active={activeStep === 5}>
-              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'} style={{height: '290px'}}>
+              <DivFormConteudo active={activeForm === 'AguaEsgotoSanitario'}>
                 <DivTitulo>
                   <DivTituloConteudo>Observações, esclarecimentos ou sugestões</DivTituloConteudo>
                 </DivTitulo>
@@ -1158,7 +1176,7 @@ const handleNext = () => {
                                               Próximo
                                             </StepperButton>
                                           )}
-                                        </StepperNavigation>
+                </StepperNavigation>
               </DivFormConteudo>
               </StepContent>
 
@@ -2199,8 +2217,6 @@ const handleNext = () => {
               
 
           </DivForm>
-
-          
         </Form>
       </DivCenter>
 

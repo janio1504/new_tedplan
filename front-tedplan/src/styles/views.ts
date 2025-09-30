@@ -113,9 +113,13 @@ export const Menu = styled.div`
   padding: 0;
   background: #fff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  //border-bottom: solid 1px #ccc;
   color: #666;
   float: left;
+
+   @media (max-width: 768px) {
+    
+  }
+
 `;
 
 export const DivListPost = styled.table`
@@ -408,6 +412,10 @@ export const TextoHead = styled.div`
   color: #008080;
   padding-top: 40px;
   float: left;
+
+  @media (max-width: 768px) {
+  margin-left: 5%;
+  }
 `;
 export const DivInstrucoes = styled.div`
   justify-content: left;

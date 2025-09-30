@@ -21,7 +21,8 @@ import {
   Ps3ImageEsquerda,
   Ps3ImageDireita,
   TitlePsOnMouse,
-  BreadCrumbStyle
+  BreadCrumbStyle,
+  DivCenter
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -42,7 +43,6 @@ import Balanco from "../../img/balanco.png"
 import Tarifas from "../../img/tarifas.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { set } from "react-hook-form";
-import BreadCrumb from "./componentes/breadCrumb";
 import Link from "next/link";
 
 interface IMunicipio {
@@ -69,6 +69,7 @@ interface MunicipioProps {
 export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   const { usuario, signOut, isAuthenticated } = useContext(AuthContext);
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
   useEffect(() => {
     getMunicipio()     
@@ -144,7 +145,8 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ width: '25%', position: 'absolute', marginTop: '20px'}}>
+
+      <BreadCrumbStyle isCollapsed={isCollapsed}>
               <nav>
                 <ol>
                   <li>
@@ -152,13 +154,16 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
                     <span> / </span>
                   </li>
                   <li>
-                    <span>Prestação de Serviços</span>
+                    <span>Prestação de Serviços SNIS</span>
                   </li>
                 </ol>
               </nav>
-        </BreadCrumbStyle>
+      </BreadCrumbStyle>
+
       <div style={{marginTop:"150px"}}>
       </div>
+
+      
       <ContainerPs>
         <Ps1>
           <PsImage>
@@ -169,7 +174,6 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
           </PsImage>
         </Ps1>
         <Ps2>
-         
           <Ps5>
           <PsImage>
           <Image src={Financeiro} onClick={handleFinaceiro} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)}  alt="Financeiro" />
@@ -229,6 +233,7 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
             </PsImage>
           </Ps1>
       </ContainerPs>
+      
   
     </Container>
   );

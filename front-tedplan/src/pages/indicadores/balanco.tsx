@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import { MainContent } from "../../styles/indicadores";
 import {
   Container,
   DivInput,
@@ -80,7 +80,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
   const [dadosBalanco, setDadosBalanco] = useState(null);
   const [content, setContent] = useState("");
   const [dadosMunicipio, setDadosMunicipio] = useState<IMunicipio>(null);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   useEffect(() => {
     getMunicipio();
     if (anoEditorSimisab) {
@@ -154,7 +154,11 @@ export default function Balanco({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <BreadCrumbStyle style={{ width: '25%', marginTop: '10px'}}>
+      
+      
+      <DivCenter>
+        <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
+        <BreadCrumbStyle isCollapsed={isCollapsed} >
                                     <nav>
                                       <ol>
                                         <li>
@@ -162,7 +166,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                                           <span> / </span>
                                         </li>
                                         <li>
-                                          <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                          <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                                           <span> / </span>
                                         </li>
                                         <li>
@@ -170,9 +174,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
                                         </li>
                                       </ol>
                                     </nav>
-        </BreadCrumbStyle>
-      <DivCenter>
-        <Form onSubmit={handleSubmit(handleCadastro)}>
+      </BreadCrumbStyle>
           <DivForm>
             <DivTituloForm>Balanço</DivTituloForm>
             <DivFormEixo>
@@ -547,6 +549,8 @@ export default function Balanco({ municipio }: MunicipioProps) {
           </DivForm>
         </Form>
       </DivCenter>
+      
+      
     </Container>
   );
 }

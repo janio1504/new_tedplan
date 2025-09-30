@@ -31,19 +31,16 @@ import { AuthContext } from "../../contexts/AuthContext";
 import api from "../../services/api";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
-import Geral from "../../img/geral.png"
-import Financeiro from "../../img/financeiro.png"
+import Institucional from "../../img/user_mun.png"
 import Agua from "../../img/agua.png"
 import Drenagem from "../../img/drenagem.png"
+import Modelo from "../../img/modelo_home_prestacao_servicoes.png"
 import Esgoto from "../../img/esgoto.png"
 import Residuos from "../../img/residuos.png"
-import Qualidade from "../../img/qualidade.png"
-import Balanco from "../../img/balanco.png"
-import Tarifas from "../../img/tarifas.png"
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { set } from "react-hook-form";
-import BreadCrumb from "./componentes/breadCrumb";
 import Link from "next/link";
+import { styled } from "styled-components";
 
 interface IMunicipio {
   id_municipio: string;
@@ -67,10 +64,13 @@ interface MunicipioProps {
 export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   const { usuario, signOut, isAuthenticated } = useContext(AuthContext);
   const [municipio, setMunicipio] = useState<IMunicipio>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   
-  useEffect(() => {
-    getMunicipio()     
-  }, [municipio]);
+ useEffect(() => {
+    if (usuario?.id_municipio) {
+      getMunicipio();
+    }
+  }, [usuario]);
 
   async function getMunicipio(){
     const res = await api.get("getMunicipio", {
@@ -106,9 +106,6 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   async function handleDrenagem() {
     Router.push("/indicadores/sinisa-drenagem");
   }
-  async function handleResiduosColeta() {
-    Router.push("/indicadores/residuos-indicadores-coleta");
-  }
   async function handleResiduosUnidade() {
     Router.push("/indicadores/sinisa-residuos");
   }
@@ -127,13 +124,47 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
     setShow(true);    
   };
   
+  const CircularContainer = styled.div`
+  position: relative;
+  width: 600px;
+  height: 350px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const CenterIcon = styled.div`
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+  
+`;
+
+
+const ServiceIcon = styled.div<{ rotation: number }>`
+  position: absolute; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transform: rotate(${props => props.rotation}deg) translateX(250px) rotate(-${props => props.rotation}deg);
+  transition: transform 0.3s ease;
+
+  
+`;
 
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ width: '25%', position: 'absolute', marginTop: '20px'}}>
+      <BreadCrumbStyle isCollapsed={isCollapsed}>
               <nav>
                 <ol>
                   <li>
@@ -149,49 +180,92 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <div style={{marginTop:"150px"}}>
       </div>
 
-      <ContainerPs>
-        <Ps1>
-          <PsImage>
-          <Image src={Geral} onClick={handleInstitucional} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Institucional" />
-          {title === 'Institucional' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}
-          </PsImage>
-        </Ps1>
-        <Ps2>
-         
-          <Ps5>
-          </Ps5>
+      <CircularContainer>
 
-          <PsImageEsquerda>
-            <Image src={Agua} onClick={handleAgua} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Água" />
-            {title === 'Água' && show && (<TitlePsOnMouse>
-          {title}
+        
+          <CenterIcon onClick={handleInstitucional}>
+          
+          <Image 
+            src={Institucional} 
+            onMouseOver={titleOnMouse} 
+            onMouseOut={() => setShow(false)} 
+            width={150}
+            height={150}
+            alt="Institucional" />
+            {title === 'Institucional' && show && (<TitlePsOnMouse>
+            {title} 
           </TitlePsOnMouse>)}
-          </PsImageEsquerda>
-          <PsImageDireita>
-          <Image src={Residuos} onClick={handleResiduosUnidade} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Residuos" />
-          {title === 'Residuos' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}            
-          </PsImageDireita>
-          <Ps3>  
-            <Ps3ImageEsquerda>
-            <Image src={Esgoto} onClick={handleEsgoto} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Esgoto" />
+
+          </CenterIcon>
+
+          <ServiceIcon onClick={handleEsgoto}
+          rotation={0}>
+            <Image 
+              src={Esgoto} 
+              onMouseOver={titleOnMouse} 
+              onMouseOut={() => setShow(false)} 
+              width={100}
+              height={100}
+              alt="Esgoto"
+              />
             {title === 'Esgoto' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)}               
-            </Ps3ImageEsquerda>
-            <Ps3ImageDireita>
-            <Image src={Drenagem} onClick={handleDrenagem} onMouseOver={titleOnMouse} onMouseOut={() => setShow(false)} alt="Drenagem" />
+            {title} 
+            </TitlePsOnMouse>)}
+          </ServiceIcon>
+
+          <ServiceIcon onClick={handleResiduosUnidade}
+          rotation={90}>
+            <Image 
+              src={Residuos} 
+              onMouseOver={titleOnMouse} 
+              onMouseOut={() => setShow(false)} 
+              width={100}
+              height={100}
+              alt="Residuos"
+              />
+            {title === 'Residuos' && show && (<TitlePsOnMouse>
+            {title} 
+            </TitlePsOnMouse>)}
+          </ServiceIcon>
+
+          <ServiceIcon onClick={handleAgua}
+          rotation={180}>
+            <Image 
+              src={Agua} 
+              onMouseOver={titleOnMouse} 
+              onMouseOut={() => setShow(false)} 
+              width={100}
+              height={100}
+              alt="Água"
+              />
+            {title === 'Água' && show && (<TitlePsOnMouse>
+            {title} 
+            </TitlePsOnMouse>)}
+          </ServiceIcon>
+
+          <ServiceIcon rotation={270} onClick={handleDrenagem} >
+            <Image 
+              src={Drenagem} 
+              onMouseOver={titleOnMouse} 
+              onMouseOut={() => setShow(false)} 
+              width={100}
+              height={100}
+              alt="Drenagem"
+              />
             {title === 'Drenagem' && show && (<TitlePsOnMouse>
-          {title}
-          </TitlePsOnMouse>)} 
-            </Ps3ImageDireita>    
-          </Ps3>          
-        </Ps2>
-      </ContainerPs>
-  
+            {title} 
+            </TitlePsOnMouse>)}
+          </ServiceIcon>
+      </CircularContainer>
+              
+              <Image 
+              src={Modelo} 
+              onMouseOver={titleOnMouse} 
+              onMouseOut={() => setShow(false)} 
+              width={100}
+              height={100}
+              alt="Modelo"
+              />
     </Container>
   );
 }

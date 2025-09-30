@@ -7,6 +7,7 @@ import {
   BaixarRelatorio,
   TituloRelatorios,
 } from "../../styles/indicadores";
+import { BreadCrumbStyle } from "../../styles/indicadores";
 import Image from "next/image";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -27,6 +28,7 @@ import MenuHorizontal from "../../components/MenuHorizontal";
 import { useMunicipio } from "@/contexts/MunicipioContext";
 import { get } from "http";
 import { log } from "console";
+import Link from "next/link";
 
 interface IMunicipio {
   id_municipio: string;
@@ -66,7 +68,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
   const [unidadesRss, setDadosUnidadesRss] = useState(null);
   const [associacoes, setAssociacoes] = useState(null);
   const [anoSelected, setAnoSelected] = useState(null);
-
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [ listPoliticas, setPoliticas] = useState(null)
   const [ listPlanos, setPlanos] = useState(null)
   const [ listParticipacoes, setListParticipacoes]= useState(null)
@@ -329,10 +331,22 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <div style={{marginTop:"50px"}}>
-
-      </div>
+      
       <DivCenter>
+        <BreadCrumbStyle isCollapsed={isCollapsed}>
+                <nav>
+                  <ol>
+                    <li>
+                      <Link href="/indicadores/home_indicadores">Home</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <span>Monitoramento e Avaliação</span>
+                    </li>
+                  </ol>
+                </nav>
+        </BreadCrumbStyle>
+        
         <DivForm>
           <DivTituloForm>Relatórios Atuais</DivTituloForm>
             

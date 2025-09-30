@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import {FaBars} from "react-icons/fa";
 import {
   Container,
   DivInput,
@@ -50,7 +50,7 @@ import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
 import Link from "next/link";
 
@@ -79,6 +79,22 @@ export default function Drenagem({ municipio }: MunicipioProps) {
   const [dadosDrenagem, setDadosDrenagem] = useState(null);
   const [content, setContent] = useState("");
   const [anoSelected, setAnoSelected] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 768) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   useEffect(() => {
     getMunicipio();
@@ -150,7 +166,16 @@ export default function Drenagem({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+       
+      {isCollapsed ? (
+                    <ExpandButton  onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </ExpandButton>
+                ) : (
+                  <Sidebar isCollapsed={isCollapsed}>
+                    <CollapseButton onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </CollapseButton>
         <SidebarItem
           active={activeForm === "ViasUrbanas"}
           onClick={() => setActiveForm("ViasUrbanas")}
@@ -176,9 +201,14 @@ export default function Drenagem({ municipio }: MunicipioProps) {
           Eventos hidrológicos
         </SidebarItem>
       </Sidebar>
-
-      <MainContent>
-        <BreadCrumbStyle style={{ width: '27%'}}>
+                )}
+      <MainContent isCollapsed={isCollapsed}>
+       
+        <DivCenter
+          style={{ marginLeft: isCollapsed ? "0px" : "30px" }}
+        >
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <BreadCrumbStyle isCollapsed={isCollapsed}>
                                 <nav>
                                   <ol>
                                     <li>
@@ -186,7 +216,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                                       <span> / </span>
                                     </li>
                                     <li>
-                                      <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                                      <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                                       <span> / </span>
                                     </li>
                                     <li>
@@ -194,9 +224,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                                     </li>
                                   </ol>
                                 </nav>
-          </BreadCrumbStyle>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
+      </BreadCrumbStyle>
             <DivForm>
               <DivTituloForm>Drenagem e Águas Pluviais</DivTituloForm>
 

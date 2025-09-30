@@ -20,9 +20,11 @@ import {
   PsImageDireita,
   Ps3ImageEsquerda,
   Ps3ImageDireita,
+  HamburgerMenu
 } from "../styles/indicadores";
 import HeadIndicadores from "../components/headIndicadores";
 import MenuIndicadores from "../components/MenuIndicadores";
+import {FaAngleDown} from "react-icons/fa";
 import Router from "next/router";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
@@ -38,6 +40,7 @@ import Residuos from "../../img/residuos.png"
 import Qualidade from "../../img/qualidade.png"
 import Balanco from "../../img/balanco.png"
 import Tarifas from "../../img/tarifas.png"
+import styled from "styled-components/dist/constructors/styled";
 
 interface IMunicipio {
   id_municipio: string;
@@ -93,12 +96,27 @@ export default function MenuHorizontal({municipio}) {
     Router.push("/indicadores/Manuais");
   }
 
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  
+
   return (
     <Container>
    
       <MenuMunicipio>
-        <Municipio>Bem vindos Município de {municipio}</Municipio>
-        <MenuMunicipioItem>
+        <Municipio 
+        style={{
+        display: "flex",
+        flexDirection: "row", 
+        justifyContent: "space-around"
+        }}>
+          Bem vindos Município de {municipio} 
+        <HamburgerMenu onClick={() => setMenuOpen(!menuOpen)}>
+          <span> <FaAngleDown /> </span>
+        </HamburgerMenu>
+        </Municipio>
+        
+        <MenuMunicipioItem menuOpen={menuOpen}>
           <ul>
           <li onClick={handleDashboard}> {permission.adminGeral || permission.adminTedPlan ? "Dashboard" : ""}</li>
           <li onClick={handleHome}>Pagina Inicial</li>
@@ -109,6 +127,7 @@ export default function MenuHorizontal({municipio}) {
             <li onClick={handleSignOut}>Sair</li>
           </ul>
         </MenuMunicipioItem>
+        
       </MenuMunicipio>
 
      

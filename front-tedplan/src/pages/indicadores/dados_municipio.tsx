@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-
+import { FaBars } from "react-icons/fa";
 import {
   Container,
   Sidebar,
@@ -25,7 +25,9 @@ import {
   StepperButton,
   DivFormCadastro,
   StepButton,
-  BreadCrumbStyle
+  BreadCrumbStyle,
+  ExpandButton,
+  CollapseButton
 } from "../../styles/indicadores";
 import HeadIndicadores from "../../components/headIndicadores";
 import MenuIndicadores from "../../components/MenuIndicadoresCadastro";
@@ -41,7 +43,8 @@ import { onlyLettersAndCharacters, toTitleCase } from "@/util/util";
 import api from "@/services/api";
 import { Loading } from "@/components/Loading";
 import styled from "styled-components";
-import BreadCrumb from "./componentes/breadCrumb";
+import Link from "next/link";
+
 
 interface MunicipioProps {
   municipio: Municipio;
@@ -64,6 +67,20 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   const [content, setContent] = useState("");
   const [responsaveisSimisab, setResponsaveisSimisab] = useState<any[]>([]);
   const [copiaParaEsgoto, setCopiaParaEsgoto] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+  const handleResize = () => {
+    if (window.innerWidth <= 1000) {
+      setIsCollapsed(true);
+    } else {
+      setIsCollapsed(false);
+    }
+  };
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
 
   const popUrbana = watch("dd_populacao_urbana");
   const popRural = watch("dd_populacao_rural");
@@ -257,6 +274,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   const [activeTab, setActiveTab] = useState("controleSocial");
 
+
   const TabContainer = styled.div`
     display: flex;
     gap: 10px;
@@ -272,6 +290,83 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     border-radius: 4px;
   `;
 
+ const TableContainer = styled.div`
+  margin-bottom: 50px;
+  background-color: #fff;
+  border-radius: 8px;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  margin-top: 20px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    
+
+    td {
+      padding: 12px 16px;
+      vertical-align: middle;
+      border-bottom: 1px solid #eee;
+      
+
+      &:first-child {
+        width: 20px;
+      }
+
+      &:nth-child(2) {
+        width: 80%;
+      }
+
+      &:nth-child(3) {
+        width: 10%;
+      }
+      &:nth-child(4) {
+        width: 150px;
+      }
+
+      input, select {
+        width: 150px;
+        height: 36px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #fff;
+        font-size: 14px;
+        margin: 0;
+
+        &:disabled {
+          background-color: #f5f5f5;
+          cursor: not-allowed;
+        }
+
+        &:focus {
+          border-color: #0085bd;
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(0,133,189,0.2);
+        }
+      }
+
+      span {
+        color: #ff0000;
+        margin-left: 4px;
+      }
+    }
+
+    tr {
+      &:hover {
+        background-color: #f9f9f9;
+      }
+    }
+  }
+`;
+
+ const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
+
+  
+
   return (
     <Container>
       {loading && <Loading />}
@@ -279,7 +374,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <Sidebar>
+      
+      {isCollapsed ? (
+              <ExpandButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+          ) : (
+      <Sidebar isCollapsed={isCollapsed}>
+         <CollapseButton onClick={toggleSidebar}>
+            <FaBars /> 
+          </CollapseButton>
         <SidebarItem
           active={activeForm === "dadosMunicipio"}
           onClick={() => setActiveForm("dadosMunicipio")}
@@ -323,10 +427,23 @@ export default function Cadastro({ municipio }: MunicipioProps) {
           Dados Demográficos
         </SidebarItem>
       </Sidebar>
-      <MainContent>
-        <BreadCrumb />
-        <DivCenter>
+      )}
+      <MainContent isCollapsed={isCollapsed}>
+        <DivCenter >
           <Form onSubmit={handleSubmit(handleCadastro)}>
+            <BreadCrumbStyle isCollapsed={isCollapsed}>
+                          <nav>
+                            <ol>
+                              <li>
+                                <Link href="/indicadores/home_indicadores">Home</Link>
+                                <span> / </span>
+                              </li>
+                              <li>
+                                <span>Cadastro</span>
+                              </li>
+                            </ol>
+                          </nav>
+          </BreadCrumbStyle>
             <DivFormCadastro active={activeForm === "dadosMunicipio"}>
               <DivTituloForm>Dados do Município</DivTituloForm>
 
@@ -607,11 +724,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                 </tbody>
               </table>
+
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
                   <SubmitButton type="submit">Gravar</SubmitButton>
                 )}
               </SubmitButtonContainer>
+
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "titularServicos"}>
@@ -2838,24 +2957,32 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 type="hidden"
                 name="id_dados_geograficos"
               />
-              <table style={{ marginBottom: "50px" }}>
+              <TableContainer>
+              <table>
                 <tbody>
                   <tr>
                     <td
                       colSpan={4}
-                      style={{ paddingTop: "25px", fontWeight: "bold" }}
+                      style={{fontWeight: "bold", textAlign: "center",
+                        color: "#fff",
+                        fontSize: "16px",
+                        backgroundColor: "#0085bd",
+                        padding: "15px",
+                        width: '100%',
+                       
+                       }}
                     >
                       Gerais
                     </td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Nome da mesorregião geográfica
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0001", {
                           required: "Campo obrigatório",
                         })}
@@ -2868,12 +2995,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Nome da microrregião geográfica
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0002", {
                           required: "Campo obrigatório",
                         })}
@@ -2886,14 +3013,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       O município pertence a uma Região Metropolitana (RM),
                       Região Integrada de Desenvolvimento (RIDE), Aglomeração
                       Urbana ou Microrregião legalmente instituída?
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <select
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0003", {
                           required: "Campo obrigatório",
                         })}
@@ -2909,13 +3036,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Nome oficial (RM, RIDE, Aglomeração Urbana ou
                       Microrregião)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                      
                         {...register("OGM0004", {
                           required:
                             watch("OGM0003") === "Sim"
@@ -2932,12 +3059,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Área territorial total
                     </td>
                     <td style={{ paddingTop: "0px", width: "150px" }}>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0005", {
                           required: "Campo obrigatório",
                         })}
@@ -2951,14 +3078,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0005 && <span>{errors.OGM0005.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>km²</td>
+                    <td >km²</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Total de áreas urbanizadas
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
                         style={{ margin: "0px", width: "150px" }}
                         {...register("OGM0006", {
@@ -2974,17 +3101,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0006 && <span>{errors.OGM0006.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>km²</td>
+                    <td >km²</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Quantidade de distritos em que se divide o município
                       (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0007", {
                           required: "Campo obrigatório",
                         })}
@@ -2998,17 +3125,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0007 && <span>{errors.OGM0007.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>unidades</td>
+                    <td >unidades</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Quantidade de localidades urbanas existentes, inclusive à
                       sede (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0008", {
                           required: "Campo obrigatório",
                         })}
@@ -3022,17 +3149,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0008 && <span>{errors.OGM0008.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>unidades</td>
+                    <td >unidades</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Quantidade de aglomerados rurais de características
                       urbanas existentes (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0009", {
                           required: "Campo obrigatório",
                         })}
@@ -3046,25 +3173,30 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0009 && <span>{errors.OGM0009.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>unidades</td>
+                    <td>unidades</td>
                   </tr>
 
                   <tr>
                     <td
                       colSpan={4}
-                      style={{ paddingTop: "25px", fontWeight: "bold" }}
+                      style={{ fontWeight: "bold", textAlign: "center", color: "#fff",
+                        backgroundColor: "#0085bd", fontSize: "16px", 
+                        borderRadius: "10px 10px 0 0",
+                        padding: "15px",
+                        width: '100%',
+                       }}
                     >
                       Cotas topográficas, bacias hidrográficas e cursos d'água
                     </td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Cota altimétrica de referência
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0010", {
                           required: "Campo obrigatório",
                         })}
@@ -3078,16 +3210,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0010 && <span>{errors.OGM0010.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>m</td>
+                    <td >m</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Cota altimétrica mínima
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0011", {
                           required: "Campo obrigatório",
                         })}
@@ -3101,16 +3233,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0011 && <span>{errors.OGM0011.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>m</td>
+                    <td >m</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Cota altimétrica máxima
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0012", {
                           required: "Campo obrigatório",
                         })}
@@ -3130,7 +3262,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   <tr>
                     <td
                       colSpan={4}
-                      style={{ paddingTop: "25px", fontWeight: "bold" }}
+                      style={{fontWeight: "bold", textAlign: "center",
+                        backgroundColor: "#0085bd", fontSize: "16px", 
+                        borderRadius: "10px 10px 0 0",
+                        padding: "15px", color: "#ffffff",
+                        position: "relative",
+                        width: '100%',
+                       }}
                     >
                       Comunidades especiais existentes no município
                     </td>
@@ -3138,12 +3276,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Existem Aldeias Indígenas no município?
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <select
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0101", {
                           required: "Campo obrigatório",
                         })}
@@ -3159,13 +3297,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Quantidade de moradias/habitações existente nas Aldeias
                       Indígenas (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0102", {
                           required:
                             watch("OGM0101") === "Sim"
@@ -3183,17 +3321,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0102 && <span>{errors.OGM0102.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>moradias</td>
+                    <td >moradias</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       População permanente estimada nas Aldeias Indígenas
                       (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0103", {
                           required:
                             watch("OGM0101") === "Sim"
@@ -3211,17 +3349,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0103 && <span>{errors.OGM0103.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>habitantes</td>
+                    <td >habitantes</td>
                   </tr>
 
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Existem Comunidades Quilombolas no município?
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <select
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0104", {
                           required: "Campo obrigatório",
                         })}
@@ -3237,14 +3375,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Quantidade de moradias/habitações existente nas
                       Comunidades Quilombolas (previsão de coleta: a partir de
                       2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0105", {
                           required:
                             watch("OGM0104") === "Sim"
@@ -3262,17 +3400,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0105 && <span>{errors.OGM0105.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>moradias</td>
+                    <td >moradias</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       População permanente estimada nas Comunidades Quilombolas
                       (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM0106", {
                           required:
                             watch("OGM0104") === "Sim"
@@ -3295,12 +3433,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Existem Comunidades Extrativistas no município?
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <select
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0107", {
                           required: "Campo obrigatório",
                         })}
@@ -3316,14 +3454,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Quantidade de moradias/habitações existente nas
                       Comunidades Extrativistas (previsão de coleta: a partir de
                       2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0108", {
                           required:
                             watch("OGM0107") === "Sim"
@@ -3341,17 +3479,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       />
                       {errors.OGM0108 && <span>{errors.OGM0108.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>moradias</td>
+                    <td >moradias</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       População permanente estimada nas Comunidades
                       Extrativistas (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM0109", {
                           required:
                             watch("OGM0107") === "Sim"
@@ -3373,6 +3511,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                 </tbody>
               </table>
+              </TableContainer>
 
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
@@ -3388,16 +3527,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 type="hidden"
                 name="id_dados_demograficos"
               />
-              <table style={{ marginBottom: "50px" }}>
+              <TableContainer>
+              <table>    
                 <tbody>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       População Urbana<span> *</span>
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
                         {...register("dd_populacao_urbana", {
                           required: "Campo obrigatório",
                         })}
@@ -3417,13 +3556,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       {" "}
                       População Rural<span> *</span>
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("dd_populacao_rural", {
                           required: "Campo obrigatório",
                         })}
@@ -3443,13 +3582,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       {" "}
                       População Total<span> *</span>
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("dd_populacao_total")}
                         type="text"
                         disabled={true}
@@ -3460,12 +3599,12 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       Total de Moradias<span> *</span>
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("dd_total_moradias", {
                           required: "Campo obrigatório",
                         })}
@@ -3486,14 +3625,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       {" "}
                       Quantidade de estabelecimentos urbanos existente no
                       município (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM4001", {
                           required: "Campo obrigatório",
                         })}
@@ -3507,18 +3646,18 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       ></input>
                       {errors.OGM4001 && <span>{errors.OGM4001.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Unidades</td>
+                    <td>Unidades</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td>
                       {" "}
                       Quantidade de estabelecimentos rurais existente no
                       município (previsão de coleta: a partir de 2025)
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM4002", {
                           required: "Campo obrigatório",
                         })}
@@ -3532,35 +3671,35 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       ></input>
                       {errors.OGM4002 && <span>{errors.OGM4002.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Unidades</td>
+                    <td >Unidades</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       {" "}
                       Quantidade de estabelecimentos totais existente no
                       município (previsão de coleta: a partir de 2025).
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM4003")}
                         type="text"
                         name="OGM4003"
                         disabled={true}
                       ></input>
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Unidades</td>
+                    <td >Unidades</td>
                   </tr>
 
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Quantidade de domicílios urbanos existente no município.
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM4004", {
                           required: "Campo obrigatório",
                         })}
@@ -3574,16 +3713,16 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       ></input>
                       {errors.OGM4004 && <span>{errors.OGM4004.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Domicílios</td>
+                    <td>Domicílios</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Quantidade de domicílios rurais existente no município.
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM4005", {
                           required: "Campo obrigatório",
                         })}
@@ -3597,33 +3736,33 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       ></input>
                       {errors.OGM4005 && <span>{errors.OGM4005.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Domicílios</td>
+                    <td>Domicílios</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Quantidade de domicílios totais existente no município.
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM4006")}
                         type="text"
                         name="OGM4006"
                         disabled={true}
                       ></input>
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Domicílios</td>
+                    <td>Domicílios</td>
                   </tr>
 
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Extensão total de vias públicas urbanas com pavimento.
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM4007", {
                           required: "Campo obrigatório",
                         })}
@@ -3637,17 +3776,17 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       ></input>
                       {errors.OGM4007 && <span>{errors.OGM4007.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Km</td>
+                    <td >Km</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       {" "}
                       Extensão total de vias públicas urbanas sem pavimento.
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td>
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                        
                         {...register("OGM4008", {
                           required: "Campo obrigatório",
                         })}
@@ -3661,27 +3800,28 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       ></input>
                       {errors.OGM4008 && <span>{errors.OGM4008.message}</span>}
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Km</td>
+                    <td >Km</td>
                   </tr>
                   <tr>
                     <td></td>
-                    <td style={{ paddingTop: "15px" }}>
+                    <td >
                       Extensão total de vias públicas urbanas (com e sem
                       pavimento).
                     </td>
-                    <td style={{ paddingTop: "0px", width: "150px" }}>
+                    <td >
                       <input
-                        style={{ margin: "0px", width: "150px" }}
+                       
                         {...register("OGM4009")}
                         type="text"
                         name="OGM4009"
                         disabled={true}
                       ></input>
                     </td>
-                    <td style={{ paddingTop: "15px" }}>Km</td>
+                    <td>Km</td>
                   </tr>
                 </tbody>
               </table>
+              </TableContainer>
 
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (

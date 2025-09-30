@@ -1,15 +1,20 @@
 import {} from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
-
-import { Footer } from "../styles/dashboard";
+import Sidebar from "@/components/Sidebar";
+import { DivMenuTitulo, Footer, MenuMunicipioItem } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
 import Router from "next/router";
+import { Container } from "../styles/dashboard";
 import api from "../services/api";
+import HeadIndicadores from "@/components/headIndicadores";
+import { AuthContext } from "@/contexts/AuthContext";
+import { BodyDashboard } from "@/styles/dashboard-original";
+
 
 interface IMenu {
   id_menu: string;
@@ -47,6 +52,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
   const [modulosData, setModulosData] = useState<any>(modulos);
   const [isEditing, setIsEditing] = useState(false);
   const [menuId, setMenuId] = useState<string | null>(null);
+  const {signOut} = useContext(AuthContext);
   const router = useRouter();
 
   useEffect(() => {
@@ -155,19 +161,50 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
     }
   }
 
+  async function handleSignOut() {
+      signOut();
+    }
+  
+  function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+    }
+
+
   return (
+    
     <div style={{
-      minHeight: '100vh',
+      height: '0vh',
       backgroundColor: '#f5f5f5',
       fontFamily: 'Arial, sans-serif'
     }}>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+      <Container>
+      {/* <MenuSuperior usuarios={[]}></MenuSuperior> */}
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+              <DivMenuTitulo> 
+                    <text style={{
+                      fontSize: '20px',
+                      fontWeight: 'bold',
+                      padding: '15px 20px',
+                      float: 'left',
+                      
+                      }}>
+                        Painel de Edição 
+                      </text>
+                    <ul style={{}}>
+                    <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                    <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                    </ul>
+              </DivMenuTitulo>
+            <BodyDashboard>
+           
+            <Sidebar />
 
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 'calc(100vh - 200px)',
+        minHeight: 'calc(90vh - 200px)',
+        marginLeft: '100px',
         padding: '20px'
       }}>
         <div style={{
@@ -458,10 +495,12 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
         </div>
       </div>
 
+              </BodyDashboard>
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>
-
+    </Container> 
+    
       <style jsx>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }

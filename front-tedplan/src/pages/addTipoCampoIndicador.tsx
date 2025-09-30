@@ -1,14 +1,16 @@
 import {} from "next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
-
-import { Footer } from "../styles/dashboard";
+import { AuthContext } from "@/contexts/AuthContext";
+import { BodyDashboard, DivMenuTitulo, Footer, MenuMunicipioItem } from "../styles/dashboard";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
+import Sidebar from "@/components/Sidebar";
 import MenuSuperior from "../components/head";
 import Router from "next/router";
+import HeadIndicadores from "@/components/headIndicadores";
 
 interface ITipoCampo {
   id_tipo_campo_indicador: string;
@@ -35,6 +37,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [tipoCampoId, setTipoCampoId] = useState<string | null>(null);
   const router = useRouter();
+  const {signOut} = useContext(AuthContext);
   
   const watchType = watch("type");
 
@@ -128,19 +131,46 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
     }
   }
 
+  async function handleSignOut() {
+              signOut();
+            }
+          
+            function handleSimisab() {
+                  Router.push("/indicadores/home_indicadores");
+                }
+
   return (
     <div style={{
-      minHeight: '100vh',
+      height: '100vh',
       backgroundColor: '#f5f5f5',
       fontFamily: 'Arial, sans-serif'
     }}>
-      <MenuSuperior usuarios={[]}></MenuSuperior>
+      <HeadIndicadores usuarios={[]}></HeadIndicadores>
+                                      <DivMenuTitulo> 
+                                            <text style={{
+                                              fontSize: '20px',
+                                              fontWeight: 'bold',
+                                              padding: '15px 20px',
+                                              float: 'left',
+                                              
+                                              }}>
+                                               Painel de Edição 
+                                              </text>
+                                            <ul style={{}}>
+                                            <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                                            <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                                            </ul>
+                                      </DivMenuTitulo>
+      <BodyDashboard>
+
+        <Sidebar />                               
 
       <div style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        minHeight: 'calc(100vh - 200px)',
+        height: 'calc(100vh - 200px)',
+        marginLeft: '100px',
         padding: '20px'
       }}>
         <div style={{
@@ -455,7 +485,7 @@ export default function AddTipoCampoIndicador({ tipoCampo }: TipoCampoProps) {
           </form>
         </div>
       </div>
-
+      </BodyDashboard> 
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-
+import {FaBars} from "react-icons/fa"
 import {
   Form,
   InputP,
@@ -53,7 +53,8 @@ import api from "../../services/api";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { log } from "console";
-import { BreadCrumbStyle, MainContent } from "../../styles/indicadores";
+import { BreadCrumbStyle, CollapseButton, ExpandButton} from "../../styles/indicadores";
+import { MainContent } from "../../styles/esgoto-indicadores";
 import { SidebarItem, Sidebar } from "../../styles/residuo-solido-coleta-in";
 import { LineSideBar } from "../../styles/drenagem-indicadores";
 import { anosSelect } from "../../util/util";
@@ -88,6 +89,24 @@ export default function Financeiro({ municipio }: MunicipioProps) {
   const [dadosFinanceiros, setDadosFinanceiros] = useState(null);
   const [anoSelected, setAnoSelected] = useState(null);
   const [activeForm, setActiveForm] = useState("receitas1");
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   useEffect(() => {
     getDadosMunicipio();
@@ -612,7 +631,15 @@ export default function Financeiro({ municipio }: MunicipioProps) {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
-      <Sidebar>
+       {isCollapsed ? (
+                    <ExpandButton onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </ExpandButton>
+                ) : (
+      <Sidebar isCollapsed={isCollapsed}>
+                    <CollapseButton onClick={toggleSidebar}>
+                      <FaBars /> 
+                    </CollapseButton>
         <LineSideBar>Água e Esgoto Sanitário</LineSideBar>
         <SidebarItem
           active={activeForm === "receitas1"}
@@ -719,8 +746,12 @@ export default function Financeiro({ municipio }: MunicipioProps) {
           Observações, esclarecimentos e sugestões
         </SidebarItem>
       </Sidebar>
-      <MainContent>
-        <BreadCrumbStyle style={{ width: '27%'}}>
+      )}
+      <MainContent isCollapsed={isCollapsed}>
+        
+        <DivCenter>
+          <Form onSubmit={handleSubmit(handleCadastro)}>
+            <BreadCrumbStyle isCollapsed={isCollapsed}>
                 <nav>
                   <ol>
                     <li>
@@ -728,7 +759,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                       <span> / </span>
                     </li>
                     <li>
-                      <Link href="./prestacao-servicos">Prestação de Serviços</Link>
+                      <Link href="./prestacao-servicos-snis">Prestação de Serviços SNIS</Link>
                       <span> / </span>
                     </li>
                     <li>
@@ -737,8 +768,6 @@ export default function Financeiro({ municipio }: MunicipioProps) {
                   </ol>
                 </nav>
           </BreadCrumbStyle>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
             <DivForm>
               <DivTituloForm>Informações Financeiras</DivTituloForm>
               <DivFormEixo>

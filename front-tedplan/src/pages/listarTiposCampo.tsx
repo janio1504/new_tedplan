@@ -207,11 +207,11 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
       <DivCenter>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h2>Lista de Tipos de Campo</h2>
-          {(permission.adminGeral || permission.adminTedPlan) && (
-            <BotaoAdicionar onClick={handleAddTipoCampo}>
+          {/* {(permission.adminGeral || permission.adminTedPlan) && ( */}
+            <BotaoAdicionar onClick={handleAddTipoCampo} style={{marginLeft: '15px'}}>
               + Novo Tipo de Campo
             </BotaoAdicionar>
-          )}
+          {/* )} */}
         </div>
 
         <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>

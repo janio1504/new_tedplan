@@ -31,7 +31,10 @@ import {
   ButtonAdicionarPresidente,
   Tooltip,
   TooltipText,
+  ExpandButton,
+  CollapseButton
 } from "../../styles/indicadores";
+import { FaBars } from "react-icons/fa";
 import Link from "next/link";
 import Editar from "../../img/editar.png";
 import ajuda from "../../img/ajuda.png";
@@ -196,6 +199,25 @@ export default function GestaoIndicadores({
   const [isClient, setIsClient] = useState(null);
   const [updatePresidente, setUpdatePresidente] = useState(null);
   const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  }
 
   const {
     register,
@@ -1184,29 +1206,37 @@ export default function GestaoIndicadores({
       });
   }
 
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     if (window.innerWidth <= 768) {
+  //       setIsCollapsed(true);
+  //     } else {
+  //       setIsCollapsed(false);
+  //     }
+  //   };
+  //   handleResize();
+  //   window.addEventListener("resize", handleResize);
+  //   return () => window.removeEventListener("resize", handleResize);
+  // }, []);
+
+
   return (
     <Container>
-      
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={[]}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <BreadCrumbStyle style={{ 
-        width: '25%', marginTop: '20px',
-        marginLeft: '140px', marginBottom: '-20px'
-        }}>
-                    <nav>
-                      <ol>
-                        <li>
-                          <Link href="/indicadores/home_indicadores">Home</Link>
-                          <span> / </span>
-                        </li>
-                        <li>
-                          <span>Gestão</span>
-                        </li>
-                      </ol>
-                    </nav>
-        </BreadCrumbStyle>
-      <Sidebar>
+      
+       
+
+    {isCollapsed ? (
+              <ExpandButton onClick={toggleSidebar}>
+                <FaBars /> 
+              </ExpandButton>
+          ) : (
+      <Sidebar isCollapsed={isCollapsed}>
+              <CollapseButton onClick={toggleSidebar}>
+                          <FaBars /> 
+              </CollapseButton>
         <SidebarItem
           active={activeForm === "gestaoAssociada"}
           onClick={() => setActiveForm("gestaoAssociada")}
@@ -1249,14 +1279,27 @@ export default function GestaoIndicadores({
         >
           Comunidades Tradicionais
         </SidebarItem>
+      
       </Sidebar>
-
-      <MainContent>
+      )}
+      <MainContent isCollapsed={isCollapsed}>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
+             <BreadCrumbStyle isCollapsed={isCollapsed}>
+                    <nav>
+                      <ol>
+                        <li>
+                          <Link href="/indicadores/home_indicadores">Home</Link>
+                          <span> / </span>
+                        </li>
+                        <li>
+                          <span>Gestão</span>
+                        </li>
+                      </ol>
+                    </nav>
+              </BreadCrumbStyle>
             <DivFormCadastro active={activeForm === "gestaoAssociada"}>
               <DivTituloForm>Gestão Associada</DivTituloForm>
-
               <table>
                 <tr>
                   <td>
@@ -1350,7 +1393,6 @@ export default function GestaoIndicadores({
                   </tbody>
                 </table>
               </Tabela>
-
               <SubmitButtonContainer
                 style={{
                   bottom: "-50px",
@@ -1378,13 +1420,14 @@ export default function GestaoIndicadores({
                 >
                   Situação da Política Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
                   <label
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "5px",
                       cursor: "pointer",
+                     
                     }}
                   >
                     <input
@@ -1401,6 +1444,7 @@ export default function GestaoIndicadores({
                       alignItems: "center",
                       gap: "5px",
                       cursor: "pointer",
+                      
                     }}
                   >
                     <input
@@ -1618,7 +1662,7 @@ export default function GestaoIndicadores({
                 >
                   Situação do Plano Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
                   <label
                     style={{
                       display: "flex",
@@ -1846,7 +1890,7 @@ export default function GestaoIndicadores({
                 >
                   Situação do Conselho Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
                   <label
                     style={{
                       display: "flex",
@@ -2225,8 +2269,11 @@ export default function GestaoIndicadores({
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "saneamentoRural"}
-            style={{minWidth: "1045px", minHeight: "380px"}}>
-              <DivTituloForm style={{display: "flex",alignItems: "center", gap: "10px"}}>
+            style={{minWidth: innerWidth <= 1000 ? "95%" : "1045px", minHeight: "380px",}}>
+              <DivTituloForm style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px"}}>
                 Saneamento Rural
                 <Actions>
                   <Tooltip>
@@ -2264,7 +2311,7 @@ export default function GestaoIndicadores({
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "comunidadesTradicionais"}
-            style={{minWidth: "1045px", height: "658px"}}
+            style={{minWidth: innerWidth <= 1000 ? "95%" : "1045px", height: "658px"}}
            >
             <DivTituloForm style={{display: "flex", alignItems: "center", gap: "10px"}}>Comunidades Tradicionais
               <Actions>
@@ -2302,6 +2349,7 @@ export default function GestaoIndicadores({
                   // required
                 ></textarea>
               </DivTextArea>
+              
               <SubmitButtonContainer style={{
                 bottom: "-50px",
                 right: "-10px"

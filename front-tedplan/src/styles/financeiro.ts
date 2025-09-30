@@ -132,12 +132,11 @@ export const UsuarioLogado = styled.div`
 
 export const DivCenter = styled.div`
   display: flex;
-  max-width: 85%;
+  max-width: 95%;
   min-width: 1280px;
   width: 100%;
   height: 100%;
   min-height: 1000px;
-  //background: #fff;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
@@ -145,6 +144,19 @@ export const DivCenter = styled.div`
   align-items: left;
   padding: 0px;
   flex-direction: column;
+
+   @media (max-width: 1000px) {
+   margin: 10px;
+   justify-content: center;
+   align-items: center;
+   max-width: 100%;
+   margin: 2%;
+   width: 90%;
+   min-heigth: 0;
+   min-width: 0;
+   
+   }
+
 `;
 
 export const DivMenu = styled.div`
@@ -354,17 +366,36 @@ export const DivFormContent = styled.div`
       font-size: 16px;
     }
   }
+
+  @media (max-width: 1500px) {
+  max-width: 90%;
+  float: none;
+  min-width: 90%;
+  width: 90%;
+  margin: 0 auto;
+
+  table{
+  flex-direction: column;
+  }
+  }
 `;
 export const DivForm = styled.div`
   display: flex;
   flex-direction: column;
   width: 97%;
-  min-width: 600px;
+  min-width: auto;
   padding: 10px 12px 10px 10px;
-
   border-radius: 5px;
   margin-top: 20px;
   background-color: #ffff;
+
+  @media (max-width: 1000px) {
+    width: 95%;
+    box-sizing: border-box;
+    min-width: 0;
+    margin: 0 0 0 7% ;
+  }
+ 
 `;
 
 export const TabsList = styled.div`
@@ -682,6 +713,7 @@ export const DivTituloForm = styled.div`
   border-top-right-radius: 6px;
   font-weight: bolder;
   color: #fff;
+
 `;
 
 export const DivTituloFormDrenagem = styled.div`
@@ -911,17 +943,75 @@ export const DivEixo = styled.div`
 `;
 
 export const Form = styled.form`
+  // font-size: 14px;
+  // background-color: #f3f4f6;
+  // width: 100%;
+  // display: flex;
+  // flex-direction: column;
+  // align-items: center;
+  // input {
+  //   border: 2px solid #666666;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   color: #666;
+  //   float: left;
+  // }
+  // input:focus-within {
+  //   border-color: 2px solid #666666;
+  // }
+
+  // textarea {
+  //   border: 1px solid #eee;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   min-width: 400px;
+  //   height: 200px;
+  // }
+  // label {
+  //   color: #666;
+  //   margin: 10px 0 0 15px;
+  // }
+
+  // select {
+  //   border: 2px solid #666666;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   background: #fff;
+  // }
+  // option {
+  //   border: 1px solid #666666;
+  //   border-radius: 5px;
+  //   padding: 10px 15px;
+  //   margin: 10px;
+  //   width: 500px;
+  //   background: #fff;
+  // }
+  // span {
+  //   color: #666;
+  //   //font-weight: bold;
+  // }
+
+   display: flex;  
+  background-color: #f3f4f6;
+  width: 100%;
   font-size: 14px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   input {
-    border: 2px solid #666666;
+    border: 2px solid #ccc;
     border-radius: 5px;
-    padding: 10px 15px;
+    padding: 15px 15px;
     margin: 10px;
     color: #666;
     float: left;
   }
+
   input:focus-within {
-    border-color: 2px solid #666666;
+    border-color: 2px solid #008080;
   }
 
   textarea {
@@ -929,23 +1019,24 @@ export const Form = styled.form`
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
-    min-width: 400px;
     height: 200px;
+    border: 2px solid #ccc;
   }
   label {
     color: #666;
     margin: 10px 0 0 15px;
+    font-size: 14px;
   }
 
   select {
-    border: 2px solid #666666;
+    border: 2px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #666666;
+    border: 1px solid #2dd9d0;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -953,8 +1044,8 @@ export const Form = styled.form`
     background: #fff;
   }
   span {
-    color: #666;
-    //font-weight: bold;
+    color: red;
+    font-weight: bold;
   }
 `;
 

@@ -3,7 +3,7 @@ import styled, { keyframes } from "styled-components";
 export const Container = styled.div`
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
-  height: 100%;
+  height: ;
   max-width: 100%;
   background-color: #f3f4f6;
 
@@ -201,7 +201,13 @@ export const DivCenter = styled.div`
   text-align: left;
   padding: 0;
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
+
+  @media (max-width: 1000px) {
+ 
+  }
 `;
 
 export const MenuMunicipio = styled.div`
@@ -209,6 +215,8 @@ export const MenuMunicipio = styled.div`
   float: left;
   width: 100%;
   background: #0085bd;
+
+  
 `;
 
 export const StatusMunicipio = styled.div`
@@ -223,9 +231,13 @@ export const StatusMunicipio = styled.div`
   font-size: 25px;
   font-weight: bold;
   color: #000;
+
+  @media (max-width: 768px) {
+  text-align: center;
+  }
 `;
 
-export const MenuMunicipioItem = styled.div`
+export const MenuMunicipioItem = styled.div <{ menuOpen?: boolean }>`
   padding: 20px;
   float: right;
   font-size: 15px;
@@ -233,22 +245,88 @@ export const MenuMunicipioItem = styled.div`
 
   ul {
     text-align: right;
+    
   }
   li {
     cursor: pointer;
     display: inline;
     color: #fff;
     padding: 15px;
+
     &:hover {
       color: #000;
     }
   }
+    
+
+   @media (max-width: 768px) {
+    float: none;
+    display: ${(props) => (props.menuOpen ? "block" : "none")};
+    justify-content: center;
+    padding: 0;
+
+
+    ul {
+    text-align: center;
+    }
+    
+  li {
+    cursor: pointer;
+    display: block;
+    justify-content: flex-start;
+    color: #fff;
+    padding: 15px;
+    
+
+    &:hover {
+    color: #000;
+    
+    }
+
+    &:first-child {
+    border: none;
+    padding: 0;
+    }
+  }
+
+  
+
+  @media (min-width: 769px) {
+    display: block;
+    position: static;
+    width: auto;
+    background: transparent;
+  }
 `;
+
+export const HamburgerMenu = styled.div`
+  display: none;
+
+  span {
+  fontSize: 20,
+  cursor: pointer
+  }
+  
+  @media (max-width: 768px) {
+    display: flex;
+    position: absolute;
+    left: 92%;
+    z-index: 1100;
+    cursor: pointer;
+  }
+`;
+
 export const Municipio = styled.div`
   padding: 15px 20px;
   float: left;
   font-size: 20px;
   font-weight: bold;
+
+  @media (max-width: 768px) {
+    float: none;
+    padding: 10px;
+    text-align: center;
+  }
 `;
 
 export const MunicipioDireita = styled.div`
@@ -258,11 +336,15 @@ export const MunicipioDireita = styled.div`
   font-weight: bold;
 `;
 export const ContainerPs = styled.div`
+  width: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
   margin: 50px 0;
+  box-sizing: border-box;
+
 `;
 export const Ps1 = styled.div`
   display: flex;
@@ -273,6 +355,9 @@ export const Ps1 = styled.div`
   width: 30px;
   height: 100px;
   background-color: #2dd9d0;
+
+
+ 
 `;
 export const Ps2 = styled.div`
   display: flex;
@@ -288,6 +373,9 @@ export const Ps2 = styled.div`
     margin-top: -30px;
     width: 80px;
   }
+
+  
+
 `;
 
 export const Ps3 = styled.div`
@@ -304,6 +392,12 @@ export const Ps3 = styled.div`
     margin-top: -30px;
     width: 80px;
   }
+
+
+    
+  }
+
+  
 `;
 export const Ps4 = styled.div`
   display: flex;
@@ -319,6 +413,10 @@ export const Ps4 = styled.div`
     margin-top: -30px;
     width: 80px;
   }
+
+  
+  
+  }
 `;
 export const Ps5 = styled.div`
   display: flex;
@@ -333,6 +431,10 @@ export const Ps5 = styled.div`
     margin-top: -30px;
     width: 80px;
   }
+
+ 
+    
+  }
 `;
 export const PsImage = styled.div`
   display: flex;
@@ -342,6 +444,8 @@ export const PsImage = styled.div`
   margin: -150px 0 0px 0;
   width: 100px;
   cursor: pointer;
+
+  
 `;
 
 export const TitlePsOnMouse = styled.div`
@@ -358,12 +462,27 @@ export const TitlePsOnMouse = styled.div`
   text-align: left;
 `;
 
+export const TitlePsOnMouseSINISA = styled.div`
+  display: flex;
+  position: relative;
+  background-color: #f9f9f9;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: 1;
+  margin: -5000px auto 0 auto;
+  border-radius: 5px;
+  color: #053d68;
+  font-size: 16px;
+  text-align: left;
+`;
+
 export const PsImageEsquerda = styled.div`
   float: left;
   margin: -110px 0 0px -830px;
   width: 100px;
   left: -30px;
   cursor: pointer;
+  
 `;
 export const Ps3ImageDireita = styled.div`
   float: right;
@@ -371,6 +490,7 @@ export const Ps3ImageDireita = styled.div`
   width: 100px;
   left: -30px;
   cursor: pointer;
+   
 `;
 export const Ps3ImageEsquerda = styled.div`
   float: left;
@@ -378,6 +498,7 @@ export const Ps3ImageEsquerda = styled.div`
   width: 100px;
   right: -30px;
   cursor: pointer;
+   
 `;
 export const PsImageDireita = styled.div`
   float: right;
@@ -385,6 +506,7 @@ export const PsImageDireita = styled.div`
   width: 100px;
   left: -30px;
   cursor: pointer;
+   
 `;
 export const DivConteudo = styled.div`
   max-width: 65%;
@@ -405,6 +527,16 @@ export const DivRelatorios = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+
+  @media (max-width: 1000px) {
+    flex-direction: column;
+    min-width: 0;
+    max-width: 100vh;
+    width: 100%;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+  }
 `;
 
 export const DivColRelatorios = styled.div`
@@ -420,6 +552,12 @@ export const DivColRelatorios = styled.div`
     cursor: pointer;
     font-size: 16px;
     padding: 5px;
+  }
+
+
+  @media (max-width: 1000px) {
+    width: 90%;
+
   }
 `;
 
@@ -494,6 +632,10 @@ export const DivTituloForm = styled.div`
     margin: 0 -1.9rem 1.9rem;
     border-radius: 7.6px 7.6px 0 0;
     box-sizing: border-box;
+
+    @media (max-width: 768px) {
+  text-align: center; 
+  }
 `;
 
 export const Tooltip = styled.span`
@@ -575,6 +717,7 @@ export const Tabela = styled.div`
     }
 
     td {
+      display: table-cell;
       white-space: nowrap;
       padding: 16px 20px;
       color: #4a5568;
@@ -651,7 +794,11 @@ export const Tabela = styled.div`
       }
     }
   }
-`;
+
+    @media (max-width: 1000px) {
+    overflow-x: visible
+    }
+  `;
 
 export const Actions = styled.div`
   display: flex;
@@ -781,6 +928,14 @@ export const SubmitButton = styled.button`
   svg {
     margin-right: 8px;
   }
+
+  @media (max-width: 768px) {
+  width: 100%;
+  float: none;
+  margin: 10px;
+  right: 0;
+    bottom: 0;
+  }
 `;
 
 export const SubmitButtonModal = styled.button`
@@ -821,6 +976,10 @@ export const InputP = styled.div`
     padding: 10px;
     padding: 22px 0;
   }
+@media (max-width: 768px) {
+  width: 100%;
+  }
+
 `;
 
 export const InputM = styled.div`
@@ -830,6 +989,10 @@ export const InputM = styled.div`
   p {
     margin-left: 20px;
     padding: 22px 0;
+  }
+
+  @media (max-width: 768px) {
+  width: 100%;
   }
 `;
 
@@ -841,6 +1004,12 @@ export const InputG = styled.div`
     margin-left: 20px;
     padding: 22px 0;
   }
+
+  @media (max-width: 768px) {
+  width: 100%;
+  }
+
+}
 `;
 
 export const DivEixo = styled.div`
@@ -866,6 +1035,9 @@ export const Form = styled.form`
   background-color: #f3f4f6;
   width: 100%;
   font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   input {
     border: 2px solid #ccc;
     border-radius: 5px;
@@ -911,6 +1083,9 @@ export const Form = styled.form`
   span {
     color: red;
     font-weight: bold;
+  }
+
+  @media (max-width: 768px) {
   }
 `;
 
@@ -1279,12 +1454,22 @@ export const DivMenuCadastro = styled.div`
   width: 100%;
   margin: 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 855px) {
+    
+  }
 `;
 
 export const DivBotaoMenuCadastro = styled.div`
   display: flex;
   align-items: center;
   margin: 0 8px;
+  width: auto;
+
+  @media (max-width: 855px) {
+    justify-content: center;
+    width: 100%;
+  }
 `;
 
 export const NumeroMenuCadastro = styled.div`
@@ -1352,19 +1537,18 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 //   width: 100%;
 // `;
 
-export const Sidebar = styled.div`
-   width: 250px;
-  background-color: white;
-  padding: 1rem;
-  bottom: -600px;
+export const Sidebar = styled.div<{ isCollapsed: boolean }>`
+  width: ${(props) => (props.isCollapsed ? "0": "270px")};
+  background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  padding: ${(props) => (props.isCollapsed ? "0" : "32px 24px")};
   position: absolute;
-  left: 0;
-  top: 255px;
-  overflow-y: auto;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: 1000px;
   display: flex;
   flex-direction: column;
-  border-bottom: none;
+  height: 100vh;
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease-in-out;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -1378,12 +1562,74 @@ export const Sidebar = styled.div`
   &::-webkit-scrollbar-track {
     background-color: #f1f1f1;
   }
+
+  @media (max-width: 1000px) {
+    position: relative;
+    width: auto;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 0;
+    z-index: 1000;
+    margin-bottom: 16px;
+  }
 `;
 
-export const MainContent = styled.div`
-  margin-left: 270px;
+export const ExpandButton = styled.button`
+  width: 50px;
+  height: 50px;
+  background: white;
+  color: rgb(102, 102, 102);
+  border: none;
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  postition: relative;
+  margin: 10px 0 0 10px;
+  z-index: 1000;
+
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #f3f4f6;  
+  }
+
+  @media (max-width: 1000px) {
+    width: 100%;
+    border-radius: 0;
+    margin: 0;
+    
+  }
+  
+`;
+
+export const CollapseButton = styled.button`
+  background: transparent;
+  color: rgb(102, 102, 102);
+  border: none;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-bottom: 16px;
+`;
+
+export const MainContent = styled.div<{ isCollapsed: boolean }>`
+  margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
+  z-index: -1000;
+
+  @media (max-width: 1000px) {
+    min-height: 0;
+    height: 80%;
+    margin: 30px; ;
+    }
+  
 `;
 
 export const SidebarItem = styled.div<{ active?: boolean }>`
@@ -1409,6 +1655,11 @@ export const SidebarItem = styled.div<{ active?: boolean }>`
   &:last-child {
     margin-bottom: 0;
   }
+  &:first-child {
+    margin-top: 40px;
+  }
+
+   
 `;
 
 export const SidebarTitle = styled.h2`
@@ -1606,6 +1857,17 @@ export const SubmitButtonContainer = styled.div`
   right: 0;
   padding: 10px;
   width: 100%;
+
+  @media (max-width: 768px) {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+  position: static;
+  }
 `;
 
 export const DivTextArea = styled.div`
@@ -1617,158 +1879,171 @@ export const DivTextArea = styled.div`
 export const TextArea = styled.div`
   flex-direction: column;
   display: flex;
-  width: 600px;
-  border: #2dd9d0 solid 2px;
+  width: 100%;
+  
   margin: 10px;
   border-radius: 5px;
 `;
 
 export const DivFormCadastro = styled.div<{ active?: boolean }>`
   display: ${(props) => (props.active ? "block" : "none")};
-  background-color: white;
-  padding: 0 1.9rem 1.9rem;
-  border-radius: 7.6px;
-  box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
-  width: 90%;
-  z-index: 1;
-  margin: 0px auto;
-  position: relative;
-  color: #333;
-  overflow: hidden;
-
-  ${DivTituloForm} {
-    width: calc(100% + 3.8rem);
-    padding: 0.95rem 1.9rem;
-    background-color: #0085bd;
-    color: white;
-    font-weight: bold;
-    font-size: 1.19rem;
-    margin: 0 -1.9rem 1.9rem;
-    border-radius: 7.6px 7.6px 0 0;
-    box-sizing: border-box;
-  }
-
-  .form-header {
-    background-color: #008080;
-    color: white;
-    padding: 0.95rem;
-    margin: -1.9rem -1.9rem 0.95rem -1.9rem;
-    border-radius: 7.6px 7.6px 0 0;
-  }
-
-  .form-title {
-    margin: 0;
-    font-size: 17.1px;
-    text-align: center;
-    font-weight: bold;
-  }
-
-  table {
-    width: 99%;
-    border-collapse: separate;
-    padding-top: 9.5px;
-    border-spacing: 0 9.5px;
-  }
-
-  td {
-    padding: 0 0.475rem;
-    vertical-align: top;
-  }
-
-  ${InputG}, ${InputM}, ${InputP} {
-    margin-bottom: 1.2rem;
-  }
-
-  ${InputG}, ${InputM}, ${InputP} {
-    width: 100%;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 0.475rem;
-    font-weight: bold;
-    font-size: 15.2px;
+    background-color: white;
+    padding: 0 1.9rem 1.9rem;
+    border-radius: 7.6px;
+    box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    z-index: 1;
+    margin: 0px auto;
+    position: relative;
     color: #333;
-  }
-
-  input[type="text"],
-  input[type="email"],
-  input[type="tel"],
-  select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    font-size: 16px;
-    line-height: 1.5;
-    transition: all 0.3s ease;
-    color: #333;
-    background-color: #fff;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-
-    &:focus {
-      outline: none;
-      border-color: #008080;
-      box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+    overflow: hidden;
+  
+    ${DivTituloForm} {
+      width: calc(100% + 3.8rem);
+      padding: 0.95rem 1.9rem;
+      background-color: #0085bd;
+      color: white;
+      font-weight: bold;
+      font-size: 1.19rem;
+      margin: 0 -1.9rem 1.9rem;
+      border-radius: 7.6px 7.6px 0 0;
+      box-sizing: border-box;
     }
-
-    &:hover {
-      border-color: #999;
+  
+    .form-header {
+      background-color: #008080;
+      color: white;
+      padding: 0.95rem;
+      margin: -1.9rem -1.9rem 0.95rem -1.9rem;
+      border-radius: 7.6px 7.6px 0 0;
     }
-
-    &::placeholder {
-      color: #999;
-      opacity: 1;
+  
+    .form-title {
+      margin: 0;
+      font-size: 17.1px;
+      text-align: center;
+      font-weight: bold;
     }
-
-    &:disabled {
-      background-color: #f5f5f5;
-      cursor: not-allowed;
+  
+    table {
+      width: 95%;
+      border-collapse: separate;
+      padding-top: 9.5px;
+      border-spacing: 0 9.5px;
     }
-  }
-
-  select {
-    padding-right: 2rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 12px;
-  }
-  .required::after {
-    content: "*";
-    color: red;
-    margin-left: 0.2375rem;
-  }
-
-  ${SubmitButtonContainer} {
-    margin-top: 11.4rem;
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  ${SubmitButton} {
-    background-color: #0085bd;
-    color: white;
-    border: none;
-    margin: 6.65px 1.9px 0.95px 0;
-    padding: 0.7125rem 1.9rem;
-    border-radius: 3.8px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: bold;
-    transition: background-color 0.285s ease, transform 0.095s ease;
-
-    &:hover {
-      background-color: #006666;
+  
+    td {
+      padding: 0 0.475rem;
+      vertical-align: top;
     }
-
-    &:active {
-      transform: translateY(0.95px);
+  
+    ${InputG}, ${InputM}, ${InputP} {
+      margin-bottom: 1.2rem;
     }
-  }
+  
+    ${InputG}, ${InputM}, ${InputP} {
+      width: 95%;
+    }
+  
+    label {
+      display: block;
+      margin-bottom: 0.475rem;
+      font-weight: bold;
+      font-size: 15.2px;
+      color: #333;
+    }
+  
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 16px;
+      line-height: 1.5;
+      transition: all 0.3s ease;
+      color: #333;
+      background-color: #fff;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+  
+      &:focus {
+        outline: none;
+        border-color: #008080;
+        box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
+      }
+  
+      &:hover {
+        border-color: #999;
+      }
+  
+      &::placeholder {
+        color: #999;
+        opacity: 1;
+      }
+  
+      &:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+      }
+    }
+  
+    select {
+      padding-right: 2rem;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 12px;
+    }
+    .required::after {
+      content: "*";
+      color: red;
+      margin-left: 0.2375rem;
+    }
+  
+    ${SubmitButtonContainer} {
+      margin-top: 11.4rem;
+      display: flex;
+      justify-content: flex-end;
+    }
+  
+    ${SubmitButton} {
+      background-color: #0085bd;
+      color: white;
+      border: none;
+      margin: 6.65px 1.9px 0.95px 0;
+      padding: 0.7125rem 1.9rem;
+      border-radius: 3.8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: bold;
+      transition: background-color 0.285s ease, transform 0.095s ease;
+  
+      &:hover {
+        background-color: #006666;
+      }
+  
+      &:active {
+        transform: translateY(0.95px);
+      }
+    }
+  
+      @media (max-width: 1000px) {
+      width: 95%;
+      margin: 0;
+  
+      td  {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 95%;
+      }
+  
+      }
 `;
 
 export const StepperContainer = styled.div`
@@ -2031,15 +2306,14 @@ export const ModalStepContent = styled.div<{ active?: boolean }>`
   }
 `;
 
-export const BreadCrumbStyle = styled.div`
-  color: black;
+export const BreadCrumbStyle = styled.div<{ isCollapsed: boolean }>`
   font-size: 15px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 12%;
+  justify-content: flex-start;
+  width: 90%;
+  margin-top: 20px;
   padding: 10px;
-  border-radius: 5px;
   color: #666;
   
   nav {
@@ -2078,5 +2352,6 @@ export const BreadCrumbStyle = styled.div`
 
   span{
   margin: 5px;
+  color: #666 !important;
   }
 `;

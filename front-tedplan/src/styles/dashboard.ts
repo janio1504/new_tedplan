@@ -212,6 +212,8 @@ export const ListPost = styled.table`
       background: #f5f5f5;
     }
   }
+
+  
 `;
 export const Logo = styled.div`
   width: 100px;
@@ -288,6 +290,7 @@ export const DivCenter = styled.div`
   color: black;
   }
 
+  
 
 `;
 
@@ -307,12 +310,14 @@ export const DivMenuTitulo = styled.div`
   float: left;
   width: 100%;
   background: #0085bd;
+  color: #ffffff;
 `;
 
 export const MenuMunicipioItem = styled.div`
   padding: 20px;
   float: right;
   font-size: 15px;
+  color: #ffffff;
   font-weight: bold;
   cursor: pointer;
 
@@ -482,6 +487,13 @@ export const Form = styled.form`
     flex-direction: column;
     gap: 6px;
   }
+
+    @media (max-width: 768px) {
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    margin: 50px 50px 50px 0;
+    }
 `;
 
 export const InputData = styled.div`
