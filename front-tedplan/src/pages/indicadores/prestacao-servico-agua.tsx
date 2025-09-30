@@ -96,7 +96,21 @@ interface MunicipioProps {
   Imunicipio: IMunicipio[];
 }
 
-// Componente para renderizar campo dinâmico baseado no tipo
+/**
+ * Componente para renderizar campo dinâmico baseado no tipo
+ * 
+ * SISTEMA DE DESABILITAÇÃO DE CAMPOS:
+ * Para adicionar novos códigos com lógica de desabilitação:
+ * 
+ * 1. Adicione o código no objeto fieldConditions (linha ~140) com sua condição
+ * 2. Adicione o código no objeto fieldUpdateRules (linha ~179) com sua regra de atualização
+ * 3. Adicione o código no objeto fieldConditions do debug (linha ~160) para logs
+ * 4. Adicione as propriedades necessárias no estado fieldStates
+ * 
+ * Exemplo:
+ * - fieldConditions: "NOVO_CODIGO": () => fieldStates.novaCondicao === true
+ * - fieldUpdateRules: "NOVO_CODIGO": () => { newStates.novaCondicao = value === "valor" }
+ */
 const CampoIndicador = ({ 
   indicador, 
   register, 
@@ -128,30 +142,286 @@ const CampoIndicador = ({
 
   const tipoCampo = indicador.tiposCampo && indicador.tiposCampo.length > 0 ? indicador.tiposCampo[0] : null;
   const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
-  
-    // Função para verificar se um campo deve estar habilitado baseado nas condições
-  const isFieldEnabled = (codigoIndicador: string) => {
-    switch (codigoIndicador) {
-      case "CAD2002":
-        // CAD2002 só é habilitado quando algum campo tem valor "coleta"
-        return fieldStates?.hasColeta === true;
+  const { usuario } = useContext(AuthContext);
 
-      default:
-        return true; // Por padrão, campos estão habilitados
+    
+    // Função para validar opções do CAD2001 baseado no CAD1002
+  const getValidOptionsForCAD2001 = (cad1002Value: string, naturezaJuridica: string) => {
+    if (!cad1002Value) return [];
+    
+    // Prestadores locais de natureza jurídica específica
+    const prestadoresLocais = ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"];
+    const opcoesLocais = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
+    
+    // Prestadores regionais de natureza jurídica específica
+    const prestadoresRegionais = ["Autarquia", "Empresa pública", "Sociedade de economia mista", "Empresa privada"];
+    const opcoesRegionais = [
+      "Sem delegação atendendo Sede e Localidades - SDSL",
+      "Sem delegação atendendo Sede - SDS", 
+      "Sem delegação atendendo Localidades - SDL",
+      "Com delegação sem atendimento - DSA",
+      "Com delegação atendendo Sede e Localidades - DSL",
+      "Com Delegação atendendo apenas Sede - DS",
+      "Com Delegação atendendo apenas localidades - DL"
+    ];
+    
+    // Associação privada (local ou regional)
+    const opcoesAssociacao = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
+    
+    if (prestadoresLocais.includes(naturezaJuridica)) {
+      return opcoesLocais;
+    } else if (prestadoresRegionais.includes(naturezaJuridica)) {
+      return opcoesRegionais;
+    } else if (naturezaJuridica === "Associação privada") {
+      return opcoesAssociacao;
     }
+    
+    return []; // Nenhuma opção válida
+  };
+
+  // Função para validar opções do CAD2002 baseado no CAD1002 e natureza jurídica
+  const getValidOptionsForCAD2002 = (cad1002Value: string, naturezaJuridica: string) => {
+    if (!cad1002Value) return [];
+    
+    // Determinar se é prestador local ou regional baseado no CAD1002
+    const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
+    const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
+    
+    if (!isPrestadorLocal && !isPrestadorRegional) {
+      return []; // CAD1002 deve ser "Local" ou "Regional"
+    }
+    
+    // Prestadores locais - Município
+    if (isPrestadorLocal && naturezaJuridica === "Município") {
+      return ["Prestação direta por órgão da administração pública direta"];
+    }
+    
+    // Prestadores locais - Autarquia, Empresa pública, Sociedade de economia mista
+    if (isPrestadorLocal && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+      return ["Prestação direta por entidade da administração pública indireta"];
+    }
+    
+    // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
+    if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+      return [
+        "Prestação indireta delegada mediante concessão para empresa privada ou estatal",
+        "Prestação indireta delegada mediante contrato de programa",
+        "Outra situação (especificar)"
+      ];
+    }
+    
+    // Empresa privada (local ou regional)
+    if (naturezaJuridica === "Empresa privada") {
+      return [
+        "Prestação indireta delegada mediante concessão para empresa privada",
+        "Prestação indireta delegada mediante concessão para empresa estatal",
+        "Outra situação (especificar)"
+      ];
+    }
+    
+    // Associação privada (local ou regional)
+    if (naturezaJuridica === "Associação privada") {
+      return [
+        "Prestação indireta delegada para associação civil",
+        "Prestação indireta delegada para associação comunitária",
+        "Outra situação (especificar)"
+      ];
+    }
+    
+    return []; // Nenhuma opção válida
+  };
+
+  // Função para validar opções do CAD2004 baseado no CAD1002 e natureza jurídica
+  const getValidOptionsForCAD2004 = (cad1002Value: string, naturezaJuridica: string) => {
+    if (!cad1002Value) return [];
+    
+    // Determinar se é prestador local ou regional baseado no CAD1002
+    const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
+    const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
+    
+    if (!isPrestadorLocal && !isPrestadorRegional) {
+      return []; // CAD1002 deve ser "Local" ou "Regional"
+    }
+    
+    // Prestadores locais - Município, Autarquia, Empresa pública, Sociedade de economia mista
+    if (isPrestadorLocal && ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+      return ["Inexistente"];
+    }
+    
+    // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
+    if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+      return [
+        "Contrato de programa",
+        "Contrato de concessão",
+        "Inexistente",
+        "Outro (especifique)"
+      ];
+    }
+    
+    // Empresa privada (local ou regional)
+    if (naturezaJuridica === "Empresa privada") {
+      return [
+        "Contrato de concessão",
+        "Inexistente",
+        "Outro (especifique)"
+      ];
+    }
+    
+    // Associação privada (local ou regional)
+    if (naturezaJuridica === "Associação privada") {
+      return [
+        "Convênio administrativo (para associações civis ou comunitárias)",
+        "Inexistente",
+        "Outro (especifique)"
+      ];
+    }
+    
+    return []; // Nenhuma opção válida
+  };
+
+  // Função para verificar se um campo deve estar habilitado baseado nas condições
+  const isFieldEnabled = (codigoIndicador: string) => {
+    // Se não há fieldStates, usar valor padrão
+    if (!fieldStates) {
+      return true;
+    }
+    
+    // Mapeamento de códigos e suas condições de habilitação
+    const fieldConditions = {
+      "CAD2002": () => {
+        // CAD2002 só é habilitado quando CAD1002 tem valor válido
+        const cad1002Value = fieldStates.cad1002Value;
+        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+      },
+      "TEDGTA001": () => fieldStates.hasColeta === false,
+      "CAD2001": () => {
+        // CAD2001 só é habilitado quando CAD1002 tem valor válido
+        const cad1002Value = fieldStates.cad1002Value;
+        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+      },
+      "CAD2004": () => {
+        // CAD2004 só é habilitado quando CAD1002 tem valor válido
+        const cad1002Value = fieldStates.cad1002Value;
+        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+      },
+      // Adicione outros códigos aqui conforme necessário
+      // "CODIGO3": () => fieldStates.outraCondicao === true,
+      // "CODIGO4": () => fieldStates.condicaoEspecifica === "valor",
+    };
+    
+    // Verificar se o código tem condição específica
+    if (fieldConditions[codigoIndicador]) {
+      return fieldConditions[codigoIndicador]();
+    }
+    
+    // Por padrão, campos estão habilitados
+    return true;
   };
   
   const isDisabled = !isFieldEnabled(indicador.codigo_indicador);
   
-  function onChangeEnabled(value: any) {
+  // Debug: Log para verificar se a lógica está funcionando
+  const fieldConditions = {
+    "CAD2002": () => {
+      const cad1002Value = fieldStates?.cad1002Value;
+      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+    },
+    "TEDGTA001": () => fieldStates?.hasColeta === false,
+    "CAD2001": () => {
+      const cad1002Value = fieldStates?.cad1002Value;
+      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+    },
+    "CAD2004": () => {
+      const cad1002Value = fieldStates?.cad1002Value;
+      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+    },
+    // Adicione outros códigos aqui conforme necessário
+  };
+  
+  if (fieldConditions[indicador.codigo_indicador]) {
+    const debugInfo: any = {
+      fieldStates: fieldStates,
+      isFieldEnabled: isFieldEnabled(indicador.codigo_indicador),
+      isDisabled: isDisabled
+    };
+    
+    // Informações específicas para CAD2001
+    if (indicador.codigo_indicador === "CAD2001") {
+      const cad1002Value = fieldStates?.cad1002Value;
+      const naturezaJuridica = fieldStates?.naturezaJuridica;
+      const validOptions = getValidOptionsForCAD2001(cad1002Value, naturezaJuridica);
+      
+      debugInfo.cad1002Value = cad1002Value;
+      debugInfo.naturezaJuridica = naturezaJuridica;
+      debugInfo.validOptions = validOptions;
+    }
+    
+    // Informações específicas para CAD2002
+    if (indicador.codigo_indicador === "CAD2002") {
+      const cad1002Value = fieldStates?.cad1002Value;
+      const naturezaJuridica = fieldStates?.naturezaJuridica;
+      const validOptions = getValidOptionsForCAD2002(cad1002Value, naturezaJuridica);
+      
+      debugInfo.cad1002Value = cad1002Value;
+      debugInfo.naturezaJuridica = naturezaJuridica;
+      debugInfo.validOptions = validOptions;
+    }
+    
+    // Informações específicas para CAD2004
+    if (indicador.codigo_indicador === "CAD2004") {
+      const cad1002Value = fieldStates?.cad1002Value;
+      const naturezaJuridica = fieldStates?.naturezaJuridica;
+      const validOptions = getValidOptionsForCAD2004(cad1002Value, naturezaJuridica);
+      
+      debugInfo.cad1002Value = cad1002Value;
+      debugInfo.naturezaJuridica = naturezaJuridica;
+      debugInfo.validOptions = validOptions;
+    }
+    
+    console.log(`Campo ${indicador.codigo_indicador}:`, debugInfo);
+  }
+  
+  function onChangeEnabled(value: any, codigoIndicador: string) {
     if (setFieldStates && fieldStates) {
       const newStates = { ...fieldStates };
       
-      // Atualizar estado baseado no valor selecionado
-      if (value === "coleta") {
-        newStates.hasColeta = true;
+      // Mapeamento de códigos e como atualizar o estado baseado no valor
+      const fieldUpdateRules = {
+        // Códigos que afetam hasColeta
+        "CODIGO_COLETA": () => {
+          if (value === "coleta") {
+            newStates.hasColeta = true;
+          } else {
+            newStates.hasColeta = false;
+          }
+        },
+        // CAD1002 afeta CAD2001
+        "CAD1002": () => {
+          newStates.cad1002Value = value;
+        },
+        // Natureza jurídica afeta CAD2001
+        "CAD1001": () => {
+          newStates.naturezaJuridica = value;
+        },
+        "NATUREZA_JURIDICA": () => {
+          newStates.naturezaJuridica = value;
+        },
+        // Adicione outros códigos e suas regras aqui
+        // "CODIGO_OUTRO": () => {
+        //   newStates.outraCondicao = value === "valor_especifico";
+        // },
+      };
+      
+      // Verificar se o código tem regra de atualização específica
+      if (fieldUpdateRules[codigoIndicador]) {
+        fieldUpdateRules[codigoIndicador]();
       } else {
-        newStates.hasColeta = false;
+        // Regra padrão para códigos que afetam hasColeta
+        if (value === "coleta") {
+          newStates.hasColeta = true;
+        } else {
+          newStates.hasColeta = false;
+        }
       }
       
       setFieldStates(newStates);
@@ -209,7 +479,7 @@ const CampoIndicador = ({
     // Chamar primeiro o onChange do react-hook-form
     fieldRegistration.onChange(e);
     // Depois chamar nossa lógica personalizada
-    onChangeEnabled(e.target.value);
+    onChangeEnabled(e.target.value, indicador.codigo_indicador);
   };
 
   // Propriedades base do campo
@@ -253,7 +523,47 @@ const CampoIndicador = ({
       );
 
     case 'select':
-      const options = tipoCampo.selectOptions || [];
+      let options = tipoCampo.selectOptions || [];
+      
+      // Para CAD2001, filtrar opções baseado no CAD1002 e natureza jurídica
+      if (indicador.codigo_indicador === "CAD2001") {
+        const cad1002Value = fieldStates?.cad1002Value;
+        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        
+        if (cad1002Value) {
+          const validOptions = getValidOptionsForCAD2001(cad1002Value, naturezaJuridica);
+          options = options.filter(option => 
+            validOptions.includes(option.descricao || option.value)
+          );
+        }
+      }
+      
+      // Para CAD2002, filtrar opções baseado no CAD1002 e natureza jurídica
+      if (indicador.codigo_indicador === "CAD2002") {
+        const cad1002Value = fieldStates?.cad1002Value;
+        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        
+        if (cad1002Value) {
+          const validOptions = getValidOptionsForCAD2002(cad1002Value, naturezaJuridica);
+          options = options.filter(option => 
+            validOptions.includes(option.descricao || option.value)
+          );
+        }
+      }
+      
+      // Para CAD2004, filtrar opções baseado no CAD1002 e natureza jurídica
+      if (indicador.codigo_indicador === "CAD2004") {
+        const cad1002Value = fieldStates?.cad1002Value;
+        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        
+        if (cad1002Value) {
+          const validOptions = getValidOptionsForCAD2004(cad1002Value, naturezaJuridica);
+          options = options.filter(option => 
+            validOptions.includes(option.descricao || option.value)
+          );
+        }
+      }
+      
       return (
         <select 
           {...baseProps}
@@ -416,7 +726,9 @@ export default function PrestacaoServicoAgua() {
   const [grupo, setGrupo] = useState(null);
   const [loadingIndicadores, setLoadingIndicadores] = useState(false);
   const [fieldStates, setFieldStates] = useState<{[key: string]: any}>({
-    hasColeta: false
+    hasColeta: false,
+    cad1002Value: null,
+    naturezaJuridica: "Município" // Valor padrão
   });
 
   const [dadosCarregados, setDadosCarregados] = useState([]);
@@ -442,7 +754,7 @@ export default function PrestacaoServicoAgua() {
 
   async function getMenus() {
     const res = await api
-      .get("menus/"+1)
+      .get("menus/eixo/"+1)
       .then((response) => {
         setMenus(response.data);
       });
@@ -976,6 +1288,37 @@ export default function PrestacaoServicoAgua() {
       function preencherFormulario(dados: any[]) {
       // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
+    
+    // Verificar se há algum campo com valor "coleta" para inicializar o estado
+    let hasCodigoValue = false;
+    let cad1002Value = null;
+    let naturezaJuridica = "Município"; // Valor padrão
+    
+    dados.forEach(dado => {
+      if (dado.valor_indicador === "coleta" || 
+          (typeof dado.valor_indicador === 'string' && dado.valor_indicador.toLowerCase().includes('coleta'))) {
+        hasCodigoValue = true;
+      }
+      
+      // Capturar valor do CAD1002
+      if (dado.codigo_indicador === "CAD1002") {
+        cad1002Value = dado.valor_indicador;
+      }
+      
+      // Capturar natureza jurídica (assumindo que existe um campo para isso)
+      // Você pode ajustar o código do campo conforme necessário
+      if (dado.codigo_indicador === "CAD1001" || dado.codigo_indicador === "NATUREZA_JURIDICA") {
+        naturezaJuridica = dado.valor_indicador;
+      }
+    });
+    
+    // Atualizar o estado baseado nos dados existentes
+    setFieldStates(prev => ({
+      ...prev,
+      hasColeta: hasCodigoValue,
+      cad1002Value: cad1002Value,
+      naturezaJuridica: naturezaJuridica
+    }));
     
     // Agrupar dados por código do indicador para processar checkboxes
     const dadosAgrupados = new Map();

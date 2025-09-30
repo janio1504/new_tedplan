@@ -442,7 +442,7 @@ export default function PrestacaoServicoDrenagem() {
 
   async function getMenus() {
     const res = await api
-      .get("menus/"+2)
+      .get("menus/eixo/"+2)
       .then((response) => {
         setMenus(response.data);
       });

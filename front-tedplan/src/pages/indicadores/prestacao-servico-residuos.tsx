@@ -442,7 +442,7 @@ export default function PrestacaoServicoResiduos() {
 
   async function getMenus() {
     const res = await api
-      .get("menus/"+5)
+      .get("menus/eixo/"+4)
       .then((response) => {
         setMenus(response.data);
       });

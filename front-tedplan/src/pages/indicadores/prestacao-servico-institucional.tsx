@@ -442,7 +442,7 @@ export default function PrestacaoServicoInstitucional() {
 
   async function getMenus() {
     const res = await api
-      .get("menus/"+4)
+      .get("menus/eixo/"+5)
       .then((response) => {
         setMenus(response.data);
       });
