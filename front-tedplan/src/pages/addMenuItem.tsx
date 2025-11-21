@@ -25,6 +25,12 @@ interface IMenu {
   id_menu: string;
   titulo: string;
   descricao: string;
+  id_eixo?: string;
+}
+
+interface IEixo {
+  id_eixo: string;
+  nome: string;
 }
 
 interface MenuItemProps {
@@ -37,10 +43,14 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm();
 
   const [menusData, setMenusData] = useState<any>(menus);
+  const [allMenus, setAllMenus] = useState<any>(menus);
+  const [eixos, setEixos] = useState<IEixo[]>([]);
+  const [selectedEixo, setSelectedEixo] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [menuItemId, setMenuItemId] = useState<string | null>(null);
   const {signOut} = useContext(AuthContext);
@@ -51,6 +61,7 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
     if (!token) {
       Router.push("/login");
     }
+    getEixos();
     getMenus();
     
     // Verificar se é edição
@@ -61,13 +72,47 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
     }
   }, [router.query]);
 
+  // Filtrar menus quando o eixo mudar
+  useEffect(() => {
+    if (selectedEixo) {
+      getMenusByEixo(selectedEixo);
+      // Resetar a seleção do menu quando o eixo mudar
+      setValue("id_menu", "");
+    } else {
+      // Se nenhum eixo estiver selecionado, mostrar todos os menus
+      setMenusData(allMenus);
+    }
+  }, [selectedEixo]);
+
+  async function getEixos() {
+    try {
+      const apiClient = getAPIClient();
+      const resEixo = await apiClient.get("/getEixos");
+      setEixos(resEixo.data);
+    } catch (error) {
+      console.error("Erro ao carregar eixos:", error);
+    }
+  }
+
   async function getMenus() {
     try {
       const apiClient = getAPIClient();
       const resMenus = await apiClient.get("/menus");
+      setAllMenus(resMenus.data);
       setMenusData(resMenus.data);
     } catch (error) {
       console.error("Erro ao carregar menus:", error);
+    }
+  }
+
+  async function getMenusByEixo(idEixo: string) {
+    try {
+      const apiClient = getAPIClient();
+      const resMenus = await apiClient.get(`/menus/eixo/${idEixo}`);
+      setMenusData(resMenus.data);
+    } catch (error) {
+      console.error("Erro ao carregar menus por eixo:", error);
+      toast.error("Erro ao carregar menus do eixo selecionado!", { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -77,12 +122,29 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
       const response = await apiClient.get(`/menu-items/${id}`);
       const menuItemData = response.data;
       
-      // Preencher o formulário com os dados do item de menu
-      reset({
-        nome_menu_item: menuItemData.nome_menu_item,
-        id_menu: menuItemData.id_menu,
-        ordem_item_menu: menuItemData.ordem_item_menu,
-      });
+      // Buscar o menu para pegar o id_eixo
+      const menuResponse = await apiClient.get(`/menus/${menuItemData.id_menu}`);
+      const menuData = menuResponse.data;
+      
+      // Se o menu tiver um eixo, definir o eixo selecionado primeiro
+      if (menuData.id_eixo) {
+        setSelectedEixo(menuData.id_eixo.toString());
+        // Aguardar um pouco para que o filtro de menus seja aplicado
+        setTimeout(() => {
+          reset({
+            nome_menu_item: menuItemData.nome_menu_item,
+            id_menu: menuItemData.id_menu,
+            ordem_item_menu: menuItemData.ordem_item_menu,
+          });
+        }, 300);
+      } else {
+        // Preencher o formulário com os dados do item de menu
+        reset({
+          nome_menu_item: menuItemData.nome_menu_item,
+          id_menu: menuItemData.id_menu,
+          ordem_item_menu: menuItemData.ordem_item_menu,
+        });
+      }
     } catch (error) {
       console.error("Erro ao carregar dados do item de menu:", error);
       toast.error("Erro ao carregar dados do item de menu!", { position: "top-right", autoClose: 5000 });
@@ -118,6 +180,7 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
         id_menu: "",
         ordem_item_menu: "",
       });
+      setSelectedEixo("");
 
       setTimeout(() => {
         router.push("/listarMenuItems");
@@ -210,6 +273,56 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
             flexDirection: 'column',
             gap: '20px'
           }}>
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#333'
+              }}>
+                Eixo
+              </label>
+              <select
+                value={selectedEixo}
+                onChange={(e) => setSelectedEixo(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  fontSize: '16px',
+                  border: '2px solid #e0e0e0',
+                  borderRadius: '8px',
+                  backgroundColor: 'white',
+                  transition: 'all 0.3s ease',
+                  outline: 'none'
+                }}
+                onFocus={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = '#3498db';
+                  (e.target as HTMLSelectElement).style.boxShadow = '0 0 0 3px rgba(52, 152, 219, 0.1)';
+                }}
+                onBlur={(e) => {
+                  (e.target as HTMLSelectElement).style.borderColor = '#e0e0e0';
+                  (e.target as HTMLSelectElement).style.boxShadow = 'none';
+                }}
+              >
+                <option value="">Selecione um eixo (opcional)</option>
+                {eixos?.map((eixo, key) => (
+                  <option key={key} value={eixo.id_eixo}>
+                    {eixo.nome}
+                  </option>
+                ))}
+              </select>
+              <small style={{
+                color: '#666',
+                fontSize: '14px',
+                marginTop: '8px',
+                display: 'block',
+                lineHeight: '1.4'
+              }}>
+                Selecione um eixo para filtrar os menus disponíveis
+              </small>
+            </div>
+
             <div>
               <label style={{
                 display: 'block',
