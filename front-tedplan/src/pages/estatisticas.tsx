@@ -35,7 +35,7 @@ export default function Estatistica() {
   return (
     <Container>
       <HeadPublico></HeadPublico>
-      <BreadCrumbStyle style={{ width: '25%', marginBottom: '-20px'}}>
+      <BreadCrumbStyle isCollapsed={false} style={{ width: '25%', marginBottom: '-20px'}}>
               <nav>
                 <ol>
                   <li>
