@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {FaBars} from "react-icons/fa"
+import {FaBars, FaCaretDown, FaList, FaLink} from "react-icons/fa"
 import {
   InputP,
   InputM,
@@ -47,7 +47,7 @@ import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { toast } from "react-toastify";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
-import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
+import { Sidebar, SidebarItem, MenuHeader, MenuItemsContainer } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
@@ -58,6 +58,7 @@ interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
   municipio_nome: string;
+  aa_natureza_juridica?: string;
 }
 
 interface ISelectOption {
@@ -119,7 +120,8 @@ const CampoIndicador = ({
   campoEnabled,
   fieldStates,
   setFieldStates,
-  setValue
+  setValue,
+  dadosMunicipio
 }: { 
   indicador: IIndicador, 
   register: any, 
@@ -127,7 +129,8 @@ const CampoIndicador = ({
   campoEnabled?: boolean,
   fieldStates?: {[key: string]: any},
   setFieldStates?: (states: {[key: string]: any}) => void,
-  setValue?: any
+  setValue?: any,
+  dadosMunicipio?: IMunicipio
 }) => {
   // Verificações de segurança
   if (!indicador || !anoSelected) {
@@ -145,17 +148,14 @@ const CampoIndicador = ({
   const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
   const { usuario } = useContext(AuthContext);
 
+  // Função específica para CAD2001 baseada nas regras fornecidas
+  const getValidOptionsForCAD2001 = (naturezaJuridica: string) => {
+    if (!naturezaJuridica) return null;
     
-    // Função para validar opções do CAD2001 baseado no CAD1002
-  const getValidOptionsForCAD2001 = (cad1002Value: string, naturezaJuridica: string) => {
-    if (!cad1002Value) return [];
-    
-    // Prestadores locais de natureza jurídica específica
-    const prestadoresLocais = ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"];
+    // Opções para prestadores LOCAIS
     const opcoesLocais = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
     
-    // Prestadores regionais de natureza jurídica específica
-    const prestadoresRegionais = ["Autarquia", "Empresa pública", "Sociedade de economia mista", "Empresa privada"];
+    // Opções para prestadores REGIONAIS
     const opcoesRegionais = [
       "Sem delegação atendendo Sede e Localidades - SDSL",
       "Sem delegação atendendo Sede - SDS", 
@@ -166,119 +166,217 @@ const CampoIndicador = ({
       "Com Delegação atendendo apenas localidades - DL"
     ];
     
-    // Associação privada (local ou regional)
-    const opcoesAssociacao = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
+    // Regras específicas conforme documentação:
+    // Usando aa_natureza_juridica para determinar se é prestador local ou regional
     
-    if (prestadoresLocais.includes(naturezaJuridica)) {
+    // 1. Prestadores LOCAIS de natureza jurídica "Município", "Autarquia", "Empresa pública" e "Sociedade de economia mista"
+    if (naturezaJuridica === "Município") {
       return opcoesLocais;
-    } else if (prestadoresRegionais.includes(naturezaJuridica)) {
+    }
+    
+    // 2. Prestadores REGIONAIS de natureza jurídica "Autarquia", "Empresa pública", "Sociedade de economia mista" e "Empresa privada"
+    // NOTA: Estas naturezas jurídicas aparecem tanto na lista de LOCAIS quanto REGIONAIS
+    // Por enquanto, vamos tratá-las como REGIONAIS (conforme a regra de prestadores regionais)
+    if (["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+      return opcoesRegionais; // Tratando como REGIONAL conforme regra
+    }
+    
+    if (naturezaJuridica === "Empresa privada") {
       return opcoesRegionais;
-    } else if (naturezaJuridica === "Associação privada") {
-      return opcoesAssociacao;
     }
     
-    return []; // Nenhuma opção válida
+    // 3. Prestadores LOCAIS ou REGIONAIS de natureza jurídica "Associação privada"
+    if (naturezaJuridica === "Associação privada") {
+      return opcoesLocais; // Associação privada sempre usa opções locais
+    }
+    
+    // Se não se encaixa em nenhuma categoria, retornar null
+    return null;
   };
 
-  // Função para validar opções do CAD2002 baseado no CAD1002 e natureza jurídica
-  const getValidOptionsForCAD2002 = (cad1002Value: string, naturezaJuridica: string) => {
-    if (!cad1002Value) return [];
+  // Função para validar opções baseada na natureza jurídica
+  const getValidOptionsByNaturezaJuridica = (codigoIndicador: string, naturezaJuridica: string) => {
+    if (!naturezaJuridica) return null; // Retorna null se não há natureza jurídica
     
-    // Determinar se é prestador local ou regional baseado no CAD1002
-    const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
-    const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
-    
-    if (!isPrestadorLocal && !isPrestadorRegional) {
-      return []; // CAD1002 deve ser "Local" ou "Regional"
+    // Para CAD2001, usar função específica
+    if (codigoIndicador === "CAD2001") {
+      return getValidOptionsForCAD2001(naturezaJuridica);
     }
     
-    // Prestadores locais - Município
-    if (isPrestadorLocal && naturezaJuridica === "Município") {
-      return ["Prestação direta por órgão da administração pública direta"];
-    }
+    // Mapear opções válidas por código de indicador e natureza jurídica
+    const validOptionsMap: { [key: string]: { [key: string]: string[] } } = {
+      "CAD2002": {
+        "Município": ["Prestação direta por órgão da administração pública direta"],
+        "Autarquia": ["Prestação direta por entidade da administração pública indireta"],
+        "Empresa pública": ["Prestação direta por entidade da administração pública indireta"],
+        "Sociedade de economia mista": ["Prestação direta por entidade da administração pública indireta"],
+        "Empresa privada": [
+          "Prestação indireta delegada mediante concessão para empresa privada",
+          "Prestação indireta delegada mediante concessão para empresa estatal",
+          "Outra situação (especificar)"
+        ],
+        "Associação privada": [
+          "Prestação indireta delegada para associação civil",
+          "Prestação indireta delegada para associação comunitária",
+          "Outra situação (especificar)"
+        ]
+      },
+      "CAD2004": {
+        "Município": ["Inexistente"],
+        "Autarquia": ["Inexistente"],
+        "Empresa pública": ["Inexistente"],
+        "Sociedade de economia mista": ["Inexistente"],
+        "Empresa privada": [
+          "Contrato de concessão",
+          "Inexistente",
+          "Outro (especifique)"
+        ],
+        "Associação privada": [
+          "Convênio administrativo (para associações civis ou comunitárias)",
+          "Inexistente",
+          "Outro (especifique)"
+        ]
+      }
+    };
     
-    // Prestadores locais - Autarquia, Empresa pública, Sociedade de economia mista
-    if (isPrestadorLocal && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
-      return ["Prestação direta por entidade da administração pública indireta"];
-    }
-    
-    // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
-    if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
-      return [
-        "Prestação indireta delegada mediante concessão para empresa privada ou estatal",
-        "Prestação indireta delegada mediante contrato de programa",
-        "Outra situação (especificar)"
-      ];
-    }
-    
-    // Empresa privada (local ou regional)
-    if (naturezaJuridica === "Empresa privada") {
-      return [
-        "Prestação indireta delegada mediante concessão para empresa privada",
-        "Prestação indireta delegada mediante concessão para empresa estatal",
-        "Outra situação (especificar)"
-      ];
-    }
-    
-    // Associação privada (local ou regional)
-    if (naturezaJuridica === "Associação privada") {
-      return [
-        "Prestação indireta delegada para associação civil",
-        "Prestação indireta delegada para associação comunitária",
-        "Outra situação (especificar)"
-      ];
-    }
-    
-    return []; // Nenhuma opção válida
+    // Retornar opções válidas para o código e natureza jurídica específicos
+    return validOptionsMap[codigoIndicador]?.[naturezaJuridica] || null;
   };
 
-  // Função para validar opções do CAD2004 baseado no CAD1002 e natureza jurídica
-  const getValidOptionsForCAD2004 = (cad1002Value: string, naturezaJuridica: string) => {
-    if (!cad1002Value) return [];
     
-    // Determinar se é prestador local ou regional baseado no CAD1002
-    const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
-    const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
-    
-    if (!isPrestadorLocal && !isPrestadorRegional) {
-      return []; // CAD1002 deve ser "Local" ou "Regional"
-    }
-    
-    // Prestadores locais - Município, Autarquia, Empresa pública, Sociedade de economia mista
-    if (isPrestadorLocal && ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
-      return ["Inexistente"];
-    }
-    
-    // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
-    if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
-      return [
-        "Contrato de programa",
-        "Contrato de concessão",
-        "Inexistente",
-        "Outro (especifique)"
-      ];
-    }
-    
-    // Empresa privada (local ou regional)
-    if (naturezaJuridica === "Empresa privada") {
-      return [
-        "Contrato de concessão",
-        "Inexistente",
-        "Outro (especifique)"
-      ];
-    }
-    
-    // Associação privada (local ou regional)
-    if (naturezaJuridica === "Associação privada") {
-      return [
-        "Convênio administrativo (para associações civis ou comunitárias)",
-        "Inexistente",
-        "Outro (especifique)"
-      ];
-    }
-    
-    return []; // Nenhuma opção válida
-  };
+    // Função para validar opções do CAD2001 baseado no CAD1002 - REMOVIDA
+  // const getValidOptionsForCAD2001 = (cad1002Value: string, naturezaJuridica: string) => {
+  //   if (!cad1002Value) return [];
+  //   
+  //   // Prestadores locais de natureza jurídica específica
+  //   const prestadoresLocais = ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"];
+  //   const opcoesLocais = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
+  //   
+  //   // Prestadores regionais de natureza jurídica específica
+  //   const prestadoresRegionais = ["Autarquia", "Empresa pública", "Sociedade de economia mista", "Empresa privada"];
+  //   const opcoesRegionais = [
+  //     "Sem delegação atendendo Sede e Localidades - SDSL",
+  //     "Sem delegação atendendo Sede - SDS", 
+  //     "Sem delegação atendendo Localidades - SDL",
+  //     "Com delegação sem atendimento - DSA",
+  //     "Com delegação atendendo Sede e Localidades - DSL",
+  //     "Com Delegação atendendo apenas Sede - DS",
+  //     "Com Delegação atendendo apenas localidades - DL"
+  //   ];
+  //   
+  //   // Associação privada (local ou regional)
+  //   const opcoesAssociacao = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
+  //   
+  //   if (prestadoresLocais.includes(naturezaJuridica)) {
+  //     return opcoesLocais;
+  //   } else if (prestadoresRegionais.includes(naturezaJuridica)) {
+  //     return opcoesRegionais;
+  //   } else if (naturezaJuridica === "Associação privada") {
+  //     return opcoesAssociacao;
+  //   }
+  //   
+  //   return []; // Nenhuma opção válida
+  // };
+
+  // Função para validar opções do CAD2002 baseado no CAD1002 e natureza jurídica - REMOVIDA
+  // const getValidOptionsForCAD2002 = (cad1002Value: string, naturezaJuridica: string) => {
+  //   if (!cad1002Value) return [];
+  //   
+  //   // Determinar se é prestador local ou regional baseado no CAD1002
+  //   const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
+  //   const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
+  //   
+  //   if (!isPrestadorLocal && !isPrestadorRegional) {
+  //     return []; // CAD1002 deve ser "Local" ou "Regional"
+  //   }
+  //   
+  //   // Prestadores locais - Município
+  //   if (isPrestadorLocal && naturezaJuridica === "Município") {
+  //     return ["Prestação direta por órgão da administração pública direta"];
+  //   }
+  //   
+  //   // Prestadores locais - Autarquia, Empresa pública, Sociedade de economia mista
+  //   if (isPrestadorLocal && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+  //     return ["Prestação direta por entidade da administração pública indireta"];
+  //   }
+  //   
+  //   // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
+  //   if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+  //     return [
+  //       "Prestação indireta delegada mediante concessão para empresa privada ou estatal",
+  //       "Prestação indireta delegada mediante contrato de programa",
+  //       "Outra situação (especificar)"
+  //     ];
+  //   }
+  //   
+  //   // Empresa privada (local ou regional)
+  //   if (naturezaJuridica === "Empresa privada") {
+  //     return [
+  //       "Prestação indireta delegada mediante concessão para empresa privada",
+  //       "Prestação indireta delegada mediante concessão para empresa estatal",
+  //       "Outra situação (especificar)"
+  //     ];
+  //   }
+  //   
+  //   // Associação privada (local ou regional)
+  //   if (naturezaJuridica === "Associação privada") {
+  //     return [
+  //       "Prestação indireta delegada para associação civil",
+  //       "Prestação indireta delegada para associação comunitária",
+  //       "Outra situação (especificar)"
+  //     ];
+  //   }
+  //   
+  //   return []; // Nenhuma opção válida
+  // };
+
+  // Função para validar opções do CAD2004 baseado no CAD1002 e natureza jurídica - REMOVIDA
+  // const getValidOptionsForCAD2004 = (cad1002Value: string, naturezaJuridica: string) => {
+  //   if (!cad1002Value) return [];
+  //   
+  //   // Determinar se é prestador local ou regional baseado no CAD1002
+  //   const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
+  //   const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
+  //   
+  //   if (!isPrestadorLocal && !isPrestadorRegional) {
+  //     return []; // CAD1002 deve ser "Local" ou "Regional"
+  //   }
+  //   
+  //   // Prestadores locais - Município, Autarquia, Empresa pública, Sociedade de economia mista
+  //   if (isPrestadorLocal && ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+  //     return ["Inexistente"];
+  //   }
+  //   
+  //   // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
+  //   if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+  //     return [
+  //       "Contrato de programa",
+  //       "Contrato de concessão",
+  //       "Inexistente",
+  //       "Outro (especifique)"
+  //     ];
+  //   }
+  //   
+  //   // Empresa privada (local ou regional)
+  //   if (naturezaJuridica === "Empresa privada") {
+  //     return [
+  //       "Contrato de concessão",
+  //       "Inexistente",
+  //       "Outro (especifique)"
+  //     ];
+  //   }
+  //   
+  //   // Associação privada (local ou regional)
+  //   if (naturezaJuridica === "Associação privada") {
+  //     return [
+  //       "Convênio administrativo (para associações civis ou comunitárias)",
+  //       "Inexistente",
+  //       "Outro (especifique)"
+  //     ];
+  //   }
+  //   
+  //   return []; // Nenhuma opção válida
+  // };
 
   // Função para verificar se um campo deve estar habilitado baseado nas condições
   const isFieldEnabled = (codigoIndicador: string) => {
@@ -287,24 +385,22 @@ const CampoIndicador = ({
       return true;
     }
     
-    // Mapeamento de códigos e suas condições de habilitação
-    const fieldConditions = {
-      "CAD2002": () => {
-        // CAD2002 só é habilitado quando CAD1002 tem valor válido
-        const cad1002Value = fieldStates.cad1002Value;
-        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-      },
-      "TEDGTA001": () => fieldStates.hasColeta === false,
-      "CAD2001": () => {
-        // CAD2001 só é habilitado quando CAD1002 tem valor válido
-        const cad1002Value = fieldStates.cad1002Value;
-        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-      },
-      "CAD2004": () => {
-        // CAD2004 só é habilitado quando CAD1002 tem valor válido
-        const cad1002Value = fieldStates.cad1002Value;
-        return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-      },
+    // Mapeamento de códigos e suas condições de habilitação - REMOVIDO
+    const fieldConditions: { [key: string]: () => boolean } = {
+      // "CAD2002": () => {
+      //   // CAD2002 só é habilitado quando CAD2001 tem o valor específico "COLETA"
+      //   const cad2001Value = fieldStates.cad2001Value;
+      //   return cad2001Value === "COLETA" || cad2001Value === "coleta" || cad2001Value === "Coleta";
+      // },
+      // "CAD2004": () => {
+      //   // CAD2004 só é habilitado quando CAD1002 tem valor válido
+      //   const cad1002Value = fieldStates.cad1002Value;
+      //   return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
+      // },
+      // "TEDGTA001": () => {
+      //   // TEDGTA001 só é habilitado quando NÃO há coleta
+      //   return fieldStates.hasColeta === false;
+      // },
       // Adicione outros códigos aqui conforme necessário
       // "CODIGO3": () => fieldStates.outraCondicao === true,
       // "CODIGO4": () => fieldStates.condicaoEspecifica === "valor",
@@ -321,92 +417,28 @@ const CampoIndicador = ({
   
   const isDisabled = !isFieldEnabled(indicador.codigo_indicador);
   
-  // Debug: Log para verificar se a lógica está funcionando
-  const fieldConditions = {
-    "CAD2002": () => {
-      const cad1002Value = fieldStates?.cad1002Value;
-      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-    },
-    "TEDGTA001": () => fieldStates?.hasColeta === false,
-    "CAD2001": () => {
-      const cad1002Value = fieldStates?.cad1002Value;
-      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-    },
-    "CAD2004": () => {
-      const cad1002Value = fieldStates?.cad1002Value;
-      return cad1002Value && cad1002Value !== "" && cad1002Value !== null;
-    },
-    // Adicione outros códigos aqui conforme necessário
-  };
-  
-  if (fieldConditions[indicador.codigo_indicador]) {
-    const debugInfo: any = {
-      fieldStates: fieldStates,
-      isFieldEnabled: isFieldEnabled(indicador.codigo_indicador),
-      isDisabled: isDisabled
-    };
-    
-    // Informações específicas para CAD2001
-    if (indicador.codigo_indicador === "CAD2001") {
-      const cad1002Value = fieldStates?.cad1002Value;
-      const naturezaJuridica = fieldStates?.naturezaJuridica;
-      const validOptions = getValidOptionsForCAD2001(cad1002Value, naturezaJuridica);
-      
-      debugInfo.cad1002Value = cad1002Value;
-      debugInfo.naturezaJuridica = naturezaJuridica;
-      debugInfo.validOptions = validOptions;
-    }
-    
-    // Informações específicas para CAD2002
-    if (indicador.codigo_indicador === "CAD2002") {
-      const cad1002Value = fieldStates?.cad1002Value;
-      const naturezaJuridica = fieldStates?.naturezaJuridica;
-      const validOptions = getValidOptionsForCAD2002(cad1002Value, naturezaJuridica);
-      
-      debugInfo.cad1002Value = cad1002Value;
-      debugInfo.naturezaJuridica = naturezaJuridica;
-      debugInfo.validOptions = validOptions;
-    }
-    
-    // Informações específicas para CAD2004
-    if (indicador.codigo_indicador === "CAD2004") {
-      const cad1002Value = fieldStates?.cad1002Value;
-      const naturezaJuridica = fieldStates?.naturezaJuridica;
-      const validOptions = getValidOptionsForCAD2004(cad1002Value, naturezaJuridica);
-      
-      debugInfo.cad1002Value = cad1002Value;
-      debugInfo.naturezaJuridica = naturezaJuridica;
-      debugInfo.validOptions = validOptions;
-    }
-    
-    console.log(`Campo ${indicador.codigo_indicador}:`, debugInfo);
-  }
-  
   function onChangeEnabled(value: any, codigoIndicador: string) {
     if (setFieldStates && fieldStates) {
       const newStates = { ...fieldStates };
       
-      // Mapeamento de códigos e como atualizar o estado baseado no valor
-      const fieldUpdateRules = {
-        // Códigos que afetam hasColeta
-        "CODIGO_COLETA": () => {
-          if (value === "coleta") {
-            newStates.hasColeta = true;
-          } else {
-            newStates.hasColeta = false;
-          }
-        },
-        // CAD1002 afeta CAD2001
-        "CAD1002": () => {
-          newStates.cad1002Value = value;
-        },
-        // Natureza jurídica afeta CAD2001
-        "CAD1001": () => {
-          newStates.naturezaJuridica = value;
-        },
-        "NATUREZA_JURIDICA": () => {
-          newStates.naturezaJuridica = value;
-        },
+      // Mapeamento de códigos e como atualizar o estado baseado no valor - REMOVIDO
+      const fieldUpdateRules: { [key: string]: () => void } = {
+        // CAD1002 afeta CAD2001 e CAD2004 - REMOVIDO
+        // "CAD1002": () => {
+        //   newStates.cad1002Value = value;
+        // },
+        // CAD2001 afeta CAD2002 - REMOVIDO
+        // "CAD2001": () => {
+        //   newStates.cad2001Value = value;
+        // },
+        // Códigos que afetam hasColeta (exemplo para uso futuro) - REMOVIDO
+        // "CODIGO_COLETA": () => {
+        //   if (value === "coleta") {
+        //     newStates.hasColeta = true;
+        //   } else {
+        //     newStates.hasColeta = false;
+        //   }
+        // },
         // Adicione outros códigos e suas regras aqui
         // "CODIGO_OUTRO": () => {
         //   newStates.outraCondicao = value === "valor_especifico";
@@ -416,16 +448,9 @@ const CampoIndicador = ({
       // Verificar se o código tem regra de atualização específica
       if (fieldUpdateRules[codigoIndicador]) {
         fieldUpdateRules[codigoIndicador]();
-      } else {
-        // Regra padrão para códigos que afetam hasColeta
-        if (value === "coleta") {
-          newStates.hasColeta = true;
-        } else {
-          newStates.hasColeta = false;
-        }
+        setFieldStates(newStates);
       }
-      
-      setFieldStates(newStates);
+      // Se não há regra específica, não atualiza nada (evita comportamentos inesperados)
     }
   }
   
@@ -463,8 +488,8 @@ const CampoIndicador = ({
   const getPlaceholderMessage = (codigoIndicador: string) => {
     if (isDisabled) {
       switch (codigoIndicador) {
-        case "CAD2002":
-          return "Campo CAD2002 desabilitado";
+        // case "CAD2002":
+        //   return "Campo CAD2002 desabilitado";
         default:
           return "Campo desabilitado";
       }
@@ -526,43 +551,36 @@ const CampoIndicador = ({
     case 'select':
       let options = tipoCampo.selectOptions || [];
       
-      // Para CAD2001, filtrar opções baseado no CAD1002 e natureza jurídica
-      if (indicador.codigo_indicador === "CAD2001") {
-        const cad1002Value = fieldStates?.cad1002Value;
-        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+      // Aplicar validação baseada na natureza jurídica para campos específicos
+      if (["CAD2001", "CAD2002", "CAD2004"].includes(indicador.codigo_indicador)) {
+        const naturezaJuridica = dadosMunicipio?.aa_natureza_juridica;
+        console.log(dadosMunicipio);
         
-        if (cad1002Value) {
-          const validOptions = getValidOptionsForCAD2001(cad1002Value, naturezaJuridica);
-          options = options.filter(option => 
-            validOptions.includes(option.descricao || option.value)
-          );
-        }
-      }
-      
-      // Para CAD2002, filtrar opções baseado no CAD1002 e natureza jurídica
-      if (indicador.codigo_indicador === "CAD2002") {
-        const cad1002Value = fieldStates?.cad1002Value;
-        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
+        console.log(`=== VALIDAÇÃO ${indicador.codigo_indicador} ===`);
+        console.log(`Natureza jurídica (aa_natureza_juridica): ${naturezaJuridica}`);
         
-        if (cad1002Value) {
-          const validOptions = getValidOptionsForCAD2002(cad1002Value, naturezaJuridica);
-          options = options.filter(option => 
-            validOptions.includes(option.descricao || option.value)
-          );
+        if (naturezaJuridica) {
+          const validOptions = getValidOptionsByNaturezaJuridica(indicador.codigo_indicador, naturezaJuridica);
+          
+          console.log(`Opções válidas encontradas:`, validOptions);
+          console.log(`Total de opções originais: ${options.length}`);
+          console.log(`Opções originais:`, options.map(opt => opt.descricao || opt.value));
+          
+          if (validOptions) {
+            // Filtrar opções baseadas na natureza jurídica
+            const optionsBefore = options.length;
+            options = options.filter(option => 
+              validOptions.includes(option.descricao || option.value)
+            );
+            console.log(`✅ Opções após filtro: ${optionsBefore} -> ${options.length}`);
+            console.log(`Opções filtradas:`, options.map(opt => opt.descricao || opt.value));
+          } else {
+            console.log(`❌ Nenhuma opção válida encontrada para esta natureza jurídica`);
+          }
+        } else {
+          console.log(`⚠️ Natureza jurídica não encontrada - usando todas as opções`);
         }
-      }
-      
-      // Para CAD2004, filtrar opções baseado no CAD1002 e natureza jurídica
-      if (indicador.codigo_indicador === "CAD2004") {
-        const cad1002Value = fieldStates?.cad1002Value;
-        const naturezaJuridica = fieldStates?.naturezaJuridica || "Município"; // Valor padrão
-        
-        if (cad1002Value) {
-          const validOptions = getValidOptionsForCAD2004(cad1002Value, naturezaJuridica);
-          options = options.filter(option => 
-            validOptions.includes(option.descricao || option.value)
-          );
-        }
+        console.log(`=== FIM VALIDAÇÃO ${indicador.codigo_indicador} ===`);
       }
       
       return (
@@ -721,6 +739,7 @@ export default function PrestacaoServicoAgua() {
   formState: { errors },
 } = useForm();
 
+
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("");
   const [indicadores, setIndicadores] = useState<IIndicador[]>([]);
@@ -729,12 +748,13 @@ export default function PrestacaoServicoAgua() {
   const [fieldStates, setFieldStates] = useState<{[key: string]: any}>({
     hasColeta: false,
     cad1002Value: null,
-    naturezaJuridica: "Município" // Valor padrão
+    cad2001Value: null
   });
 
   const [dadosCarregados, setDadosCarregados] = useState([]);
   const [loadingDados, setLoadingDados] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   useEffect(() => {
       const handleResize = () => {
@@ -1308,36 +1328,7 @@ export default function PrestacaoServicoAgua() {
       // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
     
-    // Verificar se há algum campo com valor "coleta" para inicializar o estado
-    let hasCodigoValue = false;
-    let cad1002Value = null;
-    let naturezaJuridica = "Município"; // Valor padrão
-    
-    dados.forEach(dado => {
-      if (dado.valor_indicador === "coleta" || 
-          (typeof dado.valor_indicador === 'string' && dado.valor_indicador.toLowerCase().includes('coleta'))) {
-        hasCodigoValue = true;
-      }
-      
-      // Capturar valor do CAD1002
-      if (dado.codigo_indicador === "CAD1002") {
-        cad1002Value = dado.valor_indicador;
-      }
-      
-      // Capturar natureza jurídica (assumindo que existe um campo para isso)
-      // Você pode ajustar o código do campo conforme necessário
-      if (dado.codigo_indicador === "CAD1001" || dado.codigo_indicador === "NATUREZA_JURIDICA") {
-        naturezaJuridica = dado.valor_indicador;
-      }
-    });
-    
-    // Atualizar o estado baseado nos dados existentes
-    setFieldStates(prev => ({
-      ...prev,
-      hasColeta: hasCodigoValue,
-      cad1002Value: cad1002Value,
-      naturezaJuridica: naturezaJuridica
-    }));
+   
     
     // Agrupar dados por código do indicador para processar checkboxes
     const dadosAgrupados = new Map();
@@ -1443,32 +1434,41 @@ export default function PrestacaoServicoAgua() {
                                 <CollapseButton onClick={toggleSidebar}>
                                             <FaBars /> 
                                 </CollapseButton>
-        {menus?.map((menu) => (
-          <div key={menu.id_menu}>
-            <label
-              style={{
-                color: activeForm === menu.nome_menu_item ? "#12B2D5" : "#000",
-                fontWeight: "bold",
-                display: "block",
-                padding: "10px 0",
-              }}
-            >
-              {menu.titulo}
-            </label>
-            {menu.menuItems?.map((menuItem) => (
-              <SidebarItem
-                key={menuItem.id_menu_item}
-                active={activeForm === menuItem.nome_menu_item}
+        {menus?.map((menu) => {
+          const isOpen = openMenuId === menu.id_menu;
+          return (
+            <div key={menu.id_menu}>
+              <MenuHeader
+                isOpen={isOpen}
                 onClick={() => {
-                  setActiveForm(menuItem.nome_menu_item);
-                  getIndicadores(menuItem);
+                  // Se o menu já está aberto, fecha. Caso contrário, abre e fecha os outros
+                  setOpenMenuId(isOpen ? null : menu.id_menu);
                 }}
               >
-                {menuItem.nome_menu_item}
-              </SidebarItem>
-            ))}
-          </div>
-        ))}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <FaList style={{ fontSize: "14px" }} />
+                  {menu.titulo}
+                </div>
+                <FaCaretDown />
+              </MenuHeader>
+              <MenuItemsContainer isOpen={isOpen}>
+                {menu.menuItems?.map((menuItem) => (
+                  <SidebarItem
+                    key={menuItem.id_menu_item}
+                    active={activeForm === menuItem.nome_menu_item}
+                    onClick={() => {
+                      setActiveForm(menuItem.nome_menu_item);
+                      getIndicadores(menuItem);
+                    }}
+                  >
+                    <FaLink style={{ marginRight: "8px", fontSize: "14px" }} />
+                    {menuItem.nome_menu_item}
+                  </SidebarItem>
+                ))}
+              </MenuItemsContainer>
+            </div>
+          );
+        })}
       </Sidebar>
                 )}
       <MainContent isCollapsed={isCollapsed}>
@@ -1697,6 +1697,7 @@ export default function PrestacaoServicoAgua() {
                                         fieldStates={fieldStates}
                                         setFieldStates={setFieldStates}
                                         setValue={setValue}
+                                        dadosMunicipio={dadosMunicipio}
                                       />
                                     </div>
                                   ) : (
@@ -1794,6 +1795,7 @@ export default function PrestacaoServicoAgua() {
                                     fieldStates={fieldStates}
                                     setFieldStates={setFieldStates}
                                     setValue={setValue}
+                                    dadosMunicipio={dadosMunicipio}
                                   />
                                 ) : (
                                   <input 
@@ -1862,3 +1864,4 @@ export default function PrestacaoServicoAgua() {
     </Container>
   );
 }
+

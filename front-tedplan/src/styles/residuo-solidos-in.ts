@@ -1317,10 +1317,21 @@ export const SidebarItem = styled.div.withConfig({
   border-radius: 4px;
   transition: all 0.2s ease;
   border-left: 3px solid transparent;
+  display: flex;
+  align-items: center;
+
+  svg {
+    color: ${props => props.active ? 'white' : '#666'};
+    transition: color 0.2s ease;
+  }
 
   &:hover {
     background-color: ${props => props.active ? '#0073a3' : '#e0e0e0'};
     border-left-color: #0085bd;
+    
+    svg {
+      color: ${props => props.active ? 'white' : '#0085bd'};
+    }
   }
 
   &:active {
@@ -1346,6 +1357,54 @@ export const SidebarSection = styled.div`
   &:last-child {
     margin-bottom: 0;
   }
+`;
+
+export const MenuHeader = styled.div<{ isOpen: boolean }>`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-weight: bold;
+  color: ${props => props.isOpen ? "#12B2D5" : "#000"};
+  transition: color 0.3s ease;
+  user-select: none;
+
+  &:hover {
+    color: #12B2D5;
+  }
+
+  > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    svg {
+      color: ${props => props.isOpen ? "#12B2D5" : "#666"};
+      transition: color 0.3s ease;
+      font-size: 14px;
+    }
+  }
+
+  > svg:last-child {
+    transition: transform 0.3s ease;
+    transform: ${props => props.isOpen ? "rotate(180deg)" : "rotate(0deg)"};
+    font-size: 14px;
+    color: ${props => props.isOpen ? "#12B2D5" : "#666"};
+  }
+
+  &:hover > svg:last-child,
+  &:hover > div:first-child svg {
+    color: #12B2D5;
+  }
+`;
+
+export const MenuItemsContainer = styled.div<{ isOpen: boolean }>`
+  max-height: ${props => props.isOpen ? "1000px" : "0"};
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+  opacity: ${props => props.isOpen ? "1" : "0"};
+  transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
 `;
 
 
