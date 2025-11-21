@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {FaBars} from "react-icons/fa";
+import {FaBars, FaCaretDown, FaList, FaLink} from "react-icons/fa";
 import {
   InputP,
   InputM,
@@ -47,7 +47,7 @@ import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { toast } from "react-toastify";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
-import { Sidebar, SidebarItem } from "../../styles/residuo-solidos-in";
+import { Sidebar, SidebarItem, MenuHeader, MenuItemsContainer } from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
 import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
@@ -423,6 +423,7 @@ export default function PrestacaoServicoDrenagem() {
   const [dadosCarregados, setDadosCarregados] = useState([]);
   const [loadingDados, setLoadingDados] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   useEffect(() => {
       const handleResize = () => {
@@ -1100,32 +1101,41 @@ export default function PrestacaoServicoDrenagem() {
                     <CollapseButton onClick={toggleSidebar}>
                                 <FaBars /> 
                     </CollapseButton>
-        {menus?.map((menu) => (
-          <div key={menu.id_menu}>
-            <label
-              style={{
-                color: activeForm === menu.nome_menu_item ? "#12B2D5" : "#000",
-                fontWeight: "bold",
-                display: "block",
-                padding: "10px 0",
-              }}
-            >
-              {menu.titulo}
-            </label>
-            {menu.menuItems?.map((menuItem) => (
-              <SidebarItem
-                key={menuItem.id_menu_item}
-                active={activeForm === menuItem.nome_menu_item}
+        {menus?.map((menu) => {
+          const isOpen = openMenuId === menu.id_menu;
+          return (
+            <div key={menu.id_menu}>
+              <MenuHeader
+                isOpen={isOpen}
                 onClick={() => {
-                  setActiveForm(menuItem.nome_menu_item);
-                  getIndicadores(menuItem);
+                  // Se o menu já está aberto, fecha. Caso contrário, abre e fecha os outros
+                  setOpenMenuId(isOpen ? null : menu.id_menu);
                 }}
               >
-                {menuItem.nome_menu_item}
-              </SidebarItem>
-            ))}
-          </div>
-        ))}
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <FaList style={{ fontSize: "14px" }} />
+                  {menu.titulo}
+                </div>
+                <FaCaretDown />
+              </MenuHeader>
+              <MenuItemsContainer isOpen={isOpen}>
+                {menu.menuItems?.map((menuItem) => (
+                  <SidebarItem
+                    key={menuItem.id_menu_item}
+                    active={activeForm === menuItem.nome_menu_item}
+                    onClick={() => {
+                      setActiveForm(menuItem.nome_menu_item);
+                      getIndicadores(menuItem);
+                    }}
+                  >
+                    <FaLink style={{ marginRight: "8px", fontSize: "14px" }} />
+                    {menuItem.nome_menu_item}
+                  </SidebarItem>
+                ))}
+              </MenuItemsContainer>
+            </div>
+          );
+        })}
       </Sidebar>
                 )}
 
