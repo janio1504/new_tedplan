@@ -82,24 +82,24 @@ export default function HeadPublico() {
       <BotaoMenuCadastro onClick={handleGestaoIndicadores}>Gestão</BotaoMenuCadastro>}
   </DivBotaoMenuCadastro>,
 
-  <DivBotaoMenuCadastro key="03">
-   <NumeroMenuCadastro>03</NumeroMenuCadastro>
-        { rota == "/indicadores/prestacao-servicos-snis"
-        || rota == "/indicadores/geral"
-        || rota == "/indicadores/financeiro-municipio"
-        || rota == "/indicadores/residuos-indicadores-unidade"
-        || rota == "/indicadores/agua-indicadores"
-        || rota == "/indicadores/esgoto-indicadores"
-        || rota ==  "/indicadores/drenagem-indicadores"
-        || rota ==  "/indicadores/balanco"
-        || rota ==  "/indicadores/qualidade"
-        || rota ==  "/indicadores/tarifa"
-        ?<BotaoMenuActiveCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuActiveCadastro> : 
-        <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuCadastro>}
-  </DivBotaoMenuCadastro>,
+  // <DivBotaoMenuCadastro key="03">
+  //  <NumeroMenuCadastro>03</NumeroMenuCadastro>
+  //       { rota == "/indicadores/prestacao-servicos-snis"
+  //       || rota == "/indicadores/geral"
+  //       || rota == "/indicadores/financeiro-municipio"
+  //       || rota == "/indicadores/residuos-indicadores-unidade"
+  //       || rota == "/indicadores/agua-indicadores"
+  //       || rota == "/indicadores/esgoto-indicadores"
+  //       || rota ==  "/indicadores/drenagem-indicadores"
+  //       || rota ==  "/indicadores/balanco"
+  //       || rota ==  "/indicadores/qualidade"
+  //       || rota ==  "/indicadores/tarifa"
+  //       ?<BotaoMenuActiveCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuActiveCadastro> : 
+  //       <BotaoMenuCadastro onClick={handleGestaoPrestacaoServicos}>Prestação de Serviços SNIS</BotaoMenuCadastro>}
+  // </DivBotaoMenuCadastro>,
 
-  <DivBotaoMenuCadastro key="04">
-   <NumeroMenuCadastro>04</NumeroMenuCadastro>
+  <DivBotaoMenuCadastro key="03">
+   <NumeroMenuCadastro>03</NumeroMenuCadastro>  
         { rota == "/indicadores/prestacao-servicos"
         || rota == "/indicadores/prestacao-servico-drenagem"
         || rota == "/indicadores/prestacao-servico-esgoto"
@@ -110,8 +110,8 @@ export default function HeadPublico() {
         <BotaoMenuCadastro onClick={handlePrestacaoServicos}>Prestação de Serviços </BotaoMenuCadastro>}
   </DivBotaoMenuCadastro>,
 
-  <DivBotaoMenuCadastro key="05">
-   <NumeroMenuCadastro>05</NumeroMenuCadastro>        
+  <DivBotaoMenuCadastro key="04">
+   <NumeroMenuCadastro>04</NumeroMenuCadastro>        
         { rota == "/indicadores/monitoramento-avaliacao" ? 
         <BotaoMenuActiveCadastro onClick={handleMonitoramento}>Monitoramento e Avaliação</BotaoMenuActiveCadastro>:
         <BotaoMenuCadastro onClick={handleMonitoramento}>Monitoramento e Avaliação</BotaoMenuCadastro>}
