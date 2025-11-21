@@ -1161,7 +1161,7 @@ export default function PrestacaoServicoResiduos() {
           </nav>
         </BreadCrumbStyle>
             <DivForm style={{ borderColor: "#12B2D5" }}>
-              <DivTituloForm>Água</DivTituloForm>
+              <DivTituloForm>Resíduos</DivTituloForm>
 
               <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
