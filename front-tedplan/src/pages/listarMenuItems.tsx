@@ -135,7 +135,7 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       }
       
       // Buscar todos os menus únicos dos menu items para garantir que temos os dados completos
-      const menuIds = [...new Set(response.data.map((item: IMenuItem) => item.id_menu))];
+      const menuIds = Array.from(new Set(response.data.map((item: IMenuItem) => item.id_menu)));
       
       // Para cada menu único, buscar se não estiver no mapa
       await Promise.all(
