@@ -211,13 +211,14 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       }
       
       if (!menu) {
-        for (const [key, value] of mapMenus.entries()) {
-          const valueId = value.id_menu ? value.id_menu.toString() : null;
-          if (valueId === menuId || key === menuId) {
-            menu = value;
-            break;
+        Array.from(mapMenus.entries()).forEach(([key, value]) => {
+          if (!menu) {
+            const valueId = value.id_menu ? value.id_menu.toString() : null;
+            if (valueId === menuId || key === menuId) {
+              menu = value;
+            }
           }
-        }
+        });
       }
       
       if (!menu || (menu.id_eixo === null || menu.id_eixo === undefined)) {
@@ -227,7 +228,7 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       const eixoId = menu.id_eixo.toString();
       const eixo = eixosList.find(e => {
         const eId = e.id_eixo ? e.id_eixo.toString() : null;
-        return eId === eixoId || e.id_eixo === eixoId || e.id_eixo === Number(eixoId);
+        return eId === eixoId || e.id_eixo === eixoId;
       });
       
       if (!eixo) {
@@ -349,13 +350,14 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
     
     // Se ainda não encontrou, percorrer o mapa
     if (!menu) {
-      for (const [key, value] of menusMap.entries()) {
-        const valueId = value.id_menu ? value.id_menu.toString() : null;
-        if (valueId === menuId || key === menuId) {
-          menu = value;
-          break;
+      Array.from(menusMap.entries()).forEach(([key, value]) => {
+        if (!menu) {
+          const valueId = value.id_menu ? value.id_menu.toString() : null;
+          if (valueId === menuId || key === menuId) {
+            menu = value;
+          }
         }
-      }
+      });
     }
     
     if (!menu || (menu.id_eixo === null || menu.id_eixo === undefined)) {
@@ -368,7 +370,7 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
     // Buscar o eixo
     const eixo = eixos.find(e => {
       const eId = e.id_eixo ? e.id_eixo.toString() : null;
-      return eId === eixoId || e.id_eixo === eixoId || e.id_eixo === Number(eixoId);
+      return eId === eixoId || e.id_eixo === eixoId;
     });
     
     if (!eixo) {
