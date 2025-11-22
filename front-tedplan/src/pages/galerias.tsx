@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { GetServerSideProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import Router from "next/router";
 import {
   Container,
   Form,
@@ -23,12 +24,29 @@ import {
   ImagensGaleria,
 } from "../styles/views";
 import { getAPIClient } from "../services/axios";
+import { AuthContext } from "@/contexts/AuthContext";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
 import { toast } from 'react-toastify'
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
-import { ImagenAmpliada, ModalImgAmpliada } from "../styles/dashboard";
+import { BodyDashboard, DivMenuTitulo, ImagenAmpliada, MenuMunicipioItem, ModalImgAmpliada } from "../styles/dashboard";
+import { MainContent } from "@/styles/esgoto-indicadores";
+import styled from "styled-components";
+
+
+const Titulo = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  width: auto;
+  margin-top: -10px;
+  padding: 15px;
+  color: #fff;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  font-weight: bolder;
+`;
 
 type IGaleria = {
   id_galeria: string;
@@ -75,6 +93,8 @@ export default function Galerias({
   const [isModalGaleria, setModalGaleria] = useState(false);
   const [modalImagemAmpliada, setModalImagemAmpliada] = useState(false);
   const [imagemAmpliada, setImagemAmpliada] = useState(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const {signOut} = useContext(AuthContext);
 
   useEffect(() => {
     if (galerias) {
@@ -169,18 +189,43 @@ export default function Galerias({
   function handleCloseModalImgAmpliada() {
     setModalImagemAmpliada(false)
   }
+   async function handleSignOut() {
+        signOut();
+      }
+    
+    function handleSimisab() {
+            Router.push("/indicadores/home_indicadores");
+      }
 
   return (
     <Container>
       <HeadPublico></HeadPublico>
-      <DivCenter>
-        <MenuLateral>
-          <MenuPublicoLateral></MenuPublicoLateral>
-        </MenuLateral>
+      <DivMenuTitulo> 
+                                      <text style={{
+                                        fontSize: '20px',
+                                        fontWeight: 'bold',
+                                        padding: '15px 20px',
+                                        float: 'left',
+                                        
+                                        }}>
+                                          Painel de Edição 
+                                        </text>
+                                      <ul style={{}}>
+                                      <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                                      <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                                      </ul>
+      </DivMenuTitulo>
+      
+         <BodyDashboard>
+              <MenuPublicoLateral isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}  />
+          </BodyDashboard>
 
+
+      <MainContent isCollapsed={isCollapsed}>
+      
         <DivFormConteudo>
-          <h3>Galerias</h3>
-
+          
+           <Titulo>Galerias</Titulo>                             
           <Form onSubmit={handleSubmit(handlebuscaFiltrada)}>
             <DivInput>
               <label>Municipios:</label>
@@ -277,7 +322,8 @@ export default function Galerias({
                         </ModalImgAmpliada>
                       </ContainerModal>
                     )}
-      </DivCenter>
+      
+      </MainContent>
       <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );

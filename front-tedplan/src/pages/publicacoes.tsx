@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { GetServerSideProps } from "next";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Container,
   Form,
@@ -26,6 +26,24 @@ import { toast } from "react-toastify";
 import MenuPublicoLateral from "../components/MenuPublicoLateral";
 import Image from "next/image";
 import Router from "next/router";
+import { DivMenuTitulo, MenuMunicipioItem } from "@/styles/dashboard";
+import { BodyDashboard } from "@/styles/dashboard-original";
+import { AuthContext } from "@/contexts/AuthContext";
+import { DivTituloForm, MainContent } from "@/styles/esgoto-indicadores";
+import styled from "styled-components";
+
+const Titulo = styled.div`
+  display: flex;
+  box-sizing: border-box;
+  width: auto;
+  margin-top: -10px;
+  padding: 15px;
+  color: #fff;
+  background-color: #0085bd;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  font-weight: bolder;
+`;
 
 type IPublicacao = {
   id_publicacao: string;
@@ -82,6 +100,22 @@ export default function ViewPublicacoes({
   const [idMunicipio, setIdMunicipio] = useState(null);
   const [idTipo, setIdTipo] = useState(null);
   const [titulo, setTitulo] = useState(null);
+  const {signOut} = useContext(AuthContext);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth <= 1000) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
+      };
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
 
   useEffect(() => {
     if (publicacoes) {
@@ -236,19 +270,43 @@ export default function ViewPublicacoes({
     }
   }
 
+  async function handleSignOut() {
+      signOut();
+    }
+  
+  function handleSimisab() {
+          Router.push("/indicadores/home_indicadores");
+    }
+
   return (
     <Container>
       <HeadPublico></HeadPublico>
-      <DivCenter>
-        <MenuLateral>
-          <MenuPublicoLateral></MenuPublicoLateral>
-        </MenuLateral>
+      <DivMenuTitulo> 
+                          <text style={{
+                            fontSize: '20px',
+                            fontWeight: 'bold',
+                            padding: '15px 20px',
+                            float: 'left',
+                            
+                            }}>
+                              Painel de Edição 
+                            </text>
+                          <ul style={{}}>
+                          <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
+                          <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
+                          </ul>
+      </DivMenuTitulo>
+      
+      <BodyDashboard>
+          <MenuPublicoLateral isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}  />
+      </BodyDashboard>
 
-        <DivFormConteudo>
-          <h3>Publicações</h3>
+      <MainContent isCollapsed={isCollapsed}>
 
+        <DivFormConteudo >
+          <Titulo>Publicações</Titulo>
           <Form onSubmit={handleSubmit(handlebuscaFiltrada)}>
-            <DivInput>
+            <DivInput >
               <label>Municipios:</label>
               <select {...register("id_municipio")}>
                 <option value="">Todos</option>
@@ -299,10 +357,11 @@ export default function ViewPublicacoes({
                 Limpar filtro
               </LimparFiltro>
             </DivInput>
+
           </Form>
 
           {publicacoesList?.map((publicacao) => (
-            <Lista key={publicacao.id_publicacao}>
+            <Lista  key={publicacao.id_publicacao}>
               <ImagemLista>
                 <img src={publicacao.imagem} alt="TedPlan" />
               </ImagemLista>
@@ -326,6 +385,9 @@ export default function ViewPublicacoes({
               <PaginationButton
                 onClick={() => handlegetPubPaginate(paginacao.primeiraPagina)}
                 disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
+                style={{
+                 display: innerWidth < 1000 ? 'none' : 'inline-block'
+                }}
               >
                 Primeiro
               </PaginationButton>
@@ -351,16 +413,23 @@ export default function ViewPublicacoes({
               <PaginationButton
                 onClick={() => handlegetPubPaginate(paginacao.ultimaPagina)}
                 disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
+                style={{
+                 display: innerWidth < 1000 ? 'none' : 'inline-block'
+                }}
               >
                 Último
               </PaginationButton>
             </PaginationContainer>
           )}
         </DivFormConteudo>
-      </DivCenter>
+      
+      </MainContent>  
+
+      
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>
+      
     </Container>
   );
 }

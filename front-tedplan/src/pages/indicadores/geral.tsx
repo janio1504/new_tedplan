@@ -403,7 +403,6 @@ const handleNext = () => {
 
   return (
     <Container>
-      
        <HeadIndicadores usuarios={[]}></HeadIndicadores>
        <MenuHorizontal municipio={dadosMunicipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
@@ -435,7 +434,6 @@ const handleNext = () => {
        )}
       <MainContent isCollapsed={isCollapsed}>
       <DivCenter>
-      
         <Form onSubmit={handleSubmit(handleCadastro)}>
           <BreadCrumbStyle isCollapsed={isCollapsed}>
         <nav>
