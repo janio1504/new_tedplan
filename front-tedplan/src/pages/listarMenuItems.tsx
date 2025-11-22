@@ -137,20 +137,30 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       // Buscar todos os menus únicos dos menu items para garantir que temos os dados completos
       const menuIds = Array.from(new Set(response.data.map((item: IMenuItem) => item.id_menu)));
       
-      // Para cada menu único, buscar se não estiver no mapa
+      // Para cada menu único, buscar se não estiver no mapa ou se não tiver id_eixo
       await Promise.all(
         menuIds.map(async (menuId: string | number) => {
           const menuIdStr = menuId.toString();
           
-          // Verificar se já está no mapa
-          if (!mapAtualizado.has(menuIdStr)) {
+          // Verificar se já está no mapa e se tem id_eixo
+          const menuExistente = mapAtualizado.get(menuIdStr) || mapAtualizado.get(Number(menuIdStr).toString());
+          
+          // Buscar novamente se não existir no mapa ou se não tiver id_eixo
+          if (!menuExistente || !menuExistente.id_eixo) {
             try {
               const menuResponse = await apiClient.get(`/menus/${menuId}`);
               const menuData = menuResponse.data;
+              
+              // Adicionar ao mapa com várias chaves para garantir busca
               mapAtualizado.set(menuIdStr, menuData);
-              // Também adicionar como número
               if (!isNaN(Number(menuIdStr))) {
                 mapAtualizado.set(Number(menuIdStr).toString(), menuData);
+                mapAtualizado.set(String(Number(menuIdStr)), menuData);
+              }
+              
+              // Log para debug
+              if (!menuData.id_eixo) {
+                console.warn(`Menu ${menuData.titulo || menuIdStr} não tem id_eixo definido no banco de dados`);
               }
             } catch (error) {
               console.error(`Erro ao buscar menu ${menuId}:`, error);
@@ -199,39 +209,70 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
   function agruparItensPorEixo(items: IMenuItem[], mapMenus: Map<string, any>, eixosList: IEixo[]) {
     // Função auxiliar para obter eixo usando o mapa passado
     const getEixoInfoLocal = (menuItem: IMenuItem): { id: string; nome: string } | null => {
-      if (!menuItem || !menuItem.id_menu || mapMenus.size === 0 || eixosList.length === 0) {
+      if (!menuItem || !menuItem.id_menu) {
+        return null;
+      }
+      
+      if (mapMenus.size === 0 || eixosList.length === 0) {
         return null;
       }
       
       const menuId = menuItem.id_menu.toString();
       let menu = mapMenus.get(menuId);
       
+      // Tentar buscar como número também
       if (!menu && !isNaN(Number(menuId))) {
-        menu = mapMenus.get(Number(menuId).toString());
+        const numMenuId = Number(menuId);
+        menu = mapMenus.get(numMenuId.toString());
+        // Tentar como string do número
+        if (!menu) {
+          menu = mapMenus.get(String(numMenuId));
+        }
       }
       
+      // Se ainda não encontrou, buscar no mapa de forma mais ampla
       if (!menu) {
         Array.from(mapMenus.entries()).forEach(([key, value]) => {
-          if (!menu) {
+          if (!menu && value) {
             const valueId = value.id_menu ? value.id_menu.toString() : null;
-            if (valueId === menuId || key === menuId) {
+            // Comparar de várias formas
+            if (valueId === menuId || 
+                key === menuId || 
+                (valueId && Number(valueId) === Number(menuId)) ||
+                (key && Number(key) === Number(menuId))) {
               menu = value;
             }
           }
         });
       }
       
-      if (!menu || (menu.id_eixo === null || menu.id_eixo === undefined)) {
+      // Se ainda não encontrou o menu, retornar null
+      if (!menu) {
+        console.warn(`Menu não encontrado para menuItem.id_menu: ${menuId}`);
+        return null;
+      }
+      
+      // Verificar se o menu tem id_eixo
+      if (menu.id_eixo === null || menu.id_eixo === undefined || menu.id_eixo === '') {
+        console.warn(`Menu ${menu.titulo || menuId} não tem id_eixo definido`);
         return null;
       }
       
       const eixoId = menu.id_eixo.toString();
+      
+      // Buscar o eixo na lista de eixos
       const eixo = eixosList.find(e => {
-        const eId = e.id_eixo ? e.id_eixo.toString() : null;
-        return eId === eixoId || e.id_eixo === eixoId;
+        if (!e || !e.id_eixo) return false;
+        const eId = e.id_eixo.toString();
+        // Comparar de várias formas
+        return eId === eixoId || 
+               e.id_eixo === eixoId || 
+               (e.id_eixo && Number(e.id_eixo) === Number(eixoId)) ||
+               (eId && Number(eId) === Number(eixoId));
       });
       
       if (!eixo) {
+        console.warn(`Eixo não encontrado para id_eixo: ${eixoId} do menu ${menu.titulo || menuId}`);
         return null;
       }
       
