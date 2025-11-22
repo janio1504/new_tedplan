@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   DivCenter, 
@@ -58,7 +58,7 @@ export default function Estatistica() {
 
           <DivColEstatisticas>
             {active === 'drenagen' ? <Image onClick={()=>handleActive('drenagen')} src={DrenagemActive} alt="Drenagem" /> : <Image onClick={()=>handleActive('drenagen')} src={Drenagem} alt="Drenagem" />}
-            {active === 'grenagen' ? <BotaoDrenagem>Drenagem</BotaoDrenagem>: <BotaoDrenagemEscuro>Drenagem</BotaoDrenagemEscuro>}
+            {active === 'drenagen' ? <BotaoDrenagem>Drenagem</BotaoDrenagem>: <BotaoDrenagemEscuro>Drenagem</BotaoDrenagemEscuro>}
           </DivColEstatisticas>
 
           <DivColEstatisticas>

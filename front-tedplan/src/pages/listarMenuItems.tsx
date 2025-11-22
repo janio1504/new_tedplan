@@ -242,9 +242,39 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
     const filtrados = items.filter((menuItem) => {
       const eixoInfo = getEixoInfoLocal(menuItem);
       const eixoNome = eixoInfo ? eixoInfo.nome : "";
+      
+      // Buscar o título do menu no mapa
+      let menuTitulo = "";
+      const menuId = menuItem.id_menu ? menuItem.id_menu.toString() : null;
+      
+      if (menuId) {
+        let menu = mapMenus.get(menuId);
+        if (!menu && !isNaN(Number(menuId))) {
+          menu = mapMenus.get(Number(menuId).toString());
+        }
+        if (!menu) {
+          // Buscar no mapa
+          Array.from(mapMenus.entries()).forEach(([key, value]) => {
+            if (!menu) {
+              const valueId = value.id_menu ? value.id_menu.toString() : null;
+              if (valueId === menuId || key === menuId) {
+                menu = value;
+              }
+            }
+          });
+        }
+        if (menu && menu.titulo) {
+          menuTitulo = menu.titulo;
+        } else if (menuItem.menu?.titulo) {
+          menuTitulo = menuItem.menu.titulo;
+        }
+      } else if (menuItem.menu?.titulo) {
+        menuTitulo = menuItem.menu.titulo;
+      }
+      
       return (
         menuItem.nome_menu_item.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (menuItem.menu?.titulo && menuItem.menu.titulo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (menuTitulo && menuTitulo.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (menuItem.ordem_item_menu && menuItem.ordem_item_menu.toString().includes(searchTerm)) ||
         (eixoNome && eixoNome.toLowerCase().includes(searchTerm.toLowerCase()))
       );
@@ -256,7 +286,35 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
       const eixoKey = eixoInfo ? eixoInfo.id : "sem-eixo";
       const eixoNome = eixoInfo ? eixoInfo.nome : "Sem Eixo";
       const menuKey = menuItem.id_menu ? menuItem.id_menu.toString() : "sem-menu";
-      const menuTitulo = menuItem.menu?.titulo || `Menu ${menuItem.id_menu}`;
+      
+      // Buscar o título do menu no mapa
+      const menuId = menuItem.id_menu ? menuItem.id_menu.toString() : null;
+      let menuTitulo = `Menu ${menuItem.id_menu}`;
+      
+      if (menuId) {
+        let menu = mapMenus.get(menuId);
+        if (!menu && !isNaN(Number(menuId))) {
+          menu = mapMenus.get(Number(menuId).toString());
+        }
+        if (!menu) {
+          // Buscar no mapa
+          Array.from(mapMenus.entries()).forEach(([key, value]) => {
+            if (!menu) {
+              const valueId = value.id_menu ? value.id_menu.toString() : null;
+              if (valueId === menuId || key === menuId) {
+                menu = value;
+              }
+            }
+          });
+        }
+        if (menu && menu.titulo) {
+          menuTitulo = menu.titulo;
+        } else if (menuItem.menu?.titulo) {
+          menuTitulo = menuItem.menu.titulo;
+        }
+      } else if (menuItem.menu?.titulo) {
+        menuTitulo = menuItem.menu.titulo;
+      }
 
       if (!acc[eixoKey]) {
         acc[eixoKey] = {
@@ -470,9 +528,11 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
                 </h3>
                 
                 <div style={{
-                  display: "grid",
-                  gridTemplateColumns: `repeat(auto-fit, minmax(300px, 1fr))`,
-                  gap: "20px"
+                  display: "flex",
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: "20px",
+                  alignItems: "flex-start"
                 }}>
                   {Object.values(eixo.menus).map((menu) => (
                     <div
@@ -483,7 +543,9 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
                         border: "2px solid #e0e0e0",
                         padding: "20px",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        minHeight: "200px"
+                        minHeight: "200px",
+                        flex: "1 1 300px",
+                        maxWidth: "100%"
                       }}
                     >
                       <h4 style={{
