@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {FaBars, FaCaretDown, FaList, FaLink} from "react-icons/fa"
+import { FaBars, FaCaretDown, FaList, FaLink } from "react-icons/fa";
 import {
   InputP,
   InputM,
@@ -47,12 +47,23 @@ import api from "../../services/api";
 import MenuHorizontal from "../../components/MenuHorizontal";
 import { toast } from "react-toastify";
 import MenuIndicadoresCadastro from "../../components/MenuIndicadoresCadastro";
-import { Sidebar, SidebarItem, MenuHeader, MenuItemsContainer } from "../../styles/residuo-solidos-in";
+import {
+  Sidebar,
+  SidebarItem,
+  MenuHeader,
+  MenuItemsContainer,
+} from "../../styles/residuo-solidos-in";
 import { DivFormConteudo } from "../../styles/drenagem-indicadores";
-import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../../styles/indicadores";
+import {
+  BreadCrumbStyle,
+  CollapseButton,
+  ExpandButton,
+  MainContent,
+} from "../../styles/indicadores";
 import { anosSelect } from "../../util/util";
 import { bold } from "@uiw/react-md-editor/lib/commands";
 import Link from "next/link";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IMunicipio {
   id_municipio: string;
@@ -100,37 +111,37 @@ interface MunicipioProps {
 
 /**
  * Componente para renderizar campo dinâmico baseado no tipo
- * 
+ *
  * SISTEMA DE DESABILITAÇÃO DE CAMPOS:
  * Para adicionar novos códigos com lógica de desabilitação:
- * 
+ *
  * 1. Adicione o código no objeto fieldConditions (linha ~140) com sua condição
  * 2. Adicione o código no objeto fieldUpdateRules (linha ~179) com sua regra de atualização
  * 3. Adicione o código no objeto fieldConditions do debug (linha ~160) para logs
  * 4. Adicione as propriedades necessárias no estado fieldStates
- * 
+ *
  * Exemplo:
  * - fieldConditions: "NOVO_CODIGO": () => fieldStates.novaCondicao === true
  * - fieldUpdateRules: "NOVO_CODIGO": () => { newStates.novaCondicao = value === "valor" }
  */
-const CampoIndicador = ({ 
-  indicador, 
-  register, 
+const CampoIndicador = ({
+  indicador,
+  register,
   anoSelected,
   campoEnabled,
   fieldStates,
   setFieldStates,
   setValue,
-  dadosMunicipio
-}: { 
-  indicador: IIndicador, 
-  register: any, 
-  anoSelected: string,
-  campoEnabled?: boolean,
-  fieldStates?: {[key: string]: any},
-  setFieldStates?: (states: {[key: string]: any}) => void,
-  setValue?: any,
-  dadosMunicipio?: IMunicipio
+  dadosMunicipio,
+}: {
+  indicador: IIndicador;
+  register: any;
+  anoSelected: string;
+  campoEnabled?: boolean;
+  fieldStates?: { [key: string]: any };
+  setFieldStates?: (states: { [key: string]: any }) => void;
+  setValue?: any;
+  dadosMunicipio?: IMunicipio;
 }) => {
   // Verificações de segurança
   if (!indicador || !anoSelected) {
@@ -144,129 +155,151 @@ const CampoIndicador = ({
     );
   }
 
-  const tipoCampo = indicador.tiposCampo && indicador.tiposCampo.length > 0 ? indicador.tiposCampo[0] : null;
+  const tipoCampo =
+    indicador.tiposCampo && indicador.tiposCampo.length > 0
+      ? indicador.tiposCampo[0]
+      : null;
   const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
   const { usuario } = useContext(AuthContext);
 
   // Função específica para CAD2001 baseada nas regras fornecidas
   const getValidOptionsForCAD2001 = (naturezaJuridica: string) => {
     if (!naturezaJuridica) return null;
-    
+
     // Opções para prestadores LOCAIS
-    const opcoesLocais = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
-    
+    const opcoesLocais = [
+      "Sem Atendimento",
+      "Sede e Localidades",
+      "somente Sede",
+      "somente Localidades",
+    ];
+
     // Opções para prestadores REGIONAIS
     const opcoesRegionais = [
       "Sem delegação atendendo Sede e Localidades - SDSL",
-      "Sem delegação atendendo Sede - SDS", 
+      "Sem delegação atendendo Sede - SDS",
       "Sem delegação atendendo Localidades - SDL",
       "Com delegação sem atendimento - DSA",
       "Com delegação atendendo Sede e Localidades - DSL",
       "Com Delegação atendendo apenas Sede - DS",
-      "Com Delegação atendendo apenas localidades - DL"
+      "Com Delegação atendendo apenas localidades - DL",
     ];
-    
+
     // Regras específicas conforme documentação:
     // Usando aa_natureza_juridica para determinar se é prestador local ou regional
-    
+
     // 1. Prestadores LOCAIS de natureza jurídica "Município", "Autarquia", "Empresa pública" e "Sociedade de economia mista"
     if (naturezaJuridica === "Município") {
       return opcoesLocais;
     }
-    
+
     // 2. Prestadores REGIONAIS de natureza jurídica "Autarquia", "Empresa pública", "Sociedade de economia mista" e "Empresa privada"
     // NOTA: Estas naturezas jurídicas aparecem tanto na lista de LOCAIS quanto REGIONAIS
     // Por enquanto, vamos tratá-las como REGIONAIS (conforme a regra de prestadores regionais)
-    if (["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
+    if (
+      ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(
+        naturezaJuridica
+      )
+    ) {
       return opcoesRegionais; // Tratando como REGIONAL conforme regra
     }
-    
+
     if (naturezaJuridica === "Empresa privada") {
       return opcoesRegionais;
     }
-    
+
     // 3. Prestadores LOCAIS ou REGIONAIS de natureza jurídica "Associação privada"
     if (naturezaJuridica === "Associação privada") {
       return opcoesLocais; // Associação privada sempre usa opções locais
     }
-    
+
     // Se não se encaixa em nenhuma categoria, retornar null
     return null;
   };
 
   // Função para validar opções baseada na natureza jurídica
-  const getValidOptionsByNaturezaJuridica = (codigoIndicador: string, naturezaJuridica: string) => {
+  const getValidOptionsByNaturezaJuridica = (
+    codigoIndicador: string,
+    naturezaJuridica: string
+  ) => {
     if (!naturezaJuridica) return null; // Retorna null se não há natureza jurídica
-    
+
     // Para CAD2001, usar função específica
     if (codigoIndicador === "CAD2001") {
       return getValidOptionsForCAD2001(naturezaJuridica);
     }
-    
+
     // Mapear opções válidas por código de indicador e natureza jurídica
     const validOptionsMap: { [key: string]: { [key: string]: string[] } } = {
-      "CAD2002": {
-        "Município": ["Prestação direta por órgão da administração pública direta"],
-        "Autarquia": ["Prestação direta por entidade da administração pública indireta"],
-        "Empresa pública": ["Prestação direta por entidade da administração pública indireta"],
-        "Sociedade de economia mista": ["Prestação direta por entidade da administração pública indireta"],
+      CAD2002: {
+        Município: [
+          "Prestação direta por órgão da administração pública direta",
+        ],
+        Autarquia: [
+          "Prestação direta por entidade da administração pública indireta",
+        ],
+        "Empresa pública": [
+          "Prestação direta por entidade da administração pública indireta",
+        ],
+        "Sociedade de economia mista": [
+          "Prestação direta por entidade da administração pública indireta",
+        ],
         "Empresa privada": [
           "Prestação indireta delegada mediante concessão para empresa privada",
           "Prestação indireta delegada mediante concessão para empresa estatal",
-          "Outra situação (especificar)"
+          "Outra situação (especificar)",
         ],
         "Associação privada": [
           "Prestação indireta delegada para associação civil",
           "Prestação indireta delegada para associação comunitária",
-          "Outra situação (especificar)"
-        ]
+          "Outra situação (especificar)",
+        ],
       },
-      "CAD2004": {
-        "Município": ["Inexistente"],
-        "Autarquia": ["Inexistente"],
+      CAD2004: {
+        Município: ["Inexistente"],
+        Autarquia: ["Inexistente"],
         "Empresa pública": ["Inexistente"],
         "Sociedade de economia mista": ["Inexistente"],
         "Empresa privada": [
           "Contrato de concessão",
           "Inexistente",
-          "Outro (especifique)"
+          "Outro (especifique)",
         ],
         "Associação privada": [
           "Convênio administrativo (para associações civis ou comunitárias)",
           "Inexistente",
-          "Outro (especifique)"
-        ]
-      }
+          "Outro (especifique)",
+        ],
+      },
     };
-    
+
     // Retornar opções válidas para o código e natureza jurídica específicos
     return validOptionsMap[codigoIndicador]?.[naturezaJuridica] || null;
   };
 
-    
-    // Função para validar opções do CAD2001 baseado no CAD1002 - REMOVIDA
+  // Função para validar opções do CAD2001 baseado no CAD1002 - REMOVIDA
   // const getValidOptionsForCAD2001 = (cad1002Value: string, naturezaJuridica: string) => {
   //   if (!cad1002Value) return [];
-  //   
+  //
   //   // Prestadores locais de natureza jurídica específica
   //   const prestadoresLocais = ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"];
   //   const opcoesLocais = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
-  //   
+  //
   //   // Prestadores regionais de natureza jurídica específica
   //   const prestadoresRegionais = ["Autarquia", "Empresa pública", "Sociedade de economia mista", "Empresa privada"];
   //   const opcoesRegionais = [
   //     "Sem delegação atendendo Sede e Localidades - SDSL",
-  //     "Sem delegação atendendo Sede - SDS", 
+  //     "Sem delegação atendendo Sede - SDS",
   //     "Sem delegação atendendo Localidades - SDL",
   //     "Com delegação sem atendimento - DSA",
   //     "Com delegação atendendo Sede e Localidades - DSL",
   //     "Com Delegação atendendo apenas Sede - DS",
   //     "Com Delegação atendendo apenas localidades - DL"
   //   ];
-  //   
+  //
   //   // Associação privada (local ou regional)
   //   const opcoesAssociacao = ["Sem Atendimento", "Sede e Localidades", "somente Sede", "somente Localidades"];
-  //   
+  //
   //   if (prestadoresLocais.includes(naturezaJuridica)) {
   //     return opcoesLocais;
   //   } else if (prestadoresRegionais.includes(naturezaJuridica)) {
@@ -274,32 +307,32 @@ const CampoIndicador = ({
   //   } else if (naturezaJuridica === "Associação privada") {
   //     return opcoesAssociacao;
   //   }
-  //   
+  //
   //   return []; // Nenhuma opção válida
   // };
 
   // Função para validar opções do CAD2002 baseado no CAD1002 e natureza jurídica - REMOVIDA
   // const getValidOptionsForCAD2002 = (cad1002Value: string, naturezaJuridica: string) => {
   //   if (!cad1002Value) return [];
-  //   
+  //
   //   // Determinar se é prestador local ou regional baseado no CAD1002
   //   const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
   //   const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
-  //   
+  //
   //   if (!isPrestadorLocal && !isPrestadorRegional) {
   //     return []; // CAD1002 deve ser "Local" ou "Regional"
   //   }
-  //   
+  //
   //   // Prestadores locais - Município
   //   if (isPrestadorLocal && naturezaJuridica === "Município") {
   //     return ["Prestação direta por órgão da administração pública direta"];
   //   }
-  //   
+  //
   //   // Prestadores locais - Autarquia, Empresa pública, Sociedade de economia mista
   //   if (isPrestadorLocal && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
   //     return ["Prestação direta por entidade da administração pública indireta"];
   //   }
-  //   
+  //
   //   // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
   //   if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
   //     return [
@@ -308,7 +341,7 @@ const CampoIndicador = ({
   //       "Outra situação (especificar)"
   //     ];
   //   }
-  //   
+  //
   //   // Empresa privada (local ou regional)
   //   if (naturezaJuridica === "Empresa privada") {
   //     return [
@@ -317,7 +350,7 @@ const CampoIndicador = ({
   //       "Outra situação (especificar)"
   //     ];
   //   }
-  //   
+  //
   //   // Associação privada (local ou regional)
   //   if (naturezaJuridica === "Associação privada") {
   //     return [
@@ -326,27 +359,27 @@ const CampoIndicador = ({
   //       "Outra situação (especificar)"
   //     ];
   //   }
-  //   
+  //
   //   return []; // Nenhuma opção válida
   // };
 
   // Função para validar opções do CAD2004 baseado no CAD1002 e natureza jurídica - REMOVIDA
   // const getValidOptionsForCAD2004 = (cad1002Value: string, naturezaJuridica: string) => {
   //   if (!cad1002Value) return [];
-  //   
+  //
   //   // Determinar se é prestador local ou regional baseado no CAD1002
   //   const isPrestadorLocal = cad1002Value === "Local" || cad1002Value === "LOCAL";
   //   const isPrestadorRegional = cad1002Value === "Regional" || cad1002Value === "REGIONAL";
-  //   
+  //
   //   if (!isPrestadorLocal && !isPrestadorRegional) {
   //     return []; // CAD1002 deve ser "Local" ou "Regional"
   //   }
-  //   
+  //
   //   // Prestadores locais - Município, Autarquia, Empresa pública, Sociedade de economia mista
   //   if (isPrestadorLocal && ["Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
   //     return ["Inexistente"];
   //   }
-  //   
+  //
   //   // Prestadores regionais - Autarquia, Empresa pública, Sociedade de economia mista
   //   if (isPrestadorRegional && ["Autarquia", "Empresa pública", "Sociedade de economia mista"].includes(naturezaJuridica)) {
   //     return [
@@ -356,7 +389,7 @@ const CampoIndicador = ({
   //       "Outro (especifique)"
   //     ];
   //   }
-  //   
+  //
   //   // Empresa privada (local ou regional)
   //   if (naturezaJuridica === "Empresa privada") {
   //     return [
@@ -365,7 +398,7 @@ const CampoIndicador = ({
   //       "Outro (especifique)"
   //     ];
   //   }
-  //   
+  //
   //   // Associação privada (local ou regional)
   //   if (naturezaJuridica === "Associação privada") {
   //     return [
@@ -374,7 +407,7 @@ const CampoIndicador = ({
   //       "Outro (especifique)"
   //     ];
   //   }
-  //   
+  //
   //   return []; // Nenhuma opção válida
   // };
 
@@ -384,7 +417,7 @@ const CampoIndicador = ({
     if (!fieldStates) {
       return true;
     }
-    
+
     // Mapeamento de códigos e suas condições de habilitação - REMOVIDO
     const fieldConditions: { [key: string]: () => boolean } = {
       // "CAD2002": () => {
@@ -405,22 +438,22 @@ const CampoIndicador = ({
       // "CODIGO3": () => fieldStates.outraCondicao === true,
       // "CODIGO4": () => fieldStates.condicaoEspecifica === "valor",
     };
-    
+
     // Verificar se o código tem condição específica
     if (fieldConditions[codigoIndicador]) {
       return fieldConditions[codigoIndicador]();
     }
-    
+
     // Por padrão, campos estão habilitados
     return true;
   };
-  
+
   const isDisabled = !isFieldEnabled(indicador.codigo_indicador);
-  
+
   function onChangeEnabled(value: any, codigoIndicador: string) {
     if (setFieldStates && fieldStates) {
       const newStates = { ...fieldStates };
-      
+
       // Mapeamento de códigos e como atualizar o estado baseado no valor - REMOVIDO
       const fieldUpdateRules: { [key: string]: () => void } = {
         // CAD1002 afeta CAD2001 e CAD2004 - REMOVIDO
@@ -444,7 +477,7 @@ const CampoIndicador = ({
         //   newStates.outraCondicao = value === "valor_especifico";
         // },
       };
-      
+
       // Verificar se o código tem regra de atualização específica
       if (fieldUpdateRules[codigoIndicador]) {
         fieldUpdateRules[codigoIndicador]();
@@ -453,7 +486,7 @@ const CampoIndicador = ({
       // Se não há regra específica, não atualiza nada (evita comportamentos inesperados)
     }
   }
-  
+
   // Campo não configurado ou com erro
   if (!tipoCampo) {
     const hasError = indicador._hasError;
@@ -461,12 +494,18 @@ const CampoIndicador = ({
       <input
         {...register(fieldName)}
         type="text"
-        placeholder={hasError ? "Erro ao carregar configuração" : "Campo sem configuração"}
-        title={hasError ? "Verifique a conectividade com o servidor" : "Este indicador não possui configuração de campo"}
-        style={{ 
-          backgroundColor: hasError ? "#fff3cd" : "#f8f9fa", 
+        placeholder={
+          hasError ? "Erro ao carregar configuração" : "Campo sem configuração"
+        }
+        title={
+          hasError
+            ? "Verifique a conectividade com o servidor"
+            : "Este indicador não possui configuração de campo"
+        }
+        style={{
+          backgroundColor: hasError ? "#fff3cd" : "#f8f9fa",
           border: hasError ? "1px solid #ffeaa7" : "1px solid #dee2e6",
-          color: hasError ? "#856404" : "#6c757d"
+          color: hasError ? "#856404" : "#6c757d",
         }}
       />
     );
@@ -494,12 +533,12 @@ const CampoIndicador = ({
           return "Campo desabilitado";
       }
     }
-    return tipoCampo.default_value ;
+    return tipoCampo.default_value;
   };
 
   // Pegar o registro do react-hook-form
   const fieldRegistration = register(fieldName);
-  
+
   // Criar onChange combinado que preserva o react-hook-form
   const combinedOnChange = (e: any) => {
     // Chamar primeiro o onChange do react-hook-form
@@ -515,22 +554,22 @@ const CampoIndicador = ({
     placeholder: getPlaceholderMessage(indicador.codigo_indicador),
     defaultValue: tipoCampo.default_value || "",
     disabled: isDisabled,
-    style: { 
-      width: "90%", 
-      padding: "8px 12px", 
+    style: {
+      width: "90%",
+      padding: "8px 12px",
       border: "1px solid #ddd",
       borderRadius: "4px",
       fontSize: "13px",
       transition: "all 0.2s ease",
       backgroundColor: isDisabled ? "#f8f9fa" : "white",
       color: isDisabled ? "#6c757d" : "#333",
-      boxShadow: "none"
-    }
+      boxShadow: "none",
+    },
   };
 
   // Renderizar conforme o tipo
   switch (tipoCampo.type?.toLowerCase()) {
-    case 'number':
+    case "number":
       return (
         <input
           {...baseProps}
@@ -548,43 +587,62 @@ const CampoIndicador = ({
         />
       );
 
-    case 'select':
+    case "select":
       let options = tipoCampo.selectOptions || [];
-      
+
       // Aplicar validação baseada na natureza jurídica para campos específicos
-      if (["CAD2001", "CAD2002", "CAD2004"].includes(indicador.codigo_indicador)) {
+      if (
+        ["CAD2001", "CAD2002", "CAD2004"].includes(indicador.codigo_indicador)
+      ) {
         const naturezaJuridica = dadosMunicipio?.aa_natureza_juridica;
         console.log(dadosMunicipio);
-        
+
         console.log(`=== VALIDAÇÃO ${indicador.codigo_indicador} ===`);
-        console.log(`Natureza jurídica (aa_natureza_juridica): ${naturezaJuridica}`);
-        
+        console.log(
+          `Natureza jurídica (aa_natureza_juridica): ${naturezaJuridica}`
+        );
+
         if (naturezaJuridica) {
-          const validOptions = getValidOptionsByNaturezaJuridica(indicador.codigo_indicador, naturezaJuridica);
-          
+          const validOptions = getValidOptionsByNaturezaJuridica(
+            indicador.codigo_indicador,
+            naturezaJuridica
+          );
+
           console.log(`Opções válidas encontradas:`, validOptions);
           console.log(`Total de opções originais: ${options.length}`);
-          console.log(`Opções originais:`, options.map(opt => opt.descricao || opt.value));
-          
+          console.log(
+            `Opções originais:`,
+            options.map((opt) => opt.descricao || opt.value)
+          );
+
           if (validOptions) {
             // Filtrar opções baseadas na natureza jurídica
             const optionsBefore = options.length;
-            options = options.filter(option => 
+            options = options.filter((option) =>
               validOptions.includes(option.descricao || option.value)
             );
-            console.log(`✅ Opções após filtro: ${optionsBefore} -> ${options.length}`);
-            console.log(`Opções filtradas:`, options.map(opt => opt.descricao || opt.value));
+            console.log(
+              `✅ Opções após filtro: ${optionsBefore} -> ${options.length}`
+            );
+            console.log(
+              `Opções filtradas:`,
+              options.map((opt) => opt.descricao || opt.value)
+            );
           } else {
-            console.log(`❌ Nenhuma opção válida encontrada para esta natureza jurídica`);
+            console.log(
+              `❌ Nenhuma opção válida encontrada para esta natureza jurídica`
+            );
           }
         } else {
-          console.log(`⚠️ Natureza jurídica não encontrada - usando todas as opções`);
+          console.log(
+            `⚠️ Natureza jurídica não encontrada - usando todas as opções`
+          );
         }
         console.log(`=== FIM VALIDAÇÃO ${indicador.codigo_indicador} ===`);
       }
-      
+
       return (
-        <select 
+        <select
           {...baseProps}
           style={{ ...baseProps.style }}
           onFocus={(e) => {
@@ -600,57 +658,52 @@ const CampoIndicador = ({
           {options
             .sort((a, b) => (a.ordem_option || 0) - (b.ordem_option || 0))
             .map((option, index) => (
-              <option key={option.id_select_option || index} value={option.value}>
+              <option
+                key={option.id_select_option || index}
+                value={option.value}
+              >
                 {option.descricao || option.value}
               </option>
-            ))
-          }
+            ))}
         </select>
       );
 
-    case 'textarea':
+    case "textarea":
       return (
         <textarea
           {...baseProps}
           rows={2}
-          style={{ 
-            ...baseProps.style, 
-            resize: "vertical", 
-            minHeight: "60px" 
+          style={{
+            ...baseProps.style,
+            resize: "vertical",
+            minHeight: "60px",
           }}
         />
       );
 
-    case 'date':
+    case "date":
       return (
-        <input
-          {...baseProps}
-          type="date"
-          style={{ ...baseProps.style }}
-        />
+        <input {...baseProps} type="date" style={{ ...baseProps.style }} />
       );
 
-    case 'email':
+    case "email":
       return (
-        <input
-          {...baseProps}
-          type="email"
-          style={{ ...baseProps.style }}
-        />
+        <input {...baseProps} type="email" style={{ ...baseProps.style }} />
       );
 
-    case 'checkbox':
+    case "checkbox":
       const checkBoxItems = tipoCampo.checkBoxItems || [];
 
-      
       if (checkBoxItems.length === 0) {
         return (
-          <div style={{ 
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center",
-            height: "40px"
-          }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "40px",
+            }}
+          >
             <input
               {...register(fieldName)}
               type="checkbox"
@@ -659,30 +712,34 @@ const CampoIndicador = ({
           </div>
         );
       }
-      
+
       return (
-        <div style={{ 
-          display: "flex", 
-          flexDirection: "column", 
-          gap: "8px",
-          padding: "8px",
-          border: "1px solid #ddd",
-          borderRadius: "4px",
-          backgroundColor: isDisabled ? "#f8f9fa" : "white"
-        }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            backgroundColor: isDisabled ? "#f8f9fa" : "white",
+          }}
+        >
           {checkBoxItems.map((item, index) => {
             const checkboxFieldName = `${fieldName}_${item.id_item_check_box}_${anoSelected}`;
 
-            
             return (
-              <label key={item.id_item_check_box} style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "13px",
-                cursor: isDisabled ? "not-allowed" : "pointer",
-                opacity: isDisabled ? 0.6 : 1
-              }}>
+              <label
+                key={item.id_item_check_box}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "13px",
+                  cursor: isDisabled ? "not-allowed" : "pointer",
+                  opacity: isDisabled ? 0.6 : 1,
+                }}
+              >
                 <input
                   type="checkbox"
                   defaultChecked={Boolean(item.valor)}
@@ -704,7 +761,7 @@ const CampoIndicador = ({
         </div>
       );
 
-    case 'text':
+    case "text":
     default:
       return (
         <input
@@ -732,23 +789,22 @@ export default function PrestacaoServicoAgua() {
   const [anoSelected, setAnoSelected] = useState(null);
   const [campoEnabled, setCampoEnabled] = useState(true);
   const {
-  register,
-  handleSubmit,
-  reset,
-  setValue,
-  formState: { errors },
-} = useForm();
-
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm();
 
   const [content, setContent] = useState(null);
   const [activeForm, setActiveForm] = useState("");
   const [indicadores, setIndicadores] = useState<IIndicador[]>([]);
   const [grupo, setGrupo] = useState(null);
   const [loadingIndicadores, setLoadingIndicadores] = useState(false);
-  const [fieldStates, setFieldStates] = useState<{[key: string]: any}>({
+  const [fieldStates, setFieldStates] = useState<{ [key: string]: any }>({
     hasColeta: false,
     cad1002Value: null,
-    cad2001Value: null
+    cad2001Value: null,
   });
 
   const [dadosCarregados, setDadosCarregados] = useState([]);
@@ -757,17 +813,17 @@ export default function PrestacaoServicoAgua() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   useEffect(() => {
-      const handleResize = () => {
-        if (window.innerWidth <= 1000) {
-          setIsCollapsed(true);
-        } else {
-          setIsCollapsed(false);
-        }
-      };
-      handleResize();
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -792,92 +848,99 @@ export default function PrestacaoServicoAgua() {
   }
 
   async function getMenus() {
-    const res = await api
-      .get("menus/eixo/"+1)
-      .then((response) => {
-        setMenus(response.data);
-      });
+    const res = await api.get("menus/eixo/" + 1).then((response) => {
+      setMenus(response.data);
+    });
   }
 
-  async function getIndicadores(menu_item: { id_menu_item: number; nome_menu_item: string; }) {
+  async function getIndicadores(menu_item: {
+    id_menu_item: number;
+    nome_menu_item: string;
+  }) {
     setGrupo(menu_item.nome_menu_item);
     setLoadingIndicadores(true);
-    
+
     try {
       // Buscar indicadores do menu item
-      const resIndicadores = await api.get(`indicadores-novo/menu-item/${menu_item?.id_menu_item}`);
+      const resIndicadores = await api.get(
+        `indicadores-novo/menu-item/${menu_item?.id_menu_item}`
+      );
       const indicadoresData = resIndicadores.data || [];
-      
+
       if (indicadoresData.length === 0) {
         setIndicadores([]);
         return;
       }
-      
+
       // Primeiro, mostrar os indicadores básicos
       setIndicadores(indicadoresData);
-      
+
       // Depois, carregar tipos de campo gradualmente
       const indicadoresComTipos = [];
-      
+
       for (let i = 0; i < indicadoresData.length; i++) {
         const indicador = indicadoresData[i];
-        
+
         try {
           // Usar a instância de API configurada com autenticação
-          const tiposResponse = await api.get(`tipos-campo/indicador/${indicador.id_indicador}`);
+          const tiposResponse = await api.get(
+            `tipos-campo/indicador/${indicador.id_indicador}`
+          );
           const tiposCampo = tiposResponse.data || [];
-          
+
           // Processar opções para campos select
           const tiposComOpcoes = [];
           for (const tipo of tiposCampo) {
             if (tipo.type === "select") {
               try {
-                const opcoesResponse = await api.get(`select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`);
+                const opcoesResponse = await api.get(
+                  `select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`
+                );
                 const opcoes = opcoesResponse.data || [];
                 tiposComOpcoes.push({
                   ...tipo,
-                  selectOptions: opcoes
+                  selectOptions: opcoes,
                 });
               } catch (error) {
                 tiposComOpcoes.push(tipo);
               }
             } else if (tipo.type === "checkbox") {
               try {
-                const checkBoxResponse = await api.get(`item-check-box/indicador/${indicador.id_indicador}`);
+                const checkBoxResponse = await api.get(
+                  `item-check-box/indicador/${indicador.id_indicador}`
+                );
                 const checkBoxItems = checkBoxResponse.data || [];
                 tiposComOpcoes.push({
                   ...tipo,
-                  checkBoxItems: checkBoxItems
+                  checkBoxItems: checkBoxItems,
                 });
               } catch (error) {
-                  tiposComOpcoes.push(tipo);
-                }
-              } else {
                 tiposComOpcoes.push(tipo);
               }
+            } else {
+              tiposComOpcoes.push(tipo);
             }
-            
-            indicadoresComTipos.push({
-              ...indicador,
-              tiposCampo: tiposComOpcoes
-            });
-            
-          } catch (error) {
-            // Em caso de erro, pelo menos adicionar o indicador sem tipos
-            indicadoresComTipos.push({
-              ...indicador,
-              tiposCampo: []
-            });
           }
+
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: tiposComOpcoes,
+          });
+        } catch (error) {
+          // Em caso de erro, pelo menos adicionar o indicador sem tipos
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: [],
+          });
         }
-        
-        setIndicadores(indicadoresComTipos);
-        
-        // Se há um ano selecionado, carregar dados existentes
-        if (anoSelected && usuario?.id_municipio) {
-          await carregarDadosExistentes(anoSelected);
-        }
-      
+      }
+
+      setIndicadores(indicadoresComTipos);
+
+      // Se há um ano selecionado, carregar dados existentes
+      if (anoSelected && usuario?.id_municipio) {
+        await carregarDadosExistentes(anoSelected);
+      }
     } catch (error) {
       let errorMessage = "Erro desconhecido";
       if (error.response?.status === 401) {
@@ -887,22 +950,26 @@ export default function PrestacaoServicoAgua() {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       toast.error(`Erro ao carregar indicadores: ${errorMessage}`, {
         position: "top-right",
         autoClose: 7000,
       });
-      
+
       // Em caso de erro, pelo menos tentar mostrar os dados básicos
       try {
-        const resIndicadores = await api.get(`indicadores-novo/menu-item/${menu_item?.id_menu_item}`);
+        const resIndicadores = await api.get(
+          `indicadores-novo/menu-item/${menu_item?.id_menu_item}`
+        );
         const indicadoresBasicos = resIndicadores.data || [];
-        setIndicadores(indicadoresBasicos.map(ind => ({ 
-          ...ind, 
-          tiposCampo: [],
-          _hasError: true 
-        })));
-        
+        setIndicadores(
+          indicadoresBasicos.map((ind) => ({
+            ...ind,
+            tiposCampo: [],
+            _hasError: true,
+          }))
+        );
+
         // Se há um ano selecionado, carregar dados existentes mesmo com erro
         if (anoSelected && usuario?.id_municipio) {
           await carregarDadosExistentes(anoSelected);
@@ -915,39 +982,43 @@ export default function PrestacaoServicoAgua() {
     }
   }
 
-
-
   // Função para salvar dados na tabela item_check_box
   async function salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes) {
     if (!todosCheckBoxes || todosCheckBoxes.length === 0) {
       return;
     }
-    
+
     try {
       const apiClient = getAPIClient();
-      
+
       // Criar um mapa dos checkboxes selecionados para facilitar a busca
       const checkBoxSelecionadosMap = new Map();
       if (checkBoxSelecionados && checkBoxSelecionados.length > 0) {
-        checkBoxSelecionados.forEach(checkBox => {
+        checkBoxSelecionados.forEach((checkBox) => {
           checkBoxSelecionadosMap.set(checkBox.id_item_check_box, checkBox);
         });
       }
-      
+
       // Para cada checkbox disponível, atualizar o registro na tabela item_check_box
       for (const checkBox of todosCheckBoxes) {
         try {
           // Validar se o checkbox tem os campos necessários
-          if (!checkBox.id_item_check_box || !checkBox.descricao || !checkBox.id_indicador) {
+          if (
+            !checkBox.id_item_check_box ||
+            !checkBox.descricao ||
+            !checkBox.id_indicador
+          ) {
             continue;
           }
-          
+
           // Verificar se o checkbox está selecionado
-          const isSelected = checkBoxSelecionadosMap.has(checkBox.id_item_check_box);
-          
+          const isSelected = checkBoxSelecionadosMap.has(
+            checkBox.id_item_check_box
+          );
+
           // Atualizar o campo valor para boolean (true se selecionado, false se não selecionado)
           await apiClient.put(`/item-check-box/${checkBox.id_item_check_box}`, {
-            valor: isSelected // boolean true se selecionado, false se não selecionado
+            valor: isSelected, // boolean true se selecionado, false se não selecionado
           });
         } catch (error) {
           console.error("Erro ao atualizar item checkbox:", checkBox, error);
@@ -960,7 +1031,6 @@ export default function PrestacaoServicoAgua() {
   }
 
   async function handleCadastroIndicadores(data) {
-    
     try {
       if (!isEditor) {
         toast.error("Você não tem permissão para editar!", {
@@ -992,105 +1062,116 @@ export default function PrestacaoServicoAgua() {
       // Processar os dados para salvar valores dos indicadores
       const valoresIndicadores = [];
       const checkBoxSelecionados = [];
-      
+
       // Agrupar checkboxes por código do indicador
       const checkBoxAgrupados = new Map();
-      
-      Object.keys(data).forEach(key => {
+
+      Object.keys(data).forEach((key) => {
         const valor = data[key];
-        
-                  // Verificar se é um campo checkbox
-          const isCheckboxField = key.includes('_') && key.split('_').length > 2;
-        
-                  if (isCheckboxField) {
-            const parts = key.split('_');
-            const codigoIndicador = parts[0];
-            const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2 (GFI1008_2025_8_2025)
-          
-                     
-            
-                        if (valor === true || valor === "true" || (typeof valor === 'string' && valor.length > 0 && valor !== "false")) {
-            
+
+        // Verificar se é um campo checkbox
+        const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+        if (isCheckboxField) {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0];
+          const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2 (GFI1008_2025_8_2025)
+
+          if (
+            valor === true ||
+            valor === "true" ||
+            (typeof valor === "string" && valor.length > 0 && valor !== "false")
+          ) {
             // Encontrar a descrição do checkbox selecionado
-            const indicador = indicadores.find(ind => ind.codigo_indicador === codigoIndicador);
-            
-                          if (indicador) {              
-                const tipoCheckbox = indicador.tiposCampo?.find(tipo => tipo.type === 'checkbox');
-                
-                if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
-                
+            const indicador = indicadores.find(
+              (ind) => ind.codigo_indicador === codigoIndicador
+            );
+
+            if (indicador) {
+              const tipoCheckbox = indicador.tiposCampo?.find(
+                (tipo) => tipo.type === "checkbox"
+              );
+
+              if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
                 // Tentar encontrar por id_item_check_box
-                let checkBoxItem = tipoCheckbox.checkBoxItems.find(item => 
-                  item.id_item_check_box === idItemCheckBox
+                let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.id_item_check_box === idItemCheckBox
                 );
-                
+
                 if (!checkBoxItem) {
                   // Se não encontrou, tentar encontrar por qualquer correspondência
-                  const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(item => 
-                    item.id_item_check_box.toString() === idItemCheckBox.toString() ||
-                    item.descricao.toLowerCase().includes(idItemCheckBox.toLowerCase()) ||
-                    (typeof valor === 'string' && valor.toLowerCase().includes(item.descricao.toLowerCase()))
+                  const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                    (item) =>
+                      item.id_item_check_box.toString() ===
+                        idItemCheckBox.toString() ||
+                      item.descricao
+                        .toLowerCase()
+                        .includes(idItemCheckBox.toLowerCase()) ||
+                      (typeof valor === "string" &&
+                        valor
+                          .toLowerCase()
+                          .includes(item.descricao.toLowerCase()))
                   );
-                  
+
                   // Usar o resultado da busca alternativa se encontrou
                   if (checkBoxItemAlt) {
                     checkBoxItem = checkBoxItemAlt;
                   }
                 }
-                
+
                 if (checkBoxItem) {
                   // Agrupar checkboxes por indicador
                   if (!checkBoxAgrupados.has(codigoIndicador)) {
                     checkBoxAgrupados.set(codigoIndicador, []);
                   }
-                  checkBoxAgrupados.get(codigoIndicador).push(checkBoxItem.descricao);
-                  
+                  checkBoxAgrupados
+                    .get(codigoIndicador)
+                    .push(checkBoxItem.descricao);
+
                   // Salvar para tabela item_check_box
                   const checkBoxData = {
                     id_item_check_box: checkBoxItem.id_item_check_box,
                     descricao: checkBoxItem.descricao,
                     valor: true, // boolean true para item selecionado
-                    id_indicador: indicador.id_indicador
+                    id_indicador: indicador.id_indicador,
                   };
-                  
-                                    checkBoxSelecionados.push(checkBoxData);
+
+                  checkBoxSelecionados.push(checkBoxData);
                 }
               }
             }
           }
         } else {
           // Campo normal (não checkbox) - formato: "CODIGO_ANO"
-          if (valor !== null && valor !== undefined && valor !== '') {
-            const parts = key.split('_');
+          if (valor !== null && valor !== undefined && valor !== "") {
+            const parts = key.split("_");
             const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
-            
+
             valoresIndicadores.push({
               codigo_indicador: codigoIndicador,
               ano: parseInt(anoSelected),
               valor_indicador: valor,
-              id_municipio: usuario.id_municipio
+              id_municipio: usuario.id_municipio,
             });
           }
         }
-                      });
-        
+      });
 
-        
-
-        
-        // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+      // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
       checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
-        const indicador = indicadores.find(ind => ind.codigo_indicador === codigoIndicador);
+        const indicador = indicadores.find(
+          (ind) => ind.codigo_indicador === codigoIndicador
+        );
         if (indicador) {
           // Salvar array JSON com descrições na tabela indicadores-municipio
           valoresIndicadores.push({
             codigo_indicador: codigoIndicador,
             ano: parseInt(anoSelected),
             valor_indicador: JSON.stringify(descricoes), // Array JSON
-            id_municipio: usuario.id_municipio
+            id_municipio: usuario.id_municipio,
           });
         }
-              });
+      });
 
       if (valoresIndicadores.length === 0) {
         toast.warning("Nenhum valor foi preenchido!", {
@@ -1100,105 +1181,113 @@ export default function PrestacaoServicoAgua() {
         return;
       }
 
-
-
-              // Verificar se já existem dados para este município e ano
+      // Verificar se já existem dados para este município e ano
       const apiClient = getAPIClient();
-      
+
       try {
         // Buscar dados existentes para o município e ano
         const existingDataResponse = await apiClient.get(
           `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${anoSelected}`
         );
-        
+
         const existingData = existingDataResponse.data || [];
-        
-                  if (existingData.length > 0) {
-            // Se existem dados, atualizar apenas os que foram alterados
-          
+
+        if (existingData.length > 0) {
+          // Se existem dados, atualizar apenas os que foram alterados
+
           // Criar um mapa dos dados existentes para facilitar a busca
           const existingDataMap = new Map();
-          existingData.forEach(record => {
+          existingData.forEach((record) => {
             const key = `${record.codigo_indicador}_${record.ano}`;
             existingDataMap.set(key, record);
           });
-          
+
           // Processar cada valor para salvar/atualizar
           for (const valorIndicador of valoresIndicadores) {
             const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}`;
             const existingRecord = existingDataMap.get(key);
-            
+
             try {
-                              if (existingRecord) {
-                  // Atualizar registro existente
-                  await apiClient.put(`/indicadores-municipio/${existingRecord.id_incicador_municipio}`, valorIndicador);
-                } else {
-                  // Criar novo registro
-                  await apiClient.post("/indicadores-municipio", valorIndicador);
-                }
+              if (existingRecord) {
+                // Atualizar registro existente
+                await apiClient.put(
+                  `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                  valorIndicador
+                );
+              } else {
+                // Criar novo registro
+                await apiClient.post("/indicadores-municipio", valorIndicador);
+              }
             } catch (saveError) {
-              console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+              console.error(
+                "Erro ao salvar/atualizar valor:",
+                valorIndicador,
+                saveError
+              );
               throw saveError;
             }
           }
-          
+
           // Salvar dados na tabela item_check_box
           try {
             // Coletar todos os checkboxes disponíveis para o indicador
             const todosCheckBoxes = [];
-            indicadores.forEach(indicador => {
-              const tipoCheckbox = indicador.tiposCampo?.find(tipo => tipo.type === 'checkbox');
+            indicadores.forEach((indicador) => {
+              const tipoCheckbox = indicador.tiposCampo?.find(
+                (tipo) => tipo.type === "checkbox"
+              );
               if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
-                tipoCheckbox.checkBoxItems.forEach(item => {
+                tipoCheckbox.checkBoxItems.forEach((item) => {
                   todosCheckBoxes.push({
                     id_item_check_box: item.id_item_check_box,
                     descricao: item.descricao,
-                    id_indicador: indicador.id_indicador
+                    id_indicador: indicador.id_indicador,
                   });
                 });
               }
-            });
-            
-            await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
-          } catch (error) {
-            console.error("Erro ao salvar na tabela item_check_box:", error);
-            // Não interromper o processo principal
-          }
-            
-            toast.success("Dados atualizados com sucesso!", {
-              position: "top-right",
-              autoClose: 5000,
             });
 
-        } else {
-                      // Se não existem dados, criar novos registros
-            for (const valorIndicador of valoresIndicadores) {
-              await apiClient.post("/indicadores-municipio", valorIndicador);
-            }
-          
-          // Salvar dados na tabela item_check_box
-          try {
-            // Coletar todos os checkboxes disponíveis para o indicador
-            const todosCheckBoxes = [];
-            indicadores.forEach(indicador => {
-              const tipoCheckbox = indicador.tiposCampo?.find(tipo => tipo.type === 'checkbox');
-              if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
-                tipoCheckbox.checkBoxItems.forEach(item => {
-                  todosCheckBoxes.push({
-                    id_item_check_box: item.id_item_check_box,
-                    descricao: item.descricao,
-                    id_indicador: indicador.id_indicador
-                  });
-                });
-              }
-            });
-            
             await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
           } catch (error) {
             console.error("Erro ao salvar na tabela item_check_box:", error);
             // Não interromper o processo principal
           }
-          
+
+          toast.success("Dados atualizados com sucesso!", {
+            position: "top-right",
+            autoClose: 5000,
+          });
+        } else {
+          // Se não existem dados, criar novos registros
+          for (const valorIndicador of valoresIndicadores) {
+            await apiClient.post("/indicadores-municipio", valorIndicador);
+          }
+
+          // Salvar dados na tabela item_check_box
+          try {
+            // Coletar todos os checkboxes disponíveis para o indicador
+            const todosCheckBoxes = [];
+            indicadores.forEach((indicador) => {
+              const tipoCheckbox = indicador.tiposCampo?.find(
+                (tipo) => tipo.type === "checkbox"
+              );
+              if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+                tipoCheckbox.checkBoxItems.forEach((item) => {
+                  todosCheckBoxes.push({
+                    id_item_check_box: item.id_item_check_box,
+                    descricao: item.descricao,
+                    id_indicador: indicador.id_indicador,
+                  });
+                });
+              }
+            });
+
+            await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
+          } catch (error) {
+            console.error("Erro ao salvar na tabela item_check_box:", error);
+            // Não interromper o processo principal
+          }
+
           toast.success("Dados salvos com sucesso!", {
             position: "top-right",
             autoClose: 5000,
@@ -1206,46 +1295,47 @@ export default function PrestacaoServicoAgua() {
         }
       } catch (error) {
         console.error("Erro ao verificar dados existentes:", error);
-        
+
         // Se não conseguir verificar dados existentes, tentar salvar normalmente
-                  for (const valorIndicador of valoresIndicadores) {
-            try {
-              await apiClient.post("/indicadores-municipio", valorIndicador);
-            } catch (saveError) {
+        for (const valorIndicador of valoresIndicadores) {
+          try {
+            await apiClient.post("/indicadores-municipio", valorIndicador);
+          } catch (saveError) {
             console.error("Erro ao salvar valor:", valorIndicador, saveError);
             throw saveError;
           }
         }
-        
+
         // Salvar dados na tabela item_check_box
         try {
           // Coletar todos os checkboxes disponíveis para o indicador
           const todosCheckBoxes = [];
-          indicadores.forEach(indicador => {
-            const tipoCheckbox = indicador.tiposCampo?.find(tipo => tipo.type === 'checkbox');
+          indicadores.forEach((indicador) => {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
             if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
-              tipoCheckbox.checkBoxItems.forEach(item => {
+              tipoCheckbox.checkBoxItems.forEach((item) => {
                 todosCheckBoxes.push({
                   id_item_check_box: item.id_item_check_box,
                   descricao: item.descricao,
-                  id_indicador: indicador.id_indicador
+                  id_indicador: indicador.id_indicador,
                 });
               });
             }
           });
-          
+
           await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
         } catch (error) {
           console.error("Erro ao salvar na tabela item_check_box:", error);
           // Não interromper o processo principal
         }
-        
+
         toast.success("Dados salvos com sucesso!", {
           position: "top-right",
           autoClose: 5000,
         });
       }
-
     } catch (error) {
       console.error("Erro ao salvar dados:", error);
       console.error("Stack trace:", error.stack);
@@ -1255,8 +1345,6 @@ export default function PrestacaoServicoAgua() {
       });
     }
   }
-
-
 
   function handleOnChange(content) {
     setContent(content);
@@ -1274,7 +1362,7 @@ export default function PrestacaoServicoAgua() {
 
   async function selectAno(ano: string) {
     setAnoSelected(ano);
-    
+
     if (ano && usuario?.id_municipio) {
       await carregarDadosExistentes(ano);
     } else {
@@ -1286,22 +1374,22 @@ export default function PrestacaoServicoAgua() {
 
   async function carregarDadosExistentes(ano: string) {
     if (!usuario?.id_municipio || !ano) return;
-    
+
     setLoadingDados(true);
-    
+
     try {
       const apiClient = getAPIClient();
-      
+
       // Carregar dados dos indicadores (mantém funcionalidade atual)
       const response = await apiClient.get(
         `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${ano}`
       );
-             const dados = response.data || [];
+      const dados = response.data || [];
       setDadosCarregados(dados);
-      
+
       // Preencher o formulário com os dados carregados
       preencherFormulario(dados);
-      
+
       if (dados.length > 0) {
         toast.info(`Carregados ${dados.length} registro(s) para o ano ${ano}`, {
           position: "top-right",
@@ -1324,80 +1412,89 @@ export default function PrestacaoServicoAgua() {
     }
   }
 
-      function preencherFormulario(dados: any[]) {
-      // Criar objeto com os valores para preencher o formulário
+  function preencherFormulario(dados: any[]) {
+    // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
-    
-   
-    
+
     // Agrupar dados por código do indicador para processar checkboxes
     const dadosAgrupados = new Map();
-    
-    dados.forEach(dado => {
+
+    dados.forEach((dado) => {
       const codigoIndicador = dado.codigo_indicador;
       const ano = dado.ano;
       const valor = dado.valor_indicador;
-      
+
       if (!dadosAgrupados.has(codigoIndicador)) {
         dadosAgrupados.set(codigoIndicador, []);
       }
       dadosAgrupados.get(codigoIndicador).push({ ano, valor });
     });
-    
+
     // Processar cada grupo de dados de indicadores
     dadosAgrupados.forEach((valores, codigoIndicador) => {
-      const indicador = indicadores.find(ind => ind.codigo_indicador === codigoIndicador);
-      
+      const indicador = indicadores.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
       if (indicador) {
-        const tipoCheckbox = indicador.tiposCampo?.find(tipo => tipo.type === 'checkbox');
-        
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
         if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
           // É um checkbox, verificar quais itens estão salvos
-                     valores.forEach(({ ano, valor }) => {
-             try {
-               // Se o valor é uma string que parece JSON, tentar fazer parse
-               if (typeof valor === 'string' && (valor.startsWith('[') || valor.startsWith('{'))) {
-                 try {
-                   const jsonParsed = JSON.parse(valor);
-                   if (Array.isArray(jsonParsed)) {
-                     // Para cada descrição no array JSON, encontrar o checkbox correspondente
-                     jsonParsed.forEach(descricao => {
-                       const checkBoxItem = tipoCheckbox.checkBoxItems.find(item => 
-                         item.descricao === descricao
-                       );
-                       
-                       if (checkBoxItem) {
-                         const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
-                         valoresFormulario[fieldName] = true;
-                       }
-                     });
-                   }
-                 } catch (jsonError) {
-                   // Fallback: tratar como valor único
-                   const checkBoxItem = tipoCheckbox.checkBoxItems.find(item => 
-                     item.descricao === valor
-                   );
-                   
-                   if (checkBoxItem) {
-                     const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
-                     valoresFormulario[fieldName] = true;
-                   }
-                 }
-               } else {
-                 // Valor único (não JSON)
-                 const checkBoxItem = tipoCheckbox.checkBoxItems.find(item => 
-                   item.descricao === valor || item.valor === valor
-                 );
-                 
-                 if (checkBoxItem) {
-                   const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
-                   valoresFormulario[fieldName] = true;
-                 }
-               }
-             } catch (error) {
-               console.error('Erro ao processar valor do checkbox:', valor, error);
-             }
-           });
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
         } else {
           // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
           const { ano, valor } = valores[0];
@@ -1411,11 +1508,9 @@ export default function PrestacaoServicoAgua() {
         valoresFormulario[fieldName] = valor;
       }
     });
-    
 
-    
-         // Preencher o formulário
-     reset(valoresFormulario);
+    // Preencher o formulário
+    reset(valoresFormulario);
   }
 
   return (
@@ -1425,91 +1520,109 @@ export default function PrestacaoServicoAgua() {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <BodyDashboard>
       {isCollapsed ? (
-                                <ExpandButton onClick={toggleSidebar}>
-                                  <FaBars /> 
-                                </ExpandButton>
-                            ) : (
-                  <Sidebar isCollapsed={isCollapsed}>
-                                <CollapseButton onClick={toggleSidebar}>
-                                            <FaBars /> 
-                                </CollapseButton>
-        {menus?.map((menu) => {
-          const isOpen = openMenuId === menu.id_menu;
-          return (
-            <div key={menu.id_menu}>
-              <MenuHeader
-                isOpen={isOpen}
-                onClick={() => {
-                  // Se o menu já está aberto, fecha. Caso contrário, abre e fecha os outros
-                  setOpenMenuId(isOpen ? null : menu.id_menu);
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <FaList style={{ fontSize: "14px" }} />
-                  {menu.titulo}
-                </div>
-                <FaCaretDown />
-              </MenuHeader>
-              <MenuItemsContainer isOpen={isOpen}>
-                {menu.menuItems?.map((menuItem) => (
-                  <SidebarItem
-                    key={menuItem.id_menu_item}
-                    active={activeForm === menuItem.nome_menu_item}
-                    onClick={() => {
-                      setActiveForm(menuItem.nome_menu_item);
-                      getIndicadores(menuItem);
+        <ExpandButton onClick={toggleSidebar}>
+          <FaBars />
+        </ExpandButton>
+      ) : (
+        
+        <Sidebar isCollapsed={isCollapsed}>
+          <CollapseButton onClick={toggleSidebar}>
+            <FaBars />
+          </CollapseButton>
+          {menus?.map((menu) => {
+            const isOpen = openMenuId === menu.id_menu;
+            return (
+              <div key={menu.id_menu}>
+                <MenuHeader
+                  isOpen={isOpen}
+                  onClick={() => {
+                    // Se o menu já está aberto, fecha. Caso contrário, abre e fecha os outros
+                    setOpenMenuId(isOpen ? null : menu.id_menu);
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
                     }}
                   >
-                    <FaLink style={{ marginRight: "8px", fontSize: "14px" }} />
-                    {menuItem.nome_menu_item}
-                  </SidebarItem>
-                ))}
-              </MenuItemsContainer>
-            </div>
-          );
-        })}
-      </Sidebar>
-                )}
-      <MainContent isCollapsed={isCollapsed}>
-        
+                    <FaList style={{ fontSize: "14px" }} />
+                    {menu.titulo}
+                  </div>
+                  <FaCaretDown />
+                </MenuHeader>
+                <MenuItemsContainer isOpen={isOpen}>
+                  {menu.menuItems?.map((menuItem) => (
+                    <SidebarItem
+                      key={menuItem.id_menu_item}
+                      active={activeForm === menuItem.nome_menu_item}
+                      onClick={() => {
+                        setActiveForm(menuItem.nome_menu_item);
+                        getIndicadores(menuItem);
+                      }}
+                    >
+                      <FaLink
+                        style={{ marginRight: "8px", fontSize: "14px" }}
+                      />
+                      {menuItem.nome_menu_item}
+                    </SidebarItem>
+                  ))}
+                </MenuItemsContainer>
+              </div>
+            );
+          })}
+        </Sidebar>
+      )}
+      
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastroIndicadores)}>
             <BreadCrumbStyle isCollapsed={isCollapsed}>
-          <nav>
-            <ol>
-              <li>
-                <Link href="/indicadores/home_indicadores">Home</Link>
-                <span> / </span>
-              </li>
-              <li>
-                                    <Link href="/indicadores/prestacao-servicos">
-                  Prestação de Serviços
-                </Link>
-                <span> / </span>
-              </li>
-              <li>
-                <span>Água</span>
-              </li>
-            </ol>
-          </nav>
-        </BreadCrumbStyle>
+              <nav>
+                <ol>
+                  <li>
+                    <Link href="/indicadores/home_indicadores">Home</Link>
+                    <span> / </span>
+                  </li>
+                  <li>
+                    <Link href="/indicadores/prestacao-servicos">
+                      Prestação de Serviços
+                    </Link>
+                    <span> / </span>
+                  </li>
+                  <li>
+                    <span>Água</span>
+                  </li>
+                </ol>
+              </nav>
+            </BreadCrumbStyle>
             <DivForm style={{ borderColor: "#12B2D5" }}>
               <DivTituloForm>Água</DivTituloForm>
 
               <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "20px",
+                    flexWrap: "wrap",
+                  }}
+                >
                   <div>
                     <label>Selecionar Ano:</label>
-                    <select 
-                      value={anoSelected || ""} 
+                    <select
+                      value={anoSelected || ""}
                       onChange={(e) => selectAno(e.target.value)}
                       disabled={loadingDados}
                       style={{ marginLeft: "10px", padding: "5px" }}
                     >
                       <option value="">Selecione o ano</option>
-                      {anosSelect().map(ano => (
-                        <option key={ano} value={ano}>{ano}</option>
+                      {anosSelect().map((ano) => (
+                        <option key={ano} value={ano}>
+                          {ano}
+                        </option>
                       ))}
                     </select>
                     {loadingDados && (
@@ -1518,67 +1631,81 @@ export default function PrestacaoServicoAgua() {
                       </span>
                     )}
                   </div>
-                  
+
                   <div style={{ fontSize: "14px", color: "#666" }}>
-                    <strong>{indicadores.length}</strong> indicador{indicadores.length !== 1 ? 'es' : ''} encontrado{indicadores.length !== 1 ? 's' : ''}
-                    {indicadores.some(ind => ind._hasError) && (
+                    <strong>{indicadores.length}</strong> indicador
+                    {indicadores.length !== 1 ? "es" : ""} encontrado
+                    {indicadores.length !== 1 ? "s" : ""}
+                    {indicadores.some((ind) => ind._hasError) && (
                       <span style={{ color: "#dc3545", marginLeft: "10px" }}>
                         | ⚠️ Alguns campos com erro
                       </span>
                     )}
                     {dadosCarregados.length > 0 && (
                       <span style={{ color: "#28a745", marginLeft: "10px" }}>
-                        | ✅ {dadosCarregados.length} dado{dadosCarregados.length !== 1 ? 's' : ''} carregado{dadosCarregados.length !== 1 ? 's' : ''}
+                        | ✅ {dadosCarregados.length} dado
+                        {dadosCarregados.length !== 1 ? "s" : ""} carregado
+                        {dadosCarregados.length !== 1 ? "s" : ""}
                       </span>
                     )}
                   </div>
-                  
-                  {grupo && !loadingIndicadores && indicadores.some(ind => ind._hasError) && (
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        const currentMenu = menus.find(menu => 
-                          menu.menu_item?.some(item => item.nome_menu_item === grupo)
-                        );
-                        const menuItem = currentMenu?.menu_item?.find(item => item.nome_menu_item === grupo);
-                        if (menuItem) {
-                          getIndicadores(menuItem);
-                        }
-                      }}
-                      style={{ 
-                        padding: "6px 12px", 
-                        fontSize: "12px", 
-                        backgroundColor: "#dc3545", 
-                        color: "white", 
-                        border: "none", 
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        marginLeft: "10px"
-                      }}
-                    >
-                      🔄 Tentar Novamente
-                    </button>
-                  )}
+
+                  {grupo &&
+                    !loadingIndicadores &&
+                    indicadores.some((ind) => ind._hasError) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentMenu = menus.find((menu) =>
+                            menu.menu_item?.some(
+                              (item) => item.nome_menu_item === grupo
+                            )
+                          );
+                          const menuItem = currentMenu?.menu_item?.find(
+                            (item) => item.nome_menu_item === grupo
+                          );
+                          if (menuItem) {
+                            getIndicadores(menuItem);
+                          }
+                        }}
+                        style={{
+                          padding: "6px 12px",
+                          fontSize: "12px",
+                          backgroundColor: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        🔄 Tentar Novamente
+                      </button>
+                    )}
                 </div>
               </div>
 
               <DivFormEixo>
-                <DivFormConteudo 
+                <DivFormConteudo
                   active={!!grupo}
-                  style={{ 
+                  style={{
                     display: grupo ? "block" : "none",
                     visibility: grupo ? "visible" : "hidden",
-                    opacity: grupo ? 1 : 0
+                    opacity: grupo ? 1 : 0,
                   }}
                 >
                   <DivTitulo>
                     <DivTituloConteudo>{grupo}</DivTituloConteudo>
                   </DivTitulo>
-                  
 
-                  
                   {!grupo ? (
-                    <div style={{ textAlign: "center", padding: "40px", backgroundColor: "#f8f9fa" }}>
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "40px",
+                        backgroundColor: "#f8f9fa",
+                      }}
+                    >
                       <p>👈 Selecione um item do menu lateral para começar</p>
                     </div>
                   ) : loadingIndicadores ? (
@@ -1589,107 +1716,137 @@ export default function PrestacaoServicoAgua() {
                     <div style={{ textAlign: "center", padding: "40px" }}>
                       <p>Nenhum indicador encontrado para este grupo.</p>
                       <p style={{ fontSize: "12px", color: "#666" }}>
-                        Grupo: {grupo} | Loading: {loadingIndicadores ? "true" : "false"}
+                        Grupo: {grupo} | Loading:{" "}
+                        {loadingIndicadores ? "true" : "false"}
                       </p>
                     </div>
                   ) : (
-                    <div style={{ 
-                      backgroundColor: "#fff",
-                      borderRadius: "8px",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                      overflow: "hidden",
-                      marginTop: "20px"
-                    }}>
+                    <div
+                      style={{
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        overflow: "hidden",
+                        marginTop: "20px",
+                      }}
+                    >
                       {/* Cabeçalho da Tabela */}
-                      <div style={{
-                        backgroundColor: "#1e88e5",
-                        color: "white",
-                        padding: "15px 0",
-                        fontWeight: "600",
-                        fontSize: "13px",
-                        letterSpacing: "0.5px"
-                      }}>
-                        <div style={{
-                          display: "grid",
-                          gridTemplateColumns: window.innerWidth > 768 
-                            ? "180px 1fr 280px 100px" 
-                            : "1fr",
-                          gap: window.innerWidth > 768 ? "15px" : "10px",
-                          alignItems: "center",
-                          padding: "0 15px"
-                        }}>
+                      <div
+                        style={{
+                          backgroundColor: "#1e88e5",
+                          color: "white",
+                          padding: "15px 0",
+                          fontWeight: "600",
+                          fontSize: "13px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              window.innerWidth > 768
+                                ? "180px 1fr 280px 100px"
+                                : "1fr",
+                            gap: window.innerWidth > 768 ? "15px" : "10px",
+                            alignItems: "center",
+                            padding: "0 15px",
+                          }}
+                        >
                           {window.innerWidth > 768 ? (
                             <>
                               <div>CÓDIGO</div>
                               <div>DESCRIÇÃO DO INDICADOR</div>
-                              <div style={{ textAlign: "center" }}>VALOR - ANO: {anoSelected || "____"}</div>
+                              <div style={{ textAlign: "center" }}>
+                                VALOR - ANO: {anoSelected || "____"}
+                              </div>
                               <div style={{ textAlign: "center" }}>UNIDADE</div>
                             </>
                           ) : (
-                            <div>INDICADORES - ANO: {anoSelected || "____"}</div>
+                            <div>
+                              INDICADORES - ANO: {anoSelected || "____"}
+                            </div>
                           )}
                         </div>
                       </div>
 
                       {/* Linhas da Tabela */}
                       {indicadores.map((indicador, index) => {
-                        const tipoCampo = indicador.tiposCampo && indicador.tiposCampo.length > 0 ? indicador.tiposCampo[0] : null;
+                        const tipoCampo =
+                          indicador.tiposCampo &&
+                          indicador.tiposCampo.length > 0
+                            ? indicador.tiposCampo[0]
+                            : null;
                         const isEven = index % 2 === 0;
-                        
+
                         return (
-                          <div 
+                          <div
                             key={indicador.id_indicador}
                             style={{
                               backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
-                              borderBottom: index < indicadores.length - 1 ? "1px solid #dee2e6" : "none",
+                              borderBottom:
+                                index < indicadores.length - 1
+                                  ? "1px solid #dee2e6"
+                                  : "none",
                               padding: "15px 0",
-                              transition: "background-color 0.2s ease"
+                              transition: "background-color 0.2s ease",
                             }}
                             onMouseEnter={(e) => {
                               e.currentTarget.style.backgroundColor = "#e8f4fd";
-                              e.currentTarget.style.borderLeft = "3px solid #1e88e5";
+                              e.currentTarget.style.borderLeft =
+                                "3px solid #1e88e5";
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = isEven ? "#f8f9fa" : "#ffffff";
+                              e.currentTarget.style.backgroundColor = isEven
+                                ? "#f8f9fa"
+                                : "#ffffff";
                               e.currentTarget.style.borderLeft = "none";
                             }}
                           >
-          {window.innerWidth > 768 ? (
-                              <div style={{
-                                display: "grid",
-                                gridTemplateColumns: "180px 1fr 280px 100px",
-                                gap: "15px",
-                                alignItems: "center",
-                                padding: "0 15px"
-                              }}>
+                            {window.innerWidth > 768 ? (
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "180px 1fr 280px 100px",
+                                  gap: "15px",
+                                  alignItems: "center",
+                                  padding: "0 15px",
+                                }}
+                              >
                                 {/* Código */}
                                 <div>
-                                  <div style={{ 
-                                    fontSize: "15px",
-                                    fontWeight: "bold",
-                                    color: "#1e88e5"
-                                  }}>
+                                  <div
+                                    style={{
+                                      fontSize: "15px",
+                                      fontWeight: "bold",
+                                      color: "#1e88e5",
+                                    }}
+                                  >
                                     {indicador.codigo_indicador}
-                                  </div>                                
+                                  </div>
                                 </div>
 
                                 {/* Descrição */}
-                                <div style={{ 
-                                  fontSize: "13px",
-                                  color: "#495057",
-                                  lineHeight: "1.3"
-                                }}>
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    color: "#495057",
+                                    lineHeight: "1.3",
+                                  }}
+                                >
                                   {indicador.nome_indicador}
                                 </div>
 
                                 {/* Campo de Input */}
-                                <div style={{ 
-                                  display: "flex", 
-                                  justifyContent: "center"
-                                }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                  }}
+                                >
                                   {anoSelected ? (
                                     <div style={{ width: "260px" }}>
-                                      <CampoIndicador 
+                                      <CampoIndicador
                                         indicador={indicador}
                                         register={register}
                                         anoSelected={anoSelected}
@@ -1701,11 +1858,11 @@ export default function PrestacaoServicoAgua() {
                                       />
                                     </div>
                                   ) : (
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       placeholder="Selecione um ano"
                                       disabled
-                                      style={{ 
+                                      style={{
                                         width: "260px",
                                         backgroundColor: "#f8f9fa",
                                         border: "1px solid #dee2e6",
@@ -1713,81 +1870,97 @@ export default function PrestacaoServicoAgua() {
                                         padding: "8px 12px",
                                         color: "#6c757d",
                                         textAlign: "center",
-                                        fontSize: "12px"
+                                        fontSize: "12px",
                                       }}
                                     />
                                   )}
                                 </div>
 
                                 {/* Unidade */}
-                                <div style={{ 
-                                  textAlign: "center",
-                                  fontSize: "12px",
-                                  color: "#495057"
-                                }}>
-                                  <div style={{ 
-                                    fontWeight: "500",
-                                    padding: "5px 6px",
-                                    backgroundColor: "#e9ecef",
-                                    borderRadius: "3px",
-                                    fontSize: "11px"
-                                  }}>
+                                <div
+                                  style={{
+                                    textAlign: "center",
+                                    fontSize: "12px",
+                                    color: "#495057",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      fontWeight: "500",
+                                      padding: "5px 6px",
+                                      backgroundColor: "#e9ecef",
+                                      borderRadius: "3px",
+                                      fontSize: "11px",
+                                    }}
+                                  >
                                     {indicador.unidade_indicador || "-"}
                                   </div>
                                 </div>
                               </div>
                             ) : (
                               /* Layout Mobile */
-                              <div style={{ 
-                                padding: "0 15px",
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "10px"
-                              }}>
-                                <div style={{ 
+                              <div
+                                style={{
+                                  padding: "0 15px",
                                   display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "center"
-                                }}>
+                                  flexDirection: "column",
+                                  gap: "10px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
                                   <div>
-                                    <div style={{ 
-                                      fontSize: "16px",
-                                      fontWeight: "bold",
-                                      color: "#1e88e5"
-                                    }}>
+                                    <div
+                                      style={{
+                                        fontSize: "16px",
+                                        fontWeight: "bold",
+                                        color: "#1e88e5",
+                                      }}
+                                    >
                                       {indicador.codigo_indicador}
                                     </div>
-                                    <div style={{ 
-                                      fontSize: "11px", 
-                                      color: "#6c757d"
-                                    }}>
+                                    <div
+                                      style={{
+                                        fontSize: "11px",
+                                        color: "#6c757d",
+                                      }}
+                                    >
                                       {indicador.unidade_indicador || "-"}
                                     </div>
                                   </div>
                                   {tipoCampo && (
-                                    <div style={{ 
-                                      fontSize: "10px", 
-                                      color: "#6c757d",
-                                      backgroundColor: "#f8f9fa",
-                                      padding: "3px 6px",
-                                      borderRadius: "3px"
-                                    }}>
+                                    <div
+                                      style={{
+                                        fontSize: "10px",
+                                        color: "#6c757d",
+                                        backgroundColor: "#f8f9fa",
+                                        padding: "3px 6px",
+                                        borderRadius: "3px",
+                                      }}
+                                    >
                                       {tipoCampo.type}
                                     </div>
                                   )}
                                 </div>
-                                
-                                <div style={{ 
-                                  fontSize: "13px",
-                                  color: "#495057",
-                                  lineHeight: "1.3",
-                                  marginBottom: "8px"
-                                }}>
+
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    color: "#495057",
+                                    lineHeight: "1.3",
+                                    marginBottom: "8px",
+                                  }}
+                                >
                                   {indicador.nome_indicador}
                                 </div>
 
                                 {anoSelected ? (
-                                  <CampoIndicador 
+                                  <CampoIndicador
                                     indicador={indicador}
                                     register={register}
                                     anoSelected={anoSelected}
@@ -1798,17 +1971,17 @@ export default function PrestacaoServicoAgua() {
                                     dadosMunicipio={dadosMunicipio}
                                   />
                                 ) : (
-                                  <input 
-                                    type="text" 
+                                  <input
+                                    type="text"
                                     placeholder="Selecione um ano primeiro"
                                     disabled
-                                    style={{ 
+                                    style={{
                                       backgroundColor: "#f8f9fa",
                                       border: "1px solid #dee2e6",
                                       borderRadius: "4px",
                                       padding: "8px 12px",
                                       color: "#6c757d",
-                                      textAlign: "center"
+                                      textAlign: "center",
                                     }}
                                   />
                                 )}
@@ -1821,13 +1994,15 @@ export default function PrestacaoServicoAgua() {
                   )}
                 </DivFormConteudo>
                 {isEditor && indicadores.length > 0 && anoSelected && (
-                  <div style={{ 
-                    marginTop: "30px", 
-                    padding: "20px", 
-                    textAlign: "center",
-                    borderTop: "1px solid #e1e5e9"
-                  }}>
-                    <button 
+                  <div
+                    style={{
+                      marginTop: "30px",
+                      padding: "20px",
+                      textAlign: "center",
+                      borderTop: "1px solid #e1e5e9",
+                    }}
+                  >
+                    <button
                       type="submit"
                       style={{
                         backgroundColor: "#28a745",
@@ -1839,16 +2014,18 @@ export default function PrestacaoServicoAgua() {
                         fontWeight: "500",
                         cursor: "pointer",
                         boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
-                        transition: "all 0.2s ease"
+                        transition: "all 0.2s ease",
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.backgroundColor = "#218838";
-                        e.currentTarget.style.boxShadow = "0 4px 8px rgba(40,167,69,0.3)";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 8px rgba(40,167,69,0.3)";
                         e.currentTarget.style.transform = "translateY(-1px)";
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.backgroundColor = "#28a745";
-                        e.currentTarget.style.boxShadow = "0 2px 4px rgba(40,167,69,0.2)";
+                        e.currentTarget.style.boxShadow =
+                          "0 2px 4px rgba(40,167,69,0.2)";
                         e.currentTarget.style.transform = "translateY(0)";
                       }}
                     >
@@ -1860,8 +2037,7 @@ export default function PrestacaoServicoAgua() {
             </DivForm>
           </Form>
         </DivCenter>
-      </MainContent>
+      </BodyDashboard>
     </Container>
   );
 }
-
