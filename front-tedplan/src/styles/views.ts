@@ -268,17 +268,23 @@ export const MenuLateral = styled.div`
 `;
 export const DivFormConteudo = styled.div`
   width: 100%;
-  height: 100%;
-  margin-left: 0px;
+  min-height: calc(100vh - 200px);
   background: #ffffff;
   padding: 10px 0px 10px 0px;
   color: #666;
   display: flex;
   justify-content: center;
   flex-direction: column;
-  
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 97%;
+  margin-left: auto;
+  margin-right: auto; 
+  margin-bottom: 50px;
+  margin-top: 30px;
   @media (max-width: 1000px) {
-  margin-top: 16px;
+    margin-top: 16px;
+    min-height: calc(100vh - 150px);
   }
 `;
 
@@ -458,7 +464,7 @@ export const Form = styled.form`
   display: flex;
   font-size: 14px;
   input {
-    border: 2px solid #2dd9d0;
+   
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -476,7 +482,7 @@ export const Form = styled.form`
     margin: 10px;
     width: 500px;
     height: 200px;
-    border: 2px solid #2dd9d0;
+    
   }
   label {
     color: #666;
@@ -484,7 +490,7 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -492,7 +498,7 @@ export const Form = styled.form`
     background: #fff;
   }
   option {
-    border: 1px solid #2dd9d0;
+    
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;

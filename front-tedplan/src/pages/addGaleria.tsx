@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { parseCookies } from "nookies";
 import { toast } from "react-toastify";
 import Sidebar from "@/components/Sidebar";
@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import MenuSuperior from "../components/head";
 import { useRouter } from "next/router";
 import HeadIndicadores from "@/components/headIndicadores";
-import { BodyDashboard } from "@/styles/dashboard-original";
+import { BodyDashboard, DivCenter } from "@/styles/dashboard-original";
 
 interface IGaleria {
   id_galeria: string;
@@ -59,6 +59,9 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
   } = useForm();
 
   const [content, setContent] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [galeriaId, setGaleriaId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const {signOut} = useContext(AuthContext);
 
@@ -84,6 +87,44 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
     return { value: ano.toString(), label: ano.toString() };
   });
 
+  // Carregar dados da galeria se estiver em modo de edição
+  useEffect(() => {
+    async function loadGaleria() {
+      const { id } = router.query;
+      if (id && typeof id === 'string') {
+        setIsEditMode(true);
+        setGaleriaId(id);
+        setIsLoading(true);
+        try {
+          const apiClient = getAPIClient();
+          const response = await apiClient.get(`/getGaleria/${id}`);
+          
+          if (response.data && response.data.success && response.data.data) {
+            const galeria = response.data.data;
+            reset({
+              titulo: galeria.titulo || "",
+              mes: galeria.mes || "",
+              ano: galeria.ano || "",
+              id_municipio: galeria.id_municipio || "",
+              id_eixo: galeria.id_eixo || "",
+            });
+            setContent(galeria.descricao || "");
+          } else {
+            toast.error("Erro ao carregar dados da galeria!", { position: "top-right", autoClose: 5000 });
+            router.push("/listarGalerias");
+          }
+        } catch (error) {
+          console.error("Erro ao carregar galeria:", error);
+          toast.error("Erro ao carregar dados da galeria!", { position: "top-right", autoClose: 5000 });
+          router.push("/listarGalerias");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    }
+    loadGaleria();
+  }, [router.query, reset]);
+
   async function handleAddGaleria({
     titulo,
     mes,
@@ -96,7 +137,11 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
       const descricao = content.toString();
       const formData = new FormData();
 
-      formData.append("imagem", imagem[0]);
+      // Se estiver editando e uma nova imagem foi selecionada, adicionar ao formData
+      if (imagem && imagem[0]) {
+        formData.append("imagem", imagem[0]);
+      }
+      
       formData.append("titulo", titulo);
       formData.append("descricao", descricao);
       formData.append("mes", mes);
@@ -105,31 +150,59 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
       formData.append("id_eixo", id_eixo);
 
       const apiClient = getAPIClient();
-      const response = await apiClient
-        .post("addGaleria", formData)
-        .then((response) => {
-          return response.data;
-        });
+      let response;
 
-      if (response.success) {
-        toast.success("Galeria cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
-        reset({
-          titulo: "",
-          mes: "",
-          ano: "",
-          id_municipio: "",
-          id_eixo: "",
+      if (isEditMode && galeriaId) {
+        // Modo de edição
+        response = await apiClient.put(`/updateGaleria/${galeriaId}`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         });
-        setContent("");
+      } else {
+        // Modo de criação
+        if (!imagem || !imagem[0]) {
+          toast.error("Imagem é obrigatória para criar uma nova galeria!", { position: "top-right", autoClose: 5000 });
+          return;
+        }
+        response = await apiClient.post("addGaleria", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
+
+      if (response.data && response.data.success) {
+        const mensagem = isEditMode 
+          ? (response.data.message || "Galeria atualizada com sucesso!")
+          : (response.data.message || "Galeria cadastrada com sucesso!");
+        toast.success(mensagem, { position: "top-right", autoClose: 5000 });
+        
+        if (!isEditMode) {
+          reset({
+            titulo: "",
+            mes: "",
+            ano: "",
+            id_municipio: "",
+            id_eixo: "",
+          });
+          setContent("");
+        }
+        
         setTimeout(() => {
           router.push("/listarGalerias");
         }, 2000);
       } else {
-        toast.error("Erro ao cadastrar galeria!", { position: "top-right", autoClose: 5000 });
+        const errorMsg = response.data?.message || response.data?.error || (isEditMode ? "Erro ao atualizar galeria" : "Erro ao cadastrar galeria");
+        toast.error(errorMsg, { position: "top-right", autoClose: 5000 });
       }
-    } catch (error) {
-      console.error("Erro ao cadastrar galeria:", error);
-      toast.error("Erro ao cadastrar galeria!", { position: "top-right", autoClose: 5000 });
+    } catch (error: any) {
+      console.error(`Erro ao ${isEditMode ? 'atualizar' : 'cadastrar'} galeria:`, error);
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.data?.error || 
+                          error?.message || 
+                          (isEditMode ? "Erro ao atualizar galeria" : "Erro ao cadastrar galeria");
+      toast.error(errorMessage, { position: "top-right", autoClose: 5000 });
     }
   }
 
@@ -167,7 +240,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
 
       <BodyDashboard>
         <Sidebar/>
-      
+      <DivCenter>
       <div style={{
         display: 'flex',
         justifyContent: 'center',
@@ -195,14 +268,14 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
               fontWeight: '600',
               margin: '0 0 10px 0'
             }}>
-              Cadastro de Galeria
+              {isEditMode ? 'Editar Galeria' : 'Cadastro de Galeria'}
             </h1>
             <p style={{
               color: '#666',
               fontSize: '16px',
               margin: '0'
             }}>
-              Preencha as informações para criar uma nova galeria
+              {isEditMode ? 'Edite as informações da galeria' : 'Preencha as informações para criar uma nova galeria'}
             </p>
           </div>
 
@@ -482,10 +555,10 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
                 fontWeight: '600',
                 color: '#333'
               }}>
-                Imagem *
+                Imagem {!isEditMode && '*'}
               </label>
               <input
-                {...register("imagem", { required: true })}
+                {...register("imagem", { required: !isEditMode })}
                 type="file"
                 name="imagem"
                 accept="image/*"
@@ -526,7 +599,7 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
                 display: 'block',
                 lineHeight: '1.4'
               }}>
-                Aceita apenas arquivos de imagem (JPG, PNG, GIF, etc.)
+                {isEditMode ? 'Deixe em branco para manter a imagem atual. Aceita apenas arquivos de imagem (JPG, PNG, GIF, etc.)' : 'Aceita apenas arquivos de imagem (JPG, PNG, GIF, etc.)'}
               </small>
             </div>
 
@@ -626,12 +699,13 @@ export default function AddGaleria({ municipios, eixos }: GaleriaProps) {
                   Cadastrando...
                 </>
               ) : (
-                "Cadastrar Galeria"
+                isEditMode ? "Atualizar Galeria" : "Cadastrar Galeria"
               )}
             </button>
           </form>
         </div>
       </div>
+      </DivCenter>
       </BodyDashboard>        
       <Footer>
         &copy; Todos os direitos reservados

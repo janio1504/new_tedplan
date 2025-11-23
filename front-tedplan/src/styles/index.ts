@@ -217,7 +217,7 @@ export const BotaoMenuTexto = styled.button`
 
 export const DivEixosEstatisticas= styled.div`
   display: flex;
-  margin: 20px 10px 0 10px;
+  margin: 30px 10px 0 10px;
   flex-direction: row;
   justify-content: center;
   align-items: center;

@@ -9,11 +9,10 @@ import Router from "next/router";
 import MenuSuperior from "../components/head";
 import Sidebar from "../components/Sidebar";
 import { toast } from "react-toastify";
+import { FaSearch } from "react-icons/fa";
 import HeadIndicadores from "../components/headIndicadores";
 import {
   Container,
-  NewButton,
-  ListPost,
   FormModal,
   ConfirmButton,
   CancelButton,
@@ -34,6 +33,7 @@ import {
   Form,
   DivMenuTitulo,
   MenuMunicipioItem,
+  BotaoAdicionar,
 } from "../styles/dashboard";
 
 import { useForm } from "react-hook-form";
@@ -106,6 +106,8 @@ export default function Publicacoes({
   const { signOut} = useContext(AuthContext);
   const [idArquivo, setIdArquivo] = useState(null);
   const [listPublicacoes, setListPublicacoes] = useState(null);
+  const [publicacoesList, setPublicacoesList] = useState<IPublicacao[]>(publicacoes || []);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     setListPublicacoes(publicacoes);
@@ -243,6 +245,22 @@ export default function Publicacoes({
           Router.push("/indicadores/home_indicadores");
         }
 
+  // Filtrar publicações baseado no termo de busca
+  const publicacoesParaFiltrar = (() => {
+    if (listPublicacoes?.data && Array.isArray(listPublicacoes.data)) {
+      return listPublicacoes.data;
+    }
+    return Array.isArray(publicacoesList) ? publicacoesList : [];
+  })();
+  
+  const publicacoesFiltradas = publicacoesParaFiltrar.filter(
+    (publicacao) =>
+      publicacao?.titulo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (publicacao?.eixo && publicacao.eixo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (publicacao?.tipo_publicacao && publicacao.tipo_publicacao.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (publicacao?.municipio && publicacao.municipio.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   const { usuario } = useContext(AuthContext);
 
   return (
@@ -250,14 +268,14 @@ export default function Publicacoes({
       {/* <MenuSuperior usuarios={[]}></MenuSuperior> */}
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <DivMenuTitulo> 
-                    <text style={{
+                    <span style={{
                       fontSize: '20px',
                       fontWeight: 'bold',
                       padding: '15px 20px',
                       float: 'left'
                       }}>
                        Painel de Edição 
-                      </text>
+                      </span>
                     <ul style={{}}>
                     <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
                     <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
@@ -266,59 +284,131 @@ export default function Publicacoes({
       <BodyDashboard>
         <Sidebar />
       <DivCenter>
-        <NewButton onClick={handleNewPublicacao}>
-          Adicionar Publicação
-        </NewButton>
-        <ListPost>
-          <thead>
-            <tr>
-              <th>Titulo</th>
-              <th>Eixo</th>
-              <th>Tipo Publicação</th>
-              <th>Municipio</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          {listPublicacoes?.data.map((publicacao) => {
-            return (
-              <tbody key={publicacao.id_publicacao}>
-                <tr>
-                  <td>{publicacao.titulo}</td>
-                  <td>{publicacao.eixo}</td>
-                  <td>{publicacao.tipo_publicacao}</td>
-                  <td>{publicacao.municipio}</td>
-                  <td>
-                    <BotaoRemover
-                      onClick={() =>
-                        handleOpenConfirm({
-                          id_publicacao: publicacao.id_publicacao,
-                          id_imagem: publicacao.id_imagem,
-                          id_arquivo: publicacao.id_arquivo,
-                        })
-                      }
+        <div
+          style={{
+            marginBottom: "20px",
+            borderBottom: "1px solid rgb(162, 160, 160)",
+            textAlign: "center",
+          }}
+        >
+          <h2>Lista de Publicações</h2>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ position: "relative", width: "30%" }}>
+            <input
+              type="text"
+              placeholder="Buscar por título, eixo, tipo ou município..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 40px 10px 10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+              }}
+            />
+            <FaSearch
+              style={{
+                position: "absolute",
+                right: "-35px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#666",
+                fontSize: "18px",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+          <BotaoAdicionar
+            onClick={handleNewPublicacao}
+            style={{ marginLeft: "10px" }}
+          >
+            + Nova Publicação
+          </BotaoAdicionar>
+        </div>
+
+        <div style={{ width: "100%" }}>
+          {publicacoesFiltradas.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px" }}>
+              <p>Nenhuma publicação encontrada.</p>
+            </div>
+          ) : (
+            publicacoesFiltradas.map((publicacao) => (
+              <div key={publicacao.id_publicacao} style={{ marginBottom: "15px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    padding: "20px",
+                    borderRadius: "8px",
+                    border: "1px solid #e0e0e0",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
+                        {publicacao.titulo}
+                      </h3>
+                      <div style={{ fontSize: "14px", color: "#888" }}>
+                        {publicacao.eixo && <span>Eixo: {publicacao.eixo}</span>}
+                        {publicacao.tipo_publicacao && (
+                          <span style={{ marginLeft: "15px" }}>Tipo: {publicacao.tipo_publicacao}</span>
+                        )}
+                        {publicacao.municipio && (
+                          <span style={{ marginLeft: "15px" }}>Município: {publicacao.municipio}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        marginLeft: "20px",
+                      }}
                     >
-                      Remover
-                    </BotaoRemover>
-                    <BotaoEditar
-                      onClick={() =>
-                        Router.push(
-                          `/addPublicacao?id=${publicacao.id_publicacao}`
-                        )
-                      }
-                    >
-                      Editar
-                    </BotaoEditar>
-                  </td>
-                </tr>
-              </tbody>
-            );
-          })}
-        </ListPost>
+                      <BotaoEditar
+                        onClick={() =>
+                          Router.push(
+                            `/addPublicacao?id=${publicacao.id_publicacao}`
+                          )
+                        }
+                      >
+                        Editar
+                      </BotaoEditar>
+                      <BotaoRemover
+                        onClick={() =>
+                          handleOpenConfirm({
+                            id_publicacao: publicacao.id_publicacao,
+                            id_imagem: publicacao.id_imagem,
+                            id_arquivo: publicacao.id_arquivo,
+                          })
+                        }
+                      >
+                        Remover
+                      </BotaoRemover>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </DivCenter>
       </BodyDashboard>
-      <Footer>
-        &copy; Todos os direitos reservados 
-      </Footer>
+      <Footer>&copy; Todos os direitos reservados</Footer>
       {isModalConfirm && (
         <ContainerModal>
           <Modal>

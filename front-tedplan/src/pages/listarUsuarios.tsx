@@ -8,16 +8,14 @@ import Router from "next/router";
 import MenuSuperior from "../components/head";
 import HeadIndicadores from "../components/headIndicadores";
 import { toast } from "react-toastify";
+import { FaSearch } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import {
   Container,
-  NewButton,
-  ListPost,
   FormModal,
   ConfirmButton,
   CancelButton,
   Footer,
-  DivCenter,
   BotaoVisualizar,
   BotaoEditar,
   BotaoRemover,
@@ -38,7 +36,7 @@ import { set, useForm } from "react-hook-form";
 import { InputP } from "../styles/financeiro";
 import { anosSelect } from "@/util/util";
 import { permissionByYear } from "@/services/auth";
-import { BodyDashboard } from "@/styles/dashboard-original";
+import { BodyDashboard, DivCenter } from "@/styles/dashboard-original";
 
 interface IUsuario {
   id_usuario: string;
@@ -91,6 +89,8 @@ export default function Postagens({
   const [usuarioModal, setUsuarioModal] = useState(null);
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [permissoes, setPermissoes] = useState<any>(null);
+  const [usuariosList, setUsuariosList] = useState<IUsuario[]>(usuarios || []);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const editor = useRef();
   const [municipios, setMunicipios] = useState<any>(null);
@@ -244,22 +244,27 @@ export default function Postagens({
         Router.push("/indicadores/home_indicadores");
       }
 
- 
-  
+  // Filtrar usuários baseado no termo de busca
+  const usuariosFiltrados = usuariosList.filter(
+    (usuario) =>
+      usuario.login.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (usuario.nome && usuario.nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (usuario.permissao_usuario && usuario.permissao_usuario.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
     <Container>
       {/* <MenuSuperior usuarios={[]}></MenuSuperior> */}
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
         <DivMenuTitulo> 
-              <text style={{
+              <span style={{
                 fontSize: '20px',
                 fontWeight: 'bold',
                 padding: '15px 20px',
                 float: 'left'
                 }}>
                  Painel de Edição 
-                </text>
+                </span>
               <ul style={{}}>
               <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
               <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
@@ -270,63 +275,154 @@ export default function Postagens({
           <Sidebar />
             
               <DivCenter>
-                <NewButton onClick={handleAddUsuario}>Adicionar Usuário</NewButton>
-                <ListPost>
-                  <thead>
-                    <tr>
-                      <th>Login</th>
-                      <th>Permissão Usuário</th>
-                      <th>Ativo</th>
-                      <th style={{ textAlign: "center" }}>Ações</th>
-                    </tr>
-                  </thead>
-                  {usuarios.map((usuario) => {
-                    return (
-                      <tbody key={usuario.id_usuario}>
-                        <tr>
-                          <td>{usuario.login}</td>
-                          <td>{usuario.permissao_usuario}</td>
-                          <td>{usuario.ativo ? "Sim" : "Não"}</td>
-                          <td style={{ width: "450px" }}>
-                            <BotaoEditar onClick={() => handleShowModal(usuario)}>
-                              Editar Permissões
-                            </BotaoEditar>
-                            <BotaoPermissao
-                              onClick={() => handleEditorSimisabShowModal(usuario)}
+                <div
+                  style={{
+                    marginBottom: "20px",
+                    borderBottom: "1px solid rgb(162, 160, 160)",
+                    textAlign: "center",
+                  }}
+                >
+                  <h2>Lista de Usuários</h2>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "20px",
+                  }}
+                >
+                  <div style={{ position: "relative", width: "30%" }}>
+                    <input
+                      type="text"
+                      placeholder="Buscar por login, nome ou permissão..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{
+                        width: "100%",
+                        padding: "10px 40px 10px 10px",
+                        border: "1px solid #ddd",
+                        borderRadius: "8px",
+                        fontSize: "16px",
+                      }}
+                    />
+                    <FaSearch
+                      style={{
+                        position: "absolute",
+                        right: "-35px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        color: "#666",
+                        fontSize: "18px",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  </div>
+                  <BotaoAdicionar
+                    onClick={handleAddUsuario}
+                    style={{ marginLeft: "10px" }}
+                  >
+                    + Novo Usuário
+                  </BotaoAdicionar>
+                </div>
+
+                <div style={{ width: "100%" }}>
+                  {usuariosFiltrados.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px" }}>
+                      <p>Nenhum usuário encontrado.</p>
+                    </div>
+                  ) : (
+                    usuariosFiltrados.map((usuario) => {
+                      return (
+                        <div key={usuario.id_usuario} style={{ marginBottom: "15px" }}>
+                          <div
+                            style={{
+                              backgroundColor: "#f8f9fa",
+                              padding: "20px",
+                              borderRadius: "8px",
+                              border: "1px solid #e0e0e0",
+                            }}
+                          >
+                            <div
+                              style={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                              }}
                             >
-                              Permissão de edição por ano
-                            </BotaoPermissao>
-                            <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
-                              Remover
-                            </BotaoRemover>
+                              <div style={{ flex: 1 }}>
+                                <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
+                                  {usuario.nome || usuario.login}
+                                </h3>
+                                {usuario.login && (
+                                  <p style={{ margin: "0 0 10px 0", color: "#666" }}>
+                                    Login: {usuario.login}
+                                  </p>
+                                )}
+                                <div style={{ fontSize: "14px", color: "#888" }}>
+                                  <span>Permissão: {usuario.permissao_usuario}</span>
+                                  <span style={{ marginLeft: "15px" }}>
+                                    Status: {usuario.ativo ? "Ativo" : "Inativo"}
+                                  </span>
+                                </div>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "10px",
+                                  marginLeft: "20px",
+                                }}
+                              >
+                                <BotaoEditar onClick={() => handleShowModal(usuario)}>
+                                  Editar Permissões
+                                </BotaoEditar>
+                                <BotaoPermissao
+                                  onClick={() => handleEditorSimisabShowModal(usuario)}
+                                >
+                                  Permissão de edição por ano
+                                </BotaoPermissao>
+                                <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
+                                  Remover
+                                </BotaoRemover>
 
-                            {isModalConfirm && (
-                              <ContainerModal>
-                                <Modal>
-                                  <ConteudoModal>
-                                    <TituloModal>
-                                      <h3>
-                                        <b>Você confirma a exclusão!</b>
-                                      </h3>
-                                    </TituloModal>
-                                    <TextoModal>
-                                      <CancelButton onClick={handleCloseConfirm}>
-                                        <b>Cancelar</b>
-                                      </CancelButton>
-                                      <ConfirmButton
-                                        onClick={() =>
-                                          handleRemoverUsuario(usuarioModal.id_usuario)
-                                        }
-                                      >
-                                        <b>Confirmar</b>
-                                      </ConfirmButton>
-                                    </TextoModal>
-                                  </ConteudoModal>
-                                </Modal>
-                              </ContainerModal>
-                            )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </DivCenter>
+            </BodyDashboard>
 
-                            {isModalVisible && (
+            {isModalConfirm && (
+              <ContainerModal>
+                <Modal>
+                  <ConteudoModal>
+                    <TituloModal>
+                      <h3>
+                        <b>Você confirma a exclusão!</b>
+                      </h3>
+                    </TituloModal>
+                    <TextoModal>
+                      <CancelButton onClick={handleCloseConfirm}>
+                        <b>Cancelar</b>
+                      </CancelButton>
+                      <ConfirmButton
+                        onClick={() =>
+                          handleRemoverUsuario(usuarioModal.id_usuario)
+                        }
+                      >
+                        <b>Confirmar</b>
+                      </ConfirmButton>
+                    </TextoModal>
+                  </ConteudoModal>
+                </Modal>
+              </ContainerModal>
+            )}
+
+            {isModalVisible && (
                               <ContainerModal>
                                 <Modal>
                                   <FormModal
@@ -422,64 +518,56 @@ export default function Postagens({
                               </ContainerModal>
                             )}
 
-                            {isModalEditorVisible && (
-                              <ContainerModal>
-                                <Modal>
-                                  <FormModal
-                                    onSubmit={handleSubmit(handleEditorSimisabPorAno)}
-                                  >
-                                    <TextoModal>
-                                      <CloseModalButton
-                                        onClick={handleEditorSimisabCloseModal}
-                                      >
-                                        Fechar
-                                      </CloseModalButton>
-                                      <SubmitButton type="submit">Gravar</SubmitButton>
+            {isModalEditorVisible && (
+              <ContainerModal>
+                <Modal>
+                  <FormModal
+                    onSubmit={handleSubmit(handleEditorSimisabPorAno)}
+                  >
+                    <TextoModal>
+                      <CloseModalButton
+                        onClick={handleEditorSimisabCloseModal}
+                      >
+                        Fechar
+                      </CloseModalButton>
+                      <SubmitButton type="submit">Gravar</SubmitButton>
 
-                                      <ConteudoModal>
-                                        <input
-                                          type="hidden"
-                                          {...register("id_usuario")}
-                                          value={usuarioModal.id_usuario}
-                                        />
-                                          <input
-                                          type="hidden"
-                                          {...register("id_editor_simisab")}
-                                          name="id_editor_simisab"
-                                        />
-                                        <p>Nome: {usuarioModal.nome}</p>
-                                        <p>Login: {usuarioModal.login}</p>
+                      <ConteudoModal>
+                        <input
+                          type="hidden"
+                          {...register("id_usuario")}
+                          value={usuarioModal.id_usuario}
+                        />
+                          <input
+                          type="hidden"
+                          {...register("id_editor_simisab")}
+                          name="id_editor_simisab"
+                        />
+                        <p>Nome: {usuarioModal.nome}</p>
+                        <p>Login: {usuarioModal.login}</p>
 
-                                        <label>Status Permissão</label>
-                                        <select {...register("editor_ativo")} name="editor_ativo">
-                                          <option value="true">Ativo</option>
-                                          <option value="false">Inativo</option>
-                                        </select>
+                        <label>Status Permissão</label>
+                        <select {...register("editor_ativo")} name="editor_ativo">
+                          <option value="true">Ativo</option>
+                          <option value="false">Inativo</option>
+                        </select>
 
-                                        <label>Selecione o ano que será editado.</label>
-                                        <select
-                                          {...register("ano_editor_simisab")}
-                                          name="ano_editor_simisab"
-                                        >
-                                          <option value="">Selecione um ano</option>
-                                          {anosSelect().map((ano) => (
-                                            <option value={ano}>{ano}</option>
-                                          ))}
-                                        </select>
-                                      </ConteudoModal>
-                                    </TextoModal>
-                                  </FormModal>
-                                </Modal>
-                              </ContainerModal>
-                            )}
-                          </td>
-                        </tr>
-                      </tbody>
-                    );
-                  })}
-                </ListPost>
-              </DivCenter>
-            </BodyDashboard>
+                        <label>Selecione o ano que será editado.</label>
+                        <select
+                          {...register("ano_editor_simisab")}
+                          name="ano_editor_simisab"
+                        >
+                          <option value="">Selecione um ano</option>
+                          {anosSelect().map((ano) => (
+                            <option value={ano}>{ano}</option>
+                          ))}
+                        </select>
+                      </ConteudoModal>
+                    </TextoModal>
+                  </FormModal>
+                </Modal>
+              </ContainerModal>
+            )}
                     <Footer>
                       &copy; Todos os direitos reservados{" "}
                     </Footer>

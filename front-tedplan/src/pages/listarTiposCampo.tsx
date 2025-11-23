@@ -6,11 +6,10 @@ import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
+import { FaSearch } from "react-icons/fa";
 import Sidebar from "@/components/Sidebar";
 import {
   Container,
-  NewButton,
-  ListPost,
   Footer,
   DivCenter,
   BotaoEditar,
@@ -189,14 +188,14 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
       {/* <MenuSuperior usuarios={[]} /> */}
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
             <DivMenuTitulo> 
-                          <text style={{
+                          <span style={{
                             fontSize: '20px',
                             fontWeight: 'bold',
                             padding: '15px 20px',
                             float: 'left'
                             }}>
                              Painel de Edição 
-                            </text>
+                            </span>
                           <ul style={{}}>
                           <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
                           <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
@@ -205,37 +204,57 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
       <BodyDashboard>
         <Sidebar />
       <DivCenter>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div
+          style={{
+            marginBottom: "20px",
+            borderBottom: "1px solid rgb(162, 160, 160)",
+            textAlign: "center",
+          }}
+        >
           <h2>Lista de Tipos de Campo</h2>
-          {/* {(permission.adminGeral || permission.adminTedPlan) && ( */}
-            <BotaoAdicionar onClick={handleAddTipoCampo} style={{marginLeft: '15px'}}>
-              + Novo Tipo de Campo
-            </BotaoAdicionar>
-          {/* )} */}
         </div>
-
-        <div style={{ display: "flex", gap: "15px", marginBottom: "20px" }}>
-          <input
-            type="text"
-            placeholder="Buscar por nome, tipo ou ID..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "10px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "16px",
-            }}
-          />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ position: "relative", width: "30%" }}>  <input
+              type="text"
+              placeholder="Buscar por nome, tipo ou ID..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 40px 10px 10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+              }}
+            />
+            <FaSearch
+              style={{
+                position: "absolute",
+                right: "-35px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#666",
+                fontSize: "18px",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
           <select
             value={filtroStatus}
             onChange={(e) => setFiltroStatus(e.target.value as "todos" | "ativos" | "inativos")}
             style={{
               padding: "10px",
               border: "1px solid #ddd",
-              borderRadius: "4px",
+              borderRadius: "8px",
               fontSize: "16px",
+              width: "20%",
               minWidth: "120px",
             }}
           >
@@ -243,9 +262,14 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
             <option value="ativos">Ativos</option>
             <option value="inativos">Inativos</option>
           </select>
+          {/* {(permission.adminGeral || permission.adminTedPlan) && ( */}
+          <BotaoAdicionar onClick={handleAddTipoCampo} style={{ marginLeft: "10px" }}>
+            + Novo Tipo de Campo
+          </BotaoAdicionar>
+          {/* )} */}
         </div>
 
-        <ListPost>
+        <div style={{ width: "100%" }}>
           {tiposCampoFiltrados.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px" }}>
               <p>Nenhum tipo de campo encontrado.</p>
@@ -330,7 +354,7 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
               </div>
             ))
           )}
-        </ListPost>
+        </div>
       </DivCenter>
       </BodyDashboard>
 
@@ -339,7 +363,9 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
           <ConteudoModal>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <TituloModal>Confirmar Exclusão</TituloModal>
-              <CloseModalButton onClick={handleCloseConfirm}>×</CloseModalButton>
+              <CloseModalButton onClick={handleCloseConfirm}>
+                &times;
+              </CloseModalButton>
             </div>
             <TextoModal>
               Tem certeza que deseja remover o tipo de campo "{tipoCampoSelecionado?.name_campo}"?
@@ -354,10 +380,7 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
         </Modal>
       )}
 
-      <Footer>
-        &copy; Todos os direitos reservados
-        
-      </Footer>
+      <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );
 }

@@ -132,8 +132,7 @@ export const UsuarioLogado = styled.div`
 
 export const DivCenter = styled.div`
   display: flex;
-  max-width: 95%;
-  min-width: 1280px;
+  max-width: 80%;
   width: 100%;
   height: 100%;
   min-height: 1000px;
