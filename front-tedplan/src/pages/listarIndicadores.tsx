@@ -6,11 +6,10 @@ import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
+import { FaSearch } from "react-icons/fa";
 import Sidebar from "@/components/Sidebar";
 import {
   Container,
-  NewButton,
-  ListPost,
   Footer,
   DivCenter,
   BotaoEditar,
@@ -444,14 +443,14 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       {/* <MenuSuperior usuarios={[]} /> */}
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
             <DivMenuTitulo> 
-                          <text style={{
+                          <span style={{
                             fontSize: '20px',
                             fontWeight: 'bold',
                             padding: '15px 20px',
                             float: 'left'
                             }}>
                              Painel de Edição 
-                            </text>
+                            </span>
                           <ul style={{}}>
                           <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
                           <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
@@ -460,66 +459,92 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       <BodyDashboard>
         <Sidebar />
       <DivCenter>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <div
+          style={{
+            marginBottom: "20px",
+            borderBottom: "1px solid rgb(162, 160, 160)",
+            textAlign: "center",
+          }}
+        >
           <h2>Lista de Indicadores</h2>
-          {/* {(permission?.adminGeral || permission?.adminTedPlan) && ( */}
-            <BotaoAdicionar onClick={handleAddIndicador} style={{marginLeft: '15px'}}>
-              + Novo Indicador
-            </BotaoAdicionar>
-          {/* )} */}
         </div>
-
-        <div style={{ display: "flex", gap: "15px", marginBottom: "20px", flexWrap: "wrap" }}>
-          <input
-            type="text"
-            placeholder="Buscar por nome, código, palavra-chave, unidade ou campo..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              flex: 1,
-              minWidth: "300px",
-              padding: "10px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "16px",
-            }}
-          />
-          <select
-            value={filtroGrupo}
-            onChange={(e) => setFiltroGrupo(e.target.value)}
-            style={{
-              padding: "10px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "16px",
-              minWidth: "150px",
-            }}
-          >
-            <option value="todos">Todos os grupos</option>
-            {gruposUnicos.map((grupo) => (
-              <option key={grupo} value={grupo}>
-                {grupo}
-              </option>
-            ))}
-          </select>
-          <select
-            value={filtroTipoCampo}
-            onChange={(e) => setFiltroTipoCampo(e.target.value)}
-            style={{
-              padding: "10px",
-              border: "1px solid #ddd",
-              borderRadius: "4px",
-              fontSize: "16px",
-              minWidth: "150px",
-            }}
-          >
-            <option value="todos">Todos os tipos</option>
-            {tiposCampoUnicos.map((tipo) => (
-              <option key={tipo} value={tipo}>
-                {getTipoLabel(tipo)}
-              </option>
-            ))}
-          </select>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ position: "relative", width: "30%", flex: 1, marginRight: "15px" }}>
+            <input
+              type="text"
+              placeholder="Buscar por nome, código, palavra-chave, unidade ou campo..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 40px 10px 10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+              }}
+            />
+            <FaSearch
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#666",
+                fontSize: "18px",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
+            <select
+              value={filtroGrupo}
+              onChange={(e) => setFiltroGrupo(e.target.value)}
+              style={{
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+                minWidth: "150px",
+              }}
+            >
+              <option value="todos">Todos os grupos</option>
+              {gruposUnicos.map((grupo) => (
+                <option key={grupo} value={grupo}>
+                  {grupo}
+                </option>
+              ))}
+            </select>
+            <select
+              value={filtroTipoCampo}
+              onChange={(e) => setFiltroTipoCampo(e.target.value)}
+              style={{
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+                minWidth: "150px",
+              }}
+            >
+              <option value="todos">Todos os tipos</option>
+              {tiposCampoUnicos.map((tipo) => (
+                <option key={tipo} value={tipo}>
+                  {getTipoLabel(tipo)}
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* {(permission?.adminGeral || permission?.adminTedPlan) && ( */}
+          <BotaoAdicionar onClick={handleAddIndicador} style={{ marginLeft: "10px" }}>
+            + Novo Indicador
+          </BotaoAdicionar>
+          {/* )} */}
         </div>
 
         <div style={{ marginBottom: "15px", fontSize: "14px", color: "#666" }}>
@@ -531,7 +556,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
           )}
         </div>
 
-        <ListPost>
+        <div style={{ width: "100%" }}>
           {indicadoresFiltrados.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px" }}>
               <p>
@@ -671,7 +696,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
               </div>
             ))
           )}
-        </ListPost>
+        </div>
       </DivCenter>
       </BodyDashboard>
 
@@ -680,7 +705,9 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
           <ConteudoModal>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <TituloModal>Confirmar Exclusão</TituloModal>
-              <CloseModalButton onClick={handleCloseConfirm}>×</CloseModalButton>
+              <CloseModalButton onClick={handleCloseConfirm}>
+                &times;
+              </CloseModalButton>
             </div>
             <TextoModal>
               Tem certeza que deseja remover o indicador "{indicadorSelecionado?.nome_indicador}" ({indicadorSelecionado?.codigo_indicador})?
@@ -695,10 +722,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
         </Modal>
       )}
 
-      <Footer>
-        &copy; Todos os direitos reservados
-        
-      </Footer>
+      <Footer>&copy; Todos os direitos reservados</Footer>
     </Container>
   );
 }

@@ -5,7 +5,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { Container, Footer, BodyDashboard, Form,
 DivMenuTitulo, MenuMunicipioItem, DivMenu, DivBotaoMenu
 } from "../styles/dashboard";
-import { SubmitButton } from "../styles/dashboard-original";
+import { DivCenter, SubmitButton } from "../styles/dashboard-original";
 import { getAPIClient } from "../services/axios";
 import { useForm } from "react-hook-form";
 import HeadPublico from "../components/headPublico";
@@ -142,6 +142,7 @@ export default function DashboardIndicadores() {
       
       <BodyDashboard>
         <Sidebar />
+        <DivCenter>
         
         {permission.adminGeral || permission.editorSimisab || permission.revisorTedPlan ?
         <DivMunicipios>          
@@ -162,7 +163,7 @@ export default function DashboardIndicadores() {
         </DivMunicipios>
            : '' 
          } 
-        
+        </DivCenter>
       </BodyDashboard>
      
       <Footer>&copy; Todos os direitos reservados</Footer>

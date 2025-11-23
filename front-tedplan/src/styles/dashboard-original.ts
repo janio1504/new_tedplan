@@ -225,27 +225,55 @@ export const ItensMenu = styled.div`
 export const DivCenter = styled.div`
   max-width: 80%;
   width: 100%;
-  height: 100%;
-  background: #fff;
+  max-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* background: #fff; */
   margin-left: auto;
-  margin-right: auto;
-  text-align: left;
-  justify-content: center;
-  align-items: center;
-  padding: 120px 20px 20px 20px;
+  margin-right: auto; 
   display: flex;
   flex-direction: column;
+  padding: 50px 20px 20px 20px;
+  box-sizing: border-box;
+
+  /* Estilizar a barra de rolagem */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  // &::-webkit-scrollbar-thumb {
+  //   background: #0085bd;
+  //   border-radius: 4px;
+  // }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #006a9e;
+  }
+
+  @media (max-width: 1000px) {
+    max-height: calc(100vh - 100px);
+    padding: 10px;
+  }
 `;
 
 export const BodyDashboard = styled.div`  
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  max-height: 100vh;
   background: #f3f4f6;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
   display: flex;
-  flex-direction: collumn;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 `;
 export const DivInstrucoes = styled.div`
   justify-content: left;
@@ -392,16 +420,17 @@ export const Footer = styled.div`
 `;
 
 export const ContainerModal = styled.div`
-  position: absolute;
+ position: fixed;
   z-index: 9;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
 `;
 
 export const Modal = styled.div`
@@ -412,6 +441,7 @@ export const Modal = styled.div`
   border: 1px solid #bebebe;
   border-radius: 5px;
   padding: 12px 16px 32px 16px;
+  marginBottom: 20px;
   
 `;
 
@@ -645,21 +675,40 @@ export const FormModal = styled.form`
 `;
 
 export const CloseModalButton = styled.button`
-  width: 80px;
+  padding: 8px 12px;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 6px;
   cursor: pointer;
-  padding: 10px 15px;
-  margin: 10px;
-  color: #fff;
-  border: 0px;
-  background: red;
-  border-radius: 3px;
-  flex-direction: row;
-  float: right;
-  text-align: right;
-  justify-content: right;
-  align-items: right;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    background: #ebebeb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
   svg {
-    margin-right: 8px;
+    margin: 0;
   }
 `;
 
@@ -681,19 +730,25 @@ export const ConfirmButton = styled.button`
   }
 `;
 export const CancelButton = styled.button`
-  cursor: pointer;
   padding: 10px 15px;
   margin: 10px;
+  font-weight: bold;
   color: #fff;
   border: 0px;
-  background: red;
-  border-radius: 3px;
+  background: #dc3545;
+  border-radius: 7px;
   flex-direction: row;
-  float: right;
-  text-align: right;
-  justify-content: right;
-  align-items: right;
+  cursor: pointer;
+  width: auto;
+  height: 37px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   svg {
     margin-right: 8px;
+  }
+
+  &:hover{
+  background:rgb(161, 9, 24);
   }
 `;
