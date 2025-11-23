@@ -3,21 +3,8 @@ import { GetServerSideProps } from "next";
 import React, { useEffect, useState, useContext } from "react";
 import {
   Container,
-  Form,
-  SubmitButton,
-  Lista,
   Footer,
-  DivCenter,
-  MenuLateral,
   DivFormConteudo,
-  DivInput,
-  ImagemLista,
-  Logo_si,
-  TextoLista,
-  PaginationContainer,
-  PaginationButton,
-  PageInfo,
-  LimparFiltro,
 } from "../styles/views";
 import { getAPIClient } from "../services/axios";
 import { AuthContext } from "@/contexts/AuthContext";
@@ -29,18 +16,354 @@ import { toast } from "react-toastify";
 import { BodyDashboard, DivMenuTitulo, MenuMunicipioItem } from "@/styles/dashboard";
 import { MainContent } from "@/styles/esgoto-indicadores";
 import styled from "styled-components";
+import {
+  FaSearch,
+  FaGavel,
+  FaMapMarkerAlt,
+  FaFilter,
+  FaBook,
+  FaTimes,
+} from "react-icons/fa";
+import { DivCenter } from "@/styles/dashboard-original";
 
 const Titulo = styled.div`
   display: flex;
   box-sizing: border-box;
   width: auto;
   margin-top: -10px;
-  padding: 15px;
+  padding: 20px;
+  color: #333;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-weight: 600;
+  font-size: 18px;
+`;
+
+const FiltrosContainer = styled.div`
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+`;
+
+const FiltrosGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 15px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+
+  > div {
+    flex: 1;
+    min-width: 180px;
+  }
+`;
+
+const FiltroLabel = styled.label`
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 14px;
+`;
+
+const FiltroInput = styled.input`
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #0085bd;
+    box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+  }
+`;
+
+const FiltroSelect = styled.select`
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: #0085bd;
+    box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+  }
+`;
+
+const BotaoFiltrar = styled.button`
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0085bd 0%, #006a9e 100%);
   color: #fff;
-  background-color: #0085bd;
-  border-top-left-radius: 6px;
-  border-top-right-radius: 6px;
-  font-weight: bolder;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  margin-left: auto;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 133, 189, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;
+
+const BotaoLimpar = styled.button`
+  padding: 10px 20px;
+  background: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+
+  &:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+const NormasGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+  margin-top: 30px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+`;
+
+const NormaCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const NormaImagem = styled.div`
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+  background: #f0f0f0;
+  position: relative;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  ${NormaCard}:hover & img {
+    transform: scale(1.05);
+  }
+`;
+
+const NormaPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 14px;
+`;
+
+const NormaContent = styled.div`
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+const NormaTitulo = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px 0;
+  line-height: 1.4;
+`;
+
+const NormaInfo = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 15px;
+  flex: 1;
+`;
+
+const NormaMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+
+  svg {
+    color: #0085bd;
+  }
+`;
+
+const NormaBotao = styled.a`
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #0085bd 0%, #006a9e 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: auto;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    background: linear-gradient(135deg, #006a9e 0%, #005080 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 133, 189, 0.3);
+  }
+`;
+
+const EmptyState = styled.div`
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+
+  svg {
+    font-size: 64px;
+    color: #ccc;
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  p {
+    font-size: 14px;
+    color: #999;
+  }
+`;
+
+const ContadorNormas = styled.div`
+  background: #e8f4f8;
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #0085bd;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 30px;
+  flex-wrap: wrap;
+`;
+
+const PaginationButton = styled.button`
+  padding: 8px 16px;
+  background: #fff;
+  border: 2px solid #0085bd;
+  color: #0085bd;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background: #0085bd;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 133, 189, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 1000px) {
+    &:first-child,
+    &:last-child {
+      display: none;
+    }
+  }
+`;
+
+const PageInfo = styled.div`
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 `;
 
 type INorma = {
@@ -55,6 +378,7 @@ type INorma = {
   id_imagem: string;
   imagem: string;
   arquivo: string;
+  escala: string;
 };
 
 interface IEscalas {
@@ -91,30 +415,31 @@ export default function Normas({
     reset,
     formState: { errors },
   } = useForm();
-  const [normasList, setNormasList] = useState(null);
-  const [paginacao, setPaginacao] = useState(null);
-  const [titulo, setTitulo] = useState(null);
-  const [idEixo, setIdEixo] = useState(null);
-  const [idTipoNorma, setIdTipoNorma] = useState(null);
+  const [normasList, setNormasList] = useState<INorma[]>([]);
+  const [paginacao, setPaginacao] = useState<any>(null);
+  const [titulo, setTitulo] = useState<string | null>(null);
+  const [idEixo, setIdEixo] = useState<string | null>(null);
+  const [idTipoNorma, setIdTipoNorma] = useState<string | null>(null);
   const {signOut} = useContext(AuthContext);
-  const [idEscala, setIdEscala] = useState(null);
+  const [idEscala, setIdEscala] = useState<string | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
-    useEffect(() => {
-        const handleResize = () => {
-          if (window.innerWidth <= 1000) {
-            setIsCollapsed(true);
-          } else {
-            setIsCollapsed(false);
-          }
-        };
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-      }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (normas) {
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (normas && (normas as any).data) {
       const page = 1;
       pagination(normas);
       getNormas(normas, page);
@@ -122,29 +447,40 @@ export default function Normas({
   }, [normas]);
 
   async function handlebuscaFiltrada(data) {
+    setIsLoading(true);
     setTitulo(data.titulo);
     setIdEixo(data.id_eixo);
     setIdTipoNorma(data.id_tipo_norma);
     setIdEscala(data.id_escala);
     const apiClient = getAPIClient();
 
-    const resBusca = await apiClient.get("/getPorFiltroNormas", {
-      params: {
-        titulo: data.titulo,
-        id_eixo: data.id_eixo,
-        id_tipo_norma: data.id_tipo_norma,
-        id_escala: data.id_escala,
-      },
-    });
-    const normas = resBusca.data;
-    if (normas.length == 0) {
-      toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
+    try {
+      const resBusca = await apiClient.get("/getPorFiltroNormas", {
+        params: {
+          titulo: data.titulo,
+          id_eixo: data.id_eixo,
+          id_tipo_norma: data.id_tipo_norma,
+          id_escala: data.id_escala,
+          page: data.page || 1,
+        },
+      });
+      const normas = resBusca.data;
+      
+      if (!normas.data || normas.data.length == 0) {
+        toast.warning("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
+        setNormasList([]);
+        setIsLoading(false);
+        return;
+      }
 
-      return;
+      await getNormas(normas);
+      pagination(normas);
+    } catch (error) {
+      console.error("Erro ao buscar normas:", error);
+      toast.error("Erro ao buscar normas!", { position: "top-right", autoClose: 5000 });
+    } finally {
+      setIsLoading(false);
     }
-
-    getNormas(normas);
-    pagination(normas);
   }
 
   async function handlegetNormPaginate(page?: number) {
@@ -164,11 +500,11 @@ export default function Normas({
       const normas = resBusca.data;
 
       if (!normas.data || normas.data.length === 0) {
-        toast.error("Nenhum resultado encontrado para a busca!", { position: "top-right", autoClose: 5000 });
+        toast.warning("Nenhum resultado encontrado!", { position: "top-right", autoClose: 5000 });
         return;
       }
 
-      getNormas(normas);
+      await getNormas(normas);
       pagination(normas);
     } catch (error) {
       toast.error("Erro ao buscar normas", { position: "top-right", autoClose: 5000 });
@@ -176,107 +512,13 @@ export default function Normas({
     }
   }
 
-  // async function getNormas(normas?: any, page?) {
-  //   const apiClient = getAPIClient();
-
-  //   if (normas) {
-  //     const norma = await Promise.all(
-  //       normas?.map(async (p) => {
-  //         const imagem = await apiClient({
-  //           method: "GET",
-  //           url: "getImagem",
-  //           params: { id: p.id_imagem },
-  //           responseType: "blob",
-  //         }).then((response) => {
-  //           return URL.createObjectURL(response.data);
-  //         });
-
-  //         const arquivo = await apiClient({
-  //           method: "GET",
-  //           url: "getFile",
-  //           params: { id: p.id_arquivo },
-  //           responseType: "blob",
-  //         }).then((response) => {
-  //           return URL.createObjectURL(response.data);
-  //         });
-  //         const n = {
-  //           id_norma: p.id_norma,
-  //           titulo: p.titulo,
-  //           id_eixo: p.id_eixo,
-  //           id_tipo_norma: p.id_tipo_norma,
-  //           id_escala: p.id_escala,
-  //           eixo: p.eixo,
-  //           tipo_norma: p.tipo_norma,
-  //           id_arquivo: p.id_arquivo,
-  //           id_imagem: p.id_imagem,
-  //           imagem: imagem,
-  //           arquivo: arquivo,
-  //         };
-
-  //         return n;
-  //       })
-  //     );
-
-  //     setNormasList(norma);
-  //   }
-  // }
-
-  // async function getNormas(normas?: any, page?) {
-  //   const apiClient = getAPIClient();
-
-  //   if (normas?.data) {
-  //     const norma = await Promise.all(
-  //       normas.data.map(async (p) => {
-  //         let imagem = null;
-  //         let arquivo = null;
-
-  //         try {
-  //           if (p.id_imagem) {
-  //             const imagemResponse = await apiClient({
-  //               method: "GET",
-  //               url: "getImagem",
-  //               params: { id: p.id_imagem },
-  //               responseType: "blob",
-  //             });
-  //             imagem = URL.createObjectURL(imagemResponse.data);
-  //           }
-  //         } catch (error) {
-  //           console.warn(`Imagem não encontrada para norma ${p.id_norma}`);
-  //         }
-
-  //         try {
-  //           if (p.id_arquivo) {
-  //             const arquivoResponse = await apiClient({
-  //               method: "GET",
-  //               url: "getFile",
-  //               params: { id: p.id_arquivo },
-  //               responseType: "blob",
-  //             });
-  //             arquivo = URL.createObjectURL(arquivoResponse.data);
-  //           }
-  //         } catch (error) {
-  //           console.warn(`Arquivo não encontrado para norma ${p.id_norma}`);
-  //         }
-
-  //         return {
-  //           ...p,
-  //           imagem,
-  //           arquivo,
-  //         };
-  //       })
-  //     );
-
-  //     setNormasList(norma);
-  //   }
-  // }
-
   async function getNormas(normas?: any, page?) {
     const apiClient = getAPIClient();
 
     if (normas && normas.data && normas.data.length > 0) {
       try {
         const norma = await Promise.all(
-          normas.data.map(async (p) => {
+          normas.data.map(async (p: INorma) => {
             let imagem = null;
             let arquivo = null;
 
@@ -291,7 +533,7 @@ export default function Normas({
                 imagem = URL.createObjectURL(imagemResponse.data);
               }
             } catch (error) {
-              console.warn(`Imagem não encontrada para norma ${p.id_norma}`);
+              // Imagem não encontrada
             }
 
             try {
@@ -305,7 +547,7 @@ export default function Normas({
                 arquivo = URL.createObjectURL(arquivoResponse.data);
               }
             } catch (error) {
-              console.warn(`Arquivo não encontrado para norma ${p.id_norma}`);
+              // Arquivo não encontrado
             }
 
             return {
@@ -320,28 +562,8 @@ export default function Normas({
       } catch (error) {
         console.error("Erro ao processar normas:", error);
       }
-    } else {
-      console.log("Nenhuma norma para processar");
     }
   }
-
-  // async function pagination(normas) {
-  //   const pages = {
-  //     paginaAtual: normas.page,
-
-  //     ultimaPagina: normas.lastPage,
-
-  //     anterior: Math.max(normas.page - 1, 1),
-
-  //     proximo: Math.min(normas.page + 1, normas.lastPage),
-
-  //     primeiraPagina: 1,
-
-  //     totalItens: normas.total || 0,
-  //   };
-
-  //   setPaginacao(pages);
-  // }
 
   async function pagination(normas) {
     if (normas && normas.page) {
@@ -355,16 +577,14 @@ export default function Normas({
       };
 
       setPaginacao(pages);
-    } else {
-      console.log("Dados insuficientes para calcular paginação");
     }
   }
 
   async function handleLimparFiltro() {
     reset({
-      id_municipio: "",
       id_eixo: "",
-      id_tipo_publicacao: "",
+      id_tipo_norma: "",
+      id_escala: "",
       titulo: "",
     });
     setTitulo("");
@@ -373,7 +593,10 @@ export default function Normas({
     setIdEscala("");
 
     Router.push("/normas");
-    getNormas(normas);
+    if (normas && (normas as any).data) {
+      getNormas(normas);
+      pagination(normas);
+    }
   }
 
   async function handleSignOut() {
@@ -388,149 +611,224 @@ export default function Normas({
     <Container>
       <HeadPublico></HeadPublico>
       <DivMenuTitulo> 
-                                <text style={{
-                                  fontSize: '20px',
-                                  fontWeight: 'bold',
-                                  padding: '15px 20px',
-                                  float: 'left',
-                                  
-                                  }}>
-                                    Painel de Edição 
-                                  </text>
-                                <ul style={{}}>
-                                <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
-                                <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
-                                </ul>
+        <span style={{
+          fontSize: "20px",
+          fontWeight: "bold",
+          padding: "15px 20px",
+          float: "left",
+        }}>
+          Portifolio de estatísticas, mapas, documentos e imagens
+        </span>
       </DivMenuTitulo>
       
       <BodyDashboard>
-      <MenuPublicoLateral isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed}  />
-      </BodyDashboard>
-
-
-      <MainContent isCollapsed={isCollapsed}>
+        <MenuPublicoLateral isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       
-        <DivFormConteudo>
-          <Titulo>Normas</Titulo>
 
-          <Form onSubmit={handleSubmit(handlebuscaFiltrada)}>
-            <DivInput>
-              <label>Escala:</label>
-              <select {...register("id_escala")}>
-                <option value="">Todos</option>
-                {escala?.map((escala, key) => (
-                  <option key={key} value={escala.id_escala}>
-                    {escala.nome}
-                  </option>
-                ))}
-              </select>
-            </DivInput>
+      <DivCenter>
+        <DivFormConteudo style={{ padding: "10px" }}>
+          <Titulo>
+            <FaGavel style={{ marginRight: "10px" }} />
+            Normas
+          </Titulo>
 
-            <DivInput>
-              <label>Eixos:</label>
-              <select {...register("id_eixo")}>
-                <option value="">Todos</option>
-                {eixos?.map((eixo, key) => (
-                  <option key={key} value={eixo.id_eixo}>
-                    {eixo.nome}
-                  </option>
-                ))}
-              </select>
-            </DivInput>
+          <FiltrosContainer>
+            <form onSubmit={handleSubmit(handlebuscaFiltrada)}>
+              <FiltrosGrid>
+                <div>
+                  <FiltroLabel>
+                    <FaBook style={{ marginRight: "5px", display: "inline" }} />
+                    Escala
+                  </FiltroLabel>
+                  <FiltroSelect {...register("id_escala")}>
+                    <option value="">Todas as escalas</option>
+                    {escala?.map((escala, key) => (
+                      <option key={key} value={escala.id_escala}>
+                        {escala.nome}
+                      </option>
+                    ))}
+                  </FiltroSelect>
+                </div>
 
-            <DivInput>
-              <label>Tipo:</label>
-              <select {...register("id_tipo_norma")}>
-                <option value="">Todos</option>
-                {tipoNorma?.map((tipo, key) => (
-                  <option key={key} value={tipo.id_tipo_norma}>
-                    {tipo.nome}
-                  </option>
-                ))}
-              </select>
-            </DivInput>
-            <DivInput>
-              <label>Titulo:</label>
-              <input
-                {...register("titulo")}
-                placeholder="Titulo da Norma"
-                name="titulo"
-              ></input>
-            </DivInput>
-            <DivInput>
-              <SubmitButton>Filtrar</SubmitButton>
-            </DivInput>
-            <DivInput>
-              <LimparFiltro onClick={() => handleLimparFiltro()}>
-                Limpar filtro
-              </LimparFiltro>
-            </DivInput>
-          </Form>
+                <div>
+                  <FiltroLabel>
+                    <FaFilter style={{ marginRight: "5px", display: "inline" }} />
+                    Eixo
+                  </FiltroLabel>
+                  <FiltroSelect {...register("id_eixo")}>
+                    <option value="">Todos os eixos</option>
+                    {eixos?.map((eixo, key) => (
+                      <option key={key} value={eixo.id_eixo}>
+                        {eixo.nome}
+                      </option>
+                    ))}
+                  </FiltroSelect>
+                </div>
 
-          {normasList?.map((norma) => (
-            <Lista key={norma.id_norma}>
-              <ImagemLista>
-                <img src={norma.imagem} alt="TedPlan" />
-              </ImagemLista>
-              <TextoLista>
-                <p>{norma.tipo_norma}</p>
-                <p>
-                  <b>{norma.titulo}</b>
-                </p>
-                <p>TedPlan/UNIFAP</p>
-                <p>{norma.eixo}</p>
-                <p>
-                  <a href={norma.arquivo} rel="noreferrer" target="_blank">
-                    Leia o arquivo!
-                  </a>
-                </p>
-              </TextoLista>
-            </Lista>
-          ))}
-          {paginacao && (
-            <PaginationContainer>
-              <PaginationButton
-                onClick={() => handlegetNormPaginate(paginacao.primeiraPagina)}
-                disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
-                 style={{
-                 display: innerWidth < 1000 ? 'none' : 'inline-block'
-                }}
-              >
-                Primeiro
-              </PaginationButton>
+                <div>
+                  <FiltroLabel>
+                    <FaGavel style={{ marginRight: "5px", display: "inline" }} />
+                    Tipo
+                  </FiltroLabel>
+                  <FiltroSelect {...register("id_tipo_norma")}>
+                    <option value="">Todos os tipos</option>
+                    {tipoNorma?.map((tipo, key) => (
+                      <option key={key} value={tipo.id_tipo_norma}>
+                        {tipo.nome}
+                      </option>
+                    ))}
+                  </FiltroSelect>
+                </div>
 
-              <PaginationButton
-                onClick={() => handlegetNormPaginate(paginacao.anterior)}
-                disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
-              >
-                Anterior
-              </PaginationButton>
+                <div>
+                  <FiltroLabel>
+                    <FaSearch style={{ marginRight: "5px", display: "inline" }} />
+                    Título
+                  </FiltroLabel>
+                  <FiltroInput
+                    {...register("titulo")}
+                    placeholder="Buscar por título..."
+                    name="titulo"
+                  />
+                </div>
+              </FiltrosGrid>
 
-              <PageInfo>
-                Página {paginacao.paginaAtual} de {paginacao.ultimaPagina}
-              </PageInfo>
+              <div style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "10px",
+                marginTop: "10px",
+              }}>
+                <BotaoLimpar type="button" onClick={handleLimparFiltro}>
+                  <FaTimes />
+                  Limpar
+                </BotaoLimpar>
+                <BotaoFiltrar type="submit" disabled={isLoading}>
+                  <FaSearch />
+                  {isLoading ? "Buscando..." : "Filtrar"}
+                </BotaoFiltrar>
+              </div>
+            </form>
+          </FiltrosContainer>
 
-              <PaginationButton
-                onClick={() => handlegetNormPaginate(paginacao.proximo)}
-                disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
-              >
-                Próximo
-              </PaginationButton>
-
-              <PaginationButton
-                onClick={() => handlegetNormPaginate(paginacao.ultimaPagina)}
-                disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
-                 style={{
-                 display: innerWidth < 1000 ? 'none' : 'inline-block'
-                }}
-              >
-                Último
-              </PaginationButton>
-            </PaginationContainer>
+          {isLoading && (
+            <div style={{ textAlign: "center", padding: "60px", color: "#666" }}>
+              <div>Carregando normas...</div>
+            </div>
           )}
+
+          {!isLoading && normasList && Array.isArray(normasList) && normasList.length > 0 && (
+            <ContadorNormas>
+              <FaGavel />
+              {normasList.length}{" "}
+              {normasList.length === 1 ? "norma encontrada" : "normas encontradas"}
+            </ContadorNormas>
+          )}
+
+          {!isLoading && normasList && Array.isArray(normasList) && normasList.length > 0 ? (
+            <>
+              <NormasGrid>
+                {normasList.map((norma) => (
+                  <NormaCard key={norma.id_norma}>
+                    <NormaImagem>
+                      {norma.imagem ? (
+                        <img
+                          src={norma.imagem}
+                          alt={norma.titulo || "TedPlan"}
+                        />
+                      ) : (
+                        <NormaPlaceholder>
+                          <FaGavel style={{ fontSize: "48px", opacity: 0.3 }} />
+                        </NormaPlaceholder>
+                      )}
+                    </NormaImagem>
+                    <NormaContent>
+                      <NormaTitulo>
+                        {norma.titulo || "Sem título"}
+                      </NormaTitulo>
+                      <NormaInfo>
+                        {norma.tipo_norma && (
+                          <NormaMeta>
+                            <FaGavel />
+                            <span>{norma.tipo_norma}</span>
+                          </NormaMeta>
+                        )}
+                        {norma.escala && (
+                          <NormaMeta>
+                            <FaBook />
+                            <span>Escala: {norma.escala}</span>
+                          </NormaMeta>
+                        )}
+                        {norma.eixo && (
+                          <NormaMeta>
+                            <FaFilter />
+                            <span>{norma.eixo}</span>
+                          </NormaMeta>
+                        )}
+                      </NormaInfo>
+                      {norma.arquivo && (
+                        <NormaBotao
+                          href={norma.arquivo}
+                          rel="noreferrer"
+                          target="_blank"
+                        >
+                          <FaGavel />
+                          Ler Norma
+                        </NormaBotao>
+                      )}
+                    </NormaContent>
+                  </NormaCard>
+                ))}
+              </NormasGrid>
+
+              {paginacao && (
+                <PaginationContainer>
+                  <PaginationButton
+                    onClick={() => handlegetNormPaginate(paginacao.primeiraPagina)}
+                    disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
+                  >
+                    Primeiro
+                  </PaginationButton>
+
+                  <PaginationButton
+                    onClick={() => handlegetNormPaginate(paginacao.anterior)}
+                    disabled={paginacao.paginaAtual === paginacao.primeiraPagina}
+                  >
+                    Anterior
+                  </PaginationButton>
+
+                  <PageInfo>
+                    Página {paginacao.paginaAtual} de {paginacao.ultimaPagina}
+                  </PageInfo>
+
+                  <PaginationButton
+                    onClick={() => handlegetNormPaginate(paginacao.proximo)}
+                    disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
+                  >
+                    Próximo
+                  </PaginationButton>
+
+                  <PaginationButton
+                    onClick={() => handlegetNormPaginate(paginacao.ultimaPagina)}
+                    disabled={paginacao.paginaAtual === paginacao.ultimaPagina}
+                  >
+                    Último
+                  </PaginationButton>
+                </PaginationContainer>
+              )}
+            </>
+          ) : !isLoading ? (
+            <EmptyState>
+              <FaGavel />
+              <h3>Nenhuma norma encontrada</h3>
+              <p>
+                Tente ajustar os filtros de busca para encontrar mais resultados.
+              </p>
+            </EmptyState>
+          ) : null}
         </DivFormConteudo>
-     
-      </MainContent>
+      </DivCenter>
+      </BodyDashboard>
       <Footer>
         &copy; Todos os direitos reservados
       </Footer>

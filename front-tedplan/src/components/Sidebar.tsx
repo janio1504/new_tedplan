@@ -19,8 +19,9 @@ interface MenuItemProps {
 
 // Container principal do menu
 const SidebarContainer = styled.div`
-  width: 280px;
+width: 280px;
   height: 100vh;
+  max-height: 100vh;
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
   padding: 32px 24px;
   display: flex;
@@ -29,11 +30,38 @@ const SidebarContainer = styled.div`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease-in-out;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  flex-shrink: 0;
 
-  @media (max-width: 768px) {
-    position: absolute;
+  /* Estilizar a barra de rolagem do sidebar se necessário */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #0085bd;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #006a9e;
+  }
+
+  @media (max-width: 1000px) {
+    position: absolute;    
     width: 100%;
     height: auto;
+    max-height: none;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -104,8 +132,8 @@ const MenuItemWithSubmenu = styled(MenuItem)`
   }
 `;
 
-const SubmenuContainer = styled.div<{ isOpen: boolean }>`
-  max-height: ${(props) => (props.isOpen ? "500px" : "0")};
+const SubmenuContainer = styled.div<{ $isOpen: boolean }>`
+  max-height: ${(props) => (props.$isOpen ? "500px" : "0")};
   overflow: hidden;
   transition: max-height 0.3s ease-in-out;
 `;
@@ -165,19 +193,21 @@ const Sidebar = () => {
   const { signOut, usuario, permission } = useContext(AuthContext);
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-        const handleResize = () => {
-          if (window.innerWidth <= 768) {
-            setIsCollapsed(true);
-          } else {
-            setIsCollapsed(false);
-          }
-        };
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-      }, []);
+    setMounted(true);
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -316,7 +346,9 @@ const Sidebar = () => {
       <CollapseButton onClick={toggleSidebar}>
             <FaBars /> 
           </CollapseButton>
-      <MenuTitle>{usuario?.permissao_usuario}</MenuTitle>
+      <MenuTitle suppressHydrationWarning>
+        {mounted ? (usuario?.permissao_usuario || '') : ''}
+      </MenuTitle>
       {safePermission.adminGeral || safePermission.adminTedPlan || safePermission.editorTedPlan ? (
        <>   
           <MenuItem
@@ -339,7 +371,7 @@ const Sidebar = () => {
               }}
             />
           </MenuItemWithSubmenu>
-          <SubmenuContainer isOpen={isCadastroOpen}>
+          <SubmenuContainer $isOpen={isCadastroOpen}>
             <SubmenuItem onClick={handleMenus}
              $isActive={isMenusActive()}
             >

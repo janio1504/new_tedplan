@@ -22,8 +22,6 @@ import { getData } from "./api/post";
 
 import {
   Container,
-  NewButton,
-  ListPost,
   FormModal,
   ConfirmButton,
   CancelButton,
@@ -43,6 +41,7 @@ import {
   ConfirmModal,
   DivMenuTitulo,
   MenuMunicipioItem,
+  BotaoAdicionar,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
 import { BodyDashboard } from "@/styles/dashboard-original";
@@ -95,6 +94,8 @@ export default function Postagens({ normas }: NormasProps) {
   const [idNorma, setIdNorma] = useState(null);
   const [idImagem, setIdImagem] = useState(null);
   const [idArquivo, setIdArquivo] = useState(null);
+  const [normasList, setNormasList] = useState<INorma[]>(normas || []);
+  const [searchTerm, setSearchTerm] = useState("");
   const { signOut} = useContext(AuthContext);
 
   useEffect(() => {}, [0]);
@@ -252,20 +253,29 @@ export default function Postagens({ normas }: NormasProps) {
           Router.push("/indicadores/home_indicadores");
         }
 
+  // Filtrar normas baseado no termo de busca
+  const normasFiltradas = normasList.filter(
+    (norma) =>
+      norma.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (norma.tipo_norma && norma.tipo_norma.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (norma.escala && norma.escala.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (norma.eixo && norma.eixo.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
   const { usuario } = useContext(AuthContext);
 
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <DivMenuTitulo> 
-                    <text style={{
+                    <span style={{
                       fontSize: '20px',
                       fontWeight: 'bold',
                       padding: '15px 20px',
                       float: 'left'
                       }}>
                        Painel de Edição 
-                      </text>
+                      </span>
                     <ul style={{}}>
                     <MenuMunicipioItem style={{marginRight: '18px'}}  onClick={handleSignOut}>Sair</MenuMunicipioItem>
                     <MenuMunicipioItem onClick={handleSimisab}>SIMISAB</MenuMunicipioItem>
@@ -274,61 +284,126 @@ export default function Postagens({ normas }: NormasProps) {
       <BodyDashboard>
         <Sidebar />
       <DivCenter>
-        <NewButton onClick={handleAddNorma}>Adicionar Norma</NewButton>
-        <ListPost>
-          <thead>
-            <tr>
-              <th>Titulo</th>
-              <th>Tipo de norma</th>
-              <th>Escala</th>
-              <th>Eixo</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          {normas.map((norma) => {
-            return (
-              <tbody key={norma.id_norma}>
-                <tr>
-                  <td>{norma.titulo}</td>
-                  <td>{norma.tipo_norma}</td>
-                  <td>{norma.escala}</td>
-                  <td>{norma.eixo}</td>
-                  <td>
-                    <BotaoRemover
-                      onClick={() =>
-                        handleOpenConfirm({
-                          id_imagem: norma.id_imagem,
-                          id_norma: norma.id_norma,
-                          id_arquivo: norma.id_arquivo,
-                        })
-                      }
-                    >
-                      Remover
-                    </BotaoRemover>
-                    <BotaoEditar
-                      onClick={() =>
-                        Router.push(`/addNorma?id=${norma.id_norma}`)
-                      }
+        <div
+          style={{
+            marginBottom: "20px",
+            borderBottom: "1px solid rgb(162, 160, 160)",
+            textAlign: "center",
+          }}
+        >
+          <h2>Lista de Normas</h2>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ position: "relative", width: "30%" }}>
+            <input
+              type="text"
+              placeholder="Buscar por título, tipo, escala ou eixo..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 40px 10px 10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+              }}
+            />
+            <FaSearch
+              style={{
+                position: "absolute",
+                right: "-35px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#666",
+                fontSize: "18px",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+          <BotaoAdicionar
+            onClick={handleAddNorma}
+            style={{ marginLeft: "10px" }}
+          >
+            + Nova Norma
+          </BotaoAdicionar>
+        </div>
 
-                      // onClick={() =>
-                      //   handleShowUpdateModal(norma.id_arquivo, norma.id_norma)
-                      // }
+        <div style={{ width: "100%" }}>
+          {normasFiltradas.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px" }}>
+              <p>Nenhuma norma encontrada.</p>
+            </div>
+          ) : (
+            normasFiltradas.map((norma) => (
+              <div key={norma.id_norma} style={{ marginBottom: "15px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    padding: "20px",
+                    borderRadius: "8px",
+                    border: "1px solid #e0e0e0",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ margin: "0 0 10px 0", color: "#333" }}>
+                        {norma.titulo}
+                      </h3>
+                      <div style={{ fontSize: "14px", color: "#888" }}>
+                        {norma.tipo_norma && <span>Tipo: {norma.tipo_norma}</span>}
+                        {norma.escala && (
+                          <span style={{ marginLeft: "15px" }}>Escala: {norma.escala}</span>
+                        )}
+                        {norma.eixo && (
+                          <span style={{ marginLeft: "15px" }}>Eixo: {norma.eixo}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        marginLeft: "20px",
+                      }}
                     >
-                      Editar
-                    </BotaoEditar>
-                    {/* <BotaoVisualizar
-                      onClick={() =>
-                        handleShowModal(norma.id_imagem, norma.id_norma)
-                      }
-                    >
-                      Editar Imagem
-                    </BotaoVisualizar> */}
-                  </td>
-                </tr>
-              </tbody>
-            );
-          })}
-        </ListPost>
+                      <BotaoEditar
+                        onClick={() =>
+                          Router.push(`/addNorma?id=${norma.id_norma}`)
+                        }
+                      >
+                        Editar
+                      </BotaoEditar>
+                      <BotaoRemover
+                        onClick={() =>
+                          handleOpenConfirm({
+                            id_imagem: norma.id_imagem,
+                            id_norma: norma.id_norma,
+                            id_arquivo: norma.id_arquivo,
+                          })
+                        }
+                      >
+                        Remover
+                      </BotaoRemover>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </DivCenter>
       </BodyDashboard>
       <Footer>&copy; Todos os direitos reservados </Footer>

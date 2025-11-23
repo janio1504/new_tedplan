@@ -81,24 +81,28 @@ export const Logout = styled.button`
 `;
 
 export const BotaoVisualizar = styled.button`
-  float: right;
-  padding: 5px;
-  background: #0088ff;
-  margin-top: -4px;
+  padding: 10px 16px;
+  background: #ffc107;
   border: none;
   color: #fff;
-  border-radius: 3px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-right: 5px;
+  font-size: 14px;
+  transition: all 0.2s;
+  margin-right: 8px;
+
+  &:hover {
+    background: #e0a800;
+  }
 `;
 export const BotaoEditar = styled.button`
   padding: 10px 16px;
   background: #28a745;
   border: none;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   transition: all 0.2s;
   margin-right: 8px;
 
@@ -108,38 +112,45 @@ export const BotaoEditar = styled.button`
 `;
 export const BotaoPermissao = styled.button`
   padding: 10px 16px;
-  background:rgb(21, 155, 217);
+  background: rgb(18, 113, 172);
   border: none;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   transition: all 0.2s;
   margin-right: 8px;
 
   &:hover {
-    background:rgb(18, 113, 172);
+    background: rgb(14, 90, 138);
   }
 `;
 
 export const BotaoAdicionar = styled.div`
-  float: left;
-  padding: 10px;
-  background: #008080;
-  margin-top: 5px;
+  padding: 10px 16px;
+  background: rgb(18, 113, 172);
   border: none;
   color: #fff;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  max-width: 150px;
+  &:hover {
+    background: rgb(14, 90, 138);
+  }
 `;
 export const BotaoRemover = styled.button`
   padding: 10px 16px;
   background: #dc3545;
   border: none;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   transition: all 0.2s;
   margin-right: 8px;
 
@@ -275,23 +286,41 @@ export const ItensMenu = styled.div`
 export const DivCenter = styled.div`
   max-width: 80%;
   width: 100%;
-  height: 100%;
-  background: #f3f4f6;
+  max-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  color:rgb(38, 38, 38);
   margin-left: auto;
-  margin-right: auto;
-  text-align: left;
-  justify-content: center;
-  align-items: center;
-  padding: 120px 20px 20px 20px;
+  margin-right: auto; 
   display: flex;
   flex-direction: column;
+  padding: 50px 20px 20px 20px;
+  box-sizing: border-box;
 
-  h2{
-  color: black;
+  /* Estilizar a barra de rolagem */
+  &::-webkit-scrollbar {
+    width: 8px;
   }
 
-  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
 
+  // &::-webkit-scrollbar-thumb {
+  //   background: #0085bd;
+  //   border-radius: 4px;
+  // }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #006a9e;
+  }
+
+  @media (max-width: 1000px) {
+    max-height: calc(100vh - 100px);
+    padding: 10px;
+  }
 `;
 
 export const BodyDashboard = styled.div`
@@ -449,31 +478,43 @@ export const Form = styled.form`
     width: 100%;
     max-width: 100%;
     padding: 12px 16px;
+    padding-right: 40px;
     border: 1px solid #e1e1e1;
     border-radius: 6px;
     font-size: 15px;
-    color: #2c3e50;
-    background: #f8f9fa;
+    outline: none;
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #333;
     cursor: pointer;
-    transition: all 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
-    background-size: 16px;
-    box-sizing: border-box;
-
+    background-size: 12px;
+    
     &:focus {
+      border: 1px solid #e1e1e1;
       outline: none;
-      border-color: #2dd9d0;
-      box-shadow: 0 0 0 2px rgba(45, 217, 208, 0.2);
-      background-color: #ffffff;
+      box-shadow: none;
+    }
+    
+    &:active {
+      border: 1px solid #e1e1e1;
+      outline: none;
+    }
+    
+    &::-ms-expand {
+      display: none;
     }
   }
 
   option {
     padding: 12px;
     font-size: 15px;
+    border: none;
   }
 
   span {
@@ -560,14 +601,16 @@ export const Footer = styled.div`
 
 export const ContainerModal = styled.div`
   position: fixed;
-  z-index: 1000;
+  z-index: 9;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
 `;
 
 export const Modal = styled.div`
@@ -580,13 +623,18 @@ export const Modal = styled.div`
 `;
 
 export const ModalGaleria = styled.div`
-  width: 1200px;
-  min-height: 700px;
-  margin-top: 180px;
+  width: 100%;
+  max-width: 1200px;
+  max-height: calc(100vh - 40px);
+  margin-top: 20px;
+  margin-bottom: 20px;
   background-color: #ffffff;
   border: 1px solid #bebebe;
   border-radius: 5px;
   padding: 12px 16px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
 `;
 
 export const ConteudoModal = styled.div`
@@ -680,10 +728,7 @@ export const ConteudoModal = styled.div`
 
 export const ContainerImagems = styled.div`
   width: 100%;
-
   font-size: 14px;
-  display: flex;
-  flex-direction: row;
 `;
 
 export const ImagemModal = styled.div`
@@ -744,13 +789,18 @@ export const ImagensGaleria = styled.div`
 `;
 
 export const ModalImgAmpliada = styled.div`
-  width: 600px;
-  min-height: 700px;
-  margin-top: 180px;
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 40px);
+  margin-top: 20px;
+  margin-bottom: 20px;
   background-color: #ffffff;
   border: 1px solid #bebebe;
   border-radius: 5px;
   padding: 12px 16px;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  position: relative;
 `;
 
 export const ImagenAmpliada = styled.div`
@@ -802,19 +852,36 @@ export const FormModal = styled.form`
 `;
 
 export const CloseModalButton = styled.button`
-  padding: 8px 16px;
-  color: #fff;
-  border: 0;
-  background: #dc3545;
-  border-radius: 4px;
+  padding: 8px 12px;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
-  font-size: 13px;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
   position: absolute;
-  left: 0;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 
   &:hover {
-    background: #c82333;
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  &:active {
+    background: #ebebeb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -833,33 +900,40 @@ export const ConfirmButton = styled.button`
   }
 `;
 export const CancelButton = styled.button`
-  padding: 8px 16px;
-  color: #fff;
-  border: 0;
-  background: #dc3545;
-  border-radius: 4px;
+  padding: 10px 20px;
+  color: #666;
+  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background 0.2s;
-  font-size: 13px;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
 
   &:hover {
-    background: #c82333;
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+  }
+
+  &:active {
+    background: #ebebeb;
   }
 `;
 
 export const BotaoEditarImagem = styled.button`
-  padding: 8px 16px;
-  background: #1a73e8;
+  padding: 10px 16px;
+  background: rgb(18, 113, 172);
   border: none;
   color: #fff;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   transition: all 0.2s;
   margin-right: 8px;
 
   &:hover {
-    background: #1557b0;
+    background: rgb(14, 90, 138);
   }
 `;
 

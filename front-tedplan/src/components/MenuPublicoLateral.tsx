@@ -48,6 +48,7 @@ const MenuItem = styled.div <MenuItemProps>`
 const SidebarContainer = styled.div`
   width: 280px;
   height: 100vh;
+  max-height: 100vh;
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
   padding: 32px 24px;
   display: flex;
@@ -56,13 +57,38 @@ const SidebarContainer = styled.div`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease-in-out;
-  position: absolute;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  flex-shrink: 0;
+
+  /* Estilizar a barra de rolagem do sidebar se necessário */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #0085bd;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #006a9e;
+  }
 
   @media (max-width: 1000px) {
-    position: absolute;
-    box-sizing: border-box;
+    position: absolute;    
     width: 100%;
     height: auto;
+    max-height: none;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -147,6 +173,10 @@ export default function MenuPublicoLateral({isCollapsed, setIsCollapsed}) {
     Router.push("/estatisticas");
   }
 
+  function handleMapas() {
+    Router.push("/mapas");
+  }
+
   return (
     <>
      {isCollapsed ? (
@@ -160,7 +190,10 @@ export default function MenuPublicoLateral({isCollapsed, setIsCollapsed}) {
           </CollapseButton>
 
       <>
-        <MenuItem>
+        <MenuItem 
+        onClick={handleMapas}
+        $isActive={router.pathname === '/mapas'}
+        >
           <FaMap /> Mapas
         </MenuItem>
         <MenuItem 
