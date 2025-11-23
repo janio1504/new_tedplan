@@ -1258,35 +1258,50 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 
 
 export const Sidebar = styled.div<{ isCollapsed: boolean }>`
-  width: ${(props) => (props.isCollapsed ? "0": "270px")};
+  width: ${(props) => (props.isCollapsed ? "0": "220px")};
+  width: 280px;
+  height: 100vh;
+  max-height: 100vh;
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-  padding: ${(props) => (props.isCollapsed ? "0" : "32px 24px")};
-  position: absolute;
-  overflow-y: 1000px;
+  padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  color: #2c3e50;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease-in-out;
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  flex-shrink: 0;
 
+  /* Estilizar a barra de rolagem do sidebar se necessário */
   &::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
+    width: 6px;
   }
 
   &::-webkit-scrollbar-track {
-    background-color: #f1f1f1;
+    background: #f1f1f1;
+    border-radius: 3px;
   }
 
-  @media (max-width: 768px) {
-    position: relative;
-    width: auto;
+  &::-webkit-scrollbar-thumb {
+    background: #0085bd;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #006a9e;
+  }
+
+  @media (max-width: 1000px) {
+    position: absolute;    
+    width: 100%;
     height: auto;
+    max-height: none;
     display: flex;
     flex-direction: column;
     align-items: center;
