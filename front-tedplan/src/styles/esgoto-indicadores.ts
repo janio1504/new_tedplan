@@ -259,15 +259,44 @@ export const UsuarioLogado = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  width: 100%;
-  height: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: left;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  max-width: 80%;
+  width: 100%;
+  max-height: 100vh;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  color:rgb(38, 38, 38);
+  margin-left: auto;
+  margin-right: auto; 
+  display: flex;
   flex-direction: column;
+  padding: 0 10px 0 10px;
+  box-sizing: border-box;
+
+  /* Estilizar a barra de rolagem */
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  // &::-webkit-scrollbar-thumb {
+  //   background: #0085bd;
+  //   border-radius: 4px;
+  // }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #006a9e;
+  }
+
+  @media (max-width: 1000px) {
+    max-height: calc(100vh - 100px);
+    padding: 10px;
+  }
 `;
 
 export const MenuMunicipio = styled.div`

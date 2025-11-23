@@ -1619,10 +1619,9 @@ export const CollapseButton = styled.button`
 `;
 
 export const MainContent = styled.div<{ isCollapsed: boolean }>`
-  margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
+  // margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
-  z-index: -1000;
 
   @media (max-width: 1000px) {
     min-height: 0;
@@ -2311,8 +2310,7 @@ export const BreadCrumbStyle = styled.div<{ isCollapsed: boolean }>`
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 90%;
-  margin-top: 20px;
+  width: 100%;
   padding: 10px;
   color: #666;
   

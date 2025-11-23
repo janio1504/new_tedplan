@@ -53,6 +53,7 @@ import { BreadCrumbStyle, CollapseButton, ExpandButton, MainContent } from "../.
 import { anosSelect } from "../../util/util";
 import { bold } from "@uiw/react-md-editor/lib/commands";
 import Link from "next/link";
+import { BodyDashboard } from "@/styles/dashboard-original";
 
 interface IMunicipio {
   id_municipio: string;
@@ -1092,6 +1093,7 @@ export default function PrestacaoServicoDrenagem() {
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadoresCadastro></MenuIndicadoresCadastro>
+      <BodyDashboard>
       {isCollapsed ? (
                     <ExpandButton onClick={toggleSidebar}>
                       <FaBars /> 
@@ -1139,7 +1141,7 @@ export default function PrestacaoServicoDrenagem() {
       </Sidebar>
                 )}
 
-      <MainContent isCollapsed={isCollapsed}>
+      
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastroIndicadores)}>
             <BreadCrumbStyle isCollapsed={isCollapsed}>
@@ -1525,7 +1527,7 @@ export default function PrestacaoServicoDrenagem() {
             </DivForm>
           </Form>
         </DivCenter>
-      </MainContent>
+      </BodyDashboard>
     </Container>
   );
 }
