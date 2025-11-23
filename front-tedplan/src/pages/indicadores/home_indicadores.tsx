@@ -21,6 +21,7 @@ import api from "../../services/api";
 import { GetServerSideProps } from "next";
 import { getAPIClient } from "../../services/axios";
 import MenuHorizontal from "../../components/MenuHorizontal";
+import { Footer } from "@/styles/dashboard-original";
 
 interface IMunicipio {
   id_municipio: string;
@@ -245,7 +246,7 @@ export default function HomeIndicadores() {
         Relatório SIMISAB correspondente ao ano {new Date().getFullYear()} - Estado PENDENTE
       </StatusMunicipio>
       
-      <div className="dashboard-header" style={{
+      {/* <div className="dashboard-header" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -309,7 +310,7 @@ export default function HomeIndicadores() {
             </>
           )}
         </button>
-      </div>
+      </div> */}
       
       <MenuIndicadores></MenuIndicadores>
       <div style={{
@@ -474,6 +475,7 @@ export default function HomeIndicadores() {
           </div>
                 </div>
       </div>
+      <Footer>&copy; Todos os direitos reservados</Footer>
       </Container>
     </>
   );
