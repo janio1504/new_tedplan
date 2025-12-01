@@ -8,56 +8,41 @@ import { AuthContext } from "@/contexts/AuthContext";
 import Sidebar from "@/components/Sidebar";
 import {
   Container,
-  NewButton,
-  ListPost,
-  FormModal,
   ConfirmButton,
   CancelButton,
   Footer,
   DivCenter,
-  BotaoVisualizar,
   BotaoEditar,
   BotaoRemover,
-  ContainerModal,
   Modal,
   CloseModalButton,
   ConteudoModal,
   TituloModal,
   TextoModal,
-  SubmitButton,
   DivMenuTitulo,
   MenuMunicipioItem,
+  BotaoAdicionar,
 } from "../styles/dashboard";
-import { useForm } from "react-hook-form";
 import { InfoIndicador } from "../types/InfoIndicador";
 import HeadIndicadores from "@/components/headIndicadores";
 import { BodyDashboard } from "@/styles/dashboard-original";
+import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
 export default function ListarIndicadores() {
   const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm();
-
-  const {
     indicadores,
     loadInfoIndicadores,
-    updateInfoIndicador,
     deleteInfoIndicador,
     error,
     clearError,
   } = useInfoIndicador();
 
-  const [isModalVisible, setModalVisible] = useState(false);
   const [isModalConfirm, setModalConfirm] = useState(false);
-  const [indicadorModal, setIndicadorModal] = useState(null);
-  const [idImagem, setIdImagem] = useState(null);
+  const [indicadorSelecionado, setIndicadorSelecionado] = useState<InfoIndicador | null>(null);
+  const [idImagem, setIdImagem] = useState<number | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filtroEixo, setFiltroEixo] = useState<string>("todos");
   const {signOut} = useContext(AuthContext);
-
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     const { ["tedplan.token"]: token } = parseCookies();
@@ -83,80 +68,63 @@ export default function ListarIndicadores() {
     Router.push("/addInfoIndicador");
   }
 
-  async function handleShowModal(indicador: InfoIndicador) {
-    setIndicadorModal(indicador);
-    setValue("id_descricao_indicador", indicador.id_descricao_indicador);
-    setValue("nome_indicador", indicador.nome_indicador);
-    setValue("codigo", indicador.codigo);
-    setValue("eixo", indicador.eixo);
-    setValue("descricao", indicador.descricao);
-    setValue("finalidade", indicador.finalidade);
-    setValue("limitacoes", indicador.limitacoes);
-    setModalVisible(true);
-  }
-
-  function handleCloseModal() {
-    setModalVisible(false);
-    reset();
-    setPreviewImage(null);
-  }
-
-  function handleOpenConfirm({ id_descricao_indicador, id_imagem }) {
-    setIndicadorModal(id_descricao_indicador);
-    setIdImagem(id_imagem);
+  function handleOpenConfirm(indicador: InfoIndicador) {
+    setIndicadorSelecionado(indicador);
+    setIdImagem(indicador.id_imagem || null);
     setModalConfirm(true);
   }
 
   function handleCloseConfirm() {
     setModalConfirm(false);
+    setIndicadorSelecionado(null);
+    setIdImagem(null);
   }
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  async function handleRemoverIndicador() {
+    if (!indicadorSelecionado) return;
 
-  async function handleRemoverIndicador(id: number, id_imagem?: number) {
     try {
-      await deleteInfoIndicador(id, id_imagem);
+      await deleteInfoIndicador(
+        indicadorSelecionado.id_descricao_indicador!,
+        idImagem || undefined
+      );
       toast.success("Indicador removido com sucesso!", { position: "top-right", autoClose: 5000 });
       setModalConfirm(false);
+      setIndicadorSelecionado(null);
+      setIdImagem(null);
       loadInfoIndicadores();
-      Router.push("/listarInfoIndicador");
     } catch (error) {
       toast.error("Erro ao remover indicador!", { position: "top-right", autoClose: 5000 });
     }
   }
 
-  async function handleUpdateIndicador(data: Partial<InfoIndicador>) {
-    const formData = new FormData();
-    if (data.metodo_calculo?.[0]) {
-      formData.append("imagem", data.metodo_calculo[0]);
-    }
+  // Eixos únicos dos indicadores
+  const eixosUnicos = Array.from(new Set(indicadores
+    .filter(ind => ind.eixo)
+    .map(ind => ind.eixo)
+  )).sort();
 
-    formData.append("nome_indicador", data.nome_indicador);
-    formData.append("codigo", data.codigo);
-    formData.append("eixo", data.eixo);
-    formData.append("descricao", data.descricao);
-    formData.append("finalidade", data.finalidade);
-    formData.append("limitacoes", data.limitacoes);
+  // Filtrar indicadores baseado no termo de busca e eixo
+  const indicadoresFiltrados = indicadores
+    .filter((indicador) => {
+      const matchesSearch = 
+        indicador.nome_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        indicador.codigo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (indicador.descricao && indicador.descricao.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (indicador.finalidade && indicador.finalidade.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    try {
-      await updateInfoIndicador(formData);
-      toast.success("Indicador atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
-      handleCloseModal();
-      loadInfoIndicadores();
-    } catch (error) {
-      toast.error("Erro ao atualizar indicador!", { position: "top-right", autoClose: 5000 });
-    }
-  }
-   async function handleSignOut() {
+      const matchesEixo = 
+        filtroEixo === "todos" ||
+        indicador.eixo === filtroEixo;
+
+      return matchesSearch && matchesEixo;
+    })
+    .sort((a, b) => {
+      // Ordenar por id_descricao_indicador decrescente (mais recentes primeiro)
+      return (b.id_descricao_indicador || 0) - (a.id_descricao_indicador || 0);
+    });
+
+  async function handleSignOut() {
           signOut();
         }
       
@@ -185,178 +153,229 @@ export default function ListarIndicadores() {
       <BodyDashboard>
         <Sidebar />
       <DivCenter>
-        <NewButton onClick={handleAddIndicador}>Adicionar Indicador</NewButton>
-        <ListPost>
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Nome</th>
-              <th>Eixo</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {indicadores.map((indicador) => (
-              <tr key={indicador.id_descricao_indicador}>
-                <td>{indicador.codigo}</td>
-                <td>{indicador.nome_indicador}</td>
-                <td>{indicador.eixo}</td>
-                <td>
-                  <BotaoRemover
-                    onClick={() =>
-                      handleOpenConfirm({
-                        id_descricao_indicador:
-                          indicador.id_descricao_indicador,
-                        id_imagem: indicador.id_imagem,
-                      })
-                    }
-                  >
-                    Remover
-                  </BotaoRemover>
-                  <BotaoEditar
-                    onClick={() =>
-                      Router.push(
-                        `/addInfoIndicador?id=${indicador.id_descricao_indicador}`
-                      )
-                    }
-                  >
-                    Editar
-                  </BotaoEditar>
+        <div
+          style={{
+            marginBottom: "20px",
+            borderBottom: "1px solid rgb(162, 160, 160)",
+            textAlign: "center",
+          }}
+        >
+          <h2>Lista de Informações de Indicadores</h2>
+        </div>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <div style={{ position: "relative", width: "30%" }}>
+            <input
+              type="text"
+              placeholder="Buscar por nome, código, descrição ou finalidade..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 40px 10px 10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+              }}
+            />
+            <FaSearch
+              style={{
+                position: "absolute",
+                right: "-35px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#666",
+                fontSize: "18px",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+          <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
+            <select
+              value={filtroEixo}
+              onChange={(e) => setFiltroEixo(e.target.value)}
+              style={{
+                padding: "10px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+                minWidth: "150px",
+              }}
+            >
+              <option value="todos">Todos os eixos</option>
+              {eixosUnicos.map((eixo) => (
+                <option key={eixo} value={eixo}>
+                  {eixo}
+                </option>
+              ))}
+            </select>
+          </div>
+          <BotaoAdicionar onClick={handleAddIndicador} style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+            <FaPlus /> Novo Indicador
+          </BotaoAdicionar>
+        </div>
 
-                  {isModalConfirm && (
-                    <ContainerModal>
-                      <Modal>
-                        <ConteudoModal>
-                          <TituloModal>
-                            <h3>Confirmar exclusão</h3>
-                          </TituloModal>
-                          <TextoModal>
-                            <p>Deseja realmente excluir este indicador?</p>
-                            <CancelButton onClick={handleCloseConfirm}>
-                              Cancelar
-                            </CancelButton>
-                            <ConfirmButton
-                              onClick={() =>
-                                handleRemoverIndicador(
-                                  indicador.id_descricao_indicador,
-                                  indicador.id_imagem
-                                )
-                              }
-                            >
-                              Confirmar
-                            </ConfirmButton>
-                          </TextoModal>
-                        </ConteudoModal>
-                      </Modal>
-                    </ContainerModal>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </ListPost>
+        <div style={{ marginBottom: "15px", fontSize: "14px", color: "#666" }}>
+          Mostrando {indicadoresFiltrados.length} de {indicadores.length} indicadores
+        </div>
 
-        {isModalVisible && indicadorModal && (
-          <ContainerModal>
-            <Modal>
-              <FormModal onSubmit={handleSubmit(handleUpdateIndicador)}>
-                <TextoModal>
-                  <CloseModalButton onClick={handleCloseModal}>
-                    Fechar
-                  </CloseModalButton>
-                  <SubmitButton type="submit">Atualizar</SubmitButton>
+        <div style={{ width: "100%" }}>
+          {indicadoresFiltrados.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px" }}>
+              <p>
+                {indicadores.length === 0 
+                  ? "Nenhum indicador cadastrado." 
+                  : "Nenhum indicador encontrado com os filtros aplicados."
+                }
+              </p>
+              <button
+                onClick={handleAddIndicador}
+                style={{
+                  marginTop: "15px",
+                  padding: "10px 20px",
+                  backgroundColor: "#007bff",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Cadastrar Primeiro Indicador
+              </button>
+            </div>
+          ) : (
+            indicadoresFiltrados.map((indicador) => (
+              <div key={indicador.id_descricao_indicador} style={{ marginBottom: "15px" }}>
+                <div
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    padding: "20px",
+                    borderRadius: "8px",
+                    border: "1px solid #e0e0e0",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                        <h3 style={{ margin: "0", color: "#333" }}>
+                          {indicador.nome_indicador}
+                        </h3>
+                        <span
+                          style={{
+                            backgroundColor: "#007bff",
+                            color: "white",
+                            padding: "4px 8px",
+                            borderRadius: "12px",
+                            fontSize: "12px",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {indicador.eixo}
+                        </span>
+                      </div>
+                      
+                      <div style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>
+                        <strong>Código:</strong> {indicador.codigo}
+                      </div>
+                      
+                      {indicador.unidade && (
+                        <div style={{ fontSize: "14px", color: "#666", marginBottom: "5px" }}>
+                          <strong>Unidade:</strong> {indicador.unidade}
+                        </div>
+                      )}
 
-                  <ConteudoModal>
-                    <input
-                      type="hidden"
-                      {...register("id_descricao_indicador")}
-                    />
+                      {indicador.descricao && (
+                        <div style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+                          <strong>Descrição:</strong> 
+                          <div style={{ marginTop: "5px", fontStyle: "italic" }}>
+                            {indicador.descricao.length > 200
+                              ? `${indicador.descricao.substring(0, 200)}...`
+                              : indicador.descricao
+                            }
+                          </div>
+                        </div>
+                      )}
 
-                    <label>Nome</label>
-                    <input
-                      {...register("nome_indicador", {
-                        required: "O campo Nome é obrigatório!",
-                      })}
-                      type="text"
-                      placeholder="Nome do indicador"
-                    />
-                    {errors.nome_indicador && (
-                      <span>{errors.nome_indicador.message}</span>
-                    )}
+                      {indicador.finalidade && (
+                        <div style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+                          <strong>Finalidade:</strong> 
+                          <div style={{ marginTop: "5px" }}>
+                            {indicador.finalidade.length > 200
+                              ? `${indicador.finalidade.substring(0, 200)}...`
+                              : indicador.finalidade
+                            }
+                          </div>
+                        </div>
+                      )}
 
-                    <label>Código</label>
-                    <input {...register("codigo")} type="text" disabled />
+                      {indicador.limitacoes && (
+                        <div style={{ fontSize: "14px", color: "#666", marginTop: "10px" }}>
+                          <strong>Limitações:</strong> 
+                          <div style={{ marginTop: "5px" }}>
+                            {indicador.limitacoes.length > 200
+                              ? `${indicador.limitacoes.substring(0, 200)}...`
+                              : indicador.limitacoes
+                            }
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div style={{ fontSize: "14px", color: "#888", marginTop: "10px" }}>
+                        <span>ID: {indicador.id_descricao_indicador}</span>
+                      </div>
+                    </div>
 
-                    <label>Eixo</label>
-                    <select
-                      {...register("eixo", {
-                        required: "O eixo é obrigatório!",
-                      })}
-                    >
-                      <option value="">Selecione o eixo</option>
-                      <option value="agua">Água</option>
-                      <option value="esgoto">Esgoto</option>
-                      <option value="drenagem">Drenagem</option>
-                      <option value="residuos">Resíduos</option>
-                    </select>
-                    {errors.eixo && <span>{errors.eixo.message}</span>}
+                    <div style={{ display: "flex", gap: "10px", marginLeft: "20px" }}>
+                      <BotaoEditar
+                        onClick={() =>
+                          Router.push(
+                            `/addInfoIndicador?id=${indicador.id_descricao_indicador}`
+                          )
+                        }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
+                      >
+                        <FaEdit /> Editar
+                      </BotaoEditar>
+                      <BotaoRemover
+                        onClick={() => handleOpenConfirm(indicador)}
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
+                      >
+                        <FaTrash /> Remover
+                      </BotaoRemover>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
-                    <label>Método de Cálculo</label>
-                    <input
-                      type="file"
-                      {...register("metodo_calculo")}
-                      accept="image/*"
-                      onChange={handleImageChange}
-                    />
-                    {previewImage && (
-                      <img
-                        src={previewImage}
-                        alt="Preview"
-                        style={{
-                          maxWidth: "100%",
-                          marginTop: "10px",
-                          maxHeight: "200px",
-                        }}
-                      />
-                    )}
-
-                    <label>Descrição</label>
-                    <textarea
-                      {...register("descricao", {
-                        required: "A descrição é obrigatória!",
-                      })}
-                      rows={4}
-                    />
-                    {errors.descricao && (
-                      <span>{errors.descricao.message}</span>
-                    )}
-
-                    <label>Finalidade</label>
-                    <textarea
-                      {...register("finalidade", {
-                        required: "A finalidade é obrigatória!",
-                      })}
-                      rows={4}
-                    />
-                    {errors.finalidade && (
-                      <span>{errors.finalidade.message}</span>
-                    )}
-
-                    <label>Limitações</label>
-                    <textarea
-                      {...register("limitacoes", {
-                        required: "As limitações são obrigatórias!",
-                      })}
-                      rows={3}
-                    />
-                    {errors.limitacoes && (
-                      <span>{errors.limitacoes.message}</span>
-                    )}
-                  </ConteudoModal>
-                </TextoModal>
-              </FormModal>
-            </Modal>
-          </ContainerModal>
+        {isModalConfirm && indicadorSelecionado && (
+          <Modal>
+            <ConteudoModal>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <TituloModal>Confirmar Exclusão</TituloModal>
+                <CloseModalButton onClick={handleCloseConfirm}>
+                  &times;
+                </CloseModalButton>
+              </div>
+              <TextoModal>
+                Tem certeza que deseja remover o indicador "{indicadorSelecionado.nome_indicador}" ({indicadorSelecionado.codigo})?
+                <br />
+                <strong>Esta ação não pode ser desfeita.</strong>
+              </TextoModal>
+              <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+                <CancelButton onClick={handleCloseConfirm}>Cancelar</CancelButton>
+                <ConfirmButton onClick={handleRemoverIndicador}>Confirmar</ConfirmButton>
+              </div>
+            </ConteudoModal>
+          </Modal>
         )}
       </DivCenter>
       </BodyDashboard>

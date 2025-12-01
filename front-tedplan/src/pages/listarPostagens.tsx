@@ -13,6 +13,9 @@ import {
   FaHome,
   FaSignOutAlt,
   FaRegTimesCircle,
+  FaEdit,
+  FaTrash,
+  FaEye,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
@@ -219,8 +222,9 @@ export default function Postagens({ posts }: PostProps) {
                           id_imagem: post.id_imagem,
                         })
                       }
+                      style={{ display: "flex", alignItems: "center", gap: "6px" }}
                     >
-                      Remover
+                      <FaTrash /> Remover
                     </BotaoRemover>
 
                     <BotaoEditar
@@ -229,8 +233,9 @@ export default function Postagens({ posts }: PostProps) {
                           id_posts: post.id_posts,
                         })
                       }
+                      style={{ display: "flex", alignItems: "center", gap: "6px" }}
                     >
-                      Editar
+                      <FaEdit /> Editar
                     </BotaoEditar>
 
                     <BotaoVisualizar
@@ -239,8 +244,9 @@ export default function Postagens({ posts }: PostProps) {
                           id_posts: post.id_posts,
                         })
                       }
+                      style={{ display: "flex", alignItems: "center", gap: "6px" }}
                     >
-                      Editar Imagem
+                      <FaEye /> Editar Imagem
                     </BotaoVisualizar>
 
                     {isModalVisible && (

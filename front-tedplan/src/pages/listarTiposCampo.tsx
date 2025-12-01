@@ -6,7 +6,7 @@ import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Sidebar from "@/components/Sidebar";
 import {
   Container,
@@ -263,8 +263,8 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
             <option value="inativos">Inativos</option>
           </select>
           {/* {(permission.adminGeral || permission.adminTedPlan) && ( */}
-          <BotaoAdicionar onClick={handleAddTipoCampo} style={{ marginLeft: "10px" }}>
-            + Novo Tipo de Campo
+          <BotaoAdicionar onClick={handleAddTipoCampo} style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+            <FaPlus /> Novo Tipo de Campo
           </BotaoAdicionar>
           {/* )} */}
         </div>
@@ -326,11 +326,11 @@ export default function ListarTiposCampo({ tiposCampo }: TipoCampoProps) {
                     {(permission.adminGeral || permission.adminTedPlan) && (
                       <div style={{ display: "flex", gap: "10px", marginLeft: "20px", flexDirection: "column" }}>
                         <div style={{ display: "flex", gap: "10px" }}>
-                          <BotaoEditar onClick={() => handleEditTipoCampo(tipoCampo)}>
-                            Editar
+                          <BotaoEditar onClick={() => handleEditTipoCampo(tipoCampo)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FaEdit /> Editar
                           </BotaoEditar>
-                          <BotaoRemover onClick={() => handleOpenConfirm(tipoCampo)}>
-                            Remover
+                          <BotaoRemover onClick={() => handleOpenConfirm(tipoCampo)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FaTrash /> Remover
                           </BotaoRemover>
                         </div>
                         <button
