@@ -6,7 +6,7 @@ class IndicadorNovoRepository {
         const indicadores = await IndicadorNovo.query()
             .with('menuItem')
             .with('tiposCampo')
-            .orderBy("id_indicador", "desc")
+            .orderBy("id_indicador", "asc")
             .fetch();
         return indicadores;
     }
