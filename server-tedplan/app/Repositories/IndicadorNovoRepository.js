@@ -35,7 +35,7 @@ class IndicadorNovoRepository {
             .where('grupo_indicador', grupo_indicador)
             .with('menuItem')
             .with('tiposCampo')
-            .orderBy("id_indicador", "asc")
+            .orderBy("id_indicador", "desc")
             .fetch();
         return indicadores;
     }
