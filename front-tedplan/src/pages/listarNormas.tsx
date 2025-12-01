@@ -14,6 +14,9 @@ import {
   FaHome,
   FaSignOutAlt,
   FaRegTimesCircle,
+  FaEdit,
+  FaTrash,
+  FaPlus,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "suneditor/dist/css/suneditor.min.css";
@@ -329,9 +332,9 @@ export default function Postagens({ normas }: NormasProps) {
           </div>
           <BotaoAdicionar
             onClick={handleAddNorma}
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}
           >
-            + Nova Norma
+            <FaPlus /> Nova Norma
           </BotaoAdicionar>
         </div>
 
@@ -383,8 +386,9 @@ export default function Postagens({ normas }: NormasProps) {
                         onClick={() =>
                           Router.push(`/addNorma?id=${norma.id_norma}`)
                         }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Editar
+                        <FaEdit /> Editar
                       </BotaoEditar>
                       <BotaoRemover
                         onClick={() =>
@@ -394,8 +398,9 @@ export default function Postagens({ normas }: NormasProps) {
                             id_arquivo: norma.id_arquivo,
                           })
                         }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Remover
+                        <FaTrash /> Remover
                       </BotaoRemover>
                     </div>
                   </div>

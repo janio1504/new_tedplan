@@ -475,9 +475,9 @@ export default function Postagens({ galerias }: GaleriaProps) {
           </div>
           <BotaoAdicionar
             onClick={handleAddGaleria}
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}
           >
-            + Nova Galeria
+            <FaPlus /> Nova Galeria
           </BotaoAdicionar>
         </div>
 
@@ -530,12 +530,12 @@ export default function Postagens({ galerias }: GaleriaProps) {
                     >
                       <BotaoEditar 
                         onClick={() => Router.push(`/addGaleria?id=${galeria.id_galeria}`)}
-                        style={{ backgroundColor: "#28a745" }}
+                        style={{ backgroundColor: "#28a745", display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Editar
+                        <FaEdit /> Editar
                       </BotaoEditar>
-                      <BotaoEditar onClick={() => handleShowModal(galeria)}>
-                        Adicionar imagens
+                      <BotaoEditar onClick={() => handleShowModal(galeria)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <FaUpload /> Adicionar imagens
                       </BotaoEditar>
                       <BotaoVisualizar
                         onClick={() =>
@@ -543,8 +543,9 @@ export default function Postagens({ galerias }: GaleriaProps) {
                             id_galeria: galeria.id_galeria,
                           })
                         }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Visualizar imagens
+                        <FaEye /> Visualizar imagens
                       </BotaoVisualizar>
                       <BotaoRemover
                         onClick={() =>
@@ -553,8 +554,9 @@ export default function Postagens({ galerias }: GaleriaProps) {
                             id_imagem: galeria.id_imagem,
                           })
                         }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Remover
+                        <FaTrash /> Remover
                       </BotaoRemover>
                     </div>
                   </div>
