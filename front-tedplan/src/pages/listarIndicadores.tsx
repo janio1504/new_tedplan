@@ -315,9 +315,9 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
         .map(result => result.status === 'fulfilled' ? result.value : null)
         .filter(Boolean);
       
-      // Ordenar por id_indicador em ordem decrescente
+      // Ordenar por id_indicador em ordem crescente
       const resultadosOrdenados = resultados.sort((a: IIndicador, b: IIndicador) => {
-        return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+        return parseInt(a.id_indicador) - parseInt(b.id_indicador);
       });
       
       setIndicadoresList(resultadosOrdenados);
@@ -334,9 +334,9 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       const apiClient = getAPIClient();
       const response = await apiClient.get("/indicadores-novo");
       const indicadores = response.data || [];
-      // Ordenar por id_indicador em ordem decrescente
+      // Ordenar por id_indicador em ordem crescente
       const indicadoresOrdenados = indicadores.sort((a: IIndicador, b: IIndicador) => {
-        return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+        return parseInt(a.id_indicador) - parseInt(b.id_indicador);
       });
       setIndicadoresList(indicadoresOrdenados);
       
@@ -425,8 +425,8 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       return matchesSearch && matchesGrupo && matchesTipoCampo;
     })
     .sort((a, b) => {
-      // Garantir ordenação decrescente por id_indicador mesmo após filtros
-      return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+      // Garantir ordenação crescente por id_indicador mesmo após filtros
+      return parseInt(a.id_indicador) - parseInt(b.id_indicador);
     });
 
   const getTipoLabel = (type: string) => {
@@ -759,9 +759,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     const response = await apiClient.get("/indicadores-novo");
     const indicadores = response.data || [];
     
-    // Ordenar por id_indicador em ordem decrescente
+    // Ordenar por id_indicador em ordem crescente
     const indicadoresOrdenados = indicadores.sort((a: IIndicador, b: IIndicador) => {
-      return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+      return parseInt(a.id_indicador) - parseInt(b.id_indicador);
     });
 
     return {
