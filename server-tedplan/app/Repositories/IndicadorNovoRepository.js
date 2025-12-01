@@ -25,7 +25,7 @@ class IndicadorNovoRepository {
         const indicadores = await IndicadorNovo.query()
             .where('id_menu_item', id_menu_item)
             .with('tiposCampo')
-            .orderBy("nome_indicador", "asc")
+            .orderBy("id_indicador", "asc")
             .fetch();
         return indicadores;
     }
@@ -35,7 +35,7 @@ class IndicadorNovoRepository {
             .where('grupo_indicador', grupo_indicador)
             .with('menuItem')
             .with('tiposCampo')
-            .orderBy("nome_indicador", "asc")
+            .orderBy("id_indicador", "asc")
             .fetch();
         return indicadores;
     }
@@ -75,7 +75,7 @@ class IndicadorNovoRepository {
             .orWhere('unidade_indicador', 'ilike', `%${searchTerm}%`)
             .with('menuItem')
             .with('tiposCampo')
-            .orderBy("nome_indicador", "asc")
+            .orderBy("id_indicador", "asc")
             .fetch();
         return indicadores;
     }

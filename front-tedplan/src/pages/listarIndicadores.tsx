@@ -219,7 +219,13 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
   const {signOut} = useContext(AuthContext);
   const [isModalConfirm, setModalConfirm] = useState(false);
   const [indicadorSelecionado, setIndicadorSelecionado] = useState<IIndicador | null>(null);
-  const [indicadoresList, setIndicadoresList] = useState<IIndicador[]>(indicadores || []);
+  // Ordenar indicadores iniciais por id_indicador em ordem crescente
+  const indicadoresIniciaisOrdenados = (indicadores || []).sort((a: IIndicador, b: IIndicador) => {
+    const idA = parseInt(String(a.id_indicador), 10) || 0;
+    const idB = parseInt(String(b.id_indicador), 10) || 0;
+    return idA - idB;
+  });
+  const [indicadoresList, setIndicadoresList] = useState<IIndicador[]>(indicadoresIniciaisOrdenados);
   const [searchTerm, setSearchTerm] = useState("");
   const [filtroGrupo, setFiltroGrupo] = useState<string>("todos");
   const [filtroTipoCampo, setFiltroTipoCampo] = useState<string>("todos");
@@ -244,19 +250,31 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     }
     
     // Só carregar os tipos se não vieram do SSR
-    if (indicadores && indicadores.length > 0) {
-      loadTiposCampoForIndicadores();
+    // Usar os indicadores ordenados do servidor diretamente
+    if (indicadoresIniciaisOrdenados && indicadoresIniciaisOrdenados.length > 0) {
+      loadTiposCampoForIndicadores(indicadoresIniciaisOrdenados);
     }
   }, []);
 
-  async function loadTiposCampoForIndicadores() {
+  async function loadTiposCampoForIndicadores(indicadoresParaProcessar?: IIndicador[]) {
     setLoadingTipos(true);
     try {
       const apiClient = getAPIClient();
       
+      // Usar os indicadores passados como parâmetro (já ordenados) ou o estado atual
+      // Sempre garantir ordenação antes de processar
+      const indicadoresBase = indicadoresParaProcessar || [...indicadoresList];
+      const indicadoresAtuais = [...indicadoresBase];
+      indicadoresAtuais.sort((a: IIndicador, b: IIndicador) => {
+        const idA = parseInt(String(a.id_indicador), 10) || 0;
+        const idB = parseInt(String(b.id_indicador), 10) || 0;
+        return idA - idB;
+      });
+      
       // Carregar tipos de campo para cada indicador de forma mais robusta
+      // Promise.allSettled mantém a ordem dos resultados
       const indicadoresComTipos = await Promise.allSettled(
-        indicadoresList.map(async (indicador) => {
+        indicadoresAtuais.map(async (indicador) => {
           try {
             // Buscar tipos de campo do indicador
             const tiposResponse = await apiClient.get(`/tipos-campo/indicador/${indicador.id_indicador}`);
@@ -310,17 +328,26 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       );
       
       // Processar apenas os resultados bem-sucedidos
-      const resultados = indicadoresComTipos
-        .filter(result => result.status === 'fulfilled')
-        .map(result => result.status === 'fulfilled' ? result.value : null)
-        .filter(Boolean);
+      // Promise.allSettled mantém a ordem dos resultados
+      const resultados: IIndicador[] = indicadoresComTipos
+        .map((result, index) => {
+          if (result.status === 'fulfilled' && result.value) {
+            return result.value;
+          }
+          // Se falhou, manter o indicador original
+          return indicadoresAtuais[index];
+        })
+        .filter((ind): ind is IIndicador => ind !== undefined && ind !== null);
       
-      // Ordenar por id_indicador em ordem crescente
-      const resultadosOrdenados = resultados.sort((a: IIndicador, b: IIndicador) => {
-        return parseInt(a.id_indicador) - parseInt(b.id_indicador);
+      // SEMPRE ordenar por id_indicador em ordem crescente após processar
+      // Isso garante que mesmo se a ordem for perdida durante o processamento, será restaurada
+      resultados.sort((a: IIndicador, b: IIndicador) => {
+        const idA = parseInt(String(a.id_indicador), 10) || 0;
+        const idB = parseInt(String(b.id_indicador), 10) || 0;
+        return idA - idB;
       });
       
-      setIndicadoresList(resultadosOrdenados);
+      setIndicadoresList(resultados);
     } catch (error) {
       console.error("Erro ao carregar tipos de campo:", error);
       toast.error("Erro ao carregar detalhes dos indicadores!", { position: "top-right", autoClose: 5000 });
@@ -336,13 +363,15 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       const indicadores = response.data || [];
       // Ordenar por id_indicador em ordem crescente
       const indicadoresOrdenados = indicadores.sort((a: IIndicador, b: IIndicador) => {
-        return parseInt(a.id_indicador) - parseInt(b.id_indicador);
+        const idA = parseInt(String(a.id_indicador), 10) || 0;
+        const idB = parseInt(String(b.id_indicador), 10) || 0;
+        return idA - idB;
       });
       setIndicadoresList(indicadoresOrdenados);
       
-      // Recarregar tipos de campo
+      // Recarregar tipos de campo com os indicadores já ordenados
       if (indicadoresOrdenados.length > 0) {
-        loadTiposCampoForIndicadores();
+        loadTiposCampoForIndicadores(indicadoresOrdenados);
       }
     } catch (error) {
       console.error("Erro ao carregar indicadores:", error);
@@ -426,7 +455,9 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     })
     .sort((a, b) => {
       // Garantir ordenação crescente por id_indicador mesmo após filtros
-      return parseInt(a.id_indicador) - parseInt(b.id_indicador);
+      const idA = parseInt(String(a.id_indicador), 10) || 0;
+      const idB = parseInt(String(b.id_indicador), 10) || 0;
+      return idA - idB;
     });
 
   const getTipoLabel = (type: string) => {
@@ -761,7 +792,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     
     // Ordenar por id_indicador em ordem crescente
     const indicadoresOrdenados = indicadores.sort((a: IIndicador, b: IIndicador) => {
-      return parseInt(a.id_indicador) - parseInt(b.id_indicador);
+      const idA = parseInt(String(a.id_indicador), 10) || 0;
+      const idB = parseInt(String(b.id_indicador), 10) || 0;
+      return idA - idB;
     });
 
     return {
