@@ -219,7 +219,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
               reset({
                 codigo_indicador: indicador.codigo_indicador,
                 nome_indicador: indicador.nome_indicador,
-                grupo_indicador: indicador.grupo_indicador,
                 palavra_chave: indicador.palavra_chave,
                 unidade_indicador: indicador.unidade_indicador,
                 formula_calculo_indicador: indicador.formula_calculo_indicador,
@@ -227,6 +226,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                 indicador_correspondente_ou_similar_snis:
                   indicador.indicador_correspondente_ou_similar_snis,
                 id_menu_item: indicador.id_menu_item?.toString(),
+                nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
               });
             }, 300);
           } else {
@@ -234,7 +234,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             reset({
               codigo_indicador: indicador.codigo_indicador,
               nome_indicador: indicador.nome_indicador,
-              grupo_indicador: indicador.grupo_indicador,
               palavra_chave: indicador.palavra_chave,
               unidade_indicador: indicador.unidade_indicador,
               formula_calculo_indicador: indicador.formula_calculo_indicador,
@@ -242,6 +241,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
               indicador_correspondente_ou_similar_snis:
                 indicador.indicador_correspondente_ou_similar_snis,
               id_menu_item: indicador.id_menu_item?.toString(),
+              nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
             });
           }
         } catch (error) {
@@ -250,7 +250,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           reset({
             codigo_indicador: indicador.codigo_indicador,
             nome_indicador: indicador.nome_indicador,
-            grupo_indicador: indicador.grupo_indicador,
             palavra_chave: indicador.palavra_chave,
             unidade_indicador: indicador.unidade_indicador,
             formula_calculo_indicador: indicador.formula_calculo_indicador,
@@ -258,6 +257,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             indicador_correspondente_ou_similar_snis:
               indicador.indicador_correspondente_ou_similar_snis,
             id_menu_item: indicador.id_menu_item?.toString(),
+            nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
           });
         }
       } else {
@@ -265,7 +265,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         reset({
           codigo_indicador: indicador.codigo_indicador,
           nome_indicador: indicador.nome_indicador,
-          grupo_indicador: indicador.grupo_indicador,
           palavra_chave: indicador.palavra_chave,
           unidade_indicador: indicador.unidade_indicador,
           formula_calculo_indicador: indicador.formula_calculo_indicador,
@@ -273,6 +272,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           indicador_correspondente_ou_similar_snis:
             indicador.indicador_correspondente_ou_similar_snis,
           id_menu_item: indicador.id_menu_item?.toString(),
+          nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
         });
       }
 
@@ -307,9 +307,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         reset((prevData) => ({
           ...prevData,
           tipo_campo: tipoCampo.type,
-          nome_campo: tipoCampo.name_campo,
           campo_ativo: tipoCampo.enable,
-          valor_padrao: tipoCampo.default_value,
         }));
 
         // Se for tipo select, carregar suas opções
@@ -438,7 +436,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   async function handleAddIndicador({
     codigo_indicador,
     nome_indicador,
-    grupo_indicador,
     palavra_chave,
     unidade_indicador,
     formula_calculo_indicador,
@@ -446,9 +443,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     indicador_correspondente_ou_similar_snis,
     id_menu_item,
     tipo_campo,
-    nome_campo,
     campo_ativo,
-    valor_padrao,
   }) {
     try {
       const apiClient = getAPIClient();
@@ -456,7 +451,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       const indicadorData = {
         codigo_indicador,
         nome_indicador,
-        grupo_indicador: grupo_indicador || null,
         palavra_chave: palavra_chave || null,
         unidade_indicador: unidade_indicador || null,
         formula_calculo_indicador: formula_calculo_indicador || null,
@@ -508,19 +502,19 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         : indicadorResponse.data.id_indicador;
 
       // Salvar tipo de campo e suas opções
-      if (tipo_campo && nome_campo) {
+      // O nome_campo será preenchido automaticamente com o codigo_indicador
+      if (tipo_campo && codigo_indicador) {
         await saveTipoCampoIndicador(indicadorIdToUse, {
           type: tipo_campo,
-          name_campo: nome_campo,
+          name_campo: codigo_indicador,
           enable: campo_ativo || false,
-          default_value: valor_padrao || "",
+          default_value: "",
         });
       }
 
       reset({
         codigo_indicador: "",
         nome_indicador: "",
-        grupo_indicador: "",
         palavra_chave: "",
         unidade_indicador: "",
         formula_calculo_indicador: "",
@@ -530,7 +524,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         tipo_campo: "",
         nome_campo: "",
         campo_ativo: true,
-        valor_padrao: "",
       });
 
       setSelectOptions([]);
@@ -742,7 +735,13 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                 </label>
                 <input
                   aria-invalid={errors.codigo_indicador ? "true" : "false"}
-                  {...register("codigo_indicador", { required: true })}
+                  {...register("codigo_indicador", { 
+                    required: true,
+                    onChange: (e) => {
+                      // Preencher automaticamente o nome_campo com o código do indicador
+                      setValue("nome_campo", e.target.value);
+                    }
+                  })}
                   type="text"
                   placeholder="Código único do indicador (ex: AG001, ES002)"
                   name="codigo_indicador"
@@ -838,51 +837,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                       O campo Nome do Indicador é obrigatório!
                     </span>
                   )}
-              </div>
-
-              <div style={{ marginBottom: "0" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "8px",
-                    fontWeight: "600",
-                    color: "#333",
-                    fontSize: "14px",
-                  }}
-                >
-                  Grupo do Indicador
-                </label>
-                <select
-                  {...register("grupo_indicador")}
-                  name="grupo_indicador"
-                  style={{
-                    width: "100%",
-                    padding: "12px 16px",
-                    border: "1px solid #e0e0e0",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    transition: "all 0.3s ease",
-                    backgroundColor: "white",
-                  }}
-                  onFocus={(e) => {
-                    (e.target as HTMLSelectElement).style.borderColor =
-                      "#3498db";
-                    (e.target as HTMLSelectElement).style.boxShadow =
-                      "0 0 0 3px rgba(52, 152, 219, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    (e.target as HTMLSelectElement).style.borderColor =
-                      "#e0e0e0";
-                    (e.target as HTMLSelectElement).style.boxShadow = "none";
-                  }}
-                >
-                  <option value="">Selecione um grupo (opcional)</option>
-                  {gruposIndicador.map((grupo, key) => (
-                    <option key={key} value={grupo}>
-                      {grupo}
-                    </option>
-                  ))}
-                </select>
               </div>
 
               <div style={{ marginBottom: "0" }}>
@@ -1072,61 +1026,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                 <div style={{ marginBottom: "20px" }}>
                   <label
                     style={{
-                      display: "block",
-                      marginBottom: "8px",
-                      fontWeight: "600",
-                      color: "#333",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Nome do Campo *
-                  </label>
-                  <input
-                    {...register("nome_campo", { required: true })}
-                    type="text"
-                    placeholder="Nome que aparecerá no formulário (ex: 'Volume de Água Tratada')"
-                    name="nome_campo"
-                    style={{
-                      width: "95%",
-                      padding: "12px 16px",
-                      border: `1px solid ${
-                        errors.nome_campo ? "#e74c3c" : "#e0e0e0"
-                      }`,
-                      borderRadius: "8px",
-                      fontSize: "14px",
-                      transition: "all 0.3s ease",
-                      backgroundColor: "white",
-                    }}
-                    onFocus={(e) => {
-                      (e.target as HTMLInputElement).style.borderColor =
-                        "#3498db";
-                      (e.target as HTMLInputElement).style.boxShadow =
-                        "0 0 0 3px rgba(52, 152, 219, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      (e.target as HTMLInputElement).style.borderColor =
-                        errors.nome_campo ? "#e74c3c" : "#e0e0e0";
-                      (e.target as HTMLInputElement).style.boxShadow = "none";
-                    }}
-                  />
-                  {errors.nome_campo &&
-                    errors.nome_campo.type === "required" && (
-                      <span
-                        style={{
-                          color: "#e74c3c",
-                          fontSize: "12px",
-                          marginTop: "4px",
-                          display: "block",
-                        }}
-                      >
-                        O campo Nome do Campo é obrigatório!
-                      </span>
-                    )}
-                </div>
-
-                <div style={{ marginBottom: "20px" }}>
-                  <label
-                    style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "10px",
@@ -1148,46 +1047,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                     />
                     <span style={{ fontWeight: "500" }}>Campo ativo</span>
                   </label>
-                </div>
-
-                <div style={{ marginBottom: "0" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      marginBottom: "8px",
-                      fontWeight: "600",
-                      color: "#333",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Valor Padrão
-                  </label>
-                  <input
-                    {...register("valor_padrao")}
-                    type="text"
-                    placeholder="Valor inicial do campo (opcional)"
-                    name="valor_padrao"
-                    style={{
-                      width: "95%",
-                      padding: "12px 16px",
-                      border: "1px solid #e0e0e0",
-                      borderRadius: "8px",
-                      fontSize: "14px",
-                      transition: "all 0.3s ease",
-                      backgroundColor: "white",
-                    }}
-                    onFocus={(e) => {
-                      (e.target as HTMLInputElement).style.borderColor =
-                        "#3498db";
-                      (e.target as HTMLInputElement).style.boxShadow =
-                        "0 0 0 3px rgba(52, 152, 219, 0.1)";
-                    }}
-                    onBlur={(e) => {
-                      (e.target as HTMLInputElement).style.borderColor =
-                        "#e0e0e0";
-                      (e.target as HTMLInputElement).style.boxShadow = "none";
-                    }}
-                  />
                 </div>
 
                 {/* Seção para configurar opções do select */}
