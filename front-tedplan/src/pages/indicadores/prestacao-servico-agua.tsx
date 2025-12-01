@@ -1829,7 +1829,7 @@ export default function PrestacaoServicoAgua() {
                                 {/* Descrição */}
                                 <div
                                   style={{
-                                    fontSize: "13px",
+                                    fontSize: "14px",
                                     color: "#495057",
                                     lineHeight: "1.3",
                                   }}
