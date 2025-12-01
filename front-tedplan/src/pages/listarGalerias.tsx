@@ -19,6 +19,8 @@ import {
   FaTimes,
   FaTrash,
   FaEye,
+  FaPlus,
+  FaEdit,
 } from "react-icons/fa";
 import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
