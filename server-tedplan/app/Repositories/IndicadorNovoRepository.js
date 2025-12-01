@@ -75,7 +75,7 @@ class IndicadorNovoRepository {
             .orWhere('unidade_indicador', 'ilike', `%${searchTerm}%`)
             .with('menuItem')
             .with('tiposCampo')
-            .orderBy("id_indicador", "asc")
+            .orderBy("id_indicador", "desc")
             .fetch();
         return indicadores;
     }
