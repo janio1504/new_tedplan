@@ -231,7 +231,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
                   padding: "40px",
                   marginTop: "50px",
-                  width: "80%",
+                  width: "60%",
                 }}
               >
                 <div

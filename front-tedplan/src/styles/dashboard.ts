@@ -284,7 +284,7 @@ export const ItensMenu = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  max-width: 80%;
+  max-width: 100%;
   width: 100%;
   max-height: 100vh;
   height: 100vh;
@@ -292,7 +292,7 @@ export const DivCenter = styled.div`
   overflow-x: hidden;
   color:rgb(38, 38, 38);
   margin-left: auto;
-  margin-right: auto; 
+  margin-right: auto;
   display: flex;
   flex-direction: column;
   padding: 50px 20px 20px 20px;
@@ -314,7 +314,7 @@ export const DivCenter = styled.div`
   // }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #006a9e;
+    background:rgb(245, 247, 248);
   }
 
   @media (max-width: 1000px) {

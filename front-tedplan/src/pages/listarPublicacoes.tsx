@@ -9,7 +9,7 @@ import Router from "next/router";
 import MenuSuperior from "../components/head";
 import Sidebar from "../components/Sidebar";
 import { toast } from "react-toastify";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import HeadIndicadores from "../components/headIndicadores";
 import {
   Container,
@@ -329,9 +329,9 @@ export default function Publicacoes({
           </div>
           <BotaoAdicionar
             onClick={handleNewPublicacao}
-            style={{ marginLeft: "10px" }}
+            style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}
           >
-            + Nova Publicação
+            <FaPlus /> Nova Publicação
           </BotaoAdicionar>
         </div>
 
@@ -385,8 +385,9 @@ export default function Publicacoes({
                             `/addPublicacao?id=${publicacao.id_publicacao}`
                           )
                         }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Editar
+                        <FaEdit /> Editar
                       </BotaoEditar>
                       <BotaoRemover
                         onClick={() =>
@@ -396,8 +397,9 @@ export default function Publicacoes({
                             id_arquivo: publicacao.id_arquivo,
                           })
                         }
+                        style={{ display: "flex", alignItems: "center", gap: "6px" }}
                       >
-                        Remover
+                        <FaTrash /> Remover
                       </BotaoRemover>
                     </div>
                   </div>

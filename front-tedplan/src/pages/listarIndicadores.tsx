@@ -6,7 +6,7 @@ import { getAPIClient } from "../services/axios";
 import Router from "next/router";
 import MenuSuperior from "../components/head";
 import { toast } from "react-toastify";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import Sidebar from "@/components/Sidebar";
 import {
   Container,
@@ -315,7 +315,12 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
         .map(result => result.status === 'fulfilled' ? result.value : null)
         .filter(Boolean);
       
-      setIndicadoresList(resultados);
+      // Ordenar por id_indicador em ordem decrescente
+      const resultadosOrdenados = resultados.sort((a: IIndicador, b: IIndicador) => {
+        return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+      });
+      
+      setIndicadoresList(resultadosOrdenados);
     } catch (error) {
       console.error("Erro ao carregar tipos de campo:", error);
       toast.error("Erro ao carregar detalhes dos indicadores!", { position: "top-right", autoClose: 5000 });
@@ -328,10 +333,15 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     try {
       const apiClient = getAPIClient();
       const response = await apiClient.get("/indicadores-novo");
-      setIndicadoresList(response.data || []);
+      const indicadores = response.data || [];
+      // Ordenar por id_indicador em ordem decrescente
+      const indicadoresOrdenados = indicadores.sort((a: IIndicador, b: IIndicador) => {
+        return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+      });
+      setIndicadoresList(indicadoresOrdenados);
       
       // Recarregar tipos de campo
-      if (response.data && response.data.length > 0) {
+      if (indicadoresOrdenados.length > 0) {
         loadTiposCampoForIndicadores();
       }
     } catch (error) {
@@ -393,26 +403,31 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
   }
 
   // Filtrar indicadores baseado no termo de busca, grupo e tipo de campo
-  const indicadoresFiltrados = indicadoresList.filter((indicador) => {
-    const matchesSearch = 
-      indicador.nome_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      indicador.codigo_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (indicador.palavra_chave && indicador.palavra_chave.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (indicador.unidade_indicador && indicador.unidade_indicador.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (indicador.tiposCampo && indicador.tiposCampo.length > 0 && 
-       indicador.tiposCampo[0].name_campo.toLowerCase().includes(searchTerm.toLowerCase()));
+  const indicadoresFiltrados = indicadoresList
+    .filter((indicador) => {
+      const matchesSearch = 
+        indicador.nome_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        indicador.codigo_indicador.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (indicador.palavra_chave && indicador.palavra_chave.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (indicador.unidade_indicador && indicador.unidade_indicador.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (indicador.tiposCampo && indicador.tiposCampo.length > 0 && 
+         indicador.tiposCampo[0].name_campo.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesGrupo = 
-      filtroGrupo === "todos" ||
-      indicador.grupo_indicador === filtroGrupo;
+      const matchesGrupo = 
+        filtroGrupo === "todos" ||
+        indicador.grupo_indicador === filtroGrupo;
 
-    const matchesTipoCampo = 
-      filtroTipoCampo === "todos" ||
-      (indicador.tiposCampo && indicador.tiposCampo.length > 0 && 
-       indicador.tiposCampo[0].type === filtroTipoCampo);
+      const matchesTipoCampo = 
+        filtroTipoCampo === "todos" ||
+        (indicador.tiposCampo && indicador.tiposCampo.length > 0 && 
+         indicador.tiposCampo[0].type === filtroTipoCampo);
 
-    return matchesSearch && matchesGrupo && matchesTipoCampo;
-  });
+      return matchesSearch && matchesGrupo && matchesTipoCampo;
+    })
+    .sort((a, b) => {
+      // Garantir ordenação decrescente por id_indicador mesmo após filtros
+      return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+    });
 
   const getTipoLabel = (type: string) => {
     const tipos: { [key: string]: string } = {
@@ -476,7 +491,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
             marginBottom: "20px",
           }}
         >
-          <div style={{ position: "relative", width: "30%", flex: 1, marginRight: "15px" }}>
+          <div style={{ position: "relative", width: "30%" }}>
             <input
               type="text"
               placeholder="Buscar por nome, código, palavra-chave, unidade ou campo..."
@@ -493,7 +508,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
             <FaSearch
               style={{
                 position: "absolute",
-                right: "12px",
+                right: "-35px",
                 top: "50%",
                 transform: "translateY(-50%)",
                 color: "#666",
@@ -541,8 +556,8 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
             </select>
           </div>
           {/* {(permission?.adminGeral || permission?.adminTedPlan) && ( */}
-          <BotaoAdicionar onClick={handleAddIndicador} style={{ marginLeft: "10px" }}>
-            + Novo Indicador
+          <BotaoAdicionar onClick={handleAddIndicador} style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}>
+            <FaPlus /> Novo Indicador
           </BotaoAdicionar>
           {/* )} */}
         </div>
@@ -683,11 +698,11 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
 
                     {(permission?.adminGeral || permission?.adminTedPlan) && (
                       <div style={{ display: "flex", gap: "10px", marginLeft: "20px" }}>
-                        <BotaoEditar onClick={() => handleEditIndicador(indicador)}>
-                          Editar
+                        <BotaoEditar onClick={() => handleEditIndicador(indicador)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FaEdit /> Editar
                         </BotaoEditar>
-                        <BotaoRemover onClick={() => handleOpenConfirm(indicador)}>
-                          Remover
+                        <BotaoRemover onClick={() => handleOpenConfirm(indicador)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <FaTrash /> Remover
                         </BotaoRemover>
                       </div>
                     )}
@@ -742,10 +757,16 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
     const apiClient = getAPIClient(ctx);
     const response = await apiClient.get("/indicadores-novo");
+    const indicadores = response.data || [];
+    
+    // Ordenar por id_indicador em ordem decrescente
+    const indicadoresOrdenados = indicadores.sort((a: IIndicador, b: IIndicador) => {
+      return parseInt(b.id_indicador) - parseInt(a.id_indicador);
+    });
 
     return {
       props: {
-        indicadores: response.data || [],
+        indicadores: indicadoresOrdenados,
       },
     };
   } catch (error) {

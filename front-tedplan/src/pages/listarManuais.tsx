@@ -31,6 +31,7 @@ import {
   ConfirmModal,
 } from "../styles/dashboard";
 import { useForm } from "react-hook-form";
+import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 
 interface IManual {
   id_manual: string;
@@ -207,8 +208,9 @@ export default function Postagens({ manuais }: ManuaisProps) {
                           id_arquivo: manual.id_arquivo,
                         })
                       }
+                      style={{ display: "flex", alignItems: "center", gap: "6px" }}
                     >
-                      Remover
+                      <FaTrash /> Remover
                     </BotaoRemover>
                     <BotaoEditar
                       onClick={() =>
@@ -217,8 +219,9 @@ export default function Postagens({ manuais }: ManuaisProps) {
                           manual.id_manual
                         )
                       }
+                      style={{ display: "flex", alignItems: "center", gap: "6px" }}
                     >
-                      Editar
+                      <FaEdit /> Editar
                     </BotaoEditar>
 
                     {isModalVisible && (

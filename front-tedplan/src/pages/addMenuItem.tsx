@@ -270,7 +270,7 @@ export default function AddMenuItem({ menuItem, menus }: MenuItemProps) {
               boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
               padding: "40px",
               marginTop: "50px",
-              width: "80%",  
+              width: "60%",  
             }}
           >
             <div
