@@ -923,14 +923,14 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #999999;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #2dd9d0;
+    border: 1px solid #999999;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
