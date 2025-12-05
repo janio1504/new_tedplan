@@ -25,6 +25,9 @@ class IndicadorNovoRepository {
     async getIndicadoresByMenuItem(id_menu_item) {
         const indicadores = await IndicadorNovo.query()
             .where('id_menu_item', id_menu_item)
+            .where((builder) => {
+                builder.where('is_unidade', false).orWhereNull('is_unidade');
+            })
             .with('tiposCampo')
             .orderBy("id_indicador", "asc")
             .fetch();
