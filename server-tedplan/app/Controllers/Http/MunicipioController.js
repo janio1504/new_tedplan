@@ -5,6 +5,11 @@ const Municipio = use("App/Models/Municipio");
 class MunicipioController {
   async index() {
     const municipios = await Municipio.query()
+      .select(
+        "id_municipio",
+        "nome as municipio_nome",
+        "codigo_ibge as municipio_codigo_ibge"
+      )
       .from("tedplan.municipios")
       .fetch();
 
@@ -12,7 +17,6 @@ class MunicipioController {
   }
 
   async getMunicipio({ request, response }) {
-    
     try {
       const { id_municipio } = request.all();
 
@@ -61,7 +65,7 @@ class MunicipioController {
           "tsms.telefone_comercial_tsms as ts_telefone_comercial",
           "tsms.nome_responsavel_tsms as ts_responsavel",
           "tsms.cargo_tsms as ts_cargo",
-          "tsms.funcao_tsms as ts_funcao",
+          //"tsms.funcao_tsms as ts_funcao",
           "tsms.telefone_tsms as ts_telefone",
           "tsms.email_tsms as ts_email",
 
@@ -175,7 +179,7 @@ class MunicipioController {
           "dg.ogm0109 as OGM0109"
         )
         .from("tedplan.municipios as m")
-        .where("m.id_municipio", id_municipio)
+        .where("m.id_municipio", municipioId)
         .leftJoin(
           "tedplan.titular_servicos_ms as tsms",
           "m.id_municipio",

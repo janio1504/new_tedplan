@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import {FaBars, FaCaretDown, FaList, FaLink} from "react-icons/fa";
+import {FaBars, FaCaretDown, FaList, FaLink, FaPlus, FaEdit, FaTrash, FaSearch} from "react-icons/fa";
 import {
   InputP,
   InputM,
@@ -54,11 +54,51 @@ import { anosSelect } from "../../util/util";
 import { bold } from "@uiw/react-md-editor/lib/commands";
 import Link from "next/link";
 import { BodyDashboard } from "@/styles/dashboard-original";
+import {
+  ContainerModal,
+  Modal,
+  CloseModalButton,
+  ConteudoModal,
+  TituloModal,
+  TextoModal,
+  BotaoAdicionar,
+  BotaoEditar,
+  BotaoRemover,
+} from "../../styles/dashboard";
 
 interface IMunicipio {
   id_municipio: string;
   municipio_codigo_ibge: string;
   municipio_nome: string;
+  aa_natureza_juridica?: string;
+}
+
+interface IUnidade {
+  id_unidade: number;
+  nome_unidade: string;
+  id_tipo_unidade?: number;
+  id_eixo?: number;
+  id_municipio?: number;
+  data_cadastro?: string;
+  created_at?: string;
+  updated_at?: string;
+  tipoUnidade?: {
+    id_tipo_unidade: number;
+    nome_tipo_unidade: string;
+  };
+  eixo?: {
+    id_eixo: number;
+    nome_eixo: string;
+  };
+  municipio?: {
+    id_municipio: string;
+    municipio_nome: string;
+  };
+}
+
+interface IEixo {
+  id_eixo: number;
+  nome: string;
 }
 
 interface ISelectOption {
@@ -425,19 +465,79 @@ export default function PrestacaoServicoDrenagem() {
   const [loadingDados, setLoadingDados] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [showUnidades, setShowUnidades] = useState(false);
+  const [unidades, setUnidades] = useState<IUnidade[]>([]);
+  const [loadingUnidades, setLoadingUnidades] = useState(false);
+  const [isModalUnidadeVisible, setModalUnidadeVisible] = useState(false);
+  const [isEditingUnidade, setIsEditingUnidade] = useState(false);
+  const [unidadeEditando, setUnidadeEditando] = useState<IUnidade | null>(null);
+  const [searchTermUnidades, setSearchTermUnidades] = useState("");
+  const [eixos, setEixos] = useState<IEixo[]>([]);
+  const [municipios, setMunicipios] = useState<IMunicipio[]>([]);
+  const [tiposUnidade, setTiposUnidade] = useState<Array<{ id_tipo_unidade: number; nome_tipo_unidade: string }>>([]);
+  const [unidadeSelecionada, setUnidadeSelecionada] = useState<IUnidade | null>(null);
+  const [indicadoresUnidade, setIndicadoresUnidade] = useState<IIndicador[]>([]);
+  const [loadingIndicadoresUnidade, setLoadingIndicadoresUnidade] = useState(false);
+  
+  const {
+    register: registerUnidade,
+    handleSubmit: handleSubmitUnidade,
+    reset: resetUnidade,
+    setValue: setValueUnidade,
+    watch: watchUnidade,
+    formState: { errors: errorsUnidade },
+  } = useForm();
+  
+  const eixoValue = watchUnidade("id_eixo");
+  const municipioValue = watchUnidade("id_municipio");
+  const tipoUnidadeValue = watchUnidade("id_tipo_unidade");
 
   useEffect(() => {
-      const handleResize = () => {
-        if (window.innerWidth <= 1000) {
-          setIsCollapsed(true);
-        } else {
-          setIsCollapsed(false);
-        }
-      };
-      handleResize();
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
+    loadEixos();
+    loadMunicipios();
+    const handleResize = () => {
+      if (window.innerWidth <= 1000) {
+        setIsCollapsed(true);
+      } else {
+        setIsCollapsed(false);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isModalUnidadeVisible && !isEditingUnidade) {
+      if (municipios.length === 0) {
+        loadMunicipios();
+      }
+      
+      loadTiposUnidade(2);
+      
+      if (usuario?.id_municipio) {
+        const municipioUsuario = usuario.id_municipio.toString();
+        setValueUnidade("id_eixo", "2");
+        setValueUnidade("id_municipio", municipioUsuario);
+      } else {
+        const timer = setTimeout(() => {
+          if (usuario?.id_municipio) {
+            const municipioUsuario = usuario.id_municipio.toString();
+            setValueUnidade("id_eixo", "2");
+            setValueUnidade("id_municipio", municipioUsuario);
+          }
+        }, 300);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isModalUnidadeVisible, isEditingUnidade, usuario?.id_municipio, municipios.length, setValueUnidade]);
+
+  useEffect(() => {
+    if (showUnidades) {
+      loadEixos();
+      loadMunicipios();
+    }
+  }, [showUnidades]);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -452,13 +552,21 @@ export default function PrestacaoServicoDrenagem() {
   }, [anoEditorSimisab]);
 
   async function getMunicipio() {
-    const res = await api
-      .get("getMunicipio", {
-        params: { id_municipio: usuario.id_municipio },
-      })
-      .then((response) => {
-        setDadosMunicipio(response.data);
-      });
+    if (!usuario?.id_municipio) {
+      return;
+    }
+    
+    try {
+      const res = await api
+        .get("/getMunicipio", {
+          params: { id_municipio: usuario.id_municipio },
+        })
+        .then((response) => {
+          setDadosMunicipio(response.data);
+        });
+    } catch (error) {
+      console.error("Erro ao carregar município:", error);
+    }
   }
 
   async function getMenus() {
@@ -467,6 +575,644 @@ export default function PrestacaoServicoDrenagem() {
       .then((response) => {
         setMenus(response.data);
       });
+  }
+
+  async function loadUnidades() {
+    setLoadingUnidades(true);
+    try {
+      const apiClient = getAPIClient();
+      const response = await apiClient.get("/unidades/eixo/2");
+      const unidadesData = response.data || [];
+      setUnidades(unidadesData);
+    } catch (error) {
+      console.error("Erro ao carregar unidades:", error);
+      toast.error("Erro ao carregar unidades!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setLoadingUnidades(false);
+    }
+  }
+
+  async function loadEixos() {
+    try {
+      const response = await api.get("/getEixos");
+      setEixos(response.data || []);
+    } catch (error) {
+      console.error("Erro ao carregar eixos:", error);
+    }
+  }
+
+  async function loadMunicipios() {
+    try {
+      const response = await api.get("/getMunicipios");
+      setMunicipios(response.data || []);
+    } catch (error) {
+      console.error("Erro ao carregar municípios:", error);
+    }
+  }
+
+  async function loadTiposUnidade(idEixo: number = 2) {
+    try {
+      const apiClient = getAPIClient();
+      const response = await apiClient.get(`/tipo-unidade/eixo/${idEixo}`);
+      setTiposUnidade(response.data || []);
+    } catch (error) {
+      console.error("Erro ao carregar tipos de unidade:", error);
+    }
+  }
+
+  async function loadIndicadoresUnidade(idEixo: number) {
+    setLoadingIndicadoresUnidade(true);
+    try {
+      const apiClient = getAPIClient();
+      const response = await apiClient.get(`/indicadores-novo/eixo-unidade/${idEixo}`);
+      const indicadoresData = response.data || [];
+
+      if (indicadoresData.length === 0) {
+        setIndicadoresUnidade([]);
+        setLoadingIndicadoresUnidade(false);
+        return;
+      }
+
+      const indicadoresComTipos = [];
+
+      for (let i = 0; i < indicadoresData.length; i++) {
+        const indicador = indicadoresData[i];
+
+        try {
+          const tiposResponse = await api.get(
+            `tipos-campo/indicador/${indicador.id_indicador}`
+          );
+          const tiposCampo = tiposResponse.data || [];
+
+          const tiposComOpcoes = [];
+          for (const tipo of tiposCampo) {
+            if (tipo.type === "select") {
+              try {
+                const opcoesResponse = await api.get(
+                  `select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`
+                );
+                const opcoes = opcoesResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  selectOptions: opcoes,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else if (tipo.type === "checkbox") {
+              try {
+                const checkBoxResponse = await api.get(
+                  `item-check-box/indicador/${indicador.id_indicador}`
+                );
+                const checkBoxItems = checkBoxResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  checkBoxItems: checkBoxItems,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else {
+              tiposComOpcoes.push(tipo);
+            }
+          }
+
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: tiposComOpcoes,
+          });
+        } catch (error) {
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: [],
+          });
+        }
+      }
+
+      setIndicadoresUnidade(indicadoresComTipos);
+    } catch (error: any) {
+      console.error("Erro ao carregar indicadores da unidade:", error);
+      const errorMessage = error?.response?.data?.error || error?.message || "Erro ao carregar indicadores!";
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setIndicadoresUnidade([]);
+    } finally {
+      setLoadingIndicadoresUnidade(false);
+    }
+  }
+
+  async function handleSelectUnidade(unidade: IUnidade) {
+    setUnidadeSelecionada(unidade);
+    if (unidade.id_eixo) {
+      await loadIndicadoresUnidade(unidade.id_eixo);
+      if (usuario?.id_municipio) {
+        await carregarDadosExistentesUnidade(unidade.id_unidade);
+      }
+    }
+  }
+
+  function handleDeselectUnidade() {
+    setUnidadeSelecionada(null);
+    setIndicadoresUnidade([]);
+  }
+
+  function handleOpenModalUnidade() {
+    setIsEditingUnidade(false);
+    setUnidadeEditando(null);
+    
+    if (municipios.length === 0) {
+      loadMunicipios();
+    }
+    
+    loadTiposUnidade(2);
+    
+    const municipioUsuario = usuario?.id_municipio?.toString() || "";
+    resetUnidade({
+      nome_unidade: "",
+      id_tipo_unidade: "",
+      id_eixo: "2",
+      id_municipio: municipioUsuario,
+    });
+    setModalUnidadeVisible(true);
+  }
+
+  function handleCloseModalUnidade() {
+    setModalUnidadeVisible(false);
+    setIsEditingUnidade(false);
+    setUnidadeEditando(null);
+    resetUnidade();
+  }
+
+  function handleEditUnidade(unidade: IUnidade) {
+    setIsEditingUnidade(true);
+    setUnidadeEditando(unidade);
+    
+    const eixoId = unidade.id_eixo || 2;
+    loadTiposUnidade(eixoId);
+    
+    setValueUnidade("nome_unidade", unidade.nome_unidade || "");
+    setValueUnidade("id_tipo_unidade", unidade.id_tipo_unidade?.toString() || "");
+    setValueUnidade("id_eixo", unidade.id_eixo?.toString() || "2");
+    setValueUnidade("id_municipio", unidade.id_municipio?.toString() || "");
+    setModalUnidadeVisible(true);
+  }
+
+  async function handleSaveUnidade(data: any) {
+    try {
+      const apiClient = getAPIClient();
+
+      const parseToIntOrNull = (value: any): number | null => {
+        if (!value || value === "" || value === "undefined" || value === undefined) {
+          return null;
+        }
+        const parsed = parseInt(value, 10);
+        return isNaN(parsed) ? null : parsed;
+      };
+
+      const unidadeData = {
+        nome_unidade: data.nome_unidade,
+        id_tipo_unidade: parseToIntOrNull(data.id_tipo_unidade),
+        id_eixo: parseToIntOrNull(data.id_eixo) || 2,
+        id_municipio: parseToIntOrNull(data.id_municipio),
+      };
+
+      if (isEditingUnidade && unidadeEditando) {
+        await apiClient.put(`/unidades/${unidadeEditando.id_unidade}`, unidadeData);
+        toast.success("Unidade atualizada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      } else {
+        await apiClient.post("/unidades", unidadeData);
+        toast.success("Unidade cadastrada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+
+      handleCloseModalUnidade();
+      loadUnidades();
+    } catch (error) {
+      console.error("Erro ao salvar unidade:", error);
+      toast.error("Erro ao salvar unidade!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    }
+  }
+
+  async function handleDeleteUnidade(id: number) {
+    if (!confirm("Tem certeza que deseja excluir esta unidade?")) {
+      return;
+    }
+
+    try {
+      const apiClient = getAPIClient();
+      await apiClient.delete(`/unidades/${id}`);
+      toast.success("Unidade excluída com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      loadUnidades();
+    } catch (error) {
+      console.error("Erro ao excluir unidade:", error);
+      toast.error("Erro ao excluir unidade!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    }
+  }
+
+  async function carregarDadosExistentesUnidade(idUnidade: number) {
+    if (!usuario?.id_municipio || !idUnidade) return;
+
+    setLoadingDados(true);
+
+    try {
+      const apiClient = getAPIClient();
+
+      const response = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=2025&id_unidade=${idUnidade}`
+      );
+      const dados = response.data || [];
+      setDadosCarregados(dados);
+
+      preencherFormularioUnidade(dados);
+
+      if (dados.length > 0) {
+        toast.info(`Carregados ${dados.length} registro(s) para esta unidade`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados existentes da unidade:", error);
+    } finally {
+      setLoadingDados(false);
+    }
+  }
+
+  function preencherFormularioUnidade(dados: any[]) {
+    const valoresFormulario = {};
+    const dadosAgrupados = new Map();
+
+    dados.forEach((dado) => {
+      const codigoIndicador = dado.codigo_indicador;
+      const ano = dado.ano;
+      const valor = dado.valor_indicador;
+
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
+    });
+
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresUnidade.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          valores.forEach(({ ano, valor }) => {
+            try {
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                  }
+                }
+              } else {
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.valor}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                }
+              }
+            } catch (error) {
+              console.error("Erro ao processar valor do checkbox:", valor, error);
+            }
+          });
+        } else {
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    reset(valoresFormulario);
+  }
+
+  async function handleCadastroIndicadoresUnidade(data) {
+    try {
+      if (!isEditor) {
+        toast.error("Você não tem permissão para editar!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+        return;
+      }
+
+      if (!usuario || !usuario.id_municipio) {
+        console.error("Usuário não disponível:", usuario);
+        toast.error("Erro: Dados do usuário não disponíveis!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+        return;
+      }
+
+      if (!unidadeSelecionada || !unidadeSelecionada.id_unidade) {
+        toast.error("Erro: Nenhuma unidade selecionada!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+        return;
+      }
+
+      const valoresIndicadores = [];
+      const checkBoxSelecionados = [];
+      const checkBoxAgrupados = new Map();
+
+      Object.keys(data).forEach((key) => {
+        const valor = data[key];
+        const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+        if (isCheckboxField) {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0];
+          const idItemCheckBox = parts[2];
+
+          if (
+            valor === true ||
+            valor === "true" ||
+            (typeof valor === "string" && valor.length > 0 && valor !== "false")
+          ) {
+            const indicador = indicadoresUnidade.find(
+              (ind) => ind.codigo_indicador === codigoIndicador
+            );
+
+            if (indicador) {
+              const tipoCheckbox = indicador.tiposCampo?.find(
+                (tipo) => tipo.type === "checkbox"
+              );
+
+              if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+                let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.id_item_check_box === idItemCheckBox
+                );
+
+                if (!checkBoxItem) {
+                  const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                    (item) =>
+                      item.id_item_check_box.toString() ===
+                        idItemCheckBox.toString() ||
+                      item.descricao.toLowerCase().includes(idItemCheckBox.toLowerCase())
+                  );
+
+                  if (checkBoxItemAlt) {
+                    checkBoxItem = checkBoxItemAlt;
+                  }
+                }
+
+                if (checkBoxItem) {
+                  if (!checkBoxAgrupados.has(codigoIndicador)) {
+                    checkBoxAgrupados.set(codigoIndicador, []);
+                  }
+                  checkBoxAgrupados
+                    .get(codigoIndicador)
+                    .push(checkBoxItem.descricao);
+
+                  const checkBoxData = {
+                    id_item_check_box: checkBoxItem.id_item_check_box,
+                    descricao: checkBoxItem.descricao,
+                    valor: true,
+                    id_indicador: indicador.id_indicador,
+                  };
+
+                  checkBoxSelecionados.push(checkBoxData);
+                }
+              }
+            }
+          }
+        } else {
+          if (valor !== null && valor !== undefined && valor !== "") {
+            const parts = key.split("_");
+            const codigoIndicador = parts[0];
+
+            valoresIndicadores.push({
+              codigo_indicador: codigoIndicador,
+              ano: 2025,
+              valor_indicador: valor,
+              id_municipio: usuario.id_municipio,
+              id_unidade: unidadeSelecionada.id_unidade,
+            });
+          }
+        }
+      });
+
+      checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+        const indicador = indicadoresUnidade.find(
+          (ind) => ind.codigo_indicador === codigoIndicador
+        );
+        if (indicador) {
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: 2025,
+            valor_indicador: JSON.stringify(descricoes),
+            id_municipio: usuario.id_municipio,
+            id_unidade: unidadeSelecionada.id_unidade,
+          });
+        }
+      });
+
+      if (valoresIndicadores.length === 0) {
+        toast.warning("Nenhum valor foi preenchido!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+        return;
+      }
+
+      const apiClient = getAPIClient();
+
+      try {
+        const existingDataResponse = await apiClient.get(
+          `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=2025&id_unidade=${unidadeSelecionada.id_unidade}`
+        );
+
+        const existingData = existingDataResponse.data || [];
+
+        if (existingData.length > 0) {
+          const existingDataMap = new Map();
+          existingData.forEach((record) => {
+            const key = `${record.codigo_indicador}_${record.ano}_${record.id_unidade || 'null'}`;
+            existingDataMap.set(key, record);
+          });
+
+          for (const valorIndicador of valoresIndicadores) {
+            const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}_${valorIndicador.id_unidade}`;
+            const existingRecord = existingDataMap.get(key);
+
+            try {
+              if (existingRecord) {
+                await apiClient.put(
+                  `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                  valorIndicador
+                );
+              } else {
+                await apiClient.post("/indicadores-municipio", valorIndicador);
+              }
+            } catch (saveError) {
+              console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+              throw saveError;
+            }
+          }
+
+          try {
+            const todosCheckBoxes = [];
+            indicadoresUnidade.forEach((indicador) => {
+              const tipoCheckbox = indicador.tiposCampo?.find(
+                (tipo) => tipo.type === "checkbox"
+              );
+              if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+                tipoCheckbox.checkBoxItems.forEach((item) => {
+                  todosCheckBoxes.push({
+                    id_item_check_box: item.id_item_check_box,
+                    descricao: item.descricao,
+                    id_indicador: indicador.id_indicador,
+                  });
+                });
+              }
+            });
+
+            await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
+          } catch (error) {
+            console.error("Erro ao salvar na tabela item_check_box:", error);
+          }
+
+          toast.success("Dados atualizados com sucesso!", {
+            position: "top-right",
+            autoClose: 5000,
+          });
+        } else {
+          for (const valorIndicador of valoresIndicadores) {
+            await apiClient.post("/indicadores-municipio", valorIndicador);
+          }
+
+          try {
+            const todosCheckBoxes = [];
+            indicadoresUnidade.forEach((indicador) => {
+              const tipoCheckbox = indicador.tiposCampo?.find(
+                (tipo) => tipo.type === "checkbox"
+              );
+              if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+                tipoCheckbox.checkBoxItems.forEach((item) => {
+                  todosCheckBoxes.push({
+                    id_item_check_box: item.id_item_check_box,
+                    descricao: item.descricao,
+                    id_indicador: indicador.id_indicador,
+                  });
+                });
+              }
+            });
+
+            await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
+          } catch (error) {
+            console.error("Erro ao salvar na tabela item_check_box:", error);
+          }
+
+          toast.success("Dados salvos com sucesso!", {
+            position: "top-right",
+            autoClose: 5000,
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao verificar dados existentes:", error);
+
+        for (const valorIndicador of valoresIndicadores) {
+          try {
+            await apiClient.post("/indicadores-municipio", valorIndicador);
+          } catch (saveError) {
+            console.error("Erro ao salvar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+
+        try {
+          const todosCheckBoxes = [];
+          indicadoresUnidade.forEach((indicador) => {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              tipoCheckbox.checkBoxItems.forEach((item) => {
+                todosCheckBoxes.push({
+                  id_item_check_box: item.id_item_check_box,
+                  descricao: item.descricao,
+                  id_indicador: indicador.id_indicador,
+                });
+              });
+            }
+          });
+
+          await salvarItemCheckBox(checkBoxSelecionados, todosCheckBoxes);
+        } catch (error) {
+          console.error("Erro ao salvar na tabela item_check_box:", error);
+        }
+
+        toast.success("Dados salvos com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao salvar dados:", error);
+      console.error("Stack trace:", error.stack);
+      toast.error("Erro ao salvar dados!", {
+        position: "top-right",
+        autoClose: 7000,
+      });
+    }
   }
 
   async function getIndicadores(menu_item: { id_menu_item: number; nome_menu_item: string; }) {
@@ -1099,7 +1845,7 @@ export default function PrestacaoServicoDrenagem() {
                       <FaBars /> 
                     </ExpandButton>
                 ) : (
-      <Sidebar isCollapsed={isCollapsed}>
+      <Sidebar $isCollapsed={isCollapsed}>
                     <CollapseButton onClick={toggleSidebar}>
                                 <FaBars /> 
                     </CollapseButton>
@@ -1108,7 +1854,7 @@ export default function PrestacaoServicoDrenagem() {
           return (
             <div key={menu.id_menu}>
               <MenuHeader
-                isOpen={isOpen}
+                $isOpen={isOpen}
                 onClick={() => {
                   // Se o menu já está aberto, fecha. Caso contrário, abre e fecha os outros
                   setOpenMenuId(isOpen ? null : menu.id_menu);
@@ -1120,13 +1866,14 @@ export default function PrestacaoServicoDrenagem() {
                 </div>
                 <FaCaretDown />
               </MenuHeader>
-              <MenuItemsContainer isOpen={isOpen}>
+              <MenuItemsContainer $isOpen={isOpen}>
                 {menu.menuItems?.map((menuItem) => (
                   <SidebarItem
                     key={menuItem.id_menu_item}
                     active={activeForm === menuItem.nome_menu_item}
                     onClick={() => {
                       setActiveForm(menuItem.nome_menu_item);
+                      setShowUnidades(false);
                       getIndicadores(menuItem);
                     }}
                   >
@@ -1138,13 +1885,35 @@ export default function PrestacaoServicoDrenagem() {
             </div>
           );
         })}
+        <MenuHeader
+          $isOpen={false}
+          onClick={() => {
+            setActiveForm("Unidades");
+            setGrupo(null);
+            setShowUnidades(true);
+            loadUnidades();
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <FaList style={{ fontSize: "14px" }} />
+            Unidades
+          </div>
+        </MenuHeader>
       </Sidebar>
                 )}
 
       
         <DivCenter>
+          {/* Formulário de Indicadores - só aparece quando não está mostrando unidades */}
+          {!showUnidades && (
           <Form onSubmit={handleSubmit(handleCadastroIndicadores)}>
-            <BreadCrumbStyle isCollapsed={isCollapsed}>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
           <nav>
             <ol>
               <li>
@@ -1526,8 +2295,890 @@ export default function PrestacaoServicoDrenagem() {
               </DivFormEixo>
             </DivForm>
           </Form>
+          )}
+
+          {/* Componente de Unidades */}
+          {showUnidades && (
+            <Form onSubmit={handleSubmit(handleCadastroIndicadoresUnidade)}>
+              <BreadCrumbStyle $isCollapsed={isCollapsed}>
+                <nav>
+                  <ol>
+                    <li>
+                      <Link href="/indicadores/home_indicadores">Home</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <Link href="/indicadores/prestacao-servicos">
+                        Prestação de Serviços
+                      </Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <span>Unidades</span>
+                    </li>
+                  </ol>
+                </nav>
+              </BreadCrumbStyle>
+              <DivForm style={{ borderColor: "#12B2D5" }}>
+                <DivTituloForm>Gestão de Unidades</DivTituloForm>
+
+                <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "20px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    {!unidadeSelecionada && (
+                      <>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            flex: 1,
+                            minWidth: "250px",
+                          }}
+                        >
+                          <FaSearch style={{ color: "#666" }} />
+                          <input
+                            type="text"
+                            placeholder="Buscar unidades..."
+                            value={searchTermUnidades}
+                            onChange={(e) => setSearchTermUnidades(e.target.value)}
+                            style={{
+                              flex: 1,
+                              padding: "8px 12px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              fontSize: "14px",
+                            }}
+                          />
+                        </div>
+                        <BotaoAdicionar onClick={handleOpenModalUnidade}>
+                          <FaPlus style={{ marginRight: "8px" }} />
+                          Adicionar Unidade
+                        </BotaoAdicionar>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <DivFormEixo>
+                  <DivFormConteudo
+                    active={true}
+                    style={{
+                      display: "block",
+                      visibility: "visible",
+                      opacity: 1,
+                    }}
+                  >
+                    {!unidadeSelecionada && (
+                      <>
+                        {loadingUnidades ? (
+                          <div style={{ textAlign: "center", padding: "40px" }}>
+                            <p>Carregando unidades...</p>
+                          </div>
+                        ) : unidades.filter((unidade) =>
+                            unidade.nome_unidade?.toLowerCase().includes(searchTermUnidades.toLowerCase())
+                          ).length === 0 ? (
+                          <div style={{ textAlign: "center", padding: "40px" }}>
+                            <p>
+                              {searchTermUnidades
+                                ? "Nenhuma unidade encontrada com o termo buscado."
+                                : "Nenhuma unidade cadastrada."}
+                            </p>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              backgroundColor: "#fff",
+                              borderRadius: "8px",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {/* Cabeçalho da Tabela */}
+                            <div
+                              style={{
+                                backgroundColor: "#1e88e5",
+                                color: "white",
+                                padding: "15px 0",
+                                fontWeight: "600",
+                                fontSize: "13px",
+                                letterSpacing: "0.5px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns:
+                                    window.innerWidth > 768
+                                      ? "1fr 150px 150px 150px 120px"
+                                      : "1fr",
+                                  gap: window.innerWidth > 768 ? "15px" : "10px",
+                                  alignItems: "center",
+                                  padding: "0 15px",
+                                }}
+                              >
+                                {window.innerWidth > 768 ? (
+                                  <>
+                                    <div>NOME DA UNIDADE</div>
+                                    <div>TIPO</div>
+                                    <div>EIXO</div>
+                                    <div>MUNICÍPIO</div>
+                                    <div style={{ textAlign: "center" }}>AÇÕES</div>
+                                  </>
+                                ) : (
+                                  <div>UNIDADES</div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Linhas da Tabela */}
+                            {unidades
+                              .filter((unidade) =>
+                                unidade.nome_unidade?.toLowerCase().includes(searchTermUnidades.toLowerCase())
+                              )
+                              .map((unidade, index) => {
+                                const isEven = index % 2 === 0;
+
+                                return (
+                                  <div
+                                    key={unidade.id_unidade}
+                                    style={{
+                                      backgroundColor: unidadeSelecionada?.id_unidade === unidade.id_unidade 
+                                        ? "#d1ecf1" 
+                                        : (isEven ? "#f8f9fa" : "#ffffff"),
+                                      borderBottom:
+                                        index < unidades.length - 1
+                                          ? "1px solid #dee2e6"
+                                          : "none",
+                                      padding: "15px 0",
+                                      transition: "background-color 0.2s ease",
+                                      cursor: "pointer",
+                                      borderLeft: unidadeSelecionada?.id_unidade === unidade.id_unidade
+                                        ? "4px solid #1e88e5"
+                                        : "none",
+                                    }}
+                                    onClick={() => handleSelectUnidade(unidade)}
+                                    onMouseEnter={(e) => {
+                                      if (unidadeSelecionada?.id_unidade !== unidade.id_unidade) {
+                                        e.currentTarget.style.backgroundColor = "#e8f4fd";
+                                        e.currentTarget.style.borderLeft = "3px solid #1e88e5";
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (unidadeSelecionada?.id_unidade !== unidade.id_unidade) {
+                                        e.currentTarget.style.backgroundColor = isEven
+                                          ? "#f8f9fa"
+                                          : "#ffffff";
+                                        e.currentTarget.style.borderLeft = "none";
+                                      }
+                                    }}
+                                  >
+                                    {window.innerWidth > 768 ? (
+                                      <div
+                                        style={{
+                                          display: "grid",
+                                          gridTemplateColumns:
+                                            "1fr 150px 150px 150px 120px",
+                                          gap: "15px",
+                                          alignItems: "center",
+                                          padding: "0 15px",
+                                          pointerEvents: "none",
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            fontSize: "14px",
+                                            color: "#495057",
+                                            fontWeight: "500",
+                                          }}
+                                        >
+                                          {unidade.nome_unidade}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          {unidade.tipoUnidade?.nome_tipo_unidade || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          {unidade.eixo?.nome_eixo || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          {unidade.municipio?.municipio_nome || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            display: "flex",
+                                            gap: "8px",
+                                            justifyContent: "center",
+                                            pointerEvents: "auto",
+                                          }}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <BotaoEditar
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleEditUnidade(unidade);
+                                            }}
+                                            title="Editar"
+                                          >
+                                            <FaEdit />
+                                          </BotaoEditar>
+                                          <BotaoRemover
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleDeleteUnidade(unidade.id_unidade);
+                                            }}
+                                            title="Excluir"
+                                          >
+                                            <FaTrash />
+                                          </BotaoRemover>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div
+                                        style={{
+                                          padding: "0 15px",
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          gap: "10px",
+                                          pointerEvents: "none",
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            fontSize: "16px",
+                                            fontWeight: "bold",
+                                            color: "#1e88e5",
+                                          }}
+                                        >
+                                          {unidade.nome_unidade}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          Tipo: {unidade.tipoUnidade?.nome_tipo_unidade || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          Eixo: {unidade.eixo?.nome_eixo || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          Município: {unidade.municipio?.municipio_nome || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            display: "flex",
+                                            gap: "8px",
+                                            marginTop: "10px",
+                                            pointerEvents: "auto",
+                                          }}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <BotaoEditar
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleEditUnidade(unidade);
+                                            }}
+                                            title="Editar"
+                                          >
+                                            <FaEdit /> Editar
+                                          </BotaoEditar>
+                                          <BotaoRemover
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleDeleteUnidade(unidade.id_unidade);
+                                            }}
+                                            title="Excluir"
+                                          >
+                                            <FaTrash /> Excluir
+                                          </BotaoRemover>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Indicadores da Unidade Selecionada */}
+                    {unidadeSelecionada && (
+                      <div
+                        style={{
+                          marginTop: "30px",
+                          padding: "20px",
+                          borderTop: "2px solid #1e88e5",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "20px",
+                          }}
+                        >
+                          <h3 style={{ margin: 0, color: "#333" }}>
+                            Indicadores da Unidade: {unidadeSelecionada.nome_unidade}
+                          </h3>
+                          <button
+                            type="button"
+                            onClick={handleDeselectUnidade}
+                            style={{
+                              padding: "8px 16px",
+                              backgroundColor: "#6c757d",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                            }}
+                          >
+                            Fechar
+                          </button>
+                        </div>
+
+                        {loadingIndicadoresUnidade ? (
+                          <div style={{ textAlign: "center", padding: "40px" }}>
+                            <p>Carregando indicadores...</p>
+                          </div>
+                        ) : indicadoresUnidade.length === 0 ? (
+                          <div style={{ textAlign: "center", padding: "40px" }}>
+                            <p>Nenhum indicador encontrado para esta unidade.</p>
+                          </div>
+                        ) : (
+                          <div
+                            style={{
+                              backgroundColor: "#fff",
+                              borderRadius: "8px",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                              overflow: "hidden",
+                            }}
+                          >
+                            {/* Cabeçalho da Tabela */}
+                            <div
+                              style={{
+                                backgroundColor: "#1e88e5",
+                                color: "white",
+                                padding: "15px 0",
+                                fontWeight: "600",
+                                fontSize: "13px",
+                                letterSpacing: "0.5px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns:
+                                    window.innerWidth > 768
+                                      ? "180px 1fr 280px 100px"
+                                      : "1fr",
+                                  gap: window.innerWidth > 768 ? "15px" : "10px",
+                                  alignItems: "center",
+                                  padding: "0 15px",
+                                }}
+                              >
+                                {window.innerWidth > 768 ? (
+                                  <>
+                                    <div>CÓDIGO</div>
+                                    <div>DESCRIÇÃO DO INDICADOR</div>
+                                    <div style={{ textAlign: "center" }}>VALOR</div>
+                                    <div style={{ textAlign: "center" }}>UNIDADE</div>
+                                  </>
+                                ) : (
+                                  <div>INDICADORES</div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Linhas da Tabela */}
+                            {indicadoresUnidade.map((indicador, index) => {
+                              const tipoCampo =
+                                indicador.tiposCampo &&
+                                indicador.tiposCampo.length > 0
+                                  ? indicador.tiposCampo[0]
+                                  : null;
+                              const isEven = index % 2 === 0;
+
+                              return (
+                                <div
+                                  key={indicador.id_indicador}
+                                  style={{
+                                    backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                                    borderBottom:
+                                      index < indicadoresUnidade.length - 1
+                                        ? "1px solid #dee2e6"
+                                        : "none",
+                                    padding: "15px 0",
+                                    transition: "background-color 0.2s ease",
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = "#e8f4fd";
+                                    e.currentTarget.style.borderLeft =
+                                      "3px solid #1e88e5";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = isEven
+                                      ? "#f8f9fa"
+                                      : "#ffffff";
+                                    e.currentTarget.style.borderLeft = "none";
+                                  }}
+                                >
+                                  {window.innerWidth > 768 ? (
+                                    <div
+                                      style={{
+                                        display: "grid",
+                                        gridTemplateColumns: "180px 1fr 280px 100px",
+                                        gap: "15px",
+                                        alignItems: "center",
+                                        padding: "0 15px",
+                                      }}
+                                    >
+                                      <div>
+                                        <div
+                                          style={{
+                                            fontSize: "15px",
+                                            fontWeight: "bold",
+                                            color: "#1e88e5",
+                                          }}
+                                        >
+                                          {indicador.codigo_indicador}
+                                        </div>
+                                      </div>
+                                      <div
+                                        style={{
+                                          fontSize: "14px",
+                                          color: "#495057",
+                                          lineHeight: "1.3",
+                                        }}
+                                      >
+                                        {indicador.nome_indicador}
+                                      </div>
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "center",
+                                        }}
+                                      >
+                                        <div style={{ width: "260px" }}>
+                                          <CampoIndicador
+                                            indicador={indicador}
+                                            register={register}
+                                            anoSelected="2025"
+                                            campoEnabled={campoEnabled}
+                                            fieldStates={fieldStates}
+                                            setFieldStates={setFieldStates}
+                                            setValue={setValue}
+                                          />
+                                        </div>
+                                      </div>
+                                      <div
+                                        style={{
+                                          textAlign: "center",
+                                          fontSize: "12px",
+                                          color: "#495057",
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            fontWeight: "500",
+                                            padding: "5px 6px",
+                                            backgroundColor: "#e9ecef",
+                                            borderRadius: "3px",
+                                            fontSize: "11px",
+                                          }}
+                                        >
+                                          {indicador.unidade_indicador || "-"}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div
+                                      style={{
+                                        padding: "0 15px",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: "10px",
+                                      }}
+                                    >
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          justifyContent: "space-between",
+                                          alignItems: "center",
+                                        }}
+                                      >
+                                        <div>
+                                          <div
+                                            style={{
+                                              fontSize: "16px",
+                                              fontWeight: "bold",
+                                              color: "#1e88e5",
+                                            }}
+                                          >
+                                            {indicador.codigo_indicador}
+                                          </div>
+                                          <div
+                                            style={{
+                                              fontSize: "11px",
+                                              color: "#6c757d",
+                                            }}
+                                          >
+                                            {indicador.unidade_indicador || "-"}
+                                          </div>
+                                        </div>
+                                        {tipoCampo && (
+                                          <div
+                                            style={{
+                                              fontSize: "10px",
+                                              color: "#6c757d",
+                                              backgroundColor: "#f8f9fa",
+                                              padding: "3px 6px",
+                                              borderRadius: "3px",
+                                            }}
+                                          >
+                                            {tipoCampo.type}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div
+                                        style={{
+                                          fontSize: "13px",
+                                          color: "#495057",
+                                          lineHeight: "1.3",
+                                          marginBottom: "8px",
+                                        }}
+                                      >
+                                        {indicador.nome_indicador}
+                                      </div>
+                                      <CampoIndicador
+                                        indicador={indicador}
+                                        register={register}
+                                        anoSelected="2025"
+                                        campoEnabled={campoEnabled}
+                                        fieldStates={fieldStates}
+                                        setFieldStates={setFieldStates}
+                                        setValue={setValue}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+
+                        {/* Botão de Salvar */}
+                        {isEditor && indicadoresUnidade.length > 0 && (
+                          <div
+                            style={{
+                              marginTop: "30px",
+                              padding: "20px",
+                              textAlign: "center",
+                              borderTop: "1px solid #e1e5e9",
+                            }}
+                          >
+                            <button
+                              type="submit"
+                              style={{
+                                backgroundColor: "#28a745",
+                                color: "white",
+                                border: "none",
+                                borderRadius: "8px",
+                                padding: "12px 40px",
+                                fontSize: "16px",
+                                fontWeight: "500",
+                                cursor: "pointer",
+                                boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                                transition: "all 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = "#218838";
+                                e.currentTarget.style.boxShadow =
+                                  "0 4px 8px rgba(40,167,69,0.3)";
+                                e.currentTarget.style.transform = "translateY(-1px)";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "#28a745";
+                                e.currentTarget.style.boxShadow =
+                                  "0 2px 4px rgba(40,167,69,0.2)";
+                                e.currentTarget.style.transform = "translateY(0)";
+                              }}
+                            >
+                              💾 Salvar Dados dos Indicadores da Unidade
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </DivFormConteudo>
+                </DivFormEixo>
+              </DivForm>
+            </Form>
+          )}
         </DivCenter>
       </BodyDashboard>
+
+      {/* Modal para Adicionar/Editar Unidade */}
+      {isModalUnidadeVisible && (
+        <ContainerModal onClick={handleCloseModalUnidade}>
+          <Modal onClick={(e) => e.stopPropagation()}>
+            <CloseModalButton onClick={handleCloseModalUnidade}>×</CloseModalButton>
+            <TituloModal>
+              {isEditingUnidade ? "Editar Unidade" : "Adicionar Nova Unidade"}
+            </TituloModal>
+            <ConteudoModal>
+              <form onSubmit={handleSubmitUnidade(handleSaveUnidade)}>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", padding: "10px" }}>
+                  <label style={{ 
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#333"
+                  }}>
+                    Nome da Unidade<span style={{ color: "#dc3545" }}> *</span>
+                  </label>
+                  <input
+                    {...registerUnidade("nome_unidade", {
+                      required: "O nome da unidade é obrigatório",
+                    })}
+                    type="text"
+                    placeholder="Digite o nome da unidade"
+                    style={{
+                      margin: "0 auto",
+                      width: "90%",
+                      padding: "12px 15px",
+                      border: "1px solid #ddd",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      transition: "all 0.2s",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#12B2D5";
+                      e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#ddd";
+                      e.target.style.boxShadow = "none";
+                    }}
+                  />
+                  {errorsUnidade.nome_unidade && (
+                    <span style={{ 
+                      color: "#dc3545", 
+                      fontSize: "12px",
+                      marginTop: "5px",
+                      display: "block"
+                    }}>
+                      {errorsUnidade.nome_unidade.message as string}
+                    </span>
+                  )}
+                
+                  <label style={{ 
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#333"
+                  }}>
+                    Eixo
+                  </label>
+                  <input
+                    {...registerUnidade("id_eixo", { value: "2" })}
+                    type="text"
+                    disabled
+                    value={eixos.find(e => e.id_eixo === 2)?.nome || "Eixo 2"}  
+                    style={{
+                      margin: "0 auto",
+                      width: "90%",
+                      padding: "12px 15px",
+                      border: "1px solid #ddd",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      transition: "all 0.2s",
+                      backgroundColor: "#f5f5f5",
+                    }}
+                  />
+                
+                  <label style={{ 
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#333"
+                  }}>
+                    Municipio
+                  </label>
+                  <select
+                    {...registerUnidade("id_municipio", {
+                      value: usuario?.id_municipio?.toString() || "",
+                    })}
+                    value={municipioValue || (usuario?.id_municipio?.toString() || "")}
+                    onChange={(e) => {
+                      setValueUnidade("id_municipio", e.target.value);
+                    }}
+                    style={{
+                      margin: "0 auto",
+                      width: "95%",
+                      padding: "12px 15px",
+                      border: "1px solid #ddd",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      transition: "all 0.2s",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#12B2D5";
+                      e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#ddd";
+                      e.target.style.boxShadow = "none";
+                    }}
+                  >
+                    <option value="">Selecione um município</option>
+                    {municipios.map(municipio => (
+                      <option key={municipio.id_municipio} value={municipio.id_municipio}>
+                          {municipio.municipio_nome}
+                      </option>
+                    ))}
+                  </select>
+                  <label style={{ 
+                    display: "block",
+                    marginBottom: "8px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    color: "#333"
+                  }}>
+                    Tipo de Unidade
+                  </label>
+                  <select
+                    {...registerUnidade("id_tipo_unidade")}
+                    value={tipoUnidadeValue || ""}
+                    onChange={(e) => {
+                      setValueUnidade("id_tipo_unidade", e.target.value);
+                    }}
+                    style={{
+                      margin: "0 auto",
+                      width: "95%",
+                      padding: "12px 15px",
+                      border: "1px solid #ddd",
+                      borderRadius: "6px",
+                      fontSize: "14px",
+                      transition: "all 0.2s",
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "#12B2D5";
+                      e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = "#ddd";
+                      e.target.style.boxShadow = "none";
+                    }}
+                  >
+                    <option value="">Selecione um tipo de unidade</option>
+                    {tiposUnidade.map(tipo => (
+                      <option key={tipo.id_tipo_unidade} value={tipo.id_tipo_unidade}>
+                          {tipo.nome_tipo_unidade}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "12px",
+                    justifyContent: "flex-end",
+                    marginTop: "10px",
+                    paddingTop: "20px",
+                    borderTop: "1px solid #eee",
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={handleCloseModalUnidade}
+                    style={{
+                      padding: "12px 24px",
+                      backgroundColor: "#6c757d",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#5a6268";
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "#6c757d";
+                      e.currentTarget.style.transform = "translateY(0)";
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <SubmitButton 
+                    type="submit"
+                    style={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    {isEditingUnidade ? "Atualizar" : "Salvar"}
+                  </SubmitButton>
+                </div>
+              </form>
+            </ConteudoModal>
+          </Modal>
+        </ContainerModal>
+      )}
     </Container>
   );
 }

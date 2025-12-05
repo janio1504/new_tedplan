@@ -137,6 +137,26 @@ class IndicadorNovoController {
       return response.status(500).json({ error: 'Erro interno do servidor' });
     }
   }
+
+  async getIndicadoresByEixoAndUnidade({ params, response }) {
+    try {
+      const { id_eixo } = params;
+      
+      if (!id_eixo) {
+        return response.status(400).json({ error: 'ID do eixo é obrigatório' });
+      }
+
+      const indicadores = await this.indicadorRepository.getIndicadoresByEixoAndUnidade(id_eixo);
+      return response.status(200).json(indicadores);
+    } catch (error) {
+      console.log('Erro no IndicadorNovoController.getIndicadoresByEixoAndUnidade:', error);
+      console.log('Stack:', error.stack);
+      return response.status(500).json({ 
+        error: 'Erro interno do servidor ao buscar indicadores por eixo e unidade',
+        details: error.message 
+      });
+    }
+  }
 }
 
 module.exports = IndicadorNovoController;

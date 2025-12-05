@@ -253,7 +253,7 @@ export const DivColRelatorios = styled.div`
 export const DivFormEixo = styled.div`
   width: 98%;
   padding: 10px 8px 10px 0;
-  margin: 30px 0 20px 0;
+  margin: 0px 0 20px 0;
   color: #667778;
   margin-left: 5px;
 `;

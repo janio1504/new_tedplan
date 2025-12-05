@@ -106,9 +106,13 @@ class IndicadorMunicipioController {
   async getIndicadoresByMunicipio({ params, request, response }) {
     try {
       const { id_municipio } = params;
-      const { ano } = request.get();
+      const { ano, id_unidade } = request.get();
 
-      const indicadores = await this.indicadorMunicipioRepository.getIndicadoresByMunicipio(id_municipio, ano);
+      const indicadores = await this.indicadorMunicipioRepository.getIndicadoresByMunicipio(
+        id_municipio, 
+        ano, 
+        id_unidade ? parseInt(id_unidade, 10) : null
+      );
       return response.status(200).json(indicadores);
     } catch (error) {
       console.log(error);
