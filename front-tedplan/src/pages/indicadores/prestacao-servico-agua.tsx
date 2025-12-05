@@ -2838,7 +2838,7 @@ export default function PrestacaoServicoAgua() {
                           }}
                         >
                           <h3 style={{ margin: 0, color: "#333" }}>
-                            Indicadores da Unidade: {unidadeSelecionada.nome_unidade}
+                            Unidade: {unidadeSelecionada.nome_unidade}
                           </h3>
                           <button
                             type="button"

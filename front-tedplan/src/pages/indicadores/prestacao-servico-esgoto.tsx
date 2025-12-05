@@ -1912,7 +1912,7 @@ export default function PrestacaoServicoEsgoto() {
           {/* Formulário de Indicadores - só aparece quando não está mostrando unidades */}
           {!showUnidades && (
           <Form onSubmit={handleSubmit(handleCadastroIndicadores)}>
-            <BreadCrumbStyle isCollapsed={isCollapsed}>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
           <nav>
             <ol>
               <li>
@@ -2660,7 +2660,7 @@ export default function PrestacaoServicoEsgoto() {
                           }}
                         >
                           <h3 style={{ margin: 0, color: "#333" }}>
-                            Indicadores da Unidade: {unidadeSelecionada.nome_unidade}
+                            Unidade: {unidadeSelecionada.nome_unidade}
                           </h3>
                           <button
                             type="button"
