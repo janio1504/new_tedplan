@@ -1,7 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaBars, FaCaretDown, FaList, FaLink, FaPlus, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import {
+  FaBars,
+  FaCaretDown,
+  FaList,
+  FaLink,
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaSearch,
+} from "react-icons/fa";
 import {
   InputM,
   DivTitulo,
@@ -168,15 +177,12 @@ const CampoIndicador = ({
   const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
   const { usuario } = useContext(AuthContext);
 
-
   // Função para verificar se um campo deve estar habilitado baseado nas condições
   const isFieldEnabled = (codigoIndicador: string) => {
     // Se não há fieldStates, usar valor padrão
     if (!fieldStates) {
       return true;
     }
-
-
 
     // Por padrão, campos estão habilitados
     return true;
@@ -187,7 +193,6 @@ const CampoIndicador = ({
   function onChangeEnabled(value: any, codigoIndicador: string) {
     if (setFieldStates && fieldStates) {
       const newStates = { ...fieldStates };
-
     }
   }
 
@@ -473,11 +478,18 @@ export default function PrestacaoServicoAgua() {
   const [searchTermUnidades, setSearchTermUnidades] = useState("");
   const [eixos, setEixos] = useState<IEixo[]>([]);
   const [municipios, setMunicipios] = useState<IMunicipio[]>([]);
-  const [tiposUnidade, setTiposUnidade] = useState<Array<{ id_tipo_unidade: number; nome_tipo_unidade: string }>>([]);
-  const [unidadeSelecionada, setUnidadeSelecionada] = useState<IUnidade | null>(null);
-  const [indicadoresUnidade, setIndicadoresUnidade] = useState<IIndicador[]>([]);
-  const [loadingIndicadoresUnidade, setLoadingIndicadoresUnidade] = useState(false);
-  
+  const [tiposUnidade, setTiposUnidade] = useState<
+    Array<{ id_tipo_unidade: number; nome_tipo_unidade: string }>
+  >([]);
+  const [unidadeSelecionada, setUnidadeSelecionada] = useState<IUnidade | null>(
+    null
+  );
+  const [indicadoresUnidade, setIndicadoresUnidade] = useState<IIndicador[]>(
+    []
+  );
+  const [loadingIndicadoresUnidade, setLoadingIndicadoresUnidade] =
+    useState(false);
+
   const {
     register: registerUnidade,
     handleSubmit: handleSubmitUnidade,
@@ -486,7 +498,7 @@ export default function PrestacaoServicoAgua() {
     watch: watchUnidade,
     formState: { errors: errorsUnidade },
   } = useForm();
-  
+
   const eixoValue = watchUnidade("id_eixo");
   const municipioValue = watchUnidade("id_municipio");
   const tipoUnidadeValue = watchUnidade("id_tipo_unidade");
@@ -513,10 +525,10 @@ export default function PrestacaoServicoAgua() {
       if (municipios.length === 0) {
         loadMunicipios();
       }
-      
+
       // Carregar tipos de unidade do eixo 1
       loadTiposUnidade(1);
-      
+
       // Se o usuário já estiver disponível, definir os valores imediatamente
       if (usuario?.id_municipio) {
         const municipioUsuario = usuario.id_municipio.toString();
@@ -534,7 +546,13 @@ export default function PrestacaoServicoAgua() {
         return () => clearTimeout(timer);
       }
     }
-  }, [isModalUnidadeVisible, isEditingUnidade, usuario?.id_municipio, municipios.length, setValueUnidade]);
+  }, [
+    isModalUnidadeVisible,
+    isEditingUnidade,
+    usuario?.id_municipio,
+    municipios.length,
+    setValueUnidade,
+  ]);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -557,13 +575,13 @@ export default function PrestacaoServicoAgua() {
     if (!usuario?.id_municipio) {
       return;
     }
-    
+
     try {
       const res = await api
         .get("/getMunicipio", {
           params: { id_municipio: usuario.id_municipio },
         })
-        .then((response) => { 
+        .then((response) => {
           setDadosMunicipio(response.data);
         });
     } catch (error) {
@@ -627,7 +645,9 @@ export default function PrestacaoServicoAgua() {
     setLoadingIndicadoresUnidade(true);
     try {
       const apiClient = getAPIClient();
-      const response = await apiClient.get(`/indicadores-novo/eixo-unidade/${idEixo}`);
+      const response = await apiClient.get(
+        `/indicadores-novo/eixo-unidade/${idEixo}`
+      );
       const indicadoresData = response.data || [];
 
       if (indicadoresData.length === 0) {
@@ -697,7 +717,10 @@ export default function PrestacaoServicoAgua() {
       setIndicadoresUnidade(indicadoresComTipos);
     } catch (error: any) {
       console.error("Erro ao carregar indicadores da unidade:", error);
-      const errorMessage = error?.response?.data?.error || error?.message || "Erro ao carregar indicadores!";
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Erro ao carregar indicadores!";
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
@@ -818,7 +841,11 @@ export default function PrestacaoServicoAgua() {
                 }
               }
             } catch (error) {
-              console.error("Erro ao processar valor do checkbox:", valor, error);
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
             }
           });
         } else {
@@ -999,7 +1026,9 @@ export default function PrestacaoServicoAgua() {
           // Criar um mapa dos dados existentes
           const existingDataMap = new Map();
           existingData.forEach((record) => {
-            const key = `${record.codigo_indicador}_${record.ano}_${record.id_unidade || 'null'}`;
+            const key = `${record.codigo_indicador}_${record.ano}_${
+              record.id_unidade || "null"
+            }`;
             existingDataMap.set(key, record);
           });
 
@@ -1018,7 +1047,11 @@ export default function PrestacaoServicoAgua() {
                 await apiClient.post("/indicadores-municipio", valorIndicador);
               }
             } catch (saveError) {
-              console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+              console.error(
+                "Erro ao salvar/atualizar valor:",
+                valorIndicador,
+                saveError
+              );
               throw saveError;
             }
           }
@@ -1138,15 +1171,15 @@ export default function PrestacaoServicoAgua() {
   function handleOpenModalUnidade() {
     setIsEditingUnidade(false);
     setUnidadeEditando(null);
-    
+
     // Garantir que os municípios estejam carregados
     if (municipios.length === 0) {
       loadMunicipios();
     }
-    
+
     // Carregar tipos de unidade do eixo 1
     loadTiposUnidade(1);
-    
+
     const municipioUsuario = usuario?.id_municipio?.toString() || "";
     resetUnidade({
       nome_unidade: "",
@@ -1167,26 +1200,33 @@ export default function PrestacaoServicoAgua() {
   function handleEditUnidade(unidade: IUnidade) {
     setIsEditingUnidade(true);
     setUnidadeEditando(unidade);
-    
+
     // Carregar tipos de unidade do eixo da unidade
     const eixoId = unidade.id_eixo || 1;
     loadTiposUnidade(eixoId);
-    
+
     setValueUnidade("nome_unidade", unidade.nome_unidade || "");
-    setValueUnidade("id_tipo_unidade", unidade.id_tipo_unidade?.toString() || "");
+    setValueUnidade(
+      "id_tipo_unidade",
+      unidade.id_tipo_unidade?.toString() || ""
+    );
     setValueUnidade("id_eixo", unidade.id_eixo?.toString() || "1");
     setValueUnidade("id_municipio", unidade.id_municipio?.toString() || "");
     setModalUnidadeVisible(true);
   }
 
   async function handleSaveUnidade(data: any) {
-    
     try {
       const apiClient = getAPIClient();
 
       // Função auxiliar para converter string para número ou null
       const parseToIntOrNull = (value: any): number | null => {
-        if (!value || value === "" || value === "undefined" || value === undefined) {
+        if (
+          !value ||
+          value === "" ||
+          value === "undefined" ||
+          value === undefined
+        ) {
           return null;
         }
         const parsed = parseInt(value, 10);
@@ -1201,7 +1241,10 @@ export default function PrestacaoServicoAgua() {
       };
 
       if (isEditingUnidade && unidadeEditando) {
-        await apiClient.put(`/unidades/${unidadeEditando.id_unidade}`, unidadeData);
+        await apiClient.put(
+          `/unidades/${unidadeEditando.id_unidade}`,
+          unidadeData
+        );
         toast.success("Unidade atualizada com sucesso!", {
           position: "top-right",
           autoClose: 5000,
@@ -1253,8 +1296,6 @@ export default function PrestacaoServicoAgua() {
       loadMunicipios();
     }
   }, [showUnidades]);
-
-  
 
   async function getIndicadores(menu_item: {
     id_menu_item: number;
@@ -1911,7 +1952,7 @@ export default function PrestacaoServicoAgua() {
         valoresFormulario[fieldName] = valor;
       }
     });
-    
+
     // Preencher o formulário
     reset(valoresFormulario);
   }
@@ -1934,6 +1975,9 @@ export default function PrestacaoServicoAgua() {
               <FaBars />
             </CollapseButton>
             {menus?.map((menu) => {
+              if (menu.titulo === "Unidades") {
+                return;
+              }
               const isOpen = openMenuId === menu.id_menu;
               return (
                 <div key={menu.id_menu}>
@@ -1986,15 +2030,15 @@ export default function PrestacaoServicoAgua() {
                 loadUnidades();
               }}
             >
-               <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                    <FaList style={{ fontSize: "14px" }} />
-              Unidades
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Unidades
               </div>
             </MenuHeader>
           </Sidebar>
@@ -2026,7 +2070,9 @@ export default function PrestacaoServicoAgua() {
               <DivForm style={{ borderColor: "#12B2D5" }}>
                 <DivTituloForm>Água</DivTituloForm>
 
-                <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
+                <div
+                  style={{ padding: "20px", borderBottom: "1px solid #eee" }}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -2119,348 +2165,352 @@ export default function PrestacaoServicoAgua() {
                       opacity: grupo ? 1 : 0,
                     }}
                   >
-                  <DivTitulo>
-                    <DivTituloConteudo>{grupo}</DivTituloConteudo>
-                  </DivTitulo>
+                    <DivTitulo>
+                      <DivTituloConteudo>{grupo}</DivTituloConteudo>
+                    </DivTitulo>
 
-                  {!grupo ? (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        padding: "40px",
-                        backgroundColor: "#f8f9fa",
-                      }}
-                    >
-                      <p>👈 Selecione um item do menu lateral para começar</p>
-                    </div>
-                  ) : loadingIndicadores ? (
-                    <div style={{ textAlign: "center", padding: "40px" }}>
-                      <p>Carregando indicadores...</p>
-                    </div>
-                  ) : indicadores.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "40px" }}>
-                      <p>Nenhum indicador encontrado para este grupo.</p>
-                      <p style={{ fontSize: "12px", color: "#666" }}>
-                        Grupo: {grupo} | Loading:{" "}
-                        {loadingIndicadores ? "true" : "false"}
-                      </p>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        backgroundColor: "#fff",
-                        borderRadius: "8px",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        overflow: "hidden",
-                        marginTop: "20px",
-                      }}
-                    >
-                      {/* Cabeçalho da Tabela */}
+                    {!grupo ? (
                       <div
                         style={{
-                          backgroundColor: "#1e88e5",
-                          color: "white",
-                          padding: "15px 0",
-                          fontWeight: "600",
-                          fontSize: "13px",
-                          letterSpacing: "0.5px",
+                          textAlign: "center",
+                          padding: "40px",
+                          backgroundColor: "#f8f9fa",
                         }}
                       >
+                        <p>👈 Selecione um item do menu lateral para começar</p>
+                      </div>
+                    ) : loadingIndicadores ? (
+                      <div style={{ textAlign: "center", padding: "40px" }}>
+                        <p>Carregando indicadores...</p>
+                      </div>
+                    ) : indicadores.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "40px" }}>
+                        <p>Nenhum indicador encontrado para este grupo.</p>
+                        <p style={{ fontSize: "12px", color: "#666" }}>
+                          Grupo: {grupo} | Loading:{" "}
+                          {loadingIndicadores ? "true" : "false"}
+                        </p>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          backgroundColor: "#fff",
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                          overflow: "hidden",
+                          marginTop: "20px",
+                        }}
+                      >
+                        {/* Cabeçalho da Tabela */}
                         <div
                           style={{
-                            display: "grid",
-                            gridTemplateColumns:
-                              window.innerWidth > 768
-                                ? "180px 1fr 280px 100px"
-                                : "1fr",
-                            gap: window.innerWidth > 768 ? "15px" : "10px",
-                            alignItems: "center",
-                            padding: "0 15px",
+                            backgroundColor: "#1e88e5",
+                            color: "white",
+                            padding: "15px 0",
+                            fontWeight: "600",
+                            fontSize: "13px",
+                            letterSpacing: "0.5px",
                           }}
                         >
-                          {window.innerWidth > 768 ? (
-                            <>
-                              <div>CÓDIGO</div>
-                              <div>DESCRIÇÃO DO INDICADOR</div>
-                              <div style={{ textAlign: "center" }}>
-                                VALOR - ANO: {anoSelected || "____"}
-                              </div>
-                              <div style={{ textAlign: "center" }}>UNIDADE</div>
-                            </>
-                          ) : (
-                            <div>
-                              INDICADORES - ANO: {anoSelected || "____"}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Linhas da Tabela */}
-                      {indicadores.map((indicador, index) => {
-                        const tipoCampo =
-                          indicador.tiposCampo &&
-                          indicador.tiposCampo.length > 0
-                            ? indicador.tiposCampo[0]
-                            : null;
-                        const isEven = index % 2 === 0;
-
-                        return (
                           <div
-                            key={indicador.id_indicador}
                             style={{
-                              backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
-                              borderBottom:
-                                index < indicadores.length - 1
-                                  ? "1px solid #dee2e6"
-                                  : "none",
-                              padding: "15px 0",
-                              transition: "background-color 0.2s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#e8f4fd";
-                              e.currentTarget.style.borderLeft =
-                                "3px solid #1e88e5";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = isEven
-                                ? "#f8f9fa"
-                                : "#ffffff";
-                              e.currentTarget.style.borderLeft = "none";
+                              display: "grid",
+                              gridTemplateColumns:
+                                window.innerWidth > 768
+                                  ? "180px 1fr 280px 100px"
+                                  : "1fr",
+                              gap: window.innerWidth > 768 ? "15px" : "10px",
+                              alignItems: "center",
+                              padding: "0 15px",
                             }}
                           >
                             {window.innerWidth > 768 ? (
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "180px 1fr 280px 100px",
-                                  gap: "15px",
-                                  alignItems: "center",
-                                  padding: "0 15px",
-                                }}
-                              >
-                                {/* Código */}
-                                <div>
-                                  <div
-                                    style={{
-                                      fontSize: "15px",
-                                      fontWeight: "bold",
-                                      color: "#1e88e5",
-                                    }}
-                                  >
-                                    {indicador.codigo_indicador}
-                                  </div>
+                              <>
+                                <div>CÓDIGO</div>
+                                <div>DESCRIÇÃO DO INDICADOR</div>
+                                <div style={{ textAlign: "center" }}>
+                                  VALOR - ANO: {anoSelected || "____"}
                                 </div>
-
-                                {/* Descrição */}
-                                <div
-                                  style={{
-                                    fontSize: "14px",
-                                    color: "#495057",
-                                    lineHeight: "1.3",
-                                  }}
-                                >
-                                  {indicador.nome_indicador}
+                                <div style={{ textAlign: "center" }}>
+                                  UNIDADE
                                 </div>
-
-                                {/* Campo de Input */}
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  {anoSelected ? (
-                                    <div style={{ width: "260px" }}>
-                                      <CampoIndicador
-                                        indicador={indicador}
-                                        register={register}
-                                        anoSelected={anoSelected}
-                                        campoEnabled={campoEnabled}
-                                        fieldStates={fieldStates}
-                                        setFieldStates={setFieldStates}
-                                        setValue={setValue}
-                                        dadosMunicipio={dadosMunicipio}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <input
-                                      type="text"
-                                      placeholder="Selecione um ano"
-                                      disabled
-                                      style={{
-                                        width: "260px",
-                                        backgroundColor: "#f8f9fa",
-                                        border: "1px solid #dee2e6",
-                                        borderRadius: "4px",
-                                        padding: "8px 12px",
-                                        color: "#6c757d",
-                                        textAlign: "center",
-                                        fontSize: "12px",
-                                      }}
-                                    />
-                                  )}
-                                </div>
-
-                                {/* Unidade */}
-                                <div
-                                  style={{
-                                    textAlign: "center",
-                                    fontSize: "12px",
-                                    color: "#495057",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      fontWeight: "500",
-                                      padding: "5px 6px",
-                                      backgroundColor: "#e9ecef",
-                                      borderRadius: "3px",
-                                      fontSize: "11px",
-                                    }}
-                                  >
-                                    {indicador.unidade_indicador || "-"}
-                                  </div>
-                                </div>
-                              </div>
+                              </>
                             ) : (
-                              /* Layout Mobile */
-                              <div
-                                style={{
-                                  padding: "0 15px",
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: "10px",
-                                }}
-                              >
+                              <div>
+                                INDICADORES - ANO: {anoSelected || "____"}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Linhas da Tabela */}
+                        {indicadores.map((indicador, index) => {
+                          const tipoCampo =
+                            indicador.tiposCampo &&
+                            indicador.tiposCampo.length > 0
+                              ? indicador.tiposCampo[0]
+                              : null;
+                          const isEven = index % 2 === 0;
+
+                          return (
+                            <div
+                              key={indicador.id_indicador}
+                              style={{
+                                backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                                borderBottom:
+                                  index < indicadores.length - 1
+                                    ? "1px solid #dee2e6"
+                                    : "none",
+                                padding: "15px 0",
+                                transition: "background-color 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "#e8f4fd";
+                                e.currentTarget.style.borderLeft =
+                                  "3px solid #1e88e5";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = isEven
+                                  ? "#f8f9fa"
+                                  : "#ffffff";
+                                e.currentTarget.style.borderLeft = "none";
+                              }}
+                            >
+                              {window.innerWidth > 768 ? (
                                 <div
                                   style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                      "180px 1fr 280px 100px",
+                                    gap: "15px",
                                     alignItems: "center",
+                                    padding: "0 15px",
                                   }}
                                 >
+                                  {/* Código */}
                                   <div>
                                     <div
                                       style={{
-                                        fontSize: "16px",
+                                        fontSize: "15px",
                                         fontWeight: "bold",
                                         color: "#1e88e5",
                                       }}
                                     >
                                       {indicador.codigo_indicador}
                                     </div>
+                                  </div>
+
+                                  {/* Descrição */}
+                                  <div
+                                    style={{
+                                      fontSize: "14px",
+                                      color: "#495057",
+                                      lineHeight: "1.3",
+                                    }}
+                                  >
+                                    {indicador.nome_indicador}
+                                  </div>
+
+                                  {/* Campo de Input */}
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    {anoSelected ? (
+                                      <div style={{ width: "260px" }}>
+                                        <CampoIndicador
+                                          indicador={indicador}
+                                          register={register}
+                                          anoSelected={anoSelected}
+                                          campoEnabled={campoEnabled}
+                                          fieldStates={fieldStates}
+                                          setFieldStates={setFieldStates}
+                                          setValue={setValue}
+                                          dadosMunicipio={dadosMunicipio}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <input
+                                        type="text"
+                                        placeholder="Selecione um ano"
+                                        disabled
+                                        style={{
+                                          width: "260px",
+                                          backgroundColor: "#f8f9fa",
+                                          border: "1px solid #dee2e6",
+                                          borderRadius: "4px",
+                                          padding: "8px 12px",
+                                          color: "#6c757d",
+                                          textAlign: "center",
+                                          fontSize: "12px",
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+
+                                  {/* Unidade */}
+                                  <div
+                                    style={{
+                                      textAlign: "center",
+                                      fontSize: "12px",
+                                      color: "#495057",
+                                    }}
+                                  >
                                     <div
                                       style={{
+                                        fontWeight: "500",
+                                        padding: "5px 6px",
+                                        backgroundColor: "#e9ecef",
+                                        borderRadius: "3px",
                                         fontSize: "11px",
-                                        color: "#6c757d",
                                       }}
                                     >
                                       {indicador.unidade_indicador || "-"}
                                     </div>
                                   </div>
-                                  {tipoCampo && (
-                                    <div
-                                      style={{
-                                        fontSize: "10px",
-                                        color: "#6c757d",
-                                        backgroundColor: "#f8f9fa",
-                                        padding: "3px 6px",
-                                        borderRadius: "3px",
-                                      }}
-                                    >
-                                      {tipoCampo.type}
-                                    </div>
-                                  )}
                                 </div>
-
+                              ) : (
+                                /* Layout Mobile */
                                 <div
                                   style={{
-                                    fontSize: "13px",
-                                    color: "#495057",
-                                    lineHeight: "1.3",
-                                    marginBottom: "8px",
+                                    padding: "0 15px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "10px",
                                   }}
                                 >
-                                  {indicador.nome_indicador}
-                                </div>
-
-                                {anoSelected ? (
-                                  <CampoIndicador
-                                    indicador={indicador}
-                                    register={register}
-                                    anoSelected={anoSelected}
-                                    campoEnabled={campoEnabled}
-                                    fieldStates={fieldStates}
-                                    setFieldStates={setFieldStates}
-                                    setValue={setValue}
-                                    dadosMunicipio={dadosMunicipio}
-                                  />
-                                ) : (
-                                  <input
-                                    type="text"
-                                    placeholder="Selecione um ano primeiro"
-                                    disabled
+                                  <div
                                     style={{
-                                      backgroundColor: "#f8f9fa",
-                                      border: "1px solid #dee2e6",
-                                      borderRadius: "4px",
-                                      padding: "8px 12px",
-                                      color: "#6c757d",
-                                      textAlign: "center",
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
                                     }}
-                                  />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </DivFormConteudo>
-                {isEditor && indicadores.length > 0 && anoSelected && (
-                  <div
-                    style={{
-                      marginTop: "30px",
-                      padding: "20px",
-                      textAlign: "center",
-                      borderTop: "1px solid #e1e5e9",
-                    }}
-                  >
-                    <button
-                      type="submit"
+                                  >
+                                    <div>
+                                      <div
+                                        style={{
+                                          fontSize: "16px",
+                                          fontWeight: "bold",
+                                          color: "#1e88e5",
+                                        }}
+                                      >
+                                        {indicador.codigo_indicador}
+                                      </div>
+                                      <div
+                                        style={{
+                                          fontSize: "11px",
+                                          color: "#6c757d",
+                                        }}
+                                      >
+                                        {indicador.unidade_indicador || "-"}
+                                      </div>
+                                    </div>
+                                    {tipoCampo && (
+                                      <div
+                                        style={{
+                                          fontSize: "10px",
+                                          color: "#6c757d",
+                                          backgroundColor: "#f8f9fa",
+                                          padding: "3px 6px",
+                                          borderRadius: "3px",
+                                        }}
+                                      >
+                                        {tipoCampo.type}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div
+                                    style={{
+                                      fontSize: "13px",
+                                      color: "#495057",
+                                      lineHeight: "1.3",
+                                      marginBottom: "8px",
+                                    }}
+                                  >
+                                    {indicador.nome_indicador}
+                                  </div>
+
+                                  {anoSelected ? (
+                                    <CampoIndicador
+                                      indicador={indicador}
+                                      register={register}
+                                      anoSelected={anoSelected}
+                                      campoEnabled={campoEnabled}
+                                      fieldStates={fieldStates}
+                                      setFieldStates={setFieldStates}
+                                      setValue={setValue}
+                                      dadosMunicipio={dadosMunicipio}
+                                    />
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder="Selecione um ano primeiro"
+                                      disabled
+                                      style={{
+                                        backgroundColor: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                        padding: "8px 12px",
+                                        color: "#6c757d",
+                                        textAlign: "center",
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </DivFormConteudo>
+                  {isEditor && indicadores.length > 0 && anoSelected && (
+                    <div
                       style={{
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        padding: "12px 40px",
-                        fontSize: "16px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#218838";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 8px rgba(40,167,69,0.3)";
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#28a745";
-                        e.currentTarget.style.boxShadow =
-                          "0 2px 4px rgba(40,167,69,0.2)";
-                        e.currentTarget.style.transform = "translateY(0)";
+                        marginTop: "30px",
+                        padding: "20px",
+                        textAlign: "center",
+                        borderTop: "1px solid #e1e5e9",
                       }}
                     >
-                      💾 Salvar Dados dos Indicadores
-                    </button>
-                  </div>
-                )}
-              </DivFormEixo>
-            </DivForm>
-          </Form>
+                      <button
+                        type="submit"
+                        style={{
+                          backgroundColor: "#28a745",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "12px 40px",
+                          fontSize: "16px",
+                          fontWeight: "500",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#218838";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 8px rgba(40,167,69,0.3)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#28a745";
+                          e.currentTarget.style.boxShadow =
+                            "0 2px 4px rgba(40,167,69,0.2)";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                      >
+                        💾 Salvar Dados dos Indicadores
+                      </button>
+                    </div>
+                  )}
+                </DivFormEixo>
+              </DivForm>
+            </Form>
           )}
 
           {/* Componente de Unidades */}
@@ -2488,7 +2538,9 @@ export default function PrestacaoServicoAgua() {
               <DivForm style={{ borderColor: "#12B2D5" }}>
                 <DivTituloForm>Gestão de Unidades</DivTituloForm>
 
-                <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
+                <div
+                  style={{ padding: "20px", borderBottom: "1px solid #eee" }}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -2514,7 +2566,9 @@ export default function PrestacaoServicoAgua() {
                             type="text"
                             placeholder="Buscar unidades..."
                             value={searchTermUnidades}
-                            onChange={(e) => setSearchTermUnidades(e.target.value)}
+                            onChange={(e) =>
+                              setSearchTermUnidades(e.target.value)
+                            }
                             style={{
                               flex: 1,
                               padding: "8px 12px",
@@ -2549,7 +2603,9 @@ export default function PrestacaoServicoAgua() {
                             <p>Carregando unidades...</p>
                           </div>
                         ) : unidades.filter((unidade) =>
-                            unidade.nome_unidade?.toLowerCase().includes(searchTermUnidades.toLowerCase())
+                            unidade.nome_unidade
+                              ?.toLowerCase()
+                              .includes(searchTermUnidades.toLowerCase())
                           ).length === 0 ? (
                           <div style={{ textAlign: "center", padding: "40px" }}>
                             <p>
@@ -2568,253 +2624,282 @@ export default function PrestacaoServicoAgua() {
                               //marginTop: "20px",
                             }}
                           >
-                        {/* Cabeçalho da Tabela */}
-                        <div
-                          style={{
-                            backgroundColor: "#1e88e5",
-                            color: "white",
-                            padding: "15px 0",
-                            fontWeight: "600",
-                            fontSize: "13px",
-                            letterSpacing: "0.5px",
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "grid",
-                              gridTemplateColumns:
-                                window.innerWidth > 768
-                                  ? "1fr 150px 150px 150px 120px"
-                                  : "1fr",
-                              gap: window.innerWidth > 768 ? "15px" : "10px",
-                              alignItems: "center",
-                              padding: "0 15px",
-                            }}
-                          >
-                            {window.innerWidth > 768 ? (
-                              <>
-                                <div>NOME DA UNIDADE</div>
-                                <div>TIPO</div>
-                                <div>EIXO</div>
-                                <div>MUNICÍPIO</div>
-                                <div style={{ textAlign: "center" }}>AÇÕES</div>
-                              </>
-                            ) : (
-                              <div>UNIDADES</div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Linhas da Tabela */}
-                        {unidades
-                          .filter((unidade) =>
-                            unidade.nome_unidade?.toLowerCase().includes(searchTermUnidades.toLowerCase())
-                          )
-                          .map((unidade, index) => {
-                            const isEven = index % 2 === 0;
-
-                            return (
+                            {/* Cabeçalho da Tabela */}
+                            <div
+                              style={{
+                                backgroundColor: "#1e88e5",
+                                color: "white",
+                                padding: "15px 0",
+                                fontWeight: "600",
+                                fontSize: "13px",
+                                letterSpacing: "0.5px",
+                              }}
+                            >
                               <div
-                                key={unidade.id_unidade}
                                 style={{
-                                  backgroundColor: unidadeSelecionada?.id_unidade === unidade.id_unidade 
-                                    ? "#d1ecf1" 
-                                    : (isEven ? "#f8f9fa" : "#ffffff"),
-                                  borderBottom:
-                                    index < unidades.length - 1
-                                      ? "1px solid #dee2e6"
-                                      : "none",
-                                  padding: "15px 0",
-                                  transition: "background-color 0.2s ease",
-                                  cursor: "pointer",
-                                  borderLeft: unidadeSelecionada?.id_unidade === unidade.id_unidade
-                                    ? "4px solid #1e88e5"
-                                    : "none",
-                                }}
-                                onClick={() => handleSelectUnidade(unidade)}
-                                onMouseEnter={(e) => {
-                                  if (unidadeSelecionada?.id_unidade !== unidade.id_unidade) {
-                                    e.currentTarget.style.backgroundColor = "#e8f4fd";
-                                    e.currentTarget.style.borderLeft = "3px solid #1e88e5";
-                                  }
-                                }}
-                                onMouseLeave={(e) => {
-                                  if (unidadeSelecionada?.id_unidade !== unidade.id_unidade) {
-                                    e.currentTarget.style.backgroundColor = isEven
-                                      ? "#f8f9fa"
-                                      : "#ffffff";
-                                    e.currentTarget.style.borderLeft = "none";
-                                  }
+                                  display: "grid",
+                                  gridTemplateColumns:
+                                    window.innerWidth > 768
+                                      ? "1fr 150px 150px 150px 120px"
+                                      : "1fr",
+                                  gap:
+                                    window.innerWidth > 768 ? "15px" : "10px",
+                                  alignItems: "center",
+                                  padding: "0 15px",
                                 }}
                               >
                                 {window.innerWidth > 768 ? (
-                                  <div
-                                    style={{
-                                      display: "grid",
-                                      gridTemplateColumns:
-                                        "1fr 150px 150px 150px 120px",
-                                      gap: "15px",
-                                      alignItems: "center",
-                                      padding: "0 15px",
-                                      pointerEvents: "none",
-                                    }}
-                                  >
-                                    {/* Nome */}
-                                    <div
-                                      style={{
-                                        fontSize: "14px",
-                                        color: "#495057",
-                                        fontWeight: "500",
-                                      }}
-                                    >
-                                      {unidade.nome_unidade}
+                                  <>
+                                    <div>NOME DA UNIDADE</div>
+                                    <div>TIPO</div>
+                                    <div>EIXO</div>
+                                    <div>MUNICÍPIO</div>
+                                    <div style={{ textAlign: "center" }}>
+                                      AÇÕES
                                     </div>
-
-                                    {/* Tipo */}
-                                    <div
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "#6c757d",
-                                      }}
-                                    >
-                                      {unidade.tipoUnidade?.nome_tipo_unidade || "-"}
-                                    </div>
-
-                                    {/* Eixo */}
-                                    <div
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "#6c757d",
-                                      }}
-                                    >
-                                      {unidade.eixo?.nome_eixo || "-"}
-                                    </div>
-
-                                    {/* Município */}
-                                    <div
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "#6c757d",
-                                      }}
-                                    >
-                                      {unidade.municipio?.municipio_nome || "-"}
-                                    </div>
-
-                                    {/* Ações */}
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        gap: "8px",
-                                        justifyContent: "center",
-                                        pointerEvents: "auto",
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <BotaoEditar
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          e.preventDefault();
-                                          handleEditUnidade(unidade);
-                                        }}
-                                        title="Editar"
-                                      >
-                                        <FaEdit />
-                                      </BotaoEditar>
-                                      <BotaoRemover
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          e.preventDefault();
-                                          handleDeleteUnidade(unidade.id_unidade);
-                                        }}
-                                        title="Excluir"
-                                      >
-                                        <FaTrash />
-                                      </BotaoRemover>
-                                    </div>
-                                  </div>
+                                  </>
                                 ) : (
-                                  /* Layout Mobile */
-                                  <div
-                                    style={{
-                                      padding: "0 15px",
-                                      display: "flex",
-                                      flexDirection: "column",
-                                      gap: "10px",
-                                      pointerEvents: "none",
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        fontSize: "16px",
-                                        fontWeight: "bold",
-                                        color: "#1e88e5",
-                                      }}
-                                    >
-                                      {unidade.nome_unidade}
-                                    </div>
-                                    <div
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "#6c757d",
-                                      }}
-                                    >
-                                      Tipo: {unidade.tipoUnidade?.nome_tipo_unidade || "-"}
-                                    </div>
-                                    <div
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "#6c757d",
-                                      }}
-                                    >
-                                      Eixo: {unidade.eixo?.nome_eixo || "-"}
-                                    </div>
-                                    <div
-                                      style={{
-                                        fontSize: "12px",
-                                        color: "#6c757d",
-                                      }}
-                                    >
-                                      Município: {unidade.municipio?.municipio_nome || "-"}
-                                    </div>
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        gap: "8px",
-                                        marginTop: "10px",
-                                        pointerEvents: "auto",
-                                      }}
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <BotaoEditar
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          e.preventDefault();
-                                          handleEditUnidade(unidade);
-                                        }}
-                                        title="Editar"
-                                      >
-                                        <FaEdit /> Editar
-                                      </BotaoEditar>
-                                      <BotaoRemover
-                                        type="button"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          e.preventDefault();
-                                          handleDeleteUnidade(unidade.id_unidade);
-                                        }}
-                                        title="Excluir"
-                                      >
-                                        <FaTrash /> Excluir
-                                      </BotaoRemover>
-                                    </div>
-                                  </div>
+                                  <div>UNIDADES</div>
                                 )}
                               </div>
-                            );
-                          })}
+                            </div>
+
+                            {/* Linhas da Tabela */}
+                            {unidades
+                              .filter((unidade) =>
+                                unidade.nome_unidade
+                                  ?.toLowerCase()
+                                  .includes(searchTermUnidades.toLowerCase())
+                              )
+                              .map((unidade, index) => {
+                                const isEven = index % 2 === 0;
+
+                                return (
+                                  <div
+                                    key={unidade.id_unidade}
+                                    style={{
+                                      backgroundColor:
+                                        unidadeSelecionada?.id_unidade ===
+                                        unidade.id_unidade
+                                          ? "#d1ecf1"
+                                          : isEven
+                                          ? "#f8f9fa"
+                                          : "#ffffff",
+                                      borderBottom:
+                                        index < unidades.length - 1
+                                          ? "1px solid #dee2e6"
+                                          : "none",
+                                      padding: "15px 0",
+                                      transition: "background-color 0.2s ease",
+                                      cursor: "pointer",
+                                      borderLeft:
+                                        unidadeSelecionada?.id_unidade ===
+                                        unidade.id_unidade
+                                          ? "4px solid #1e88e5"
+                                          : "none",
+                                    }}
+                                    onClick={() => handleSelectUnidade(unidade)}
+                                    onMouseEnter={(e) => {
+                                      if (
+                                        unidadeSelecionada?.id_unidade !==
+                                        unidade.id_unidade
+                                      ) {
+                                        e.currentTarget.style.backgroundColor =
+                                          "#e8f4fd";
+                                        e.currentTarget.style.borderLeft =
+                                          "3px solid #1e88e5";
+                                      }
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      if (
+                                        unidadeSelecionada?.id_unidade !==
+                                        unidade.id_unidade
+                                      ) {
+                                        e.currentTarget.style.backgroundColor =
+                                          isEven ? "#f8f9fa" : "#ffffff";
+                                        e.currentTarget.style.borderLeft =
+                                          "none";
+                                      }
+                                    }}
+                                  >
+                                    {window.innerWidth > 768 ? (
+                                      <div
+                                        style={{
+                                          display: "grid",
+                                          gridTemplateColumns:
+                                            "1fr 150px 150px 150px 120px",
+                                          gap: "15px",
+                                          alignItems: "center",
+                                          padding: "0 15px",
+                                          pointerEvents: "none",
+                                        }}
+                                      >
+                                        {/* Nome */}
+                                        <div
+                                          style={{
+                                            fontSize: "14px",
+                                            color: "#495057",
+                                            fontWeight: "500",
+                                          }}
+                                        >
+                                          {unidade.nome_unidade}
+                                        </div>
+
+                                        {/* Tipo */}
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          {unidade.tipoUnidade
+                                            ?.nome_tipo_unidade || "-"}
+                                        </div>
+
+                                        {/* Eixo */}
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          {unidade.eixo?.nome_eixo || "-"}
+                                        </div>
+
+                                        {/* Município */}
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          {unidade.municipio?.municipio_nome ||
+                                            "-"}
+                                        </div>
+
+                                        {/* Ações */}
+                                        <div
+                                          style={{
+                                            display: "flex",
+                                            gap: "8px",
+                                            justifyContent: "center",
+                                            pointerEvents: "auto",
+                                          }}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <BotaoEditar
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleEditUnidade(unidade);
+                                            }}
+                                            title="Editar"
+                                          >
+                                            <FaEdit />
+                                          </BotaoEditar>
+                                          <BotaoRemover
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleDeleteUnidade(
+                                                unidade.id_unidade
+                                              );
+                                            }}
+                                            title="Excluir"
+                                          >
+                                            <FaTrash />
+                                          </BotaoRemover>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      /* Layout Mobile */
+                                      <div
+                                        style={{
+                                          padding: "0 15px",
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          gap: "10px",
+                                          pointerEvents: "none",
+                                        }}
+                                      >
+                                        <div
+                                          style={{
+                                            fontSize: "16px",
+                                            fontWeight: "bold",
+                                            color: "#1e88e5",
+                                          }}
+                                        >
+                                          {unidade.nome_unidade}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          Tipo:{" "}
+                                          {unidade.tipoUnidade
+                                            ?.nome_tipo_unidade || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          Eixo: {unidade.eixo?.nome_eixo || "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            fontSize: "12px",
+                                            color: "#6c757d",
+                                          }}
+                                        >
+                                          Município:{" "}
+                                          {unidade.municipio?.municipio_nome ||
+                                            "-"}
+                                        </div>
+                                        <div
+                                          style={{
+                                            display: "flex",
+                                            gap: "8px",
+                                            marginTop: "10px",
+                                            pointerEvents: "auto",
+                                          }}
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          <BotaoEditar
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleEditUnidade(unidade);
+                                            }}
+                                            title="Editar"
+                                          >
+                                            <FaEdit /> Editar
+                                          </BotaoEditar>
+                                          <BotaoRemover
+                                            type="button"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              e.preventDefault();
+                                              handleDeleteUnidade(
+                                                unidade.id_unidade
+                                              );
+                                            }}
+                                            title="Excluir"
+                                          >
+                                            <FaTrash /> Excluir
+                                          </BotaoRemover>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                           </div>
                         )}
                       </>
@@ -2863,7 +2948,9 @@ export default function PrestacaoServicoAgua() {
                           </div>
                         ) : indicadoresUnidade.length === 0 ? (
                           <div style={{ textAlign: "center", padding: "40px" }}>
-                            <p>Nenhum indicador encontrado para esta unidade.</p>
+                            <p>
+                              Nenhum indicador encontrado para esta unidade.
+                            </p>
                           </div>
                         ) : (
                           <div
@@ -2892,7 +2979,8 @@ export default function PrestacaoServicoAgua() {
                                     window.innerWidth > 768
                                       ? "180px 1fr 280px 100px"
                                       : "1fr",
-                                  gap: window.innerWidth > 768 ? "15px" : "10px",
+                                  gap:
+                                    window.innerWidth > 768 ? "15px" : "10px",
                                   alignItems: "center",
                                   padding: "0 15px",
                                 }}
@@ -2901,8 +2989,12 @@ export default function PrestacaoServicoAgua() {
                                   <>
                                     <div>CÓDIGO</div>
                                     <div>DESCRIÇÃO DO INDICADOR</div>
-                                    <div style={{ textAlign: "center" }}>VALOR</div>
-                                    <div style={{ textAlign: "center" }}>UNIDADE</div>
+                                    <div style={{ textAlign: "center" }}>
+                                      VALOR
+                                    </div>
+                                    <div style={{ textAlign: "center" }}>
+                                      UNIDADE
+                                    </div>
                                   </>
                                 ) : (
                                   <div>INDICADORES</div>
@@ -2923,7 +3015,9 @@ export default function PrestacaoServicoAgua() {
                                 <div
                                   key={indicador.id_indicador}
                                   style={{
-                                    backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                                    backgroundColor: isEven
+                                      ? "#f8f9fa"
+                                      : "#ffffff",
                                     borderBottom:
                                       index < indicadoresUnidade.length - 1
                                         ? "1px solid #dee2e6"
@@ -2932,14 +3026,14 @@ export default function PrestacaoServicoAgua() {
                                     transition: "background-color 0.2s ease",
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#e8f4fd";
+                                    e.currentTarget.style.backgroundColor =
+                                      "#e8f4fd";
                                     e.currentTarget.style.borderLeft =
                                       "3px solid #1e88e5";
                                   }}
                                   onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = isEven
-                                      ? "#f8f9fa"
-                                      : "#ffffff";
+                                    e.currentTarget.style.backgroundColor =
+                                      isEven ? "#f8f9fa" : "#ffffff";
                                     e.currentTarget.style.borderLeft = "none";
                                   }}
                                 >
@@ -2947,7 +3041,8 @@ export default function PrestacaoServicoAgua() {
                                     <div
                                       style={{
                                         display: "grid",
-                                        gridTemplateColumns: "180px 1fr 280px 100px",
+                                        gridTemplateColumns:
+                                          "180px 1fr 280px 100px",
                                         gap: "15px",
                                         alignItems: "center",
                                         padding: "0 15px",
@@ -3124,16 +3219,20 @@ export default function PrestacaoServicoAgua() {
                                 transition: "all 0.2s ease",
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "#218838";
+                                e.currentTarget.style.backgroundColor =
+                                  "#218838";
                                 e.currentTarget.style.boxShadow =
                                   "0 4px 8px rgba(40,167,69,0.3)";
-                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.transform =
+                                  "translateY(-1px)";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "#28a745";
+                                e.currentTarget.style.backgroundColor =
+                                  "#28a745";
                                 e.currentTarget.style.boxShadow =
                                   "0 2px 4px rgba(40,167,69,0.2)";
-                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.transform =
+                                  "translateY(0)";
                               }}
                             >
                               💾 Salvar Dados dos Indicadores da Unidade
@@ -3154,7 +3253,7 @@ export default function PrestacaoServicoAgua() {
       {isModalUnidadeVisible && (
         <ContainerModal>
           <Modal style={{ maxWidth: "600px", width: "90%" }}>
-            <CloseModalButton 
+            <CloseModalButton
               onClick={handleCloseModalUnidade}
               style={{
                 position: "absolute",
@@ -3182,30 +3281,46 @@ export default function PrestacaoServicoAgua() {
               ×
             </CloseModalButton>
             <div>
-              <h2 style={{ 
-                marginBottom: "25px", 
-                fontSize: "22px",
-                fontWeight: "600",
-                color: "#333",
-                borderBottom: "2px solid #12B2D5",
-                paddingBottom: "15px"
-              }}>
+              <h2
+                style={{
+                  marginBottom: "25px",
+                  fontSize: "22px",
+                  fontWeight: "600",
+                  color: "#333",
+                  borderBottom: "2px solid #12B2D5",
+                  paddingBottom: "15px",
+                }}
+              >
                 {isEditingUnidade ? "Editar Unidade" : "Adicionar Nova Unidade"}
               </h2>
               <div>
-                <Form 
+                <Form
                   onSubmit={handleSubmitUnidade(handleSaveUnidade)}
-                  style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "20px",
+                  }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", width: "100%", padding: "10px" }}>
-                    <label style={{ 
-                      display: "block",
-                      marginBottom: "8px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#333"
-                    }}>
-                      Nome da Unidade<span style={{ color: "#dc3545" }}> *</span>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      width: "100%",
+                      padding: "10px",
+                    }}
+                  >
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        color: "#333",
+                      }}
+                    >
+                      Nome da Unidade
+                      <span style={{ color: "#dc3545" }}> *</span>
                     </label>
                     <input
                       {...registerUnidade("nome_unidade", {
@@ -3224,7 +3339,8 @@ export default function PrestacaoServicoAgua() {
                       }}
                       onFocus={(e) => {
                         e.target.style.borderColor = "#12B2D5";
-                        e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                        e.target.style.boxShadow =
+                          "0 0 0 3px rgba(18, 178, 213, 0.1)";
                       }}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#ddd";
@@ -3232,30 +3348,36 @@ export default function PrestacaoServicoAgua() {
                       }}
                     />
                     {errorsUnidade.nome_unidade && (
-                      <span style={{ 
-                        color: "#dc3545", 
-                        fontSize: "12px",
-                        marginTop: "5px",
-                        display: "block"
-                      }}>
+                      <span
+                        style={{
+                          color: "#dc3545",
+                          fontSize: "12px",
+                          marginTop: "5px",
+                          display: "block",
+                        }}
+                      >
                         {errorsUnidade.nome_unidade.message as string}
                       </span>
                     )}
-                  
-                    <label style={{ 
-                      display: "block",
-                      marginBottom: "8px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#333"
-                    }}>
+
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        color: "#333",
+                      }}
+                    >
                       Eixo
                     </label>
                     <input
                       {...registerUnidade("id_eixo", { value: "1" })}
                       type="text"
                       disabled
-                      value={eixos.find(e => e.id_eixo === 1)?.nome || "Eixo 1"}  
+                      value={
+                        eixos.find((e) => e.id_eixo === 1)?.nome || "Eixo 1"
+                      }
                       style={{
                         margin: "0 auto",
                         width: "90%",
@@ -3267,21 +3389,27 @@ export default function PrestacaoServicoAgua() {
                         backgroundColor: "#f5f5f5",
                       }}
                     />
-                  
-                    <label style={{ 
-                      display: "block",
-                      marginBottom: "8px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#333"
-                    }}>
+
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        color: "#333",
+                      }}
+                    >
                       Municipio
                     </label>
                     <select
                       {...registerUnidade("id_municipio", {
                         value: usuario?.id_municipio?.toString() || "",
                       })}
-                      value={municipioValue || (usuario?.id_municipio?.toString() || "")}
+                      value={
+                        municipioValue ||
+                        usuario?.id_municipio?.toString() ||
+                        ""
+                      }
                       onChange={(e) => {
                         setValueUnidade("id_municipio", e.target.value);
                       }}
@@ -3296,7 +3424,8 @@ export default function PrestacaoServicoAgua() {
                       }}
                       onFocus={(e) => {
                         e.target.style.borderColor = "#12B2D5";
-                        e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                        e.target.style.boxShadow =
+                          "0 0 0 3px rgba(18, 178, 213, 0.1)";
                       }}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#ddd";
@@ -3304,19 +3433,24 @@ export default function PrestacaoServicoAgua() {
                       }}
                     >
                       <option value="">Selecione um município</option>
-                      {municipios.map(municipio => (
-                        <option key={municipio.id_municipio} value={municipio.id_municipio}>
-                            {municipio.municipio_nome}
+                      {municipios.map((municipio) => (
+                        <option
+                          key={municipio.id_municipio}
+                          value={municipio.id_municipio}
+                        >
+                          {municipio.municipio_nome}
                         </option>
                       ))}
                     </select>
-                    <label style={{ 
-                      display: "block",
-                      marginBottom: "8px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      color: "#333"
-                    }}>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontSize: "14px",
+                        fontWeight: "500",
+                        color: "#333",
+                      }}
+                    >
                       Tipo de Unidade
                     </label>
                     <select
@@ -3336,7 +3470,8 @@ export default function PrestacaoServicoAgua() {
                       }}
                       onFocus={(e) => {
                         e.target.style.borderColor = "#12B2D5";
-                        e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                        e.target.style.boxShadow =
+                          "0 0 0 3px rgba(18, 178, 213, 0.1)";
                       }}
                       onBlur={(e) => {
                         e.target.style.borderColor = "#ddd";
@@ -3344,9 +3479,12 @@ export default function PrestacaoServicoAgua() {
                       }}
                     >
                       <option value="">Selecione um tipo de unidade</option>
-                      {tiposUnidade.map(tipo => (
-                        <option key={tipo.id_tipo_unidade} value={tipo.id_tipo_unidade}>
-                            {tipo.nome_tipo_unidade}
+                      {tiposUnidade.map((tipo) => (
+                        <option
+                          key={tipo.id_tipo_unidade}
+                          value={tipo.id_tipo_unidade}
+                        >
+                          {tipo.nome_tipo_unidade}
                         </option>
                       ))}
                     </select>
@@ -3387,7 +3525,7 @@ export default function PrestacaoServicoAgua() {
                     >
                       Cancelar
                     </button>
-                    <SubmitButton 
+                    <SubmitButton
                       type="submit"
                       style={{
                         padding: "12px 24px",

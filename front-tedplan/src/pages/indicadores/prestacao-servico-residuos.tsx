@@ -1,7 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaBars, FaCaretDown, FaList, FaLink, FaPlus, FaEdit, FaTrash, FaSearch } from "react-icons/fa";
+import {
+  FaBars,
+  FaCaretDown,
+  FaList,
+  FaLink,
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaSearch,
+} from "react-icons/fa";
 import {
   InputP,
   InputM,
@@ -492,11 +501,18 @@ export default function PrestacaoServicoResiduos() {
   const [searchTermUnidades, setSearchTermUnidades] = useState("");
   const [eixos, setEixos] = useState<IEixo[]>([]);
   const [municipios, setMunicipios] = useState<IMunicipio[]>([]);
-  const [tiposUnidade, setTiposUnidade] = useState<Array<{ id_tipo_unidade: number; nome_tipo_unidade: string }>>([]);
-  const [unidadeSelecionada, setUnidadeSelecionada] = useState<IUnidade | null>(null);
-  const [indicadoresUnidade, setIndicadoresUnidade] = useState<IIndicador[]>([]);
-  const [loadingIndicadoresUnidade, setLoadingIndicadoresUnidade] = useState(false);
-  
+  const [tiposUnidade, setTiposUnidade] = useState<
+    Array<{ id_tipo_unidade: number; nome_tipo_unidade: string }>
+  >([]);
+  const [unidadeSelecionada, setUnidadeSelecionada] = useState<IUnidade | null>(
+    null
+  );
+  const [indicadoresUnidade, setIndicadoresUnidade] = useState<IIndicador[]>(
+    []
+  );
+  const [loadingIndicadoresUnidade, setLoadingIndicadoresUnidade] =
+    useState(false);
+
   const {
     register: registerUnidade,
     handleSubmit: handleSubmitUnidade,
@@ -505,7 +521,7 @@ export default function PrestacaoServicoResiduos() {
     watch: watchUnidade,
     formState: { errors: errorsUnidade },
   } = useForm();
-  
+
   const eixoValue = watchUnidade("id_eixo");
   const municipioValue = watchUnidade("id_municipio");
   const tipoUnidadeValue = watchUnidade("id_tipo_unidade");
@@ -530,9 +546,9 @@ export default function PrestacaoServicoResiduos() {
       if (municipios.length === 0) {
         loadMunicipios();
       }
-      
+
       loadTiposUnidade(4);
-      
+
       if (usuario?.id_municipio) {
         const municipioUsuario = usuario.id_municipio.toString();
         setValueUnidade("id_eixo", "4");
@@ -548,7 +564,13 @@ export default function PrestacaoServicoResiduos() {
         return () => clearTimeout(timer);
       }
     }
-  }, [isModalUnidadeVisible, isEditingUnidade, usuario?.id_municipio, municipios.length, setValueUnidade]);
+  }, [
+    isModalUnidadeVisible,
+    isEditingUnidade,
+    usuario?.id_municipio,
+    municipios.length,
+    setValueUnidade,
+  ]);
 
   useEffect(() => {
     if (showUnidades) {
@@ -573,7 +595,7 @@ export default function PrestacaoServicoResiduos() {
     if (!usuario?.id_municipio) {
       return;
     }
-    
+
     try {
       const res = await api
         .get("/getMunicipio", {
@@ -643,7 +665,9 @@ export default function PrestacaoServicoResiduos() {
     setLoadingIndicadoresUnidade(true);
     try {
       const apiClient = getAPIClient();
-      const response = await apiClient.get(`/indicadores-novo/eixo-unidade/${idEixo}`);
+      const response = await apiClient.get(
+        `/indicadores-novo/eixo-unidade/${idEixo}`
+      );
       const indicadoresData = response.data || [];
 
       if (indicadoresData.length === 0) {
@@ -711,7 +735,10 @@ export default function PrestacaoServicoResiduos() {
       setIndicadoresUnidade(indicadoresComTipos);
     } catch (error: any) {
       console.error("Erro ao carregar indicadores da unidade:", error);
-      const errorMessage = error?.response?.data?.error || error?.message || "Erro ao carregar indicadores!";
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.message ||
+        "Erro ao carregar indicadores!";
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
@@ -740,13 +767,13 @@ export default function PrestacaoServicoResiduos() {
   function handleOpenModalUnidade() {
     setIsEditingUnidade(false);
     setUnidadeEditando(null);
-    
+
     if (municipios.length === 0) {
       loadMunicipios();
     }
-    
+
     loadTiposUnidade(4);
-    
+
     const municipioUsuario = usuario?.id_municipio?.toString() || "";
     resetUnidade({
       nome_unidade: "",
@@ -767,12 +794,15 @@ export default function PrestacaoServicoResiduos() {
   function handleEditUnidade(unidade: IUnidade) {
     setIsEditingUnidade(true);
     setUnidadeEditando(unidade);
-    
+
     const eixoId = unidade.id_eixo || 4;
     loadTiposUnidade(eixoId);
-    
+
     setValueUnidade("nome_unidade", unidade.nome_unidade || "");
-    setValueUnidade("id_tipo_unidade", unidade.id_tipo_unidade?.toString() || "");
+    setValueUnidade(
+      "id_tipo_unidade",
+      unidade.id_tipo_unidade?.toString() || ""
+    );
     setValueUnidade("id_eixo", unidade.id_eixo?.toString() || "4");
     setValueUnidade("id_municipio", unidade.id_municipio?.toString() || "");
     setModalUnidadeVisible(true);
@@ -783,7 +813,12 @@ export default function PrestacaoServicoResiduos() {
       const apiClient = getAPIClient();
 
       const parseToIntOrNull = (value: any): number | null => {
-        if (!value || value === "" || value === "undefined" || value === undefined) {
+        if (
+          !value ||
+          value === "" ||
+          value === "undefined" ||
+          value === undefined
+        ) {
           return null;
         }
         const parsed = parseInt(value, 10);
@@ -798,7 +833,10 @@ export default function PrestacaoServicoResiduos() {
       };
 
       if (isEditingUnidade && unidadeEditando) {
-        await apiClient.put(`/unidades/${unidadeEditando.id_unidade}`, unidadeData);
+        await apiClient.put(
+          `/unidades/${unidadeEditando.id_unidade}`,
+          unidadeData
+        );
         toast.success("Unidade atualizada com sucesso!", {
           position: "top-right",
           autoClose: 5000,
@@ -940,7 +978,11 @@ export default function PrestacaoServicoResiduos() {
                 }
               }
             } catch (error) {
-              console.error("Erro ao processar valor do checkbox:", valor, error);
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
             }
           });
         } else {
@@ -1022,7 +1064,9 @@ export default function PrestacaoServicoResiduos() {
                     (item) =>
                       item.id_item_check_box.toString() ===
                         idItemCheckBox.toString() ||
-                      item.descricao.toLowerCase().includes(idItemCheckBox.toLowerCase())
+                      item.descricao
+                        .toLowerCase()
+                        .includes(idItemCheckBox.toLowerCase())
                   );
 
                   if (checkBoxItemAlt) {
@@ -1101,7 +1145,9 @@ export default function PrestacaoServicoResiduos() {
         if (existingData.length > 0) {
           const existingDataMap = new Map();
           existingData.forEach((record) => {
-            const key = `${record.codigo_indicador}_${record.ano}_${record.id_unidade || 'null'}`;
+            const key = `${record.codigo_indicador}_${record.ano}_${
+              record.id_unidade || "null"
+            }`;
             existingDataMap.set(key, record);
           });
 
@@ -1119,7 +1165,11 @@ export default function PrestacaoServicoResiduos() {
                 await apiClient.post("/indicadores-municipio", valorIndicador);
               }
             } catch (saveError) {
-              console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+              console.error(
+                "Erro ao salvar/atualizar valor:",
+                valorIndicador,
+                saveError
+              );
               throw saveError;
             }
           }
@@ -1909,6 +1959,9 @@ export default function PrestacaoServicoResiduos() {
               <FaBars />
             </CollapseButton>
             {menus?.map((menu) => {
+              if (menu.titulo === "Unidades") {
+                return;
+              }
               const isOpen = openMenuId === menu.id_menu;
               return (
                 <div key={menu.id_menu}>
@@ -1978,462 +2031,468 @@ export default function PrestacaoServicoResiduos() {
         <DivCenter>
           {/* Formulário de Indicadores - só aparece quando não está mostrando unidades */}
           {!showUnidades && (
-          <Form onSubmit={handleSubmit(handleCadastroIndicadores)}>
-            <BreadCrumbStyle $isCollapsed={isCollapsed}>
-              <nav>
-                <ol>
-                  <li>
-                    <Link href="/indicadores/home_indicadores">Home</Link>
-                    <span> / </span>
-                  </li>
-                  <li>
-                    <Link href="/indicadores/prestacao-servicos">
-                      Prestação de Serviços
-                    </Link>
-                    <span> / </span>
-                  </li>
-                  <li>
-                    <span>Resíduos</span>
-                  </li>
-                </ol>
-              </nav>
-            </BreadCrumbStyle>
-            <DivForm style={{ borderColor: "#12B2D5" }}>
-              <DivTituloForm>Resíduos</DivTituloForm>
+            <Form onSubmit={handleSubmit(handleCadastroIndicadores)}>
+              <BreadCrumbStyle $isCollapsed={isCollapsed}>
+                <nav>
+                  <ol>
+                    <li>
+                      <Link href="/indicadores/home_indicadores">Home</Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <Link href="/indicadores/prestacao-servicos">
+                        Prestação de Serviços
+                      </Link>
+                      <span> / </span>
+                    </li>
+                    <li>
+                      <span>Resíduos</span>
+                    </li>
+                  </ol>
+                </nav>
+              </BreadCrumbStyle>
+              <DivForm style={{ borderColor: "#12B2D5" }}>
+                <DivTituloForm>Resíduos</DivTituloForm>
 
-              <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
                 <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "20px",
-                    flexWrap: "wrap",
-                  }}
+                  style={{ padding: "20px", borderBottom: "1px solid #eee" }}
                 >
-                  <div>
-                    <label>Selecionar Ano:</label>
-                    <select
-                      value={anoSelected || ""}
-                      onChange={(e) => selectAno(e.target.value)}
-                      disabled={loadingDados}
-                      style={{ marginLeft: "10px", padding: "5px" }}
-                    >
-                      <option value="">Selecione o ano</option>
-                      {anosSelect().map((ano) => (
-                        <option key={ano} value={ano}>
-                          {ano}
-                        </option>
-                      ))}
-                    </select>
-                    {loadingDados && (
-                      <span style={{ marginLeft: "10px", color: "#12B2D5" }}>
-                        Carregando dados...
-                      </span>
-                    )}
-                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div>
+                      <label>Selecionar Ano:</label>
+                      <select
+                        value={anoSelected || ""}
+                        onChange={(e) => selectAno(e.target.value)}
+                        disabled={loadingDados}
+                        style={{ marginLeft: "10px", padding: "5px" }}
+                      >
+                        <option value="">Selecione o ano</option>
+                        {anosSelect().map((ano) => (
+                          <option key={ano} value={ano}>
+                            {ano}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingDados && (
+                        <span style={{ marginLeft: "10px", color: "#12B2D5" }}>
+                          Carregando dados...
+                        </span>
+                      )}
+                    </div>
 
-                  <div style={{ fontSize: "14px", color: "#666" }}>
-                    <strong>{indicadores.length}</strong> indicador
-                    {indicadores.length !== 1 ? "es" : ""} encontrado
-                    {indicadores.length !== 1 ? "s" : ""}
-                    {indicadores.some((ind) => ind._hasError) && (
-                      <span style={{ color: "#dc3545", marginLeft: "10px" }}>
-                        | ⚠️ Alguns campos com erro
-                      </span>
-                    )}
-                    {dadosCarregados.length > 0 && (
-                      <span style={{ color: "#28a745", marginLeft: "10px" }}>
-                        | ✅ {dadosCarregados.length} dado
-                        {dadosCarregados.length !== 1 ? "s" : ""} carregado
-                        {dadosCarregados.length !== 1 ? "s" : ""}
-                      </span>
-                    )}
-                  </div>
+                    <div style={{ fontSize: "14px", color: "#666" }}>
+                      <strong>{indicadores.length}</strong> indicador
+                      {indicadores.length !== 1 ? "es" : ""} encontrado
+                      {indicadores.length !== 1 ? "s" : ""}
+                      {indicadores.some((ind) => ind._hasError) && (
+                        <span style={{ color: "#dc3545", marginLeft: "10px" }}>
+                          | ⚠️ Alguns campos com erro
+                        </span>
+                      )}
+                      {dadosCarregados.length > 0 && (
+                        <span style={{ color: "#28a745", marginLeft: "10px" }}>
+                          | ✅ {dadosCarregados.length} dado
+                          {dadosCarregados.length !== 1 ? "s" : ""} carregado
+                          {dadosCarregados.length !== 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </div>
 
-                  {grupo &&
-                    !loadingIndicadores &&
-                    indicadores.some((ind) => ind._hasError) && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const currentMenu = menus.find((menu) =>
-                            menu.menu_item?.some(
+                    {grupo &&
+                      !loadingIndicadores &&
+                      indicadores.some((ind) => ind._hasError) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentMenu = menus.find((menu) =>
+                              menu.menu_item?.some(
+                                (item) => item.nome_menu_item === grupo
+                              )
+                            );
+                            const menuItem = currentMenu?.menu_item?.find(
                               (item) => item.nome_menu_item === grupo
-                            )
-                          );
-                          const menuItem = currentMenu?.menu_item?.find(
-                            (item) => item.nome_menu_item === grupo
-                          );
-                          if (menuItem) {
-                            getIndicadores(menuItem);
-                          }
-                        }}
-                        style={{
-                          padding: "6px 12px",
-                          fontSize: "12px",
-                          backgroundColor: "#dc3545",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                          marginLeft: "10px",
-                        }}
-                      >
-                        🔄 Tentar Novamente
-                      </button>
-                    )}
-                </div>
-              </div>
-
-              <DivFormEixo>
-                <DivFormConteudo
-                  active={!!grupo}
-                  style={{
-                    display: grupo ? "block" : "none",
-                    visibility: grupo ? "visible" : "hidden",
-                    opacity: grupo ? 1 : 0,
-                  }}
-                >
-                  <DivTitulo>
-                    <DivTituloConteudo>{grupo}</DivTituloConteudo>
-                  </DivTitulo>
-
-                  {!grupo ? (
-                    <div
-                      style={{
-                        textAlign: "center",
-                        padding: "40px",
-                        backgroundColor: "#f8f9fa",
-                      }}
-                    >
-                      <p>👈 Selecione um item do menu lateral para começar</p>
-                    </div>
-                  ) : loadingIndicadores ? (
-                    <div style={{ textAlign: "center", padding: "40px" }}>
-                      <p>Carregando indicadores...</p>
-                    </div>
-                  ) : indicadores.length === 0 ? (
-                    <div style={{ textAlign: "center", padding: "40px" }}>
-                      <p>Nenhum indicador encontrado para este grupo.</p>
-                      <p style={{ fontSize: "12px", color: "#666" }}>
-                        Grupo: {grupo} | Loading:{" "}
-                        {loadingIndicadores ? "true" : "false"}
-                      </p>
-                    </div>
-                  ) : (
-                    <div
-                      style={{
-                        backgroundColor: "#fff",
-                        borderRadius: "8px",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                        overflow: "hidden",
-                        marginTop: "20px",
-                      }}
-                    >
-                      {/* Cabeçalho da Tabela */}
-                      <div
-                        style={{
-                          backgroundColor: "#1e88e5",
-                          color: "white",
-                          padding: "15px 0",
-                          fontWeight: "600",
-                          fontSize: "13px",
-                          letterSpacing: "0.5px",
-                        }}
-                      >
-                        <div
+                            );
+                            if (menuItem) {
+                              getIndicadores(menuItem);
+                            }
+                          }}
                           style={{
-                            display: "grid",
-                            gridTemplateColumns:
-                              window.innerWidth > 768
-                                ? "180px 1fr 280px 100px"
-                                : "1fr",
-                            gap: window.innerWidth > 768 ? "15px" : "10px",
-                            alignItems: "center",
-                            padding: "0 15px",
+                            padding: "6px 12px",
+                            fontSize: "12px",
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            marginLeft: "10px",
                           }}
                         >
-                          {window.innerWidth > 768 ? (
-                            <>
-                              <div>CÓDIGO</div>
-                              <div>DESCRIÇÃO DO INDICADOR</div>
-                              <div style={{ textAlign: "center" }}>
-                                VALOR - ANO: {anoSelected || "____"}
-                              </div>
-                              <div style={{ textAlign: "center" }}>UNIDADE</div>
-                            </>
-                          ) : (
-                            <div>
-                              INDICADORES - ANO: {anoSelected || "____"}
-                            </div>
-                          )}
-                        </div>
+                          🔄 Tentar Novamente
+                        </button>
+                      )}
+                  </div>
+                </div>
+
+                <DivFormEixo>
+                  <DivFormConteudo
+                    active={!!grupo}
+                    style={{
+                      display: grupo ? "block" : "none",
+                      visibility: grupo ? "visible" : "hidden",
+                      opacity: grupo ? 1 : 0,
+                    }}
+                  >
+                    <DivTitulo>
+                      <DivTituloConteudo>{grupo}</DivTituloConteudo>
+                    </DivTitulo>
+
+                    {!grupo ? (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "40px",
+                          backgroundColor: "#f8f9fa",
+                        }}
+                      >
+                        <p>👈 Selecione um item do menu lateral para começar</p>
                       </div>
-
-                      {/* Linhas da Tabela */}
-                      {indicadores.map((indicador, index) => {
-                        const tipoCampo =
-                          indicador.tiposCampo &&
-                          indicador.tiposCampo.length > 0
-                            ? indicador.tiposCampo[0]
-                            : null;
-                        const isEven = index % 2 === 0;
-
-                        return (
+                    ) : loadingIndicadores ? (
+                      <div style={{ textAlign: "center", padding: "40px" }}>
+                        <p>Carregando indicadores...</p>
+                      </div>
+                    ) : indicadores.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "40px" }}>
+                        <p>Nenhum indicador encontrado para este grupo.</p>
+                        <p style={{ fontSize: "12px", color: "#666" }}>
+                          Grupo: {grupo} | Loading:{" "}
+                          {loadingIndicadores ? "true" : "false"}
+                        </p>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          backgroundColor: "#fff",
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                          overflow: "hidden",
+                          marginTop: "20px",
+                        }}
+                      >
+                        {/* Cabeçalho da Tabela */}
+                        <div
+                          style={{
+                            backgroundColor: "#1e88e5",
+                            color: "white",
+                            padding: "15px 0",
+                            fontWeight: "600",
+                            fontSize: "13px",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
                           <div
-                            key={indicador.id_indicador}
                             style={{
-                              backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
-                              borderBottom:
-                                index < indicadores.length - 1
-                                  ? "1px solid #dee2e6"
-                                  : "none",
-                              padding: "15px 0",
-                              transition: "background-color 0.2s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#e8f4fd";
-                              e.currentTarget.style.borderLeft =
-                                "3px solid #1e88e5";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = isEven
-                                ? "#f8f9fa"
-                                : "#ffffff";
-                              e.currentTarget.style.borderLeft = "none";
+                              display: "grid",
+                              gridTemplateColumns:
+                                window.innerWidth > 768
+                                  ? "180px 1fr 280px 100px"
+                                  : "1fr",
+                              gap: window.innerWidth > 768 ? "15px" : "10px",
+                              alignItems: "center",
+                              padding: "0 15px",
                             }}
                           >
                             {window.innerWidth > 768 ? (
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "180px 1fr 280px 100px",
-                                  gap: "15px",
-                                  alignItems: "center",
-                                  padding: "0 15px",
-                                }}
-                              >
-                                {/* Código */}
-                                <div>
-                                  <div
-                                    style={{
-                                      fontSize: "15px",
-                                      fontWeight: "bold",
-                                      color: "#1e88e5",
-                                    }}
-                                  >
-                                    {indicador.codigo_indicador}
-                                  </div>
+                              <>
+                                <div>CÓDIGO</div>
+                                <div>DESCRIÇÃO DO INDICADOR</div>
+                                <div style={{ textAlign: "center" }}>
+                                  VALOR - ANO: {anoSelected || "____"}
                                 </div>
-
-                                {/* Descrição */}
-                                <div
-                                  style={{
-                                    fontSize: "14px",
-                                    color: "#495057",
-                                    lineHeight: "1.3",
-                                  }}
-                                >
-                                  {indicador.nome_indicador}
+                                <div style={{ textAlign: "center" }}>
+                                  UNIDADE
                                 </div>
-
-                                {/* Campo de Input */}
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  {anoSelected ? (
-                                    <div style={{ width: "260px" }}>
-                                      <CampoIndicador
-                                        indicador={indicador}
-                                        register={register}
-                                        anoSelected={anoSelected}
-                                        campoEnabled={campoEnabled}
-                                        fieldStates={fieldStates}
-                                        setFieldStates={setFieldStates}
-                                        setValue={setValue}
-                                      />
-                                    </div>
-                                  ) : (
-                                    <input
-                                      type="text"
-                                      placeholder="Selecione um ano"
-                                      disabled
-                                      style={{
-                                        width: "260px",
-                                        backgroundColor: "#f8f9fa",
-                                        border: "1px solid #dee2e6",
-                                        borderRadius: "4px",
-                                        padding: "8px 12px",
-                                        color: "#6c757d",
-                                        textAlign: "center",
-                                        fontSize: "12px",
-                                      }}
-                                    />
-                                  )}
-                                </div>
-
-                                {/* Unidade */}
-                                <div
-                                  style={{
-                                    textAlign: "center",
-                                    fontSize: "12px",
-                                    color: "#495057",
-                                  }}
-                                >
-                                  <div
-                                    style={{
-                                      fontWeight: "500",
-                                      padding: "5px 6px",
-                                      backgroundColor: "#e9ecef",
-                                      borderRadius: "3px",
-                                      fontSize: "11px",
-                                    }}
-                                  >
-                                    {indicador.unidade_indicador || "-"}
-                                  </div>
-                                </div>
-                              </div>
+                              </>
                             ) : (
-                              /* Layout Mobile */
-                              <div
-                                style={{
-                                  padding: "0 15px",
-                                  display: "flex",
-                                  flexDirection: "column",
-                                  gap: "10px",
-                                }}
-                              >
+                              <div>
+                                INDICADORES - ANO: {anoSelected || "____"}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Linhas da Tabela */}
+                        {indicadores.map((indicador, index) => {
+                          const tipoCampo =
+                            indicador.tiposCampo &&
+                            indicador.tiposCampo.length > 0
+                              ? indicador.tiposCampo[0]
+                              : null;
+                          const isEven = index % 2 === 0;
+
+                          return (
+                            <div
+                              key={indicador.id_indicador}
+                              style={{
+                                backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                                borderBottom:
+                                  index < indicadores.length - 1
+                                    ? "1px solid #dee2e6"
+                                    : "none",
+                                padding: "15px 0",
+                                transition: "background-color 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "#e8f4fd";
+                                e.currentTarget.style.borderLeft =
+                                  "3px solid #1e88e5";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = isEven
+                                  ? "#f8f9fa"
+                                  : "#ffffff";
+                                e.currentTarget.style.borderLeft = "none";
+                              }}
+                            >
+                              {window.innerWidth > 768 ? (
                                 <div
                                   style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                      "180px 1fr 280px 100px",
+                                    gap: "15px",
                                     alignItems: "center",
+                                    padding: "0 15px",
                                   }}
                                 >
+                                  {/* Código */}
                                   <div>
                                     <div
                                       style={{
-                                        fontSize: "16px",
+                                        fontSize: "15px",
                                         fontWeight: "bold",
                                         color: "#1e88e5",
                                       }}
                                     >
                                       {indicador.codigo_indicador}
                                     </div>
+                                  </div>
+
+                                  {/* Descrição */}
+                                  <div
+                                    style={{
+                                      fontSize: "14px",
+                                      color: "#495057",
+                                      lineHeight: "1.3",
+                                    }}
+                                  >
+                                    {indicador.nome_indicador}
+                                  </div>
+
+                                  {/* Campo de Input */}
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "center",
+                                    }}
+                                  >
+                                    {anoSelected ? (
+                                      <div style={{ width: "260px" }}>
+                                        <CampoIndicador
+                                          indicador={indicador}
+                                          register={register}
+                                          anoSelected={anoSelected}
+                                          campoEnabled={campoEnabled}
+                                          fieldStates={fieldStates}
+                                          setFieldStates={setFieldStates}
+                                          setValue={setValue}
+                                        />
+                                      </div>
+                                    ) : (
+                                      <input
+                                        type="text"
+                                        placeholder="Selecione um ano"
+                                        disabled
+                                        style={{
+                                          width: "260px",
+                                          backgroundColor: "#f8f9fa",
+                                          border: "1px solid #dee2e6",
+                                          borderRadius: "4px",
+                                          padding: "8px 12px",
+                                          color: "#6c757d",
+                                          textAlign: "center",
+                                          fontSize: "12px",
+                                        }}
+                                      />
+                                    )}
+                                  </div>
+
+                                  {/* Unidade */}
+                                  <div
+                                    style={{
+                                      textAlign: "center",
+                                      fontSize: "12px",
+                                      color: "#495057",
+                                    }}
+                                  >
                                     <div
                                       style={{
+                                        fontWeight: "500",
+                                        padding: "5px 6px",
+                                        backgroundColor: "#e9ecef",
+                                        borderRadius: "3px",
                                         fontSize: "11px",
-                                        color: "#6c757d",
                                       }}
                                     >
                                       {indicador.unidade_indicador || "-"}
                                     </div>
                                   </div>
-                                  {tipoCampo && (
-                                    <div
-                                      style={{
-                                        fontSize: "10px",
-                                        color: "#6c757d",
-                                        backgroundColor: "#f8f9fa",
-                                        padding: "3px 6px",
-                                        borderRadius: "3px",
-                                      }}
-                                    >
-                                      {tipoCampo.type}
-                                    </div>
-                                  )}
                                 </div>
-
+                              ) : (
+                                /* Layout Mobile */
                                 <div
                                   style={{
-                                    fontSize: "13px",
-                                    color: "#495057",
-                                    lineHeight: "1.3",
-                                    marginBottom: "8px",
+                                    padding: "0 15px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "10px",
                                   }}
                                 >
-                                  {indicador.nome_indicador}
-                                </div>
-
-                                {anoSelected ? (
-                                  <CampoIndicador
-                                    indicador={indicador}
-                                    register={register}
-                                    anoSelected={anoSelected}
-                                    campoEnabled={campoEnabled}
-                                    fieldStates={fieldStates}
-                                    setFieldStates={setFieldStates}
-                                    setValue={setValue}
-                                  />
-                                ) : (
-                                  <input
-                                    type="text"
-                                    placeholder="Selecione um ano primeiro"
-                                    disabled
+                                  <div
                                     style={{
-                                      backgroundColor: "#f8f9fa",
-                                      border: "1px solid #dee2e6",
-                                      borderRadius: "4px",
-                                      padding: "8px 12px",
-                                      color: "#6c757d",
-                                      textAlign: "center",
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
                                     }}
-                                  />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </DivFormConteudo>
-                {isEditor && indicadores.length > 0 && anoSelected && (
-                  <div
-                    style={{
-                      marginTop: "30px",
-                      padding: "20px",
-                      textAlign: "center",
-                      borderTop: "1px solid #e1e5e9",
-                    }}
-                  >
-                    <button
-                      type="submit"
+                                  >
+                                    <div>
+                                      <div
+                                        style={{
+                                          fontSize: "16px",
+                                          fontWeight: "bold",
+                                          color: "#1e88e5",
+                                        }}
+                                      >
+                                        {indicador.codigo_indicador}
+                                      </div>
+                                      <div
+                                        style={{
+                                          fontSize: "11px",
+                                          color: "#6c757d",
+                                        }}
+                                      >
+                                        {indicador.unidade_indicador || "-"}
+                                      </div>
+                                    </div>
+                                    {tipoCampo && (
+                                      <div
+                                        style={{
+                                          fontSize: "10px",
+                                          color: "#6c757d",
+                                          backgroundColor: "#f8f9fa",
+                                          padding: "3px 6px",
+                                          borderRadius: "3px",
+                                        }}
+                                      >
+                                        {tipoCampo.type}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div
+                                    style={{
+                                      fontSize: "13px",
+                                      color: "#495057",
+                                      lineHeight: "1.3",
+                                      marginBottom: "8px",
+                                    }}
+                                  >
+                                    {indicador.nome_indicador}
+                                  </div>
+
+                                  {anoSelected ? (
+                                    <CampoIndicador
+                                      indicador={indicador}
+                                      register={register}
+                                      anoSelected={anoSelected}
+                                      campoEnabled={campoEnabled}
+                                      fieldStates={fieldStates}
+                                      setFieldStates={setFieldStates}
+                                      setValue={setValue}
+                                    />
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder="Selecione um ano primeiro"
+                                      disabled
+                                      style={{
+                                        backgroundColor: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                        padding: "8px 12px",
+                                        color: "#6c757d",
+                                        textAlign: "center",
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </DivFormConteudo>
+                  {isEditor && indicadores.length > 0 && anoSelected && (
+                    <div
                       style={{
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "8px",
-                        padding: "12px 40px",
-                        fontSize: "16px",
-                        fontWeight: "500",
-                        cursor: "pointer",
-                        boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
-                        transition: "all 0.2s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#218838";
-                        e.currentTarget.style.boxShadow =
-                          "0 4px 8px rgba(40,167,69,0.3)";
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#28a745";
-                        e.currentTarget.style.boxShadow =
-                          "0 2px 4px rgba(40,167,69,0.2)";
-                        e.currentTarget.style.transform = "translateY(0)";
+                        marginTop: "30px",
+                        padding: "20px",
+                        textAlign: "center",
+                        borderTop: "1px solid #e1e5e9",
                       }}
                     >
-                      💾 Salvar Dados dos Indicadores
-                    </button>
-                  </div>
-                )}
-              </DivFormEixo>
-            </DivForm>
-          </Form>
+                      <button
+                        type="submit"
+                        style={{
+                          backgroundColor: "#28a745",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "12px 40px",
+                          fontSize: "16px",
+                          fontWeight: "500",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#218838";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 8px rgba(40,167,69,0.3)";
+                          e.currentTarget.style.transform = "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#28a745";
+                          e.currentTarget.style.boxShadow =
+                            "0 2px 4px rgba(40,167,69,0.2)";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                      >
+                        💾 Salvar Dados dos Indicadores
+                      </button>
+                    </div>
+                  )}
+                </DivFormEixo>
+              </DivForm>
+            </Form>
           )}
 
           {/* Componente de Unidades */}
@@ -2461,7 +2520,9 @@ export default function PrestacaoServicoResiduos() {
               <DivForm style={{ borderColor: "#12B2D5" }}>
                 <DivTituloForm>Gestão de Unidades</DivTituloForm>
 
-                <div style={{ padding: "20px", borderBottom: "1px solid #eee" }}>
+                <div
+                  style={{ padding: "20px", borderBottom: "1px solid #eee" }}
+                >
                   <div
                     style={{
                       display: "flex",
@@ -2487,7 +2548,9 @@ export default function PrestacaoServicoResiduos() {
                             type="text"
                             placeholder="Buscar unidades..."
                             value={searchTermUnidades}
-                            onChange={(e) => setSearchTermUnidades(e.target.value)}
+                            onChange={(e) =>
+                              setSearchTermUnidades(e.target.value)
+                            }
                             style={{
                               flex: 1,
                               padding: "8px 12px",
@@ -2522,7 +2585,9 @@ export default function PrestacaoServicoResiduos() {
                             <p>Carregando unidades...</p>
                           </div>
                         ) : unidades.filter((unidade) =>
-                            unidade.nome_unidade?.toLowerCase().includes(searchTermUnidades.toLowerCase())
+                            unidade.nome_unidade
+                              ?.toLowerCase()
+                              .includes(searchTermUnidades.toLowerCase())
                           ).length === 0 ? (
                           <div style={{ textAlign: "center", padding: "40px" }}>
                             <p>
@@ -2558,7 +2623,8 @@ export default function PrestacaoServicoResiduos() {
                                     window.innerWidth > 768
                                       ? "1fr 150px 150px 150px 120px"
                                       : "1fr",
-                                  gap: window.innerWidth > 768 ? "15px" : "10px",
+                                  gap:
+                                    window.innerWidth > 768 ? "15px" : "10px",
                                   alignItems: "center",
                                   padding: "0 15px",
                                 }}
@@ -2569,7 +2635,9 @@ export default function PrestacaoServicoResiduos() {
                                     <div>TIPO</div>
                                     <div>EIXO</div>
                                     <div>MUNICÍPIO</div>
-                                    <div style={{ textAlign: "center" }}>AÇÕES</div>
+                                    <div style={{ textAlign: "center" }}>
+                                      AÇÕES
+                                    </div>
                                   </>
                                 ) : (
                                   <div>UNIDADES</div>
@@ -2580,7 +2648,9 @@ export default function PrestacaoServicoResiduos() {
                             {/* Linhas da Tabela */}
                             {unidades
                               .filter((unidade) =>
-                                unidade.nome_unidade?.toLowerCase().includes(searchTermUnidades.toLowerCase())
+                                unidade.nome_unidade
+                                  ?.toLowerCase()
+                                  .includes(searchTermUnidades.toLowerCase())
                               )
                               .map((unidade, index) => {
                                 const isEven = index % 2 === 0;
@@ -2589,9 +2659,13 @@ export default function PrestacaoServicoResiduos() {
                                   <div
                                     key={unidade.id_unidade}
                                     style={{
-                                      backgroundColor: unidadeSelecionada?.id_unidade === unidade.id_unidade 
-                                        ? "#d1ecf1" 
-                                        : (isEven ? "#f8f9fa" : "#ffffff"),
+                                      backgroundColor:
+                                        unidadeSelecionada?.id_unidade ===
+                                        unidade.id_unidade
+                                          ? "#d1ecf1"
+                                          : isEven
+                                          ? "#f8f9fa"
+                                          : "#ffffff",
                                       borderBottom:
                                         index < unidades.length - 1
                                           ? "1px solid #dee2e6"
@@ -2599,23 +2673,33 @@ export default function PrestacaoServicoResiduos() {
                                       padding: "15px 0",
                                       transition: "background-color 0.2s ease",
                                       cursor: "pointer",
-                                      borderLeft: unidadeSelecionada?.id_unidade === unidade.id_unidade
-                                        ? "4px solid #1e88e5"
-                                        : "none",
+                                      borderLeft:
+                                        unidadeSelecionada?.id_unidade ===
+                                        unidade.id_unidade
+                                          ? "4px solid #1e88e5"
+                                          : "none",
                                     }}
                                     onClick={() => handleSelectUnidade(unidade)}
                                     onMouseEnter={(e) => {
-                                      if (unidadeSelecionada?.id_unidade !== unidade.id_unidade) {
-                                        e.currentTarget.style.backgroundColor = "#e8f4fd";
-                                        e.currentTarget.style.borderLeft = "3px solid #1e88e5";
+                                      if (
+                                        unidadeSelecionada?.id_unidade !==
+                                        unidade.id_unidade
+                                      ) {
+                                        e.currentTarget.style.backgroundColor =
+                                          "#e8f4fd";
+                                        e.currentTarget.style.borderLeft =
+                                          "3px solid #1e88e5";
                                       }
                                     }}
                                     onMouseLeave={(e) => {
-                                      if (unidadeSelecionada?.id_unidade !== unidade.id_unidade) {
-                                        e.currentTarget.style.backgroundColor = isEven
-                                          ? "#f8f9fa"
-                                          : "#ffffff";
-                                        e.currentTarget.style.borderLeft = "none";
+                                      if (
+                                        unidadeSelecionada?.id_unidade !==
+                                        unidade.id_unidade
+                                      ) {
+                                        e.currentTarget.style.backgroundColor =
+                                          isEven ? "#f8f9fa" : "#ffffff";
+                                        e.currentTarget.style.borderLeft =
+                                          "none";
                                       }
                                     }}
                                   >
@@ -2646,7 +2730,8 @@ export default function PrestacaoServicoResiduos() {
                                             color: "#6c757d",
                                           }}
                                         >
-                                          {unidade.tipoUnidade?.nome_tipo_unidade || "-"}
+                                          {unidade.tipoUnidade
+                                            ?.nome_tipo_unidade || "-"}
                                         </div>
                                         <div
                                           style={{
@@ -2662,7 +2747,8 @@ export default function PrestacaoServicoResiduos() {
                                             color: "#6c757d",
                                           }}
                                         >
-                                          {unidade.municipio?.municipio_nome || "-"}
+                                          {unidade.municipio?.municipio_nome ||
+                                            "-"}
                                         </div>
                                         <div
                                           style={{
@@ -2689,7 +2775,9 @@ export default function PrestacaoServicoResiduos() {
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               e.preventDefault();
-                                              handleDeleteUnidade(unidade.id_unidade);
+                                              handleDeleteUnidade(
+                                                unidade.id_unidade
+                                              );
                                             }}
                                             title="Excluir"
                                           >
@@ -2722,7 +2810,9 @@ export default function PrestacaoServicoResiduos() {
                                             color: "#6c757d",
                                           }}
                                         >
-                                          Tipo: {unidade.tipoUnidade?.nome_tipo_unidade || "-"}
+                                          Tipo:{" "}
+                                          {unidade.tipoUnidade
+                                            ?.nome_tipo_unidade || "-"}
                                         </div>
                                         <div
                                           style={{
@@ -2738,7 +2828,9 @@ export default function PrestacaoServicoResiduos() {
                                             color: "#6c757d",
                                           }}
                                         >
-                                          Município: {unidade.municipio?.municipio_nome || "-"}
+                                          Município:{" "}
+                                          {unidade.municipio?.municipio_nome ||
+                                            "-"}
                                         </div>
                                         <div
                                           style={{
@@ -2765,7 +2857,9 @@ export default function PrestacaoServicoResiduos() {
                                             onClick={(e) => {
                                               e.stopPropagation();
                                               e.preventDefault();
-                                              handleDeleteUnidade(unidade.id_unidade);
+                                              handleDeleteUnidade(
+                                                unidade.id_unidade
+                                              );
                                             }}
                                             title="Excluir"
                                           >
@@ -2825,7 +2919,9 @@ export default function PrestacaoServicoResiduos() {
                           </div>
                         ) : indicadoresUnidade.length === 0 ? (
                           <div style={{ textAlign: "center", padding: "40px" }}>
-                            <p>Nenhum indicador encontrado para esta unidade.</p>
+                            <p>
+                              Nenhum indicador encontrado para esta unidade.
+                            </p>
                           </div>
                         ) : (
                           <div
@@ -2854,7 +2950,8 @@ export default function PrestacaoServicoResiduos() {
                                     window.innerWidth > 768
                                       ? "180px 1fr 280px 100px"
                                       : "1fr",
-                                  gap: window.innerWidth > 768 ? "15px" : "10px",
+                                  gap:
+                                    window.innerWidth > 768 ? "15px" : "10px",
                                   alignItems: "center",
                                   padding: "0 15px",
                                 }}
@@ -2863,8 +2960,12 @@ export default function PrestacaoServicoResiduos() {
                                   <>
                                     <div>CÓDIGO</div>
                                     <div>DESCRIÇÃO DO INDICADOR</div>
-                                    <div style={{ textAlign: "center" }}>VALOR</div>
-                                    <div style={{ textAlign: "center" }}>UNIDADE</div>
+                                    <div style={{ textAlign: "center" }}>
+                                      VALOR
+                                    </div>
+                                    <div style={{ textAlign: "center" }}>
+                                      UNIDADE
+                                    </div>
                                   </>
                                 ) : (
                                   <div>INDICADORES</div>
@@ -2885,7 +2986,9 @@ export default function PrestacaoServicoResiduos() {
                                 <div
                                   key={indicador.id_indicador}
                                   style={{
-                                    backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                                    backgroundColor: isEven
+                                      ? "#f8f9fa"
+                                      : "#ffffff",
                                     borderBottom:
                                       index < indicadoresUnidade.length - 1
                                         ? "1px solid #dee2e6"
@@ -2894,14 +2997,14 @@ export default function PrestacaoServicoResiduos() {
                                     transition: "background-color 0.2s ease",
                                   }}
                                   onMouseEnter={(e) => {
-                                    e.currentTarget.style.backgroundColor = "#e8f4fd";
+                                    e.currentTarget.style.backgroundColor =
+                                      "#e8f4fd";
                                     e.currentTarget.style.borderLeft =
                                       "3px solid #1e88e5";
                                   }}
                                   onMouseLeave={(e) => {
-                                    e.currentTarget.style.backgroundColor = isEven
-                                      ? "#f8f9fa"
-                                      : "#ffffff";
+                                    e.currentTarget.style.backgroundColor =
+                                      isEven ? "#f8f9fa" : "#ffffff";
                                     e.currentTarget.style.borderLeft = "none";
                                   }}
                                 >
@@ -2909,7 +3012,8 @@ export default function PrestacaoServicoResiduos() {
                                     <div
                                       style={{
                                         display: "grid",
-                                        gridTemplateColumns: "180px 1fr 280px 100px",
+                                        gridTemplateColumns:
+                                          "180px 1fr 280px 100px",
                                         gap: "15px",
                                         alignItems: "center",
                                         padding: "0 15px",
@@ -3074,16 +3178,20 @@ export default function PrestacaoServicoResiduos() {
                                 transition: "all 0.2s ease",
                               }}
                               onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "#218838";
+                                e.currentTarget.style.backgroundColor =
+                                  "#218838";
                                 e.currentTarget.style.boxShadow =
                                   "0 4px 8px rgba(40,167,69,0.3)";
-                                e.currentTarget.style.transform = "translateY(-1px)";
+                                e.currentTarget.style.transform =
+                                  "translateY(-1px)";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "#28a745";
+                                e.currentTarget.style.backgroundColor =
+                                  "#28a745";
                                 e.currentTarget.style.boxShadow =
                                   "0 2px 4px rgba(40,167,69,0.2)";
-                                e.currentTarget.style.transform = "translateY(0)";
+                                e.currentTarget.style.transform =
+                                  "translateY(0)";
                               }}
                             >
                               💾 Salvar Dados dos Indicadores da Unidade
@@ -3104,20 +3212,31 @@ export default function PrestacaoServicoResiduos() {
       {isModalUnidadeVisible && (
         <ContainerModal onClick={handleCloseModalUnidade}>
           <Modal onClick={(e) => e.stopPropagation()}>
-            <CloseModalButton onClick={handleCloseModalUnidade}>×</CloseModalButton>
+            <CloseModalButton onClick={handleCloseModalUnidade}>
+              ×
+            </CloseModalButton>
             <TituloModal>
               {isEditingUnidade ? "Editar Unidade" : "Adicionar Nova Unidade"}
             </TituloModal>
             <ConteudoModal>
               <form onSubmit={handleSubmitUnidade(handleSaveUnidade)}>
-                <div style={{ display: "flex", flexDirection: "column", width: "100%", padding: "10px" }}>
-                  <label style={{ 
-                    display: "block",
-                    marginBottom: "8px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#333"
-                  }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    width: "100%",
+                    padding: "10px",
+                  }}
+                >
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#333",
+                    }}
+                  >
                     Nome da Unidade<span style={{ color: "#dc3545" }}> *</span>
                   </label>
                   <input
@@ -3137,7 +3256,8 @@ export default function PrestacaoServicoResiduos() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = "#12B2D5";
-                      e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                      e.target.style.boxShadow =
+                        "0 0 0 3px rgba(18, 178, 213, 0.1)";
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = "#ddd";
@@ -3145,30 +3265,34 @@ export default function PrestacaoServicoResiduos() {
                     }}
                   />
                   {errorsUnidade.nome_unidade && (
-                    <span style={{ 
-                      color: "#dc3545", 
-                      fontSize: "12px",
-                      marginTop: "5px",
-                      display: "block"
-                    }}>
+                    <span
+                      style={{
+                        color: "#dc3545",
+                        fontSize: "12px",
+                        marginTop: "5px",
+                        display: "block",
+                      }}
+                    >
                       {errorsUnidade.nome_unidade.message as string}
                     </span>
                   )}
-                
-                  <label style={{ 
-                    display: "block",
-                    marginBottom: "8px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#333"
-                  }}>
+
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#333",
+                    }}
+                  >
                     Eixo
                   </label>
                   <input
                     {...registerUnidade("id_eixo", { value: "4" })}
                     type="text"
                     disabled
-                    value={eixos.find(e => e.id_eixo === 4)?.nome || "Eixo 4"}  
+                    value={eixos.find((e) => e.id_eixo === 4)?.nome || "Eixo 4"}
                     style={{
                       margin: "0 auto",
                       width: "90%",
@@ -3180,21 +3304,25 @@ export default function PrestacaoServicoResiduos() {
                       backgroundColor: "#f5f5f5",
                     }}
                   />
-                
-                  <label style={{ 
-                    display: "block",
-                    marginBottom: "8px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#333"
-                  }}>
+
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#333",
+                    }}
+                  >
                     Municipio
                   </label>
                   <select
                     {...registerUnidade("id_municipio", {
                       value: usuario?.id_municipio?.toString() || "",
                     })}
-                    value={municipioValue || (usuario?.id_municipio?.toString() || "")}
+                    value={
+                      municipioValue || usuario?.id_municipio?.toString() || ""
+                    }
                     onChange={(e) => {
                       setValueUnidade("id_municipio", e.target.value);
                     }}
@@ -3209,7 +3337,8 @@ export default function PrestacaoServicoResiduos() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = "#12B2D5";
-                      e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                      e.target.style.boxShadow =
+                        "0 0 0 3px rgba(18, 178, 213, 0.1)";
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = "#ddd";
@@ -3217,19 +3346,24 @@ export default function PrestacaoServicoResiduos() {
                     }}
                   >
                     <option value="">Selecione um município</option>
-                    {municipios.map(municipio => (
-                      <option key={municipio.id_municipio} value={municipio.id_municipio}>
-                          {municipio.municipio_nome}
+                    {municipios.map((municipio) => (
+                      <option
+                        key={municipio.id_municipio}
+                        value={municipio.id_municipio}
+                      >
+                        {municipio.municipio_nome}
                       </option>
                     ))}
                   </select>
-                  <label style={{ 
-                    display: "block",
-                    marginBottom: "8px",
-                    fontSize: "14px",
-                    fontWeight: "500",
-                    color: "#333"
-                  }}>
+                  <label
+                    style={{
+                      display: "block",
+                      marginBottom: "8px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      color: "#333",
+                    }}
+                  >
                     Tipo de Unidade
                   </label>
                   <select
@@ -3249,7 +3383,8 @@ export default function PrestacaoServicoResiduos() {
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = "#12B2D5";
-                      e.target.style.boxShadow = "0 0 0 3px rgba(18, 178, 213, 0.1)";
+                      e.target.style.boxShadow =
+                        "0 0 0 3px rgba(18, 178, 213, 0.1)";
                     }}
                     onBlur={(e) => {
                       e.target.style.borderColor = "#ddd";
@@ -3257,9 +3392,12 @@ export default function PrestacaoServicoResiduos() {
                     }}
                   >
                     <option value="">Selecione um tipo de unidade</option>
-                    {tiposUnidade.map(tipo => (
-                      <option key={tipo.id_tipo_unidade} value={tipo.id_tipo_unidade}>
-                          {tipo.nome_tipo_unidade}
+                    {tiposUnidade.map((tipo) => (
+                      <option
+                        key={tipo.id_tipo_unidade}
+                        value={tipo.id_tipo_unidade}
+                      >
+                        {tipo.nome_tipo_unidade}
                       </option>
                     ))}
                   </select>
@@ -3300,7 +3438,7 @@ export default function PrestacaoServicoResiduos() {
                   >
                     Cancelar
                   </button>
-                  <SubmitButton 
+                  <SubmitButton
                     type="submit"
                     style={{
                       padding: "12px 24px",
