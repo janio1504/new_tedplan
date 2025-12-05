@@ -146,7 +146,7 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
       <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
 
-      <BreadCrumbStyle isCollapsed={isCollapsed}>
+      <BreadCrumbStyle $isCollapsed={isCollapsed}>
               <nav>
                 <ol>
                   <li>

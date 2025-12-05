@@ -15,6 +15,9 @@ import {
   TextArea,
   DivTextArea,
 } from "../../styles/esgoto-indicadores";
+import {
+  DivFormEixo,
+} from "../../styles/financeiro";
 
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
@@ -332,7 +335,7 @@ export default function Unidades() {
             <FaBars />
           </ExpandButton>
         ) : (
-          <Sidebar isCollapsed={isCollapsed}>
+          <Sidebar $isCollapsed={isCollapsed}>
             <CollapseButton onClick={toggleSidebar}>
               <FaBars />
             </CollapseButton>
@@ -341,7 +344,7 @@ export default function Unidades() {
               return (
                 <div key={menu.id_menu}>
                   <MenuHeader
-                    isOpen={isOpen}
+                    $isOpen={isOpen}
                     onClick={() => {
                       setOpenMenuId(isOpen ? null : menu.id_menu);
                     }}
@@ -358,7 +361,7 @@ export default function Unidades() {
                     </div>
                     <FaCaretDown />
                   </MenuHeader>
-                  <MenuItemsContainer isOpen={isOpen}>
+                  <MenuItemsContainer $isOpen={isOpen}>
                     {menu.menuItems?.map((menuItem) => (
                       <SidebarItem
                         key={menuItem.id_menu_item}
@@ -377,7 +380,7 @@ export default function Unidades() {
                 </div>
               );
             })}
-            <MenuHeader isOpen={false}>
+            <MenuHeader $isOpen={false}>
               <div
                 style={{
                   display: "flex",
@@ -394,7 +397,7 @@ export default function Unidades() {
 
         <DivCenter>
           <Form>
-            <BreadCrumbStyle isCollapsed={isCollapsed}>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
               <nav>
                 <ol>
                   <li>

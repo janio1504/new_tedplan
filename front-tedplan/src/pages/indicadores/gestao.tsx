@@ -1233,7 +1233,7 @@ export default function GestaoIndicadores({
                 <FaBars /> 
               </ExpandButton>
           ) : (
-      <Sidebar isCollapsed={isCollapsed}>
+      <Sidebar $isCollapsed={isCollapsed}>
               <CollapseButton onClick={toggleSidebar}>
                           <FaBars /> 
               </CollapseButton>
@@ -1285,7 +1285,7 @@ export default function GestaoIndicadores({
       <MainContent isCollapsed={isCollapsed}>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
-             <BreadCrumbStyle isCollapsed={isCollapsed}>
+             <BreadCrumbStyle $isCollapsed={isCollapsed}>
                     <nav>
                       <ol>
                         <li>

@@ -333,7 +333,7 @@ export default function Monitoramento({ municipio }: MunicipioProps) {
       <MenuIndicadores></MenuIndicadores>
       
       <DivCenter>
-        <BreadCrumbStyle isCollapsed={isCollapsed}>
+        <BreadCrumbStyle $isCollapsed={isCollapsed}>
                 <nav>
                   <ol>
                     <li>
