@@ -35,6 +35,7 @@ interface IIndicador {
   informacoes_indicador: string;
   indicador_correspondente_ou_similar_snis: string;
   id_menu_item: string;
+  is_unidade?: boolean;
 }
 
 interface IMenuItem {
@@ -227,6 +228,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                   indicador.indicador_correspondente_ou_similar_snis,
                 id_menu_item: indicador.id_menu_item?.toString(),
                 nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
+                is_unidade: indicador.is_unidade || false,
               });
             }, 300);
           } else {
@@ -444,6 +446,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     id_menu_item,
     tipo_campo,
     campo_ativo,
+    is_unidade,
   }) {
     try {
       const apiClient = getAPIClient();
@@ -458,6 +461,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         indicador_correspondente_ou_similar_snis:
           indicador_correspondente_ou_similar_snis || null,
         id_menu_item: id_menu_item ? parseInt(id_menu_item) : null,
+        is_unidade: is_unidade || false,
       };
 
       let indicadorResponse;
@@ -524,6 +528,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         tipo_campo: "",
         nome_campo: "",
         campo_ativo: true,
+        is_unidade: false,
       });
 
       setSelectOptions([]);
@@ -1046,6 +1051,32 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                       }}
                     />
                     <span style={{ fontWeight: "500" }}>Campo ativo</span>
+                  </label>
+                </div>
+
+                <div style={{ marginBottom: "20px" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      cursor: "pointer",
+                      fontSize: "14px",
+                      color: "#333",
+                    }}
+                  >
+                    <input
+                      {...register("is_unidade")}
+                      type="checkbox"
+                      name="is_unidade"
+                      defaultChecked={false}
+                      style={{
+                        width: "18px",
+                        height: "18px",
+                        accentColor: "#3498db",
+                      }}
+                    />
+                    <span style={{ fontWeight: "500" }}>Campo de unidade</span>
                   </label>
                 </div>
 

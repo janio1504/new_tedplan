@@ -643,7 +643,7 @@ export const ConteudoModal = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 50px;
+  margin-top: 10px;
 
   .button-group {
     display: flex;
@@ -816,13 +816,10 @@ export const ImagenAmpliada = styled.div`
 `;
 
 export const TituloModal = styled.div`
-  text-align: center;
-  margin-bottom: 24px;
-
-  h3 {
-    font-size: 20px;
-    color: #333;
-    font-weight: 500;
+  text-align: left;
+  color: #ff0000;
+  font-weight: 700;
+  font-size: 18px;
   }
 `;
 
@@ -830,11 +827,13 @@ export const TextoModal = styled.div`
   text-align: left;
   width: 100%;
   font-size: 14px;
-  color: #666;
+  color: #000;
   line-height: 1.6;
   position: relative;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  padding: 10px;
+  gap: 10px;
   margin-bottom: 20px;
 `;
 

@@ -893,19 +893,20 @@ export const Form = styled.form`
   width: 100%;
   font-size: 14px;
   flex-direction: column;
+  border-radius: 10px;
   align-items: center;
   justify-content: center;
   input {
     border: 2px solid #ccc;
     border-radius: 5px;
     padding: 15px 15px;
-    margin: 10px;
+    margin: 0px 5px 10px 5px;
     color: #666;
     float: left;
   }
 
   input:focus-within {
-    border-color: 2px solid #008080;
+   
   }
 
   textarea {

@@ -20,7 +20,7 @@ class IndicadorMunicipioRepository {
         return indicador;
     }
 
-    async getIndicadoresByMunicipio(id_municipio, ano = null) {
+    async getIndicadoresByMunicipio(id_municipio, ano = null, id_unidade = null) {
         let query = IndicadorMunicipio.query()
             .where('id_municipio', id_municipio)
             .with('indicador')
@@ -28,6 +28,10 @@ class IndicadorMunicipioRepository {
             
         if (ano) {
             query = query.where('ano', ano);
+        }
+
+        if (id_unidade) {
+            query = query.where('id_unidade', id_unidade);
         }
         
         const indicadores = await query

@@ -14,6 +14,7 @@ import {
   DivCenter,
   BotaoEditar,
   BotaoRemover,
+  ContainerModal,
   Modal,
   CloseModalButton,
   ConteudoModal,
@@ -64,6 +65,7 @@ interface IIndicador {
   id_menu_item: string;
   created_at: string;
   updated_at: string;
+  is_unidade?: boolean;
   menuItem?: {
     id_menu_item: string;
     nome_menu_item: string;
@@ -281,11 +283,11 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       Router.push("/login");
     }
 
-      // Só carregar os tipos se não vieram do SSR
-      // Usar os indicadores como vêm do banco
-      if (indicadores && indicadores.length > 0) {
-        loadTiposCampoForIndicadores(indicadores);
-      }
+    // Só carregar os tipos se não vieram do SSR
+    // Usar os indicadores como vêm do banco
+    if (indicadores && indicadores.length > 0) {
+      loadTiposCampoForIndicadores(indicadores);
+    }
   }, []);
 
   async function loadTiposCampoForIndicadores(
@@ -297,7 +299,9 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
 
       // Usar os indicadores passados como parâmetro ou o estado atual
       // Manter a ordem como vem do banco
-      const indicadoresAtuais = indicadoresParaProcessar || [...indicadoresList];
+      const indicadoresAtuais = indicadoresParaProcessar || [
+        ...indicadoresList,
+      ];
 
       // Carregar tipos de campo para cada indicador de forma mais robusta
       // Promise.allSettled mantém a ordem dos resultados
@@ -384,8 +388,8 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
         })
         .filter((ind): ind is IIndicador => ind !== undefined && ind !== null);
 
-        // Manter a ordem como vem do banco, sem ordenação adicional
-       
+      // Manter a ordem como vem do banco, sem ordenação adicional
+
       setIndicadoresList(resultados);
     } catch (error) {
       console.error("Erro ao carregar tipos de campo:", error);
@@ -403,7 +407,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       const apiClient = getAPIClient();
       const response = await apiClient.get("/indicadores-novo");
       const indicadores = response.data || [];
-      
+
       setIndicadoresList(indicadores);
 
       // Recarregar tipos de campo com os indicadores já ordenados
@@ -765,6 +769,22 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                           <strong>Código:</strong> {indicador.codigo_indicador}
                         </div>
 
+                        <div
+                          style={{
+                            fontSize: "14px",
+                            marginBottom: "5px",
+                          }}
+                        >
+                          <span
+                            style={{
+                              color: indicador.is_unidade ? "#28a745" : "#6c757d",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            {indicador.is_unidade ? "✓ Campo de unidade" : "✗ Campo de unidade"}
+                          </span>
+                        </div>
+
                         {indicador.unidade_indicador && (
                           <div
                             style={{
@@ -939,44 +959,44 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
       </BodyDashboard>
 
       {isModalConfirm && (
-        <Modal>
-          <ConteudoModal>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <TituloModal>Confirmar Exclusão</TituloModal>
-              <CloseModalButton onClick={handleCloseConfirm}>
-                &times;
-              </CloseModalButton>
-            </div>
-            <TextoModal>
-              Tem certeza que deseja remover o indicador "
-              {indicadorSelecionado?.nome_indicador}" (
-              {indicadorSelecionado?.codigo_indicador})?
-              <br />
-              <strong>
-                Esta ação removerá também o tipo de campo e suas opções. Esta
-                ação não pode ser desfeita.
-              </strong>
-            </TextoModal>
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                justifyContent: "flex-end",
-              }}
-            >
-              <CancelButton onClick={handleCloseConfirm}>Cancelar</CancelButton>
-              <ConfirmButton onClick={handleRemoverIndicador}>
-                Confirmar
-              </ConfirmButton>
-            </div>
-          </ConteudoModal>
-        </Modal>
+        <ContainerModal>
+          <Modal>
+            <ConteudoModal>
+              <TituloModal>Confirmar Remoção</TituloModal>
+              <TextoModal>
+                <div>
+                  <p>Tem certeza que deseja remover o item do formulário?</p>
+                  <p style={{ fontSize: "16px", fontWeight: "bold", color: "red" }}>
+                     {indicadorSelecionado?.codigo_indicador} - {indicadorSelecionado?.nome_indicador}
+                  </p>
+                </div>
+                <div>
+                  <p>
+                    <strong>
+                      Observação:<br />
+                      Esta ação removerá também o tipo de campo e suas opções.
+                      Esta ação não pode ser revertida.
+                    </strong>
+                  </p>
+                </div>
+              </TextoModal>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <CancelButton onClick={handleCloseConfirm}>
+                  Cancelar
+                </CancelButton>
+                <ConfirmButton onClick={handleRemoverIndicador}>
+                  Confirmar
+                </ConfirmButton>
+              </div>
+            </ConteudoModal>
+          </Modal>
+        </ContainerModal>
       )}
 
       <Footer>&copy; Todos os direitos reservados</Footer>
