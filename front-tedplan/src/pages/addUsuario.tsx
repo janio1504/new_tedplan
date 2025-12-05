@@ -86,25 +86,20 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
     id_municipio,
   }) {
     try {
-      const formData = new FormData();
-
       const apiClient = getAPIClient();
-      const response = await apiClient
-        .post("addUsuario", {
-          nome,
-          login,
-          senha,
-          email,
-          curriculo_lattes,
-          id_sistema,
-          id_municipio,
-        })
-        .then((response) => {
-          return response.data;
-        });
+      const response = await apiClient.post("addUsuario", {
+        nome,
+        login,
+        senha,
+        email,
+        telefone: "", // Campo não usado no formulário, mas esperado pelo backend
+        curriculo_lattes: curriculo_lattes || "",
+        id_sistema,
+        id_municipio,
+      });
 
-      if (response.success) {
-        toast.success("Usuário cadastrado com sucesso!", {
+      if (response.data && response.data.success) {
+        toast.success(response.data.message || "Usuário cadastrado com sucesso!", {
           position: "top-right",
           autoClose: 5000,
         });
@@ -121,14 +116,16 @@ export default function AddUsuario({ usuario, municipio }: UsuarioProps) {
           router.push("/listarUsuarios");
         }, 2000);
       } else {
-        toast.error("Erro ao cadastrar usuário!", {
+        const errorMessage = response.data?.error || "Erro ao cadastrar usuário!";
+        toast.error(errorMessage, {
           position: "top-right",
           autoClose: 5000,
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao cadastrar usuário:", error);
-      toast.error("Erro ao cadastrar usuário!", {
+      const errorMessage = error?.response?.data?.error || error?.message || "Erro ao cadastrar usuário!";
+      toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
       });

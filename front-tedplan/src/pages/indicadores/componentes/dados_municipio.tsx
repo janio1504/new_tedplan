@@ -602,7 +602,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      <Sidebar isCollapsed={isCollapsed}>
+      <Sidebar $isCollapsed={isCollapsed}>
         <SidebarItem
           active={activeForm === "dadosMunicipio"}
           onClick={() => setActiveForm("dadosMunicipio")}

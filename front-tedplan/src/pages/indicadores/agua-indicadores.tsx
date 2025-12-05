@@ -174,7 +174,7 @@ export default function Agua() {
                 <FaBars /> 
               </ExpandButton>
                 ) : (
-        <Sidebar isCollapsed={isCollapsed}>
+        <Sidebar $isCollapsed={isCollapsed}>
               <CollapseButton onClick={toggleSidebar}>
                 <FaBars /> 
               </CollapseButton>
@@ -216,7 +216,7 @@ export default function Agua() {
           
           <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
             
-             <BreadCrumbStyle isCollapsed={isCollapsed} >
+             <BreadCrumbStyle $isCollapsed={isCollapsed} >
                         <nav>
                           <ol>
                             <li>

@@ -380,7 +380,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 <FaBars /> 
               </ExpandButton>
           ) : (
-      <Sidebar isCollapsed={isCollapsed}>
+      <Sidebar $isCollapsed={isCollapsed}>
          <CollapseButton onClick={toggleSidebar}>
             <FaBars /> 
           </CollapseButton>
@@ -431,7 +431,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       <MainContent isCollapsed={isCollapsed}>
         <DivCenter >
           <Form onSubmit={handleSubmit(handleCadastro)}>
-            <BreadCrumbStyle isCollapsed={isCollapsed}>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
                           <nav>
                             <ol>
                               <li>

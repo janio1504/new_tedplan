@@ -387,7 +387,7 @@ export default function ResiduosUnidades({ municipio }: MunicipioProps) {
       <MenuIndicadores></MenuIndicadores>
       
       <DivCenter>
-        <BreadCrumbStyle isCollapsed={isCollapsed}>
+        <BreadCrumbStyle $isCollapsed={isCollapsed}>
                               <nav>
                                 <ol>
                                   <li>

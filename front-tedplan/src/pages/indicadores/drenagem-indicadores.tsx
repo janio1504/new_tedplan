@@ -172,7 +172,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                       <FaBars /> 
                     </ExpandButton>
                 ) : (
-                  <Sidebar isCollapsed={isCollapsed}>
+                  <Sidebar $isCollapsed={isCollapsed}>
                     <CollapseButton onClick={toggleSidebar}>
                       <FaBars /> 
                     </CollapseButton>
@@ -208,7 +208,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
           style={{ marginLeft: isCollapsed ? "0px" : "30px" }}
         >
           <Form onSubmit={handleSubmit(handleCadastro)}>
-            <BreadCrumbStyle isCollapsed={isCollapsed}>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
                                 <nav>
                                   <ol>
                                     <li>

@@ -39,7 +39,7 @@ class UsuariosController {
     }
   }
 
-  async store({ request }) {
+  async store({ request, response }) {
     try {
       const {
         nome,
@@ -52,10 +52,22 @@ class UsuariosController {
         id_permissao,
       } = request.all();
 
+      // Validações básicas
+      if (!nome || !login || !senha || !email || !id_sistema || !id_municipio) {
+        return response.status(400).json({
+          success: false,
+          error: 'Campos obrigatórios não preenchidos'
+        });
+      }
+
       const idPessoa = await Pessoa.query()
         .returning("id_pessoa")
         .table("tedplan.pessoa")
-        .insert({ nome: nome, email: email, telefone: telefone });
+        .insert({ 
+          nome: nome, 
+          email: email, 
+          telefone: telefone || null 
+        });
 
       const idUsuario = await Usuario.query()
         .returning("id_usuario")
@@ -72,12 +84,20 @@ class UsuariosController {
         .insert({
           id_sistema: id_sistema,
           id_usuario: idUsuario[0],
-          id_permissao: id_permissao,
+          id_permissao: id_permissao || 2, // Valor padrão se não fornecido
         });
 
-      return idUsuario[0];
+      return response.status(201).json({
+        success: true,
+        id_usuario: idUsuario[0],
+        message: 'Usuário cadastrado com sucesso!'
+      });
     } catch (error) {
-      return error;
+      console.log('Erro ao cadastrar usuário:', error);
+      return response.status(500).json({
+        success: false,
+        error: error.message || 'Erro ao cadastrar usuário'
+      });
     }
   }
 
