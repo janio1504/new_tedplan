@@ -380,6 +380,7 @@ Route.group(() => {
   Route.get("indicadores-novo/grupo/:grupo", "IndicadorNovoController.getIndicadoresByGrupo");
   Route.get("indicadores-novo/codigo/:codigo", "IndicadorNovoController.getIndicadorByCodigo");
   Route.get("indicadores-novo/search", "IndicadorNovoController.search");
+  Route.get("indicadores-novo/eixo-unidade/:id_eixo", "IndicadorNovoController.getIndicadoresByEixoAndUnidade");
 
   // Rotas para IndicadorMunicipio
   Route.get("indicadores-municipio", "IndicadorMunicipioController.index");
@@ -401,5 +402,25 @@ Route.group(() => {
   Route.get("menus/modulo/:id_modulo", "MenuController.getMenusByModulo");
   Route.get("menus/eixo/:id_eixo", "MenuController.getMenusByEixo");
   Route.get("menus/search", "MenuController.search");
+
+  // Rotas para Unidades
+  Route.get("unidades", "UnidadeController.index");
+  Route.get("unidades/:id", "UnidadeController.show");
+  Route.post("unidades", "UnidadeController.store");
+  Route.put("unidades/:id", "UnidadeController.update");
+  Route.delete("unidades/:id", "UnidadeController.destroy");
+  Route.get("unidades/tipo/:id_tipo_unidade", "UnidadeController.getUnidadesByTipo");
+  Route.get("unidades/eixo/:id_eixo", "UnidadeController.getUnidadesByEixo");
+  Route.get("unidades/municipio/:id_municipio", "UnidadeController.getUnidadesByMunicipio");
+  Route.get("unidades/search", "UnidadeController.search");
+
+  // Rotas para TipoUnidade
+  Route.get("tipo-unidade", "TipoUnidadeController.index");
+  Route.get("tipo-unidade/:id", "TipoUnidadeController.show");
+  Route.post("tipo-unidade", "TipoUnidadeController.store");
+  Route.put("tipo-unidade/:id", "TipoUnidadeController.update");
+  Route.delete("tipo-unidade/:id", "TipoUnidadeController.destroy");
+  Route.get("tipo-unidade/search", "TipoUnidadeController.search");
+  Route.get("tipo-unidade/eixo/:id_eixo", "TipoUnidadeController.getTiposUnidadeByEixo");
 
 }).middleware(["auth"]);

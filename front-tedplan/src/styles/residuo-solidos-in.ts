@@ -1257,8 +1257,10 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 // `;
 
 
-export const Sidebar = styled.div<{ isCollapsed: boolean }>`
-  width: ${(props) => (props.isCollapsed ? "0": "220px")};
+export const Sidebar = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isCollapsed',
+})<{ $isCollapsed: boolean }>`
+  width: ${(props) => (props.$isCollapsed ? "0": "220px")};
   width: 280px;
   height: 100vh;
   max-height: 100vh;
@@ -1374,14 +1376,16 @@ export const SidebarSection = styled.div`
   }
 `;
 
-export const MenuHeader = styled.div<{ isOpen: boolean }>`
+export const MenuHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen',
+})<{ $isOpen: boolean }>`
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
   font-weight: bold;
-  color: ${props => props.isOpen ? "#12B2D5" : "#000"};
+  color: ${props => props.$isOpen ? "#12B2D5" : "#000"};
   transition: color 0.3s ease;
   user-select: none;
 
@@ -1395,7 +1399,7 @@ export const MenuHeader = styled.div<{ isOpen: boolean }>`
     gap: 8px;
     
     svg {
-      color: ${props => props.isOpen ? "#12B2D5" : "#666"};
+      color: ${props => props.$isOpen ? "#12B2D5" : "#666"};
       transition: color 0.3s ease;
       font-size: 14px;
     }
@@ -1403,9 +1407,9 @@ export const MenuHeader = styled.div<{ isOpen: boolean }>`
 
   > svg:last-child {
     transition: transform 0.3s ease;
-    transform: ${props => props.isOpen ? "rotate(180deg)" : "rotate(0deg)"};
+    transform: ${props => props.$isOpen ? "rotate(180deg)" : "rotate(0deg)"};
     font-size: 14px;
-    color: ${props => props.isOpen ? "#12B2D5" : "#666"};
+    color: ${props => props.$isOpen ? "#12B2D5" : "#666"};
   }
 
   &:hover > svg:last-child,
@@ -1414,11 +1418,13 @@ export const MenuHeader = styled.div<{ isOpen: boolean }>`
   }
 `;
 
-export const MenuItemsContainer = styled.div<{ isOpen: boolean }>`
-  max-height: ${props => props.isOpen ? "1000px" : "0"};
+export const MenuItemsContainer = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isOpen',
+})<{ $isOpen: boolean }>`
+  max-height: ${props => props.$isOpen ? "1000px" : "0"};
   overflow: hidden;
   transition: max-height 0.3s ease-in-out;
-  opacity: ${props => props.isOpen ? "1" : "0"};
+  opacity: ${props => props.$isOpen ? "1" : "0"};
   transition: max-height 0.3s ease-in-out, opacity 0.2s ease-in-out;
 `;
 
