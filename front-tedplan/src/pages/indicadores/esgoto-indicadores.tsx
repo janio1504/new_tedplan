@@ -188,7 +188,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
                       <FaBars /> 
                     </ExpandButton>
                 ) : (
-                  <Sidebar isCollapsed={isCollapsed}>
+                  <Sidebar $isCollapsed={isCollapsed}>
                     <CollapseButton onClick={toggleSidebar}>
                       <FaBars /> 
                     </CollapseButton>
@@ -228,7 +228,7 @@ export default function Esgoto({ municipio }: MunicipioProps) {
         
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
-        <BreadCrumbStyle isCollapsed={isCollapsed} >
+        <BreadCrumbStyle $isCollapsed={isCollapsed} >
                   <nav>
                     <ol>
                       <li>
