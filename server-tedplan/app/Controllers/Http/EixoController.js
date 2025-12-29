@@ -7,7 +7,6 @@ class EixoController {
     async index(){
         const eixos = await Eixo
             .query()
-            .from('tedplan.eixos')
             .fetch()
 
         return eixos
