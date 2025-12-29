@@ -43,6 +43,9 @@ class UnidadeRepository {
 
             const unidades = await Unidade.query()
                 .where('id_eixo', eixoId)
+                .with('tipoUnidade')
+                .with('eixo')
+                .with('municipio')
                 .orderBy("nome_unidade", "asc")
                 .fetch();
             

@@ -606,7 +606,7 @@ export default function Unidades() {
                                     color: "#6c757d",
                                   }}
                                 >
-                                  {unidade.municipio?.municipio_nome || "-"}
+                                  {unidade.municipio?.nome || unidade.municipio?.municipio_nome || "-"}
                                 </div>
 
                                 {/* Ações */}
@@ -674,7 +674,7 @@ export default function Unidades() {
                                     color: "#6c757d",
                                   }}
                                 >
-                                  Município: {unidade.municipio?.municipio_nome || "-"}
+                                  Município: {unidade.municipio?.nome || unidade.municipio?.municipio_nome || "-"}
                                 </div>
                                 <div
                                   style={{
