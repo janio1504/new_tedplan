@@ -166,6 +166,7 @@ const CampoIndicador = ({
   fieldStates,
   setFieldStates,
   setValue,
+  watch,
 }: {
   indicador: IIndicador;
   register: any;
@@ -174,6 +175,7 @@ const CampoIndicador = ({
   fieldStates?: { [key: string]: any };
   setFieldStates?: (states: { [key: string]: any }) => void;
   setValue?: any;
+  watch?: any;
 }) => {
   // Verificações de segurança
   if (!indicador || !anoSelected) {
@@ -192,35 +194,34 @@ const CampoIndicador = ({
       ? indicador.tiposCampo[0]
       : null;
   const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
-
   // Função para verificar se um campo deve estar habilitado baseado nas condições
-  const isFieldEnabled = (codigoIndicador: string) => {
-    switch (codigoIndicador) {
-      case "CAD2002":
-        // CAD2002 só é habilitado quando algum campo tem valor "coleta"
-        return fieldStates?.hasColeta === true;
+  // const isFieldEnabled = (codigoIndicador: string) => {
+  //   switch (codigoIndicador) {
+  //     case "CAD2002":
+  //       // CAD2002 só é habilitado quando algum campo tem valor "coleta"
+  //       return fieldStates?.hasColeta === true;
 
-      default:
-        return true; // Por padrão, campos estão habilitados
-    }
-  };
+  //     default:
+  //       return true; // Por padrão, campos estão habilitados
+  //   }
+  // };
 
-  const isDisabled = !isFieldEnabled(indicador.codigo_indicador);
+  //const isDisabled = !isFieldEnabled(indicador.codigo_indicador);
 
-  function onChangeEnabled(value: any) {
-    if (setFieldStates && fieldStates) {
-      const newStates = { ...fieldStates };
+  // function onChangeEnabled(value: any) {
+  //   if (setFieldStates && fieldStates) {
+  //     const newStates = { ...fieldStates };
 
-      // Atualizar estado baseado no valor selecionado
-      if (value === "coleta") {
-        newStates.hasColeta = true;
-      } else {
-        newStates.hasColeta = false;
-      }
+  //     // Atualizar estado baseado no valor selecionado
+  //     if (value === "coleta") {
+  //       newStates.hasColeta = true;
+  //     } else {
+  //       newStates.hasColeta = false;
+  //     }
 
-      setFieldStates(newStates);
-    }
-  }
+  //     setFieldStates(newStates);
+  //   }
+  // }
 
   // Campo não configurado ou com erro
   if (!tipoCampo) {
@@ -246,49 +247,187 @@ const CampoIndicador = ({
     );
   }
 
-  if (!tipoCampo.enable) {
+  // Configuração de somas automáticas
+  // Estrutura: { campoDestino: [camposOrigem] }
+  const configuracoesSoma: { [key: string]: string[] } = {
+    "GFI1103": ["GFI1101", "GFI1102"],
+    "GFI1105": ["GFI1101", "GFI1102", "GFI1104"],
+    "GFI2108": ["GFI2101", "GFI2102", "GFI2103", "GFI2104", "GFI2105", "GFI2106", "GFI2107"],
+    "GFI2112": ["GFI2109", "GFI2110", "GFI2111"],
+    "GFI2118": ["GFI2112", "GFI2116", "GFI2117"],
+    "GFI2120": ["GFI2108", "GFI2109", "GFI2110", "GFI2116", "GFI2117", "GFI2119"],
+    "GFI2124": ["GFI2121", "GFI2122", "GFI2123", "GFI2127", "GFI2131", "GFI2132"],
+    "GFI2127": ["GFI2125", "GFI2126"],
+    "GFI2130": ["GFI2128", "GFI2129"],
+    "GFI2136": ["GFI2133", "GFI2134", "GFI2135", "GFI2139", "GFI2142", "GFI2143", "GFI2144"],
+    "GFI2139": ["GFI2137", "GFI2138"],
+    "GFI2142": ["GFI2140", "GFI2141"],
+    "GFI2147": ["GFI2145", "GFI2146"],
+    "GTE0023": ["GTE0001", "GTE0002"],
+    "TEDGTA001": ["GTA0003", "GTA0005"],
+    // Adicione mais configurações aqui conforme necessário
+  };
+  // Verificar se este campo precisa de soma automática
+  const campoPrecisaSoma = configuracoesSoma[indicador.codigo_indicador];
+  
+  // Preparar nomes dos campos para observação
+  const camposOrigem = React.useMemo(() => {
+    if (!campoPrecisaSoma || !anoSelected) return [];
+    return campoPrecisaSoma.map(codigo => `${codigo}_${anoSelected}`);
+  }, [campoPrecisaSoma, anoSelected]);
+  
+  const campoDestino = React.useMemo(() => {
+    return anoSelected ? `${indicador.codigo_indicador}_${anoSelected}` : null;
+  }, [indicador.codigo_indicador, anoSelected]);
+
+  // Observar cada campo individualmente (watch precisa ser chamado durante render para criar subscriptions)
+  // Mas não usar os valores diretamente nas dependências do useEffect
+  const valoresObservados = campoPrecisaSoma && watch && camposOrigem.length > 0
+    ? camposOrigem.map(campo => watch(campo))
+    : null;
+
+  // Usar ref para rastrear o último valor calculado e evitar loops
+  const ultimoValorRef = React.useRef<string>("");
+
+  // Calcular e atualizar soma automática
+  // Usar apenas os nomes dos campos como dependência, não os valores
+  useEffect(() => {
+    if (!campoPrecisaSoma || !setValue || !anoSelected || !campoDestino || !valoresObservados || camposOrigem.length === 0) {
+      return;
+    }
+
+    // Calcular a soma de todos os valores observados
+    const soma = valoresObservados.reduce((total: number, valor: any) => {
+      return total + (parseFloat(String(valor)) || 0);
+    }, 0);
+
+    const novoValor = soma > 0 ? soma.toString() : "";
+
+    // Só atualizar se o valor calculado for diferente do último valor calculado
+    // Isso evita loops infinitos
+    if (ultimoValorRef.current !== novoValor) {
+      ultimoValorRef.current = novoValor;
+      setValue(campoDestino, novoValor, { shouldValidate: false, shouldDirty: false });
+    }
+  }, [campoPrecisaSoma, setValue, anoSelected, campoDestino, camposOrigem.join(',')]);
+  
+
+  
+  // Configuração de campos dependentes (campo dependente: campo de controle)
+  // Campos que só são habilitados quando o campo de controle tem valor "Sim"
+  const camposDependentes: { [key: string]: string } = {
+    "GFI1109": "GFI1108",
+    // Adicione mais campos dependentes aqui conforme necessário
+    // Exemplo: "GFI1110": "GFI1108",
+  };
+
+  // Verificar se este campo é dependente de outro campo
+  const campoControle = camposDependentes[indicador.codigo_indicador];
+  const nomeCampoControle = campoControle && anoSelected ? `${campoControle}_${anoSelected}` : null;
+  
+  // Observar o valor do campo de controle se existir
+  const valorCampoControle = nomeCampoControle && watch ? watch(nomeCampoControle) : null;
+  
+  // Determinar se o campo deve estar habilitado
+  // Se for um campo dependente, só habilita se o campo de controle for "Sim"
+  // Caso contrário, usa a configuração padrão do tipoCampo.enable
+  const campoHabilitado = campoControle 
+    ? valorCampoControle === "Sim" && tipoCampo.enable
+    : tipoCampo.enable;
+
+
+  // Se o campo não está habilitado (seja por configuração ou por dependência)
+  if (!campoHabilitado) {
+    // Se for um campo select dependente, renderizar como select desabilitado
+    if (campoControle && tipoCampo.type?.toLowerCase() === "select") {
+      const options = tipoCampo.selectOptions || [];
+      return (
+        <select
+          {...register(fieldName)}
+          disabled
+          style={{
+            width: "90%",
+            padding: "8px 12px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            fontSize: "13px",
+            transition: "all 0.2s ease",
+            boxShadow: "none",
+            backgroundColor: "#f8f9fa",
+            color: "#6c757d",
+            cursor: "not-allowed",
+          }}
+        >
+          <option value="">Selecione...</option>
+          {options
+            .sort((a, b) => (a.ordem_option || 0) - (b.ordem_option || 0))
+            .map((option, index) => (
+              <option
+                key={option.id_select_option || index}
+                value={option.value}
+              >
+                {option.descricao || option.value}
+              </option>
+            ))}
+        </select>
+      );
+    }
+    
+    // Para outros tipos de campo, renderizar como input desabilitado
     return (
       <input
         {...register(fieldName)}
-        type="text"
-        placeholder="Campo desabilitado"
+        type={tipoCampo.type}
         disabled
-        style={{ backgroundColor: "#f5f5f5", color: "#999" }}
+        style={{
+          backgroundColor: "#f8f9fa",
+          width: "90%",
+          padding: "8px 12px",
+          border: "1px solid #ddd",
+          borderRadius: "4px",
+          fontSize: "13px",
+          transition: "all 0.2s ease",
+          boxShadow: "none",
+          textAlign: "right",
+          color: "#6c757d",
+          cursor: "not-allowed",
+        }}
       />
     );
   }
+  
 
   // Função para obter a mensagem de placeholder baseada na condição
-  const getPlaceholderMessage = (codigoIndicador: string) => {
-    if (isDisabled) {
-      switch (codigoIndicador) {
-        case "CAD2002":
-          return "Campo CAD2002 desabilitado";
-        default:
-          return "Campo desabilitado";
-      }
-    }
-    return tipoCampo.default_value;
-  };
+  // const getPlaceholderMessage = (codigoIndicador: string) => {
+  //   if (isDisabled) {
+  //     switch (codigoIndicador) {
+  //       case "CAD2002":
+  //         return "Campo CAD2002 desabilitado";
+  //       default:
+  //         return "Campo desabilitado";
+  //     }
+  //   }
+  //   return tipoCampo.default_value;
+  // };
 
   // Pegar o registro do react-hook-form
   const fieldRegistration = register(fieldName);
 
   // Criar onChange combinado que preserva o react-hook-form
-  const combinedOnChange = (e: any) => {
-    // Chamar primeiro o onChange do react-hook-form
-    fieldRegistration.onChange(e);
-    // Depois chamar nossa lógica personalizada
-    onChangeEnabled(e.target.value);
-  };
+  // const combinedOnChange = (e: any) => {
+  //   // Chamar primeiro o onChange do react-hook-form
+  //   fieldRegistration.onChange(e);
+  //   // Depois chamar nossa lógica personalizada
+  //   //onChangeEnabled(e.target.value);
+  // };
 
   // Propriedades base do campo
   const baseProps = {
     ...fieldRegistration,
-    onChange: combinedOnChange, // Usar o onChange combinado
-    placeholder: getPlaceholderMessage(indicador.codigo_indicador),
+   // onChange: combinedOnChange, // Usar o onChange combinado
+   // placeholder: getPlaceholderMessage(indicador.codigo_indicador),
     defaultValue: tipoCampo.default_value || "",
-    disabled: isDisabled,
+   // disabled: isDisabled,
     style: {
       width: "90%",
       padding: "8px 12px",
@@ -296,8 +435,8 @@ const CampoIndicador = ({
       borderRadius: "4px",
       fontSize: "13px",
       transition: "all 0.2s ease",
-      backgroundColor: isDisabled ? "#f8f9fa" : "white",
-      color: isDisabled ? "#6c757d" : "#333",
+     // backgroundColor: isDisabled ? "#f8f9fa" : "white",
+     // color: isDisabled ? "#6c757d" : "#333",
       boxShadow: "none",
     },
   };
@@ -405,7 +544,7 @@ const CampoIndicador = ({
             padding: "8px",
             border: "1px solid #ddd",
             borderRadius: "4px",
-            backgroundColor: isDisabled ? "#f8f9fa" : "white",
+           // backgroundColor: isDisabled ? "#f8f9fa" : "white",
           }}
         >
           {checkBoxItems.map((item, index) => {
@@ -419,14 +558,14 @@ const CampoIndicador = ({
                   alignItems: "center",
                   gap: "6px",
                   fontSize: "13px",
-                  cursor: isDisabled ? "not-allowed" : "pointer",
-                  opacity: isDisabled ? 0.6 : 1,
+                 // cursor: isDisabled ? "not-allowed" : "pointer",
+                 // opacity: isDisabled ? 0.6 : 1,
                 }}
               >
                 <input
                   type="checkbox"
                   defaultChecked={Boolean(item.valor)}
-                  disabled={isDisabled}
+                  //disabled={isDisabled}
                   style={{ transform: "scale(1.1)" }}
                   onChange={(e) => {
                     // Forçar o React Hook Form a registrar corretamente usando setValue
@@ -476,6 +615,7 @@ export default function PrestacaoServicoEsgoto() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm();
 
@@ -1459,6 +1599,7 @@ export default function PrestacaoServicoEsgoto() {
   }
 
   async function handleCadastroIndicadores(data) {
+   
     try {
       if (!isEditor) {
         toast.error("Você não tem permissão para editar!", {
@@ -2313,6 +2454,7 @@ export default function PrestacaoServicoEsgoto() {
                                           fieldStates={fieldStates}
                                           setFieldStates={setFieldStates}
                                           setValue={setValue}
+                                          watch={watch}
                                         />
                                       </div>
                                     ) : (
@@ -2426,6 +2568,7 @@ export default function PrestacaoServicoEsgoto() {
                                       fieldStates={fieldStates}
                                       setFieldStates={setFieldStates}
                                       setValue={setValue}
+                                      watch={watch}
                                     />
                                   ) : (
                                     <input
@@ -3054,6 +3197,7 @@ export default function PrestacaoServicoEsgoto() {
                                             fieldStates={fieldStates}
                                             setFieldStates={setFieldStates}
                                             setValue={setValue}
+                                            watch={watch}
                                           />
                                         </div>
                                       </div>
@@ -3144,6 +3288,7 @@ export default function PrestacaoServicoEsgoto() {
                                         fieldStates={fieldStates}
                                         setFieldStates={setFieldStates}
                                         setValue={setValue}
+                                        watch={watch}
                                       />
                                     </div>
                                   )}

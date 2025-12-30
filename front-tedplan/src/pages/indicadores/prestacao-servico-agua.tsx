@@ -148,6 +148,7 @@ const CampoIndicador = ({
   setFieldStates,
   setValue,
   dadosMunicipio,
+  watch,
 }: {
   indicador: IIndicador;
   register: any;
@@ -157,6 +158,7 @@ const CampoIndicador = ({
   setFieldStates?: (states: { [key: string]: any }) => void;
   setValue?: any;
   dadosMunicipio?: IMunicipio;
+  watch?: any;
 }) => {
   // Verificações de segurança
   if (!indicador || !anoSelected) {
@@ -220,14 +222,176 @@ const CampoIndicador = ({
     );
   }
 
-  if (!tipoCampo.enable) {
+   // Configuração de somas automáticas
+  // Estrutura: { campoDestino: [camposOrigem] }
+  const configuracoesSoma: { [key: string]: string[] } = {
+    "GFI2008": ["GFI2001", "GFI2002", "GFI2003", "GFI2004", "GFI2005", "GFI2006", "GFI2007"],
+    "GFI2012": ["GFI2009", "GFI2010", "GFI2011"],
+    "GFI2016": ["GFI2013", "GFI2014", "GFI2015"],
+    "GFI2018": ["GFI2012", "GFI2016", "GFI2017"],
+    "GFI2020": ["GFI2008", "GFI2009", "GFI2010", "GFI2016", "GFI2017", "GFI2019"],
+    "GFI2024": ["GFI2021", "GFI2022", "GFI2023", "GFI2027","GFI2030", "GFI2031", "GFI2032"],
+    "GFI2027": ["GFI2025", "GFI2026"],
+    "GFI2030": ["GFI2028", "GFI2029"],
+    "GFI2036": ["GFI2033", "GFI2034", "GFI2035", "GFI2039", "GFI2042", "GFI2043", "GFI2044"],
+    "GFI2039": ["GFI2037", "GFI2038"],
+    "GFI2042": ["GFI2040", "GFI2041"],
+    "GFI2047": ["GFI2045", "GFI2046"],
+    "DFE0001": ["DFE0002", "DF00030"],
+    "GTA0019": ["GTA0001", "GTA0002"],
+    "TEDGTA001": ["GTA0003", "GTA0005"],
+    "GTA1014": ["GTA1001", "GTA1009"],
+    "GTA1207": ["GTA1204", "GTA1205", "GTA1206"],
+    "GTA1211": ["GTA1209", "GTA1210"],
+    "GTA1214": ["GTA1212", "GTA1213"],
+    "GTA1217": ["GTA1215", "GTA1216"],
+    "GTA1218": ["GTA1211", "GTA1203", "GTA1207","GTA1217"],
+    // Adicione mais configurações aqui conforme necessário
+  };
+  // Verificar se este campo precisa de soma automática
+  const campoPrecisaSoma = configuracoesSoma[indicador.codigo_indicador];
+  
+  // Preparar nomes dos campos para observação
+  const camposOrigem = React.useMemo(() => {
+    if (!campoPrecisaSoma || !anoSelected) return [];
+    return campoPrecisaSoma.map(codigo => `${codigo}_${anoSelected}`);
+  }, [campoPrecisaSoma, anoSelected]);
+  
+  const campoDestino = React.useMemo(() => {
+    return anoSelected ? `${indicador.codigo_indicador}_${anoSelected}` : null;
+  }, [indicador.codigo_indicador, anoSelected]);
+
+  // Observar cada campo individualmente (watch precisa ser chamado durante render para criar subscriptions)
+  // Mas não usar os valores diretamente nas dependências do useEffect
+  const valoresObservados = campoPrecisaSoma && watch && camposOrigem.length > 0
+    ? camposOrigem.map(campo => watch(campo))
+    : null;
+
+  // Usar ref para rastrear o último valor calculado e evitar loops
+  const ultimoValorRef = React.useRef<string>("");
+
+  // Calcular e atualizar soma automática
+  // Usar apenas os nomes dos campos como dependência, não os valores
+  useEffect(() => {
+    if (!campoPrecisaSoma || !setValue || !anoSelected || !campoDestino || !valoresObservados || camposOrigem.length === 0) {
+      return;
+    }
+
+    // Calcular a soma de todos os valores observados
+    const soma = valoresObservados.reduce((total: number, valor: any) => {
+      return total + (parseFloat(String(valor)) || 0);
+    }, 0);
+
+    const novoValor = soma > 0 ? soma.toString() : "";
+
+    // Só atualizar se o valor calculado for diferente do último valor calculado
+    // Isso evita loops infinitos
+    if (ultimoValorRef.current !== novoValor) {
+      ultimoValorRef.current = novoValor;
+      setValue(campoDestino, novoValor, { shouldValidate: false, shouldDirty: false });
+    }
+  }, [campoPrecisaSoma, setValue, anoSelected, campoDestino, camposOrigem.join(',')]);
+  
+
+  
+  // Configuração de campos dependentes (campo dependente: campo de controle)
+  // Campos que só são habilitados quando o campo de controle tem valor "Sim"
+  const camposDependentes: { [key: string]: string } = {
+    "GFI1109": "GFI1108",
+    "GFI1013A": "GFI1013",
+    "GFI1016A": "GFI1016",
+    "GFI1020A": "GFI1019",
+    "GFI1021A": "GFI1020",
+    "GFI1022": "GFI1019",
+    "GFI1023": "GFI1022",
+    "GFI1024": "GFI1023",
+    "GFI1025": "GFI1023",
+    "GFI1026": "GFI1019",
+    "GFI1027": "GFI1026",
+    "GFI1028": "GFI1019",
+    "GFI1029": "GFI1028",
+    "GFI1030": "GFI1019",
+    "GFI1031": "GFI1019",
+    "GFI1032": "GFI1019",
+    "GFI1033": "GFI1019",
+    "GFI1034": "GFI1019",
+    "GFI1035": "GFI1019",
+    "GFI1035A": "GFI1035",
+    // Adicione mais campos dependentes aqui conforme necessário
+    // Exemplo: "GFI1110": "GFI1108",
+  };
+
+  // Verificar se este campo é dependente de outro campo
+  const campoControle = camposDependentes[indicador.codigo_indicador];
+  const nomeCampoControle = campoControle && anoSelected ? `${campoControle}_${anoSelected}` : null;
+  
+  // Observar o valor do campo de controle se existir
+  const valorCampoControle = nomeCampoControle && watch ? watch(nomeCampoControle) : null;
+  
+  // Determinar se o campo deve estar habilitado
+  // Se for um campo dependente, só habilita se o campo de controle for "Sim"
+  // Caso contrário, usa a configuração padrão do tipoCampo.enable
+  const campoHabilitado = campoControle 
+    ? (valorCampoControle === "Sim" || valorCampoControle === "Outro") && tipoCampo.enable
+    : tipoCampo.enable;
+
+
+  // Se o campo não está habilitado (seja por configuração ou por dependência)
+  if (!campoHabilitado) {
+    // Se for um campo select dependente, renderizar como select desabilitado
+    if (campoControle && tipoCampo.type?.toLowerCase() === "select") {
+      const options = tipoCampo.selectOptions || [];
+      return (
+        <select
+          {...register(fieldName)}
+          disabled
+          style={{
+            width: "90%",
+            padding: "8px 12px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            fontSize: "13px",
+            transition: "all 0.2s ease",
+            boxShadow: "none",
+            backgroundColor: "#f8f9fa",
+            color: "#6c757d",
+            cursor: "not-allowed",
+          }}
+        >
+          <option value="">Selecione...</option>
+          {options
+            .sort((a, b) => (a.ordem_option || 0) - (b.ordem_option || 0))
+            .map((option, index) => (
+              <option
+                key={option.id_select_option || index}
+                value={option.value}
+              >
+                {option.descricao || option.value}
+              </option>
+            ))}
+        </select>
+      );
+    }
+    
+    // Para outros tipos de campo, renderizar como input desabilitado
     return (
       <input
         {...register(fieldName)}
-        type="text"
-        placeholder="Campo desabilitado"
+        type={tipoCampo.type}
         disabled
-        style={{ backgroundColor: "#f5f5f5", color: "#999" }}
+        style={{
+          backgroundColor: "#f8f9fa",
+          width: "90%",
+          padding: "8px 12px",
+          border: "1px solid #ddd",
+          borderRadius: "4px",
+          fontSize: "13px",
+          transition: "all 0.2s ease",
+          boxShadow: "none",
+          textAlign: "right",
+          color: "#6c757d",
+          cursor: "not-allowed",
+        }}
       />
     );
   }
