@@ -1,5 +1,37 @@
+# Dependencies
+node_modules/
+yarn-error.log
+package-lock.json
+
+# Environment
+*.env
+.env.local
+.env.*.local
+
+# Database
 db/
+app/.pgpass
+
+# Docker
 docker-compose.yml
 app/.dockerignore
-app/.pgpass
-*.env
+
+# Testing
+coverage/
+*.log
+*.log.*
+
+# Documentation (exceto README.md)
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
