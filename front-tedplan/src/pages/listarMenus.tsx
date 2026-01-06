@@ -7,7 +7,7 @@ import Router from "next/router";
 import MenuSuperior from "../components/head";
 import Sidebar from "@/components/Sidebar";
 import { toast } from "react-toastify";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import {
   Container,
   NewButton,
@@ -208,9 +208,9 @@ export default function ListarMenus({ menus }: MenuProps) {
 
             <BotaoAdicionar
               onClick={handleAddMenu}
-              style={{ marginLeft: "10px" }}
+              style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}
             >
-              + Novo Menu
+              <FaPlus /> Novo Menu
             </BotaoAdicionar>
             {/* )} */}
           </div>
@@ -264,11 +264,11 @@ export default function ListarMenus({ menus }: MenuProps) {
                             marginLeft: "20px",
                           }}
                         >
-                          <BotaoEditar onClick={() => handleEditMenu(menu)}>
-                            Editar
+                          <BotaoEditar onClick={() => handleEditMenu(menu)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FaEdit /> Editar
                           </BotaoEditar>
-                          <BotaoRemover onClick={() => handleOpenConfirm(menu)}>
-                            Remover
+                          <BotaoRemover onClick={() => handleOpenConfirm(menu)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                            <FaTrash /> Remover
                           </BotaoRemover>
                         </div>
                       )}

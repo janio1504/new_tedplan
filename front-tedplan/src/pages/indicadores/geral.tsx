@@ -412,7 +412,7 @@ const handleNext = () => {
                 <FaBars /> 
               </ExpandButton>
           ) : (
-            <Sidebar isCollapsed={isCollapsed}>
+            <Sidebar $isCollapsed={isCollapsed}>
               <CollapseButton onClick={toggleSidebar}>
                 <FaBars /> 
               </CollapseButton>
@@ -435,7 +435,7 @@ const handleNext = () => {
       <MainContent isCollapsed={isCollapsed}>
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)}>
-          <BreadCrumbStyle isCollapsed={isCollapsed}>
+          <BreadCrumbStyle $isCollapsed={isCollapsed}>
         <nav>
           <ol>
             <li>

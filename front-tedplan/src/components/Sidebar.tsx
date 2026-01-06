@@ -75,11 +75,12 @@ width: 280px;
 // Título do menu
 const MenuTitle = styled.h2`
   color: #424242;
-  font-size: 26px;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 32px;
   padding-bottom: 16px;
   border-bottom: 2px solid #e0e0e0;
+  text-align: center;
 `;
 
 // Estilos para cada item do menu
@@ -388,7 +389,7 @@ const Sidebar = () => {
             </SubmenuItem>
             <SubmenuItem onClick={handleIndicadores}
             $isActive={isMenusIndicadores()}>
-              Indicadores
+              Campos do formulário de coleta de dados
             </SubmenuItem>
             <SubmenuItem onClick={handleAddIndicador}
             $isActive={isMenusInfoIndicadores()}>

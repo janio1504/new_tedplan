@@ -8,7 +8,7 @@ import Router from "next/router";
 import MenuSuperior from "../components/head";
 import HeadIndicadores from "../components/headIndicadores";
 import { toast } from "react-toastify";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaPlus, FaUserShield } from "react-icons/fa";
 import Sidebar from "../components/Sidebar";
 import {
   Container,
@@ -320,9 +320,9 @@ export default function Postagens({
                   </div>
                   <BotaoAdicionar
                     onClick={handleAddUsuario}
-                    style={{ marginLeft: "10px" }}
+                    style={{ marginLeft: "10px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}
                   >
-                    + Novo Usuário
+                    <FaPlus /> Novo Usuário
                   </BotaoAdicionar>
                 </div>
 
@@ -373,16 +373,17 @@ export default function Postagens({
                                   marginLeft: "20px",
                                 }}
                               >
-                                <BotaoEditar onClick={() => handleShowModal(usuario)}>
-                                  Editar Permissões
+                                <BotaoEditar onClick={() => handleShowModal(usuario)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <FaEdit /> Editar Permissões
                                 </BotaoEditar>
                                 <BotaoPermissao
                                   onClick={() => handleEditorSimisabShowModal(usuario)}
+                                  style={{ display: "flex", alignItems: "center", gap: "6px" }}
                                 >
-                                  Permissão de edição por ano
+                                  <FaUserShield /> Permissão de edição por ano
                                 </BotaoPermissao>
-                                <BotaoRemover onClick={() => handleOpenConfirm(usuario)}>
-                                  Remover
+                                <BotaoRemover onClick={() => handleOpenConfirm(usuario)} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <FaTrash /> Remover
                                 </BotaoRemover>
 
                               </div>

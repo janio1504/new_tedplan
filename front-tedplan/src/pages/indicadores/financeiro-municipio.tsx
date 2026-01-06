@@ -751,7 +751,7 @@ export default function Financeiro({ municipio }: MunicipioProps) {
         
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
-            <BreadCrumbStyle isCollapsed={isCollapsed}>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
                 <nav>
                   <ol>
                     <li>

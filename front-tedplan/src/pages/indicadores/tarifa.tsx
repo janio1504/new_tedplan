@@ -190,7 +190,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
                   <FaBars /> 
                 </ExpandButton>
                       ) : (
-              <Sidebar isCollapsed={isCollapsed}>
+              <Sidebar $isCollapsed={isCollapsed}>
                   <CollapseButton onClick={toggleSidebar}>
                     <FaBars /> 
                   </CollapseButton>
@@ -219,7 +219,7 @@ export default function Tarifa({ municipio }: MunicipioProps) {
         <DivCenter>
           
           <Form onSubmit={handleSubmit(handleCadastro)}>
-          <BreadCrumbStyle isCollapsed={isCollapsed}>
+          <BreadCrumbStyle $isCollapsed={isCollapsed}>
                                       <nav>
                                         <ol>
                                           <li>

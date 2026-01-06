@@ -28,7 +28,7 @@ import {
 } from "../styles/dashboard";
 import { BodyDashboard } from "@/styles/dashboard-original";
 import HeadIndicadores from "@/components/headIndicadores";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
 interface IMenuItem {
   id_menu_item: string;
@@ -657,9 +657,9 @@ export default function ListarMenuItems({ menuItems }: MenuItemProps) {
             </div>
             <BotaoAdicionar
                 onClick={handleAddMenuItem}
-                style={{ marginLeft: "15px" }}
+                style={{ marginLeft: "15px", display: "flex", alignItems: "center", gap: "8px", justifyContent: "center" }}
               >
-                + Novo Item de Menu
+                <FaPlus /> Novo Item de Menu
               </BotaoAdicionar>
           </div>
 

@@ -237,7 +237,9 @@ export const StatusMunicipio = styled.div`
   }
 `;
 
-export const MenuMunicipioItem = styled.div <{ menuOpen?: boolean }>`
+export const MenuMunicipioItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'menuOpen',
+})<{ $menuOpen?: boolean }>`
   padding: 20px;
   float: right;
   font-size: 15px;
@@ -261,7 +263,7 @@ export const MenuMunicipioItem = styled.div <{ menuOpen?: boolean }>`
 
    @media (max-width: 768px) {
     float: none;
-    display: ${(props) => (props.menuOpen ? "block" : "none")};
+    display: ${(props) => (props.$menuOpen ? "block" : "none")};
     justify-content: center;
     padding: 0;
 
@@ -1537,10 +1539,12 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 //   width: 100%;
 // `;
 
-export const Sidebar = styled.div<{ isCollapsed: boolean }>`
-  width: ${(props) => (props.isCollapsed ? "0": "270px")};
+export const Sidebar = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isCollapsed',
+})<{ $isCollapsed: boolean }>`
+  width: ${(props) => (props.$isCollapsed ? "0": "270px")};
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-  padding: ${(props) => (props.isCollapsed ? "0" : "32px 24px")};
+  padding: ${(props) => (props.$isCollapsed ? "0" : "32px 24px")};
   position: absolute;
   overflow-y: 1000px;
   display: flex;
@@ -2305,7 +2309,9 @@ export const ModalStepContent = styled.div<{ active?: boolean }>`
   }
 `;
 
-export const BreadCrumbStyle = styled.div<{ isCollapsed: boolean }>`
+export const BreadCrumbStyle = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isCollapsed',
+})<{ $isCollapsed: boolean }>`
   font-size: 15px;
   display: flex;
   align-items: center;

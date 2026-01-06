@@ -158,7 +158,7 @@ export default function Balanco({ municipio }: MunicipioProps) {
       
       <DivCenter>
         <Form onSubmit={handleSubmit(handleCadastro)} style={{display: 'flex', flexDirection: 'column'}}>
-        <BreadCrumbStyle isCollapsed={isCollapsed} >
+        <BreadCrumbStyle $isCollapsed={isCollapsed} >
                                     <nav>
                                       <ol>
                                         <li>

@@ -116,7 +116,7 @@ export default function MenuHorizontal({municipio}) {
         </HamburgerMenu>
         </Municipio>
         
-        <MenuMunicipioItem menuOpen={menuOpen}>
+        <MenuMunicipioItem $menuOpen={menuOpen}>
           <ul>
           <li onClick={handleDashboard}> {permission.adminGeral || permission.adminTedPlan ? "Dashboard" : ""}</li>
           <li onClick={handleHome}>Pagina Inicial</li>
