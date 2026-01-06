@@ -3,6 +3,37 @@ const md5 = require("md5");
 const Usuario = use("App/Models/Usuarios");
 const Pessoa = use("App/Models/Pessoas");
 
+// Helper function para sanitizar valores integer
+function sanitizeInteger(value) {
+  // Se for undefined, null, string vazia ou string "undefined"/"null", retorna null
+  if (value === undefined || value === null || value === '' || 
+      (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
+    return null;
+  }
+  // Se já for um número válido, retorna ele mesmo
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value;
+  }
+  // Tenta converter para integer
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? null : parsed;
+}
+
+// Helper function para sanitizar valores boolean
+function sanitizeBoolean(value) {
+  if (value === undefined || value === null || value === '' || 
+      (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
+    return null;
+  }
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    return value.toLowerCase() === 'true' || value === '1';
+  }
+  return Boolean(value);
+}
+
 class UsuariosController {
   async index() {
     try {
@@ -35,7 +66,7 @@ class UsuariosController {
 
       return usuarios;
     } catch (error) {
-      console.log(error);
+      return response.status(500).json({ error: 'Erro ao buscar usuários' });
     }
   }
 
@@ -81,11 +112,19 @@ class UsuariosController {
     }
   }
 
-  async getUsuario({ request }) {
+  async getUsuario({ request, response }) {
     const { id_usuario } = request.all();
 
     try {
-      const user = await Usuario.query()
+      const sanitizedIdUsuario = sanitizeInteger(id_usuario);
+
+      if (!sanitizedIdUsuario) {
+        return response.status(400).json({
+          error: 'ID do usuário é obrigatório e deve ser um número válido'
+        });
+      }
+
+      const users = await Usuario.query()
         .select(
           "u.id_usuario",
           "u.id_pessoa",
@@ -109,17 +148,39 @@ class UsuariosController {
           "ps.id_permissao",
           "pss.id_permissao"
         )
-        .where("u.id_usuario", id_usuario)
+        .where("u.id_usuario", sanitizedIdUsuario)
         .fetch();
 
-      return user.toJSON();
+      const usersArray = users.toJSON();
+      
+      // Se não houver resultados, retorna erro
+      if (usersArray.length === 0) {
+        return response.status(404).json({
+          error: 'Usuário não encontrado'
+        });
+      }
+
+      // Retorna o array completo (pode ter múltiplas permissões)
+      // O frontend já está preparado para receber um array e usar [0]
+      return usersArray;
     } catch (error) {
-      console.log(error);
+      return response.status(500).json({
+        error: 'Erro ao buscar usuário',
+        details: error.message
+      });
     }
   }
 
-  async getResponsaveisSimisab({ params }) {
+  async getResponsaveisSimisab({ params, response }) {
     try {
+      const sanitizedIdMunicipio = sanitizeInteger(params.id);
+      const sanitizedIdPermissao = sanitizeInteger(3); // Permissão 3 é fixa
+
+      // Se não houver id_municipio válido, retorna array vazio (usuário pode não ter município associado)
+      if (!sanitizedIdMunicipio) {
+        return response.status(200).json([]);
+      }
+
       const user = await Usuario.query()
         .select(
           "u.id_usuario",
@@ -140,29 +201,42 @@ class UsuariosController {
           "ps.id_permissao",
           "pss.id_permissao"
         )
-        .where("u.id_municipio", params.id)
-        .where("pss.id_permissao", 3)
+        .where("u.id_municipio", sanitizedIdMunicipio)
+        .where("pss.id_permissao", sanitizedIdPermissao)
         .fetch();
 
       return user.toJSON();
     } catch (error) {
-      console.log(error);
+      return response.status(500).json({
+        error: 'Erro ao buscar responsáveis SIMISAB',
+        details: error.message
+      });
     }
   }
 
-  async getEditorSimisabPorAno({ params }) {
+  async getEditorSimisabPorAno({ params, response }) {
     try {
+      const sanitizedIdUsuario = sanitizeInteger(params.id);
+      const sanitizedAtivo = sanitizeBoolean(true); // Ativo é fixo como true
+
+      // Se não houver id_usuario válido, retorna array vazio (usuário pode não ter permissão de editor)
+      if (!sanitizedIdUsuario) {
+        return response.status(200).json([]);
+      }
+
       const editor = await Usuario.query()
         .select("*")
         .from("tedplan.editor_simisab_por_ano as e")
-        .where("e.id_usuario", params.id)
+        .where("e.id_usuario", sanitizedIdUsuario)
         .whereNotNull("e.ano")
-        .where("e.ativo", true)
+        .where("e.ativo", sanitizedAtivo)
         .fetch();
       return editor.toJSON();
     } catch (error) {
-      console.log(error);
-      return error;
+      return response.status(500).json({
+        error: 'Erro ao buscar editor SIMISAB por ano',
+        details: error.message
+      });
     }
   }
 
@@ -205,8 +279,7 @@ class UsuariosController {
         }
 
     } catch (error) {
-      console.log(error);
-      return error;
+      return response.status(500).json({ error: 'Erro ao processar requisição' });
     }
   }
 
@@ -221,25 +294,40 @@ class UsuariosController {
         senha,
       } = request.all();
 
+      const sanitizedIdUsuario = sanitizeInteger(id_usuario);
+      if (!sanitizedIdUsuario) {
+        return response.status(400).json({
+          error: 'ID do usuário é obrigatório e deve ser um número válido'
+        });
+      }
+
       if (ativo) {
+        const sanitizedAtivo = sanitizeBoolean(ativo);
         await Usuario.query()
           .from("tedplan.usuario")
-          .where("id_usuario", id_usuario)
-          .update({ ativo: ativo });
+          .where("id_usuario", sanitizedIdUsuario)
+          .update({ ativo: sanitizedAtivo });
       }
 
       if (id_municipio) {
-        await Usuario.query()
-          .from("tedplan.usuario")
-          .where("id_usuario", id_usuario)
-          .update({ id_municipio: id_municipio });
+        const sanitizedIdMunicipio = sanitizeInteger(id_municipio);
+        if (sanitizedIdMunicipio) {
+          await Usuario.query()
+            .from("tedplan.usuario")
+            .where("id_usuario", sanitizedIdUsuario)
+            .update({ id_municipio: sanitizedIdMunicipio });
+        }
       }
 
       if (id_permissao) {
-        await Usuario.query()
-          .from("tedplan.permissao_sistema")
-          .where("id_usuario", id_usuario)
-          .update({ id_permissao: id_permissao, id_sistema: id_sistema });
+        const sanitizedIdPermissao = sanitizeInteger(id_permissao);
+        const sanitizedIdSistema = sanitizeInteger(id_sistema);
+        if (sanitizedIdPermissao && sanitizedIdSistema) {
+          await Usuario.query()
+            .from("tedplan.permissao_sistema")
+            .where("id_usuario", sanitizedIdUsuario)
+            .update({ id_permissao: sanitizedIdPermissao, id_sistema: sanitizedIdSistema });
+        }
       }
 
       // const sistema = await Usuario.query()
@@ -256,7 +344,7 @@ class UsuariosController {
       if (senha) {
         await Usuario.query()
           .from("tedplan.usuario")
-          .where("id_usuario", id_usuario)
+          .where("id_usuario", sanitizedIdUsuario)
           .update({ senha: md5(senha) });
       }
 
@@ -264,9 +352,7 @@ class UsuariosController {
         .status(200)
         .send("As permissões do usuário foram atualizadas!");
     } catch (error) {
-      console.log(error);
-
-      return error;
+      return response.status(500).json({ error: 'Erro ao atualizar permissões' });
     }
   }
 
@@ -296,12 +382,22 @@ class UsuariosController {
     return sistema;
   }
 
-  async getPermissaoSistema({ request }) {
+  async getPermissaoSistema({ request, response }) {
     const { id_usuario, id_sistema } = request.all();
+    
+    const sanitizedIdUsuario = sanitizeInteger(id_usuario);
+    const sanitizedIdSistema = sanitizeInteger(id_sistema);
+
+    if (!sanitizedIdUsuario || !sanitizedIdSistema) {
+      return response.status(400).json({
+        error: 'ID do usuário e ID do sistema são obrigatórios e devem ser números válidos'
+      });
+    }
+
     const sistema = await Usuario.query()
       .from("tedplan.permissao_sistema")
-      .where("id_usuario", id_usuario)
-      .where("id_sistema", id_sistema)
+      .where("id_usuario", sanitizedIdUsuario)
+      .where("id_sistema", sanitizedIdSistema)
       .fetch();
     return sistema;
   }
@@ -309,21 +405,32 @@ class UsuariosController {
   async destroyUsuario({ request, response }) {
     try {
       const { id_usuario } = request.all();
+      
+      const sanitizedIdUsuario = sanitizeInteger(id_usuario);
+      if (!sanitizedIdUsuario) {
+        return response.status(400).json({
+          error: 'ID do usuário é obrigatório e deve ser um número válido'
+        });
+      }
+
       const usuario = await Usuario.query()
         .table("tedplan.usuario")
-        .where("id_usuario", id_usuario)
+        .where("id_usuario", sanitizedIdUsuario)
         .delete();
 
       const permissaoSistema = await Usuario.query()
         .table("tedplan.permissao_sistema")
-        .where("id_usuario", id_usuario)
+        .where("id_usuario", sanitizedIdUsuario)
         .delete();
 
       return response
         .status(200)
         .send({ message: "Usuário removido com sucesso!" });
     } catch (error) {
-      return error;
+      return response.status(500).json({
+        error: 'Erro ao remover usuário',
+        details: error.message
+      });
     }
   }
 }

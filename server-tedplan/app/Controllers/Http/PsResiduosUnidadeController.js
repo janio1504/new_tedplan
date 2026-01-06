@@ -1,12 +1,30 @@
 'use strict'
 const PsFinanceiro = use('App/Models/PsFinanceiro')
 
+// Helper function para sanitizar valores integer
+function sanitizeInteger(value) {
+  if (value === undefined || value === null || value === '' || 
+      (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
+    return null;
+  }
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value;
+  }
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? null : parsed;
+}
+
 class PsResiduosUnidadeController {
   async getUnidadesProcessamento({ request }){
     const dados = request.all()
+    const sanitizedIdMunicipio = sanitizeInteger(dados.id_municipio);
+    if (!sanitizedIdMunicipio) {
+      return [];
+    }
+    
     const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.unidades_processamento_residuo_solido')
-        .where('id_municipio', dados.id_municipio)
+        .where('id_municipio', sanitizedIdMunicipio)
         .fetch()       
 
         const unidades = await Promise.all(dadosRuc.toJSON().map(async (value) => {
@@ -25,9 +43,16 @@ class PsResiduosUnidadeController {
 
    async getResiduosUnidadesProcessamento({ request }){
     const dados = request.all()
+    const sanitizedIdMunicipio = sanitizeInteger(dados.id_municipio);
+    const sanitizedAno = sanitizeInteger(dados.ano);
+    
+    if (!sanitizedIdMunicipio || !sanitizedAno) {
+      return [];
+    }
+    
     const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.unidades_processamento_residuo_solido')
-        .where('id_municipio', dados.id_municipio)
+        .where('id_municipio', sanitizedIdMunicipio)
         .fetch()       
 
         const unidades = await Promise.all(dadosRuc.toJSON().map(async (value) => {
@@ -38,8 +63,10 @@ class PsResiduosUnidadeController {
 
         const rsu = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
-        .where('id_unidade_processamento', value.id_unidade_processamento)
-        .where('ano', dados.ano)
+        .where('nome_unidade', value.nome_unidade_processamento)
+        .where('municipio_unidade', res.toJSON()[0]?.nome || '')
+        .where('id_municipio', sanitizedIdMunicipio)
+        .where('ano', sanitizedAno)
         .fetch()
 
           if(rsu.toJSON().length !== 0){
@@ -56,9 +83,15 @@ class PsResiduosUnidadeController {
 
   async getUnidadesProcessamentoPorTipo({ request }){
     const dados = request.all()
+    const sanitizedIdMunicipio = sanitizeInteger(dados.id_municipio);
+    
+    if (!sanitizedIdMunicipio || !dados.tipo_unidade) {
+      return [];
+    }
+    
     const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.unidades_processamento_residuo_solido')
-        .where('id_municipio', dados.id_municipio)
+        .where('id_municipio', sanitizedIdMunicipio)
         .where('tipo_unidade', dados.tipo_unidade.trim())
         .fetch()       
 
@@ -79,53 +112,87 @@ class PsResiduosUnidadeController {
   async getDadosUnidadeProcessamento({ request }){
     const dados = request.all()    
     try {
+      const sanitizedIdMunicipio = sanitizeInteger(dados.id_municipio);
+      const sanitizedAno = sanitizeInteger(dados.ano);
+      
+      if (!sanitizedIdMunicipio || !sanitizedAno) {
+        return [];
+      }
+      
       const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
-        .where('id_municipio', dados.id_municipio)
-        .where('id_unidade_processamento', dados.id_unidade_processamento)
-        .where('ano', dados.ano)
+        .where('id_municipio', sanitizedIdMunicipio)
+        .where('nome_unidade', dados.nome_unidade || dados.nome_unidade_processamento)
+        .where('ano', sanitizedAno)
         .fetch()
 
       return dadosRuc
       
     } catch (error) {
-      console.log(error);
-      
+      return [];
     }
   }
 
   async getUnidadeProcessamento({ request }){
     const dados = request.all()
+    const sanitizedIdUnidadeProcessamento = sanitizeInteger(dados.id_unidade_processamento);
+    
+    if (!sanitizedIdUnidadeProcessamento) {
+      return null;
+    }
+    
     const dadosRuc = await PsFinanceiro.query()
         .select('upr.*', 'ms.nome as municipio_unidade_processamento')
         .from('tedplan.unidades_processamento_residuo_solido as upr')
         .innerJoin('tedplan.municipios as ms', 'upr.id_municipio_unidade_processamento', 'ms.id_municipio')
-        .where('id_unidade_processamento', dados.id_unidade_processamento)
+        .where('id_unidade_processamento', sanitizedIdUnidadeProcessamento)
         .fetch()
 
       return dadosRuc
   }
 
-  async destroy({ params }){
+  async destroy({ params, response }){
     try {
+      const sanitizedId = sanitizeInteger(params.id);
+      
+      if (!sanitizedId) {
+        return response.status(400).json({
+          error: 'ID da unidade é obrigatório e deve ser um número válido'
+        });
+      }
+      
       await PsFinanceiro.query()
       .table('tedplan.unidades_processamento_residuo_solido')
-      .where('id_unidade_processamento', params.id)
+      .where('id_unidade_processamento', sanitizedId)
       .delete()
+      
+      return response.status(200).json({ message: 'Unidade removida com sucesso' });
     } catch (error) {
-      console.log(error);
+      return response.status(500).json({
+        error: 'Erro ao remover unidade',
+        details: error.message
+      });
     }
   }
 
   async createUnidadeProcessamento({ request }){
     const dados = request.all()    
     try {
-      if(!dados.id_unidade_processamento){
+      const sanitizedIdUnidadeProcessamento = sanitizeInteger(dados.id_unidade_processamento);
+      const sanitizedIdMunicipio = sanitizeInteger(dados.id_municipio);
+      const sanitizedIdMunicipioUnidade = sanitizeInteger(dados.id_municipio_unidade_processamento);
+      const sanitizedAno = sanitizeInteger(dados.ano);
+      
+      if(!sanitizedIdUnidadeProcessamento){
+        if (!sanitizedIdMunicipio) {
+          throw new Error('ID do município é obrigatório');
+        }
+        
         const res = await PsFinanceiro.query()
         .from('tedplan.unidades_processamento_residuo_solido')
         .insert({    
-          id_municipio: dados.id_municipio, 
-          id_municipio_unidade_processamento: dados.id_municipio_unidade_processamento,    
+          id_municipio: sanitizedIdMunicipio, 
+          id_municipio_unidade_processamento: sanitizedIdMunicipioUnidade,    
           nome_unidade_processamento: dados.nome_unidade_processamento,
           cnpj: dados.cnpj,
           endereco: dados.endereco,
@@ -136,48 +203,56 @@ class PsResiduosUnidadeController {
       }else{
         const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.unidades_processamento_residuo_solido')
-        .where('id_unidade_processamento', dados.id_unidade_processamento)
+        .where('id_unidade_processamento', sanitizedIdUnidadeProcessamento)
         .fetch()
         const ruc = dadosRuc.toJSON()[0]
-        console.log(dados);
         
+        if (!ruc) {
+          throw new Error('Unidade de processamento não encontrada');
+        }
 
+        // Atualiza a tabela unidades_processamento_residuo_solido (não residuos_unidade_processamento)
         const res = await PsFinanceiro.query()
-        .from('tedplan.residuos_unidade_processamento')
-        .where('id_unidade_processamento', dados.id_unidade_processamento)
+        .from('tedplan.unidades_processamento_residuo_solido')
+        .where('id_unidade_processamento', sanitizedIdUnidadeProcessamento)
         .update({
-          id_municipio:  dados.id_municipio ? dados.id_municipio : ruc.id_municipio, 
-          id_municipio_unidade_processamento: dados.id_municipio_unidade_processamento ? dados.id_municipio_unidade_processamento : ruc.id_municipio_unidade_processamento,    
-          nome_unidade_processamento: dados.nome_unidade_processamento ? dados.nome_unidade_processamento : ruc.nome_unidade_processamento,
-          cnpj: dados.cnpj ? dados.cnpj : ruc.cnpj,
-          endereco: dados.endereco ? dados.endereco : ruc.endereco,
-          tipo_unidade: dados.tipo_unidade ? dados.tipo_unidade : ruc.tipo_unidade,
-          up065: dados.UP065 ? dados.UP065 : ruc.up065,
-          up051: dados.UP051 ? dados.UP051 : ruc.up051,
-          up002: dados.UP002 ? dados.UP002 : ruc.up002,
-          up066: dados.UP066 ? dados.UP066 : ruc.up066,
-          up004: dados.UP004 ? dados.UP004 : ruc.up004,
-          up084: dados.UP084 ? dados.UP084 : ruc.up084,
-          up050: dados.UP050 ? dados.UP050 : ruc.up050,
-          up012: dados.UP012 ? dados.UP012 : ruc.up012,
-          up085: dados.UP085 ? dados.UP085 : ruc.up085,
-
+          id_municipio: sanitizedIdMunicipio || ruc.id_municipio, 
+          id_municipio_unidade_processamento: sanitizedIdMunicipioUnidade || ruc.id_municipio_unidade_processamento,    
+          nome_unidade_processamento: dados.nome_unidade_processamento || ruc.nome_unidade_processamento,
+          cnpj: dados.cnpj || ruc.cnpj,
+          endereco: dados.endereco || ruc.endereco,
+          tipo_unidade: dados.tipo_unidade || ruc.tipo_unidade,
+          up065: dados.UP065 || ruc.up065,
+          up051: dados.UP051 || ruc.up051,
+          up002: dados.UP002 || ruc.up002,
+          up066: dados.UP066 || ruc.up066,
+          up004: dados.UP004 || ruc.up004,
+          up084: dados.UP084 || ruc.up084,
+          up050: dados.UP050 || ruc.up050,
+          up012: dados.UP012 || ruc.up012,
+          up085: dados.UP085 || ruc.up085,
           })
       }
 
     } catch (error) {
-      console.log(error);
-      return error
+      throw error;
     }
 
   }
 
   async createDadosUnidadeProcessamento({ request }){
     const dados = request.all()
-    console.log(dados);
    
     try {
-      if(!dados.id_residuos_unidade_processamento){
+      const sanitizedIdMunicipio = sanitizeInteger(dados.id_municipio);
+      const sanitizedAno = sanitizeInteger(dados.ano);
+      const sanitizedIdResiduosUnidadeProcessamento = sanitizeInteger(dados.id_residuos_unidade_processamento);
+      
+      if(!sanitizedIdResiduosUnidadeProcessamento){
+        if (!sanitizedIdMunicipio || !sanitizedAno) {
+          throw new Error('ID do município e ano são obrigatórios');
+        }
+        
         const res = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
         .insert({
@@ -234,22 +309,25 @@ class PsResiduosUnidadeController {
           up086: dados.UP086,
           up087: dados.UP087,
           municipio_unidade: dados.municipio_unidade,
-          nome_unidade: dados.nome_unidade,
+          nome_unidade: dados.nome_unidade || dados.nome_unidade_processamento,
           observacoes_unidade: dados.observacoes_unidade,
-          id_municipio: dados.id_municipio,
-          ano: dados.ano,
-          id_unidade_processamento: dados.id_unidade_processamento
+          id_municipio: sanitizedIdMunicipio,
+          ano: sanitizedAno
           })
       }else{
         const dadosRuc = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
-        .where('id_residuos_unidade_processamento', dados.id_residuos_unidade_processamento)
+        .where('id_residuos_unidade_processamento', sanitizedIdResiduosUnidadeProcessamento)
         .fetch()
-        const ruc = dadosRuc.toJSON()[0]        
+        const ruc = dadosRuc.toJSON()[0]
+        
+        if (!ruc) {
+          throw new Error('Registro de resíduos não encontrado');
+        }        
 
         const res = await PsFinanceiro.query()
         .from('tedplan.residuos_unidade_processamento')
-        .where('id_residuos_unidade_processamento', dados.id_residuos_unidade_processamento)
+        .where('id_residuos_unidade_processamento', sanitizedIdResiduosUnidadeProcessamento)
         .update({
           up001: dados.UP001 ? dados.UP001 : ruc.up001,
           up003: dados.UP003 ? dados.UP003 : ruc.up003,
@@ -299,16 +377,35 @@ class PsResiduosUnidadeController {
           observacoes_unidade: dados.observacoes_unidade ? dados.observacoes_unidade : ruc.observacoes_unidade,
           })          
 
-          const dadosUprs = await PsFinanceiro.query()
-          .from('tedplan.unidades_processamento_residuo_solido')
-          .where('id_unidade_processamento', dados.id_unidade_processamento)
-          .fetch()
-          const uprs = dadosUprs.toJSON()[0]
+          // Buscar id_unidade_processamento da unidade relacionada se necessário
+          // A relação é feita através de nome_unidade e municipio_unidade
+          let sanitizedIdUnidadeProcessamento = sanitizeInteger(dados.id_unidade_processamento);
           
-          const resUprs = await PsFinanceiro.query()
-          .from('tedplan.unidades_processamento_residuo_solido')
-          .where('id_unidade_processamento', dados.id_unidade_processamento)
-          .update({
+          // Se não tiver id_unidade_processamento, buscar pela unidade relacionada
+          if (!sanitizedIdUnidadeProcessamento && ruc.nome_unidade) {
+            const unidadeRelacionada = await PsFinanceiro.query()
+              .from('tedplan.unidades_processamento_residuo_solido')
+              .where('nome_unidade_processamento', ruc.nome_unidade)
+              .where('id_municipio', sanitizedIdMunicipio || ruc.id_municipio)
+              .first();
+            
+            if (unidadeRelacionada) {
+              sanitizedIdUnidadeProcessamento = unidadeRelacionada.id_unidade_processamento;
+            }
+          }
+          
+          if (sanitizedIdUnidadeProcessamento) {
+            const dadosUprs = await PsFinanceiro.query()
+            .from('tedplan.unidades_processamento_residuo_solido')
+            .where('id_unidade_processamento', sanitizedIdUnidadeProcessamento)
+            .fetch()
+            const uprs = dadosUprs.toJSON()[0]
+            
+            if (uprs) {
+              const resUprs = await PsFinanceiro.query()
+              .from('tedplan.unidades_processamento_residuo_solido')
+              .where('id_unidade_processamento', sanitizedIdUnidadeProcessamento)
+              .update({
             id_municipio:  dados.id_municipio ? dados.id_municipio : uprs.id_municipio, 
             id_municipio_unidade_processamento: dados.id_municipio_unidade_processamento ? dados.id_municipio_unidade_processamento : uprs.id_municipio_unidade_processamento,    
             nome_unidade_processamento: dados.nome_unidade_processamento ? dados.nome_unidade_processamento : uprs.nome_unidade_processamento,
@@ -326,10 +423,12 @@ class PsResiduosUnidadeController {
             up085: dados.UP085 ? dados.UP085 : uprs.up085,
   
             })
+            }
+          }
       }
 
     } catch (error) {
-      console.log(error);
+      throw error;
     }
 
   }
