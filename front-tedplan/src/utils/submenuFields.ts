@@ -219,20 +219,31 @@ export const submenuFields: SubmenuFields = {
 
   controleSocial: {
     required: [
-      // Controle Social
       'cs_setor_responsavel',
       'cs_telefone',
-      'cs_email',
-      // Responsável SIMISAB
+      'cs_email'
+    ],
+    optional: [
+      'id_controle_social_sms'
+    ]
+  },
+
+  responsavelSimisab: {
+    required: [
       'simisab_responsavel',
       'simisab_telefone',
-      'simisab_email',
-      // Conselho Municipal
+      'simisab_email'
+    ],
+    optional: [
+      'id_responsavel_simisab'
+    ]
+  },
+
+  conselhoMunicipal: {
+    required: [
       'possui_conselho'
     ],
     optional: [
-      'id_controle_social_sms',
-      'id_responsavel_simisab',
       'id_conselho_municipal',
       'descricao_outros'
     ],
@@ -338,7 +349,9 @@ export const getSubmenuName = (submenuKey: string): string => {
     prestadoresDrenagemAguasPluviais: 'Drenagem e Águas Pluviais',
     prestadoresResiduosSolidos: 'Limpeza Pública e Resíduos Sólidos',
     reguladorFiscalizador: 'Regulador e Fiscalizador',
-    controleSocial: 'Controle Social & Responsável pelo SIMISAB',
+    controleSocial: 'Controle Social',
+    responsavelSimisab: 'Responsável pelo SIMISAB',
+    conselhoMunicipal: 'Conselho Municipal',
     dadosGeograficos: 'Dados Geográficos',
     dadosDemograficos: 'Dados Demográficos'
   };
