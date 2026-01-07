@@ -82,15 +82,11 @@ describe('MunicipioController - getMunicipio()', () => {
     mockQueryBuilder.first.mockRejectedValue(error);
     Municipio.query.mockReturnValue(mockQueryBuilder);
 
-    // O controller captura o erro no catch e apenas faz console.log
-    // Não lança exceção nem retorna resposta de erro
-    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
-    
     await controller.getMunicipio({ request, response });
 
-    // Verificar que o erro foi logado
-    expect(consoleSpy).toHaveBeenCalled();
-    consoleSpy.mockRestore();
+    // Verificar que o erro foi tratado e retornou status 500
+    expect(response.status).toHaveBeenCalledWith(500);
+    expect(response.json).toHaveBeenCalledWith({ error: 'Erro ao buscar município' });
     
     // O controller não retorna nada quando há erro (undefined)
     // e não chama response.status
