@@ -113,6 +113,487 @@ describe('MunicipioController - Testes de Integração', () => {
     });
   });
 
+  describe('Prestadores de Serviços - Abastecimento de Água (menu a menu)', () => {
+    test('deve criar prestador quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        aa_abrangencia: 'Municipal',
+        aa_natureza_juridica: 'Empresa Privada',
+        aa_cnpj: '12345678000190',
+        aa_telefone: '1234567890',
+        aa_cep: '12345678',
+        aa_endereco: 'Rua AA',
+        aa_numero: '123',
+        aa_bairro: 'Centro',
+        aa_responsavel: 'Responsável AA',
+        aa_cargo: 'Cargo AA',
+        aa_email: 'aa@teste.com',
+        aa_secretaria_setor_responsavel: 'Setor AA',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.ps_abastecimento_agua');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando prestador já existe', async () => {
+      const data = {
+        id_municipio: 1,
+        aa_abrangencia: 'Estadual',
+        aa_cnpj: '98765432000100',
+        // Não enviar outros campos
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_ps_abastecimento_agua: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      const updateCall = mockQueryBuilder.update.mock.calls[0][0];
+      expect(updateCall).toHaveProperty('ps_abrangencia', 'Estadual');
+      expect(updateCall).toHaveProperty('ps_cnpj', '98765432000100');
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('não deve processar se payload contém apenas id_ps_abastecimento_agua sem campos de dados', async () => {
+      const data = {
+        id_municipio: 1,
+        id_ps_abastecimento_agua: 1,
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.first).not.toHaveBeenCalled();
+      expect(mockQueryBuilder.insert).not.toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Prestadores de Serviços - Esgotamento Sanitário (menu a menu)', () => {
+    test('deve processar apenas se houver campos es_* no payload', async () => {
+      const data = {
+        id_municipio: 1,
+        es_abrangencia: 'Municipal',
+        es_cnpj: '12345678000190',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.ps_esgotamento_sanitario');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Prestadores de Serviços - Drenagem e Águas Pluviais (menu a menu)', () => {
+    test('deve processar apenas se houver campos da_* no payload', async () => {
+      const data = {
+        id_municipio: 1,
+        da_abrangencia: 'Municipal',
+        da_cnpj: '12345678000190',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.ps_drenagem_aguas_pluviais');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Prestadores de Serviços - Resíduos Sólidos (menu a menu)', () => {
+    test('deve processar apenas se houver campos rs_* no payload', async () => {
+      const data = {
+        id_municipio: 1,
+        rs_abrangencia: 'Municipal',
+        rs_cnpj: '12345678000190',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.ps_residuo_solido');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Regulador e Fiscalizador (menu a menu)', () => {
+    test('deve criar regulador quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        rf_setor_responsavel: 'Setor RF',
+        rf_responsavel: 'Responsável RF',
+        rf_cargo: 'Cargo RF',
+        rf_telefone: '1234567890',
+        rf_email: 'rf@teste.com',
+        rf_descricao: 'Descrição RF',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.regulador_fiscalizador_ss');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando regulador já existe', async () => {
+      const data = {
+        id_municipio: 1,
+        rf_setor_responsavel: 'Setor RF Atualizado',
+        rf_email: 'novo@teste.com',
+        // Não enviar outros campos
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_regulador_fiscalizador_ss: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      const updateCall = mockQueryBuilder.update.mock.calls[0][0];
+      expect(updateCall).toHaveProperty('setor_responsavel', 'Setor RF Atualizado');
+      expect(updateCall).toHaveProperty('email', 'novo@teste.com');
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('não deve processar se payload contém apenas id_regulador_fiscalizador_ss sem campos de dados', async () => {
+      const data = {
+        id_municipio: 1,
+        id_regulador_fiscalizador_ss: 1,
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.first).not.toHaveBeenCalled();
+      expect(mockQueryBuilder.insert).not.toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Controle Social (menu a menu)', () => {
+    test('deve criar controle social quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        cs_setor_responsavel: 'Setor CS',
+        cs_telefone: '1234567890',
+        cs_email: 'cs@teste.com',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.controle_social_sms');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando controle social já existe', async () => {
+      const data = {
+        id_municipio: 1,
+        cs_setor_responsavel: 'Setor CS Atualizado',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_controle_social_sms: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Responsável SIMISAB (menu a menu)', () => {
+    test('deve criar responsável quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        simisab_responsavel: 'Responsável SIMISAB',
+        simisab_telefone: '1234567890',
+        simisab_email: 'simisab@teste.com',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.responsavel_simisab');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando responsável já existe', async () => {
+      const data = {
+        id_municipio: 1,
+        simisab_email: 'novo@teste.com',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_responsavel_simisab: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Conselho Municipal (menu a menu)', () => {
+    test('deve criar conselho quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        possui_conselho: 'sim',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.conselho_municipal');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando conselho já existe', async () => {
+      const data = {
+        id_municipio: 1,
+        possui_conselho: 'nao',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_conselho_municipal: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar quando altera de sim para outros com descrição', async () => {
+      const data = {
+        id_municipio: 1,
+        possui_conselho: 'outros',
+        descricao_outros: 'Descrição do conselho',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ 
+        id_conselho_municipal: 1, 
+        id_municipio: 1,
+        possui_conselho: 'sim' 
+      });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      const updateCall = mockQueryBuilder.update.mock.calls[0][0];
+      expect(updateCall).toHaveProperty('possui_conselho', 'outros');
+      expect(updateCall).toHaveProperty('descricao_outros', 'Descrição do conselho');
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Dados Geográficos (menu a menu)', () => {
+    test('deve criar dados geográficos quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        OGM0001: 100,
+        OGM0002: 200,
+        OGM0003: 300,
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.dados_geograficos');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando dados geográficos já existem', async () => {
+      const data = {
+        id_municipio: 1,
+        OGM0001: 150,
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_dados_geograficos: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
+  describe('Dados Demográficos (menu a menu)', () => {
+    test('deve criar dados demográficos quando não existe e retornar 200', async () => {
+      const data = {
+        id_municipio: 1,
+        dd_populacao_urbana: '1000',
+        dd_populacao_rural: '500',
+        dd_total_moradias: '800',
+        OGM4001: 100,
+        OGM4002: 50,
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.from).toHaveBeenCalledWith('tedplan.dados_demograficos');
+      expect(mockQueryBuilder.insert).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve atualizar apenas campos enviados quando dados demográficos já existem', async () => {
+      const data = {
+        id_municipio: 1,
+        dd_populacao_urbana: '1500',
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue({ id_dados_demograficos: 1, id_municipio: 1 });
+      mockQueryBuilder.update.mockResolvedValue(1);
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      expect(mockQueryBuilder.update).toHaveBeenCalled();
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+
+    test('deve tratar campos de texto e numéricos corretamente', async () => {
+      const data = {
+        id_municipio: 1,
+        dd_populacao_urbana: '1000',
+        OGM4001: 100,
+        OGM4007: 100.50,
+      };
+
+      request = createMockRequest(data);
+
+      const mockQueryBuilder = global.createMockQueryBuilder();
+      mockQueryBuilder.first.mockResolvedValue(null);
+      mockQueryBuilder.insert.mockResolvedValue({});
+      Municipio.query.mockReturnValue(mockQueryBuilder);
+
+      await controller.store({ request, response });
+
+      const insertCall = mockQueryBuilder.insert.mock.calls[0][0];
+      expect(insertCall.populacao_urbana).toBe('1000');
+      expect(insertCall.OGM4001).toBe(100);
+      expect(insertCall.OGM4007).toBe(100.50);
+      expect(response.status).toHaveBeenCalledWith(200);
+    });
+  });
+
   describe('Fluxo completo de salvamento', () => {
     test('deve salvar todos os submenus em uma única requisição', async () => {
       const completeData = {
