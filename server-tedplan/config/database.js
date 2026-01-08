@@ -16,7 +16,7 @@ module.exports = {
   | interacting with SQL databases.
   |
   */
-  connection: Env.get('DB_CONNECTION', 'sqlite'),
+  connection: Env.get('DB_CONNECTION', 'tedplan_db'),
 
   /*
   |--------------------------------------------------------------------------
@@ -77,6 +77,26 @@ module.exports = {
       port: Env.get('DB_PORT', ''),
       user: Env.get('DB_USER', 'root'),
       password: Env.get('DB_PASSWORD', ''),
+      database: Env.get('DB_DATABASE', 'tedplan_db')
+    },
+    debug: Env.get('DB_DEBUG', false)
+  },
+
+  /*
+  |--------------------------------------------------------------------------
+  | PostgreSQL (alias para tedplan_db)
+  |--------------------------------------------------------------------------
+  |
+  | Alias para compatibilidade com o sistema de migrations do AdonisJS
+  |
+  */
+  pg: {
+    client: 'pg',
+    connection: {
+      host: Env.get('DB_HOST', 'localhost'),
+      port: Env.get('DB_PORT', '5432'),
+      user: Env.get('DB_USER', 'postgres'),
+      password: Env.get('DB_PASSWORD', 'r00tsimisab'),
       database: Env.get('DB_DATABASE', 'tedplan_db')
     },
     debug: Env.get('DB_DEBUG', false)

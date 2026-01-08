@@ -2,6 +2,38 @@
 
 const Municipio = use("App/Models/Municipio");
 
+// Helper function para sanitizar valores integer
+function sanitizeInteger(value) {
+  // Se for undefined, null, string vazia ou string "undefined"/"null", retorna null
+  if (value === undefined || value === null || value === '' || 
+      (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
+    return null;
+  }
+  // Se já for um número válido, retorna ele mesmo
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value;
+  }
+  // Tenta converter para integer
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? null : parsed;
+}
+
+// Helper function para sanitizar valores decimal
+function sanitizeDecimal(value) {
+  // Se for undefined, null, string vazia ou string "undefined"/"null", retorna null
+  if (value === undefined || value === null || value === '' || 
+      (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
+    return null;
+  }
+  // Se já for um número válido, retorna ele mesmo
+  if (typeof value === 'number' && !isNaN(value)) {
+    return value;
+  }
+  // Tenta converter para decimal
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? null : parsed;
+}
+
 class MunicipioController {
   async index() {
     const municipios = await Municipio.query()
@@ -125,7 +157,7 @@ class MunicipioController {
           "rfss.telefone_comercial as rf_telefone_comercial",
           "rfss.nome_responsavel as rf_responsavel",
           "rfss.cargo as rf_cargo",
-          //"rfss.funcao as rf_funcao",
+          "rfss.funcao as rf_funcao",
           "rfss.telefone as rf_telefone",
           "rfss.email as rf_email",
           "rfss.descricao as rf_descricao",
@@ -144,15 +176,15 @@ class MunicipioController {
           "dd.total_moradias as dd_total_moradias",
 
           // Campos de dados demográficos completos
-          "dd.ogm4001 as OGM4001",
-          "dd.ogm4002 as OGM4002",
-          "dd.ogm4003 as OGM4003",
-          "dd.ogm4004 as OGM4004",
-          "dd.ogm4005 as OGM4005",
-          "dd.ogm4006 as OGM4006",
-          "dd.ogm4007 as OGM4007",
-          "dd.ogm4008 as OGM4008",
-          "dd.ogm4009 as OGM4009",
+          "dd.OGM4001 as OGM4001",
+          "dd.OGM4002 as OGM4002",
+          "dd.OGM4003 as OGM4003",
+          "dd.OGM4004 as OGM4004",
+          "dd.OGM4005 as OGM4005",
+          "dd.OGM4006 as OGM4006",
+          "dd.OGM4007 as OGM4007",
+          "dd.OGM4008 as OGM4008",
+          "dd.OGM4009 as OGM4009",
 
           // Campos de dados geográficos completos
           "dg.id_dados_geograficos as id_dados_geograficos",
@@ -244,11 +276,12 @@ class MunicipioController {
 
       return response.status(200).json(municipio);
     } catch (error) {
-      console.log(error);
+      return response.status(500).json({ error: 'Erro ao buscar município' });
     }
   }
 
   async store({ request, response }) {
+    const payload = request.all();
     const {
       //dados do municipio
       id_municipio,
@@ -402,544 +435,567 @@ class MunicipioController {
       OGM0107,
       OGM0108,
       OGM0109
-    } = request.all();
+    } = payload;
 
     try {
-      const municipios = await Municipio.query()
-        .from("tedplan.municipios")
-        .where("id_municipio", id_municipio)
-        .update({
-          nome: municipio_nome,
-          codigo_ibge: municipio_codigo_ibge,
-          cnpj: municipio_cnpj,
-          cep: municipio_cep,
-          endereco: municipio_endereco,
-          numero: municipio_numero,
-          bairro: municipio_bairro,
-          municipio_telefone: municipio_telefone,
-          municipio_email: municipio_email,
-          nome_prefeito: municipio_prefeito,
-          nome_prefeitura: municipio_nome_prefeitura,
+      // Sanitizar id_municipio
+      const sanitizedIdMunicipio = sanitizeInteger(id_municipio);
+      if (!sanitizedIdMunicipio) {
+        return response.status(400).json({
+          error: 'ID do município é obrigatório e deve ser um número válido'
         });
-
-      if (id_titular_servicos_ms) {
-        updateTitularServicosMS();
-      } else {
-        addTitularServicosMS();
       }
 
-      if (id_ps_abastecimento_agua) {
-        updatePsAbastecimentoAgua();
-      } else {
-        addPsAbastecimentoAgua();
-      }
+      // Sanitizar todos os IDs
+      const sanitizedIdTitularServicosMs = sanitizeInteger(id_titular_servicos_ms);
+      const sanitizedIdPsAbastecimentoAgua = sanitizeInteger(id_ps_abastecimento_agua);
+      const sanitizedIdPsEsgotamentoSanitario = sanitizeInteger(id_ps_esgotamento_sanitario);
+      const sanitizedIdPsDrenagemAguasPluviais = sanitizeInteger(id_ps_drenagem_aguas_pluviais);
+      const sanitizedIdPsResiduoSolido = sanitizeInteger(id_ps_residuo_solido);
+      const sanitizedIdReguladorFiscalizadorSs = sanitizeInteger(id_regulador_fiscalizador_ss);
+      const sanitizedIdControleSocialSms = sanitizeInteger(id_controle_social_sms);
+      const sanitizedIdConselhoMunicipal = sanitizeInteger(id_conselho_municipal);
+      const sanitizedIdResponsavelSimisab = sanitizeInteger(id_responsavel_simisab);
+      const sanitizedIdDadosGeograficos = sanitizeInteger(id_dados_geograficos);
+      const sanitizedIdDadosDemograficos = sanitizeInteger(id_dados_demograficos);
 
-      if (id_ps_esgotamento_sanitario) {
-        updatePsEsgotamentoSanitario();
-      } else {
-        addPsEsgotamentoSanitario();
-      }
+      const payloadKeys = Object.keys(payload || {});
+      const hasKey = (key) => Object.prototype.hasOwnProperty.call(payload, key);
+      const hasAnyKey = (keys) => keys.some(hasKey);
+      const hasAnyPrefix = (prefixes) =>
+        payloadKeys.some((k) => prefixes.some((p) => k.startsWith(p)));
 
-      if (id_ps_drenagem_aguas_pluviais) {
-        updatePsDrenagemAguasPluviais();
-      } else {
-        addPsDrenagemAguasPluviais();
-      }
+      const shouldProcessMunicipio = hasAnyKey([
+        "municipio_codigo_ibge",
+        "municipio_nome",
+        "municipio_cnpj",
+        "municipio_nome_prefeitura",
+        "municipio_cep",
+        "municipio_endereco",
+        "municipio_numero",
+        "municipio_bairro",
+        "municipio_telefone",
+        "municipio_email",
+        "municipio_prefeito",
+      ]);
 
-      if (id_ps_residuo_solido) {
-        updatePsResiduoSolido();
-      } else {
-        addPsResiduoSolido();
-      }
+      const shouldProcessTitular = hasAnyPrefix(["ts_"]);
+      const shouldProcessPsAbastecimentoAgua = hasAnyPrefix(["aa_"]);
+      const shouldProcessPsEsgotamentoSanitario = hasAnyPrefix(["es_"]);
+      const shouldProcessPsDrenagemAguasPluviais = hasAnyPrefix(["da_"]);
+      const shouldProcessPsResiduoSolido = hasAnyPrefix(["rs_"]);
+      const shouldProcessReguladorFiscalizador = hasAnyPrefix(["rf_"]);
+      const shouldProcessControleSocial = hasAnyPrefix(["cs_"]);
+      const shouldProcessConselhoMunicipal = hasKey("possui_conselho") || hasKey("descricao_outros");
+      const shouldProcessResponsavelSimisab = hasAnyPrefix(["simisab_"]);
+      const shouldProcessDadosGeograficos = hasAnyPrefix(["OGM0"]);
+      const shouldProcessDadosDemograficos = hasAnyPrefix(["dd_", "OGM4"]);
 
-      if (id_regulador_fiscalizador_ss) {
-        updateReguladorFiscalizador();
-      } else {
-        addReguladorFiscalizador();
-      }
+      if (shouldProcessMunicipio) {
+        // Atualizar somente os campos enviados no payload (não sobrescrever com undefined)
+        const municipioUpdate = {};
+        if (hasKey("municipio_nome")) municipioUpdate.nome = municipio_nome;
+        if (hasKey("municipio_codigo_ibge")) municipioUpdate.codigo_ibge = municipio_codigo_ibge;
+        if (hasKey("municipio_cnpj")) municipioUpdate.cnpj = municipio_cnpj;
+        if (hasKey("municipio_cep")) municipioUpdate.cep = municipio_cep;
+        if (hasKey("municipio_endereco")) municipioUpdate.endereco = municipio_endereco;
+        if (hasKey("municipio_numero")) municipioUpdate.numero = municipio_numero;
+        if (hasKey("municipio_bairro")) municipioUpdate.bairro = municipio_bairro;
+        if (hasKey("municipio_telefone")) municipioUpdate.municipio_telefone = municipio_telefone;
+        if (hasKey("municipio_email")) municipioUpdate.municipio_email = municipio_email;
+        if (hasKey("municipio_prefeito")) municipioUpdate.nome_prefeito = municipio_prefeito;
+        if (hasKey("municipio_nome_prefeitura")) municipioUpdate.nome_prefeitura = municipio_nome_prefeitura;
 
-      if (id_controle_social_sms) {
-        updateControleSocial();
-      } else {
-        addControleSocial();
-      }
+        const updatedMunicipioRows = await Municipio.query()
+          .from("tedplan.municipios")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .update(municipioUpdate);
 
-      if (id_conselho_municipal) {
-        updateConselhoMunicipal()
-      } else {
-        addConselhoMunicipal();
-      }
-
-      if (id_responsavel_simisab) {
-        updateResponsavelSimisab();
-      } else {
-        addResponsavelSimisab();
-      }
-
-      if (id_dados_geograficos) {
-        updateDadosGeograficos();
-      } else {
-        addDadosGeograficos();
-      }
-
-      if (id_dados_demograficos) {
-        updateDadosDemograficos();
-      } else {
-        addDadosDemograficos();
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
-    async function updateTitularServicosMS() {
-      const ts = await Municipio.query()
-        .from("tedplan.titular_servicos_ms")
-        .where("id_municipio", id_municipio)
-        .where("id_titular_servicos_ms", id_titular_servicos_ms)
-        .update({
-          setor_responsavel_tsms: ts_setor_responsavel,
-          telefone_comercial_tsms: ts_telefone_comercial,
-          nome_responsavel_tsms: ts_responsavel,
-          cargo_tsms: ts_cargo,
-          funcao_tsms: ts_funcao,
-          telefone_tsms: ts_telefone,
-          email_tsms: ts_email,
-        });
-    }
-    async function addTitularServicosMS() {
-      const ts = await Municipio.query()
-        .from("tedplan.titular_servicos_ms")
-        .insert({
-          setor_responsavel_tsms: ts_setor_responsavel,
-          telefone_comercial_tsms: ts_telefone_comercial,
-          nome_responsavel_tsms: ts_responsavel,
-          cargo_tsms: ts_cargo,
-          funcao_tsms: ts_funcao,
-          telefone_tsms: ts_telefone,
-          email_tsms: ts_email,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updatePsAbastecimentoAgua() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_abastecimento_agua")
-        .where("id_municipio", id_municipio)
-        .where("id_ps_abastecimento_agua", id_ps_abastecimento_agua)
-        .update({
-          ps_abrangencia: aa_abrangencia,
-          ps_natureza_juridica: aa_natureza_juridica,
-          ps_cnpj: aa_cnpj,
-          ps_telefone: aa_telefone,
-          ps_cep: aa_cep,
-          ps_endereco: aa_endereco,
-          ps_numero: aa_numero,
-          ps_bairro: aa_bairro,
-          ps_nome_responsavel: aa_responsavel,
-          ps_cargo: aa_cargo,
-          ps_email: aa_email,
-          ps_setor_responsavel: aa_secretaria_setor_responsavel,
-        });
-    }
-    async function addPsAbastecimentoAgua() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_abastecimento_agua")
-        .insert({
-          ps_abrangencia: aa_abrangencia,
-          ps_natureza_juridica: aa_natureza_juridica,
-          ps_cnpj: aa_cnpj,
-          ps_telefone: aa_telefone,
-          ps_cep: aa_cep,
-          ps_endereco: aa_endereco,
-          ps_numero: aa_numero,
-          ps_bairro: aa_bairro,
-          ps_nome_responsavel: aa_responsavel,
-          ps_cargo: aa_cargo,
-          ps_email: aa_email,
-          ps_setor_responsavel: aa_secretaria_setor_responsavel,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updatePsEsgotamentoSanitario() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_esgotamento_sanitario")
-        .where("id_municipio", id_municipio)
-        .where("id_ps_esgotamento_sanitario", id_ps_esgotamento_sanitario)
-        .update({
-          ps_abrangencia: es_abrangencia,
-          ps_natureza_juridica: es_natureza_juridica,
-          ps_cnpj: es_cnpj,
-          ps_telefone: es_telefone,
-          ps_cep: es_cep,
-          ps_endereco: es_endereco,
-          ps_numero: es_numero,
-          ps_bairro: es_bairro,
-          ps_nome_responsavel: es_responsavel,
-          ps_cargo: es_cargo,
-          ps_email: es_email,
-          ps_setor_responsavel: es_secretaria_setor_responsavel,
-        });
-    }
-    async function addPsEsgotamentoSanitario() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_esgotamento_sanitario")
-        .insert({
-          ps_abrangencia: es_abrangencia,
-          ps_natureza_juridica: es_natureza_juridica,
-          ps_cnpj: es_cnpj,
-          ps_telefone: es_telefone,
-          ps_cep: es_cep,
-          ps_endereco: es_endereco,
-          ps_numero: es_numero,
-          ps_bairro: es_bairro,
-          ps_nome_responsavel: es_responsavel,
-          ps_cargo: es_cargo,
-          ps_email: es_email,
-          ps_setor_responsavel: es_secretaria_setor_responsavel,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updatePsDrenagemAguasPluviais() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_drenagem_aguas_pluviais")
-        .where("id_municipio", id_municipio)
-        .where("id_ps_drenagem_aguas_pluviais", id_ps_drenagem_aguas_pluviais)
-        .update({
-          ps_abrangencia: da_abrangencia,
-          ps_natureza_juridica: da_natureza_juridica,
-          ps_cnpj: da_cnpj,
-          ps_telefone: da_telefone,
-          ps_cep: da_cep,
-          ps_endereco: da_endereco,
-          ps_numero: da_numero,
-          ps_bairro: da_bairro,
-          ps_nome_responsavel: da_responsavel,
-          ps_cargo: da_cargo,
-          ps_email: da_email,
-          ps_setor_responsavel: da_secretaria_setor_responsavel,
-        });
-    }
-    async function addPsDrenagemAguasPluviais() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_drenagem_aguas_pluviais")
-        .insert({
-          ps_abrangencia: da_abrangencia,
-          ps_natureza_juridica: da_natureza_juridica,
-          ps_cnpj: da_cnpj,
-          ps_telefone: da_telefone,
-          ps_cep: da_cep,
-          ps_endereco: da_endereco,
-          ps_numero: da_numero,
-          ps_bairro: da_bairro,
-          ps_nome_responsavel: da_responsavel,
-          ps_cargo: da_cargo,
-          ps_email: da_email,
-          ps_setor_responsavel: da_secretaria_setor_responsavel,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updatePsResiduoSolido() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_residuo_solido")
-        .where("id_municipio", id_municipio)
-        .where("id_ps_residuo_solido", id_ps_residuo_solido)
-        .update({
-          ps_abrangencia: rs_abrangencia,
-          ps_natureza_juridica: rs_natureza_juridica,
-          ps_cnpj: rs_cnpj,
-          ps_telefone: rs_telefone,
-          ps_cep: rs_cep,
-          ps_endereco: rs_endereco,
-          ps_numero: rs_numero,
-          ps_bairro: rs_bairro,
-          ps_nome_responsavel: rs_responsavel,
-          ps_cargo: rs_cargo,
-          ps_email: rs_email,
-          ps_setor_responsavel: rs_secretaria_setor_responsavel,
-        });
-    }
-    async function addPsResiduoSolido() {
-      const ts = await Municipio.query()
-        .from("tedplan.ps_residuo_solido")
-        .insert({
-          ps_abrangencia: rs_abrangencia,
-          ps_natureza_juridica: rs_natureza_juridica,
-          ps_cnpj: rs_cnpj,
-          ps_telefone: rs_telefone,
-          ps_cep: rs_cep,
-          ps_endereco: rs_endereco,
-          ps_numero: rs_numero,
-          ps_bairro: rs_bairro,
-          ps_nome_responsavel: rs_responsavel,
-          ps_cargo: rs_cargo,
-          ps_email: rs_email,
-          ps_setor_responsavel: rs_secretaria_setor_responsavel,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updateReguladorFiscalizador() {
-      const ts = await Municipio.query()
-        .from("tedplan.regulador_fiscalizador_ss")
-        .where("id_municipio", id_municipio)
-        .where("id_regulador_fiscalizador_ss", id_regulador_fiscalizador_ss)
-        .update({
-          setor_responsavel: rf_setor_responsavel,
-          telefone_comercial: rf_telefone_comercial,
-          nome_responsavel: rf_responsavel,
-          cargo: rf_cargo,
-          funcao: rf_funcao,
-          telefone: rf_telefone,
-          email: rf_email,
-          descricao: rf_descricao,
-        });
-    }
-    async function addReguladorFiscalizador() {
-      const ts = await Municipio.query()
-        .from("tedplan.regulador_fiscalizador_ss")
-        .insert({
-          setor_responsavel: rf_setor_responsavel,
-          telefone_comercial: rf_telefone_comercial,
-          nome_responsavel: rf_responsavel,
-          cargo: rf_cargo,
-          funcao: rf_funcao,
-          telefone: rf_telefone,
-          email: rf_email,
-          descricao: rf_descricao,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updateControleSocial() {
-      const ts = await Municipio.query()
-        .from("tedplan.controle_social_sms")
-        .where("id_municipio", id_municipio)
-        .where("id_controle_social_sms", id_controle_social_sms)
-        .update({
-          setor_responsavel_cs_sms: cs_setor_responsavel,
-          telefone_cs_sms: cs_telefone,
-          email_cs_sms: cs_email,
-        });
-    }
-    async function addControleSocial() {
-      const ts = await Municipio.query()
-        .from("tedplan.controle_social_sms")
-        .insert({
-          setor_responsavel_cs_sms: cs_setor_responsavel,
-          telefone_cs_sms: cs_telefone,
-          email_cs_sms: cs_email,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updateResponsavelSimisab() {
-      const ts = await Municipio.query()
-        .from("tedplan.responsavel_simisab")
-        .where("id_municipio", id_municipio)
-        .where("id_responsavel_simisab", id_responsavel_simisab)
-        .update({
-          simisab_nome_responsavel: simisab_responsavel,
-          simisab_telefone: simisab_telefone,
-          simisab_email: simisab_email,
-        });
-    }
-    async function addResponsavelSimisab() {
-      const ts = await Municipio.query()
-        .from("tedplan.responsavel_simisab")
-        .insert({
-          simisab_nome_responsavel: simisab_responsavel,
-          simisab_telefone: simisab_telefone,
-          simisab_email: simisab_email,
-          id_municipio: id_municipio,
-        });
-    }
-
-
-
-
-    async function updateConselhoMunicipal() {
-      try {
-        if (!id_municipio || !id_conselho_municipal) {
-          throw new Error('Missing required IDs');
+        // store() apenas atualiza municípios; se não encontrar, retornar 404
+        if (!updatedMunicipioRows) {
+          return response.status(404).json({ error: "Município não encontrado" });
         }
+      }
 
+      // Definir todas as funções internas dentro do escopo do try
+      async function updateTitularServicosMS() {
         const ts = await Municipio.query()
-          .from("tedplan.conselho_municipal")
-          .where("id_municipio", id_municipio)
-          .where("id_conselho_municipal", id_conselho_municipal)
+          .from("tedplan.titular_servicos_ms")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .where("id_titular_servicos_ms", sanitizedIdTitularServicosMs)
           .update({
-            possui_conselho: possui_conselho,
-            descricao_outros: descricao_outros,
-            updated_at: new Date()
+            setor_responsavel_tsms: ts_setor_responsavel,
+            telefone_comercial_tsms: ts_telefone_comercial,
+            nome_responsavel_tsms: ts_responsavel,
+            cargo_tsms: ts_cargo,
+            funcao_tsms: ts_funcao,
+            telefone_tsms: ts_telefone,
+            email_tsms: ts_email,
           });
-
-        return ts;
-      } catch (error) {
-        console.error('Error updating conselho municipal:', error);
-        throw error;
       }
-    }
-
-    async function addConselhoMunicipal() {
-      try {
-        if (!id_municipio) {
-          throw new Error('Missing municipio ID');
-        }
-
+      async function addTitularServicosMS() {
         const ts = await Municipio.query()
-          .from("tedplan.conselho_municipal")
+          .from("tedplan.titular_servicos_ms")
           .insert({
-            possui_conselho: possui_conselho,
-            descricao_outros: descricao_outros,
-            id_municipio: id_municipio,
-            created_at: new Date(),
-            updated_at: new Date()
+            setor_responsavel_tsms: ts_setor_responsavel,
+            telefone_comercial_tsms: ts_telefone_comercial,
+            nome_responsavel_tsms: ts_responsavel,
+            cargo_tsms: ts_cargo,
+            funcao_tsms: ts_funcao,
+            telefone_tsms: ts_telefone,
+            email_tsms: ts_email,
+            id_municipio: sanitizedIdMunicipio,
           });
-
-        return ts;
-      } catch (error) {
-        console.error('Error adding conselho municipal:', error);
-        throw error;
-      }
-    }
-
-    async function updateDadosGeograficos() {
-      const resDg = await Municipio.query()
-        .from("tedplan.dados_geograficos")
-        .where("id_municipio", id_municipio)
-        .where("id_dados_geograficos", id_dados_geograficos)
-        .fetch();
-
-      if (resDg.rows.length === 0) {
-        return response.status(404).send({
-          message: "Dados geográficos não encontrados",
-        });
       }
 
-      const ogm = resDg.rows[0].toJSON();
+      async function addPsAbastecimentoAgua() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("aa_abrangencia")) updateData.ps_abrangencia = aa_abrangencia;
+        if (hasKey("aa_natureza_juridica")) updateData.ps_natureza_juridica = aa_natureza_juridica;
+        if (hasKey("aa_cnpj")) updateData.ps_cnpj = aa_cnpj;
+        if (hasKey("aa_telefone")) updateData.ps_telefone = aa_telefone;
+        if (hasKey("aa_cep")) updateData.ps_cep = aa_cep;
+        if (hasKey("aa_endereco")) updateData.ps_endereco = aa_endereco;
+        if (hasKey("aa_numero")) updateData.ps_numero = aa_numero;
+        if (hasKey("aa_bairro")) updateData.ps_bairro = aa_bairro;
+        if (hasKey("aa_responsavel")) updateData.ps_nome_responsavel = aa_responsavel;
+        if (hasKey("aa_cargo")) updateData.ps_cargo = aa_cargo;
+        if (hasKey("aa_email")) updateData.ps_email = aa_email;
+        if (hasKey("aa_secretaria_setor_responsavel")) updateData.ps_setor_responsavel = aa_secretaria_setor_responsavel;
 
-      const ts = await Municipio.query()
-        .from("tedplan.dados_geograficos")
-        .where("id_municipio", id_municipio)
-        .where("id_dados_geograficos", id_dados_geograficos)
-        .update({
-          ogm0001: OGM0001 ? OGM0001 : ogm.ogm0001,
-          ogm0002: OGM0002 ? OGM0002 : ogm.ogm0002,
-          ogm0003: OGM0003 ? OGM0003 : ogm.ogm0003,
-          ogm0004: OGM0004 ? OGM0004 : ogm.ogm0004,
-          ogm0005: OGM0005 ? OGM0005 : ogm.ogm0005,
-          ogm0006: OGM0006 ? OGM0006 : ogm.ogm0006,
-          ogm0007: OGM0007 ? OGM0007 : ogm.ogm0007,
-          ogm0008: OGM0008 ? OGM0008 : ogm.ogm0008,
-          ogm0009: OGM0009 ? OGM0009 : ogm.ogm0009,
-          ogm0010: OGM0010 ? OGM0010 : ogm.ogm0010,
-          ogm0011: OGM0011 ? OGM0011 : ogm.ogm0011,
-          ogm0012: OGM0012 ? OGM0012 : ogm.ogm0012,
-          ogm0101: OGM0101 ? OGM0101 : ogm.ogm0101,
-          ogm0102: OGM0102 ? OGM0102 : ogm.ogm0102,
-          ogm0103: OGM0103 ? OGM0103 : ogm.ogm0103,
-          ogm0104: OGM0104 ? OGM0104 : ogm.ogm0104,
-          ogm0105: OGM0105 ? OGM0105 : ogm.ogm0105,
-          ogm0106: OGM0106 ? OGM0106 : ogm.ogm0106,
-          ogm0107: OGM0107 ? OGM0107 : ogm.ogm0107,
-          ogm0108: OGM0108 ? OGM0108 : ogm.ogm0108,
-          ogm0109: OGM0109 ? OGM0109 : ogm.ogm0109
-        });
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.ps_abastecimento_agua")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
 
-    }
-
-    async function addDadosGeograficos() {
-      const ts = await Municipio.query()
-        .from("tedplan.dados_geograficos")
-        .insert({
-          ogm0001: OGM0001,
-          ogm0002: OGM0002,
-          ogm0003: OGM0003,
-          ogm0004: OGM0004,
-          ogm0005: OGM0005,
-          ogm0006: OGM0006,
-          ogm0007: OGM0007,
-          ogm0008: OGM0008,
-          ogm0009: OGM0009,
-          ogm0010: OGM0010,
-          ogm0011: OGM0011,
-          ogm0012: OGM0012,
-          ogm0101: OGM0101,
-          ogm0102: OGM0102,
-          ogm0103: OGM0103,
-          ogm0104: OGM0104,
-          ogm0105: OGM0105,
-          ogm0106: OGM0106,
-          ogm0107: OGM0107,
-          ogm0108: OGM0108,
-          ogm0109: OGM0109,
-          id_municipio: id_municipio,
-        });
-    }
-
-    async function updateDadosDemograficos() {
-
-      const resDd = await Municipio.query()
-        .from("tedplan.dados_demograficos")
-        .where("id_municipio", id_municipio)
-        .where("id_dados_demograficos", id_dados_demograficos)
-        .fetch();
-
-      if (resDd.rows.length === 0) {
-        response.status(404).send({
-          message: "Dados demograficos não encontrados",
-        });
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.ps_abastecimento_agua")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.ps_abastecimento_agua")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
       }
 
-      const omg = resDd.rows[0].toJSON();
+      async function addPsEsgotamentoSanitario() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("es_abrangencia")) updateData.ps_abrangencia = es_abrangencia;
+        if (hasKey("es_natureza_juridica")) updateData.ps_natureza_juridica = es_natureza_juridica;
+        if (hasKey("es_cnpj")) updateData.ps_cnpj = es_cnpj;
+        if (hasKey("es_telefone")) updateData.ps_telefone = es_telefone;
+        if (hasKey("es_cep")) updateData.ps_cep = es_cep;
+        if (hasKey("es_endereco")) updateData.ps_endereco = es_endereco;
+        if (hasKey("es_numero")) updateData.ps_numero = es_numero;
+        if (hasKey("es_bairro")) updateData.ps_bairro = es_bairro;
+        if (hasKey("es_responsavel")) updateData.ps_nome_responsavel = es_responsavel;
+        if (hasKey("es_cargo")) updateData.ps_cargo = es_cargo;
+        if (hasKey("es_email")) updateData.ps_email = es_email;
+        if (hasKey("es_secretaria_setor_responsavel")) updateData.ps_setor_responsavel = es_secretaria_setor_responsavel;
 
-      const ts = await Municipio.query()
-        .from("tedplan.dados_demograficos")
-        .where("id_municipio", id_municipio)
-        .where("id_dados_demograficos", id_dados_demograficos)
-        .update({
-          populacao_urbana: dd_populacao_urbana,
-          populacao_rural: dd_populacao_rural,
-          populacao_total: dd_populacao_total,
-          total_moradias: dd_total_moradias,
-          // Novos campos OGM
-          ogm4001: OGM4001 ? OGM4001 : omg.ogm4001,
-          ogm4002: OGM4002 ? OGM4002 : omg.ogm4002,
-          ogm4003: OGM4003 ? OGM4003 : omg.ogm4003,
-          ogm4004: OGM4004 ? OGM4004 : omg.ogm4004,
-          ogm4005: OGM4005 ? OGM4005 : omg.ogm4005,
-          ogm4006: OGM4006 ? OGM4006 : omg.ogm4006,
-          ogm4007: OGM4007 ? OGM4007 : omg.ogm4007,
-          ogm4008: OGM4008 ? OGM4008 : omg.ogm4008,
-          ogm4009: OGM4009 ? OGM4009 : omg.ogm4009
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.ps_esgotamento_sanitario")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
 
-        });
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.ps_esgotamento_sanitario")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.ps_esgotamento_sanitario")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
 
-    }
+      async function addPsDrenagemAguasPluviais() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("da_abrangencia")) updateData.ps_abrangencia = da_abrangencia;
+        if (hasKey("da_natureza_juridica")) updateData.ps_natureza_juridica = da_natureza_juridica;
+        if (hasKey("da_cnpj")) updateData.ps_cnpj = da_cnpj;
+        if (hasKey("da_telefone")) updateData.ps_telefone = da_telefone;
+        if (hasKey("da_cep")) updateData.ps_cep = da_cep;
+        if (hasKey("da_endereco")) updateData.ps_endereco = da_endereco;
+        if (hasKey("da_numero")) updateData.ps_numero = da_numero;
+        if (hasKey("da_bairro")) updateData.ps_bairro = da_bairro;
+        if (hasKey("da_responsavel")) updateData.ps_nome_responsavel = da_responsavel;
+        if (hasKey("da_cargo")) updateData.ps_cargo = da_cargo;
+        if (hasKey("da_email")) updateData.ps_email = da_email;
+        if (hasKey("da_secretaria_setor_responsavel")) updateData.ps_setor_responsavel = da_secretaria_setor_responsavel;
 
-    async function addDadosDemograficos() {
-      const ts = await Municipio.query()
-        .from("tedplan.dados_demograficos")
-        .insert({
-          populacao_urbana: dd_populacao_urbana,
-          populacao_rural: dd_populacao_rural,
-          populacao_total: dd_populacao_total,
-          total_moradias: dd_total_moradias,
-          // Novos campos OGM
-          ogm4001: OGM4001,
-          ogm4002: OGM4002,
-          ogm4003: OGM4003,
-          ogm4004: OGM4004,
-          ogm4005: OGM4005,
-          ogm4006: OGM4006,
-          ogm4007: OGM4007,
-          ogm4008: OGM4008,
-          ogm4009: OGM4009,
-          id_municipio: id_municipio,
-        });
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.ps_drenagem_aguas_pluviais")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.ps_drenagem_aguas_pluviais")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.ps_drenagem_aguas_pluviais")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addPsResiduoSolido() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("rs_abrangencia")) updateData.ps_abrangencia = rs_abrangencia;
+        if (hasKey("rs_natureza_juridica")) updateData.ps_natureza_juridica = rs_natureza_juridica;
+        if (hasKey("rs_cnpj")) updateData.ps_cnpj = rs_cnpj;
+        if (hasKey("rs_telefone")) updateData.ps_telefone = rs_telefone;
+        if (hasKey("rs_cep")) updateData.ps_cep = rs_cep;
+        if (hasKey("rs_endereco")) updateData.ps_endereco = rs_endereco;
+        if (hasKey("rs_numero")) updateData.ps_numero = rs_numero;
+        if (hasKey("rs_bairro")) updateData.ps_bairro = rs_bairro;
+        if (hasKey("rs_responsavel")) updateData.ps_nome_responsavel = rs_responsavel;
+        if (hasKey("rs_cargo")) updateData.ps_cargo = rs_cargo;
+        if (hasKey("rs_email")) updateData.ps_email = rs_email;
+        if (hasKey("rs_secretaria_setor_responsavel")) updateData.ps_setor_responsavel = rs_secretaria_setor_responsavel;
+
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.ps_residuo_solido")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.ps_residuo_solido")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.ps_residuo_solido")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addReguladorFiscalizador() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("rf_setor_responsavel")) updateData.setor_responsavel = rf_setor_responsavel;
+        if (hasKey("rf_telefone_comercial")) updateData.telefone_comercial = rf_telefone_comercial;
+        if (hasKey("rf_responsavel")) updateData.nome_responsavel = rf_responsavel;
+        if (hasKey("rf_cargo")) updateData.cargo = rf_cargo;
+        if (hasKey("rf_funcao")) updateData.funcao = rf_funcao;
+        if (hasKey("rf_telefone")) updateData.telefone = rf_telefone;
+        if (hasKey("rf_email")) updateData.email = rf_email;
+        if (hasKey("rf_descricao")) updateData.descricao = rf_descricao;
+
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.regulador_fiscalizador_ss")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.regulador_fiscalizador_ss")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.regulador_fiscalizador_ss")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addControleSocial() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("cs_setor_responsavel")) updateData.setor_responsavel_cs_sms = cs_setor_responsavel;
+        if (hasKey("cs_telefone")) updateData.telefone_cs_sms = cs_telefone;
+        if (hasKey("cs_email")) updateData.email_cs_sms = cs_email;
+
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.controle_social_sms")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.controle_social_sms")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.controle_social_sms")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addResponsavelSimisab() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("simisab_responsavel")) updateData.simisab_nome_responsavel = simisab_responsavel;
+        if (hasKey("simisab_telefone")) updateData.simisab_telefone = simisab_telefone;
+        if (hasKey("simisab_email")) updateData.simisab_email = simisab_email;
+
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.responsavel_simisab")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.responsavel_simisab")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.responsavel_simisab")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addConselhoMunicipal() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        if (hasKey("possui_conselho")) updateData.possui_conselho = possui_conselho;
+        if (hasKey("descricao_outros")) updateData.descricao_outros = descricao_outros;
+
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.conselho_municipal")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.conselho_municipal")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.conselho_municipal")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addDadosGeograficos() {
+        // Construir objeto de update apenas com campos enviados no payload
+        const updateData = {};
+        // Campos de texto (nomes)
+        if (hasKey("OGM0001")) updateData.ogm0001 = OGM0001 || null;
+        if (hasKey("OGM0002")) updateData.ogm0002 = OGM0002 || null;
+        if (hasKey("OGM0004")) updateData.ogm0004 = OGM0004 || null;
+        // Campos select (Sim/Não) - texto
+        if (hasKey("OGM0003")) updateData.ogm0003 = OGM0003 || null;
+        if (hasKey("OGM0101")) updateData.ogm0101 = OGM0101 || null;
+        if (hasKey("OGM0104")) updateData.ogm0104 = OGM0104 || null;
+        if (hasKey("OGM0107")) updateData.ogm0107 = OGM0107 || null;
+        // Campos decimais
+        if (hasKey("OGM0005")) updateData.ogm0005 = sanitizeDecimal(OGM0005);
+        if (hasKey("OGM0006")) updateData.ogm0006 = sanitizeDecimal(OGM0006);
+        if (hasKey("OGM0010")) updateData.ogm0010 = sanitizeDecimal(OGM0010);
+        if (hasKey("OGM0011")) updateData.ogm0011 = sanitizeDecimal(OGM0011);
+        if (hasKey("OGM0012")) updateData.ogm0012 = sanitizeDecimal(OGM0012);
+        // Campos integer
+        if (hasKey("OGM0007")) updateData.ogm0007 = sanitizeInteger(OGM0007);
+        if (hasKey("OGM0008")) updateData.ogm0008 = sanitizeInteger(OGM0008);
+        if (hasKey("OGM0009")) updateData.ogm0009 = sanitizeInteger(OGM0009);
+        if (hasKey("OGM0102")) updateData.ogm0102 = sanitizeInteger(OGM0102);
+        if (hasKey("OGM0103")) updateData.ogm0103 = sanitizeInteger(OGM0103);
+        if (hasKey("OGM0105")) updateData.ogm0105 = sanitizeInteger(OGM0105);
+        if (hasKey("OGM0106")) updateData.ogm0106 = sanitizeInteger(OGM0106);
+        if (hasKey("OGM0108")) updateData.ogm0108 = sanitizeInteger(OGM0108);
+        if (hasKey("OGM0109")) updateData.ogm0109 = sanitizeInteger(OGM0109);
+
+        // Verificar se já existe um registro para este município
+        const existing = await Municipio.query()
+          .from("tedplan.dados_geograficos")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          // Se já existe, atualizar apenas os campos enviados
+          await Municipio.query()
+            .from("tedplan.dados_geograficos")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          // Se não existe, criar novo com todos os campos disponíveis
+          await Municipio.query()
+            .from("tedplan.dados_geograficos")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      async function addDadosDemograficos() {
+        const updateData = {};
+        if (hasKey("dd_populacao_urbana")) updateData.populacao_urbana = dd_populacao_urbana || null;
+        if (hasKey("dd_populacao_rural")) updateData.populacao_rural = dd_populacao_rural || null;
+        if (hasKey("dd_populacao_total")) updateData.populacao_total = dd_populacao_total || null;
+        if (hasKey("dd_total_moradias")) updateData.total_moradias = dd_total_moradias || null;
+        if (hasKey("OGM4001")) updateData.OGM4001 = sanitizeInteger(OGM4001);
+        if (hasKey("OGM4002")) updateData.OGM4002 = sanitizeInteger(OGM4002);
+        if (hasKey("OGM4003")) updateData.OGM4003 = sanitizeInteger(OGM4003);
+        if (hasKey("OGM4004")) updateData.OGM4004 = sanitizeInteger(OGM4004);
+        if (hasKey("OGM4005")) updateData.OGM4005 = sanitizeInteger(OGM4005);
+        if (hasKey("OGM4006")) updateData.OGM4006 = sanitizeInteger(OGM4006);
+        if (hasKey("OGM4007")) updateData.OGM4007 = sanitizeDecimal(OGM4007);
+        if (hasKey("OGM4008")) updateData.OGM4008 = sanitizeDecimal(OGM4008);
+        if (hasKey("OGM4009")) updateData.OGM4009 = sanitizeDecimal(OGM4009);
+
+        const existing = await Municipio.query()
+          .from("tedplan.dados_demograficos")
+          .where("id_municipio", sanitizedIdMunicipio)
+          .first();
+
+        if (existing) {
+          await Municipio.query()
+            .from("tedplan.dados_demograficos")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .update(updateData);
+        } else {
+          await Municipio.query()
+            .from("tedplan.dados_demograficos")
+            .insert({
+              ...updateData,
+              id_municipio: sanitizedIdMunicipio,
+            });
+        }
+      }
+
+      if (shouldProcessTitular) {
+        const titularUpdate = {};
+        // Atualizar apenas campos enviados (não sobrescrever com undefined)
+        if (hasKey("ts_setor_responsavel")) titularUpdate.setor_responsavel_tsms = ts_setor_responsavel;
+        if (hasKey("ts_telefone_comercial")) titularUpdate.telefone_comercial_tsms = ts_telefone_comercial;
+        if (hasKey("ts_responsavel")) titularUpdate.nome_responsavel_tsms = ts_responsavel;
+        if (hasKey("ts_cargo")) titularUpdate.cargo_tsms = ts_cargo;
+        if (hasKey("ts_funcao")) titularUpdate.funcao_tsms = ts_funcao;
+        if (hasKey("ts_telefone")) titularUpdate.telefone_tsms = ts_telefone;
+        if (hasKey("ts_email")) titularUpdate.email_tsms = ts_email;
+
+        const hasTitularData = Object.keys(titularUpdate).length > 0;
+        if (hasTitularData) {
+          const existingTitular = await Municipio.query()
+            .from("tedplan.titular_servicos_ms")
+            .where("id_municipio", sanitizedIdMunicipio)
+            .first();
+
+          if (existingTitular) {
+            await Municipio.query()
+              .from("tedplan.titular_servicos_ms")
+              .where("id_municipio", sanitizedIdMunicipio)
+              .update(titularUpdate);
+          } else {
+            await Municipio.query()
+              .from("tedplan.titular_servicos_ms")
+              .insert({
+                ...titularUpdate,
+                id_municipio: sanitizedIdMunicipio,
+              });
+          }
+        }
+      }
+
+      if (shouldProcessPsAbastecimentoAgua) {
+        await addPsAbastecimentoAgua();
+      }
+
+      if (shouldProcessPsEsgotamentoSanitario) {
+        await addPsEsgotamentoSanitario();
+      }
+
+      if (shouldProcessPsDrenagemAguasPluviais) {
+        await addPsDrenagemAguasPluviais();
+      }
+
+      if (shouldProcessPsResiduoSolido) {
+        await addPsResiduoSolido();
+      }
+
+      if (shouldProcessReguladorFiscalizador) {
+        await addReguladorFiscalizador();
+      }
+
+      if (shouldProcessControleSocial) {
+        await addControleSocial();
+      }
+
+      if (shouldProcessConselhoMunicipal) {
+        await addConselhoMunicipal();
+      }
+
+      if (shouldProcessResponsavelSimisab) {
+        await addResponsavelSimisab();
+      }
+
+      if (shouldProcessDadosGeograficos) {
+        await addDadosGeograficos();
+      }
+
+      if (shouldProcessDadosDemograficos) {
+        await addDadosDemograficos();
+      }
+
+      return response.status(200).json({ message: 'Dados salvos com sucesso' });
+    } catch (error) {
+      return response.status(500).json({
+        error: 'Erro ao salvar dados do município',
+        details: error.message
+      });
     }
   }
 }
