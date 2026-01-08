@@ -34,6 +34,11 @@ class IndicadorNovo extends Model {
   indicadoresMunicipio() {
     return this.hasMany('App/Models/IndicadorMunicipio', 'id_indicador', 'id_indicador');
   }
+
+  // Relacionamento com TipoUnidade
+  tipoUnidade() {
+    return this.belongsTo('App/Models/TipoUnidade', 'id_tipo_unidade', 'id_tipo_unidade');
+  }
 }
 
 module.exports = IndicadorNovo;

@@ -370,6 +370,9 @@ Route.group(() => {
   Route.put("item-check-box/:id", "ItemCheckBoxController.update");
   Route.delete("item-check-box/:id", "ItemCheckBoxController.destroy");
 
+  // Rotas para PrestadoresServicos
+  Route.get("prestadores-servicos", "PrestadoresServicosController.getPrestadoresServicos");
+
   // Rotas para IndicadorNovo
   Route.get("indicadores-novo", "IndicadorNovoController.index");
   Route.get("indicadores-novo/:id", "IndicadorNovoController.show");

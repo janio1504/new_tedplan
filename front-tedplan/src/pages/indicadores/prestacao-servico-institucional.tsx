@@ -661,12 +661,17 @@ export default function PrestacaoServicoInstitucional() {
     }
   }
 
-  async function loadIndicadoresUnidade(idEixo: number) {
+  async function loadIndicadoresUnidade(idEixo: number, idTipoUnidade?: number) {
     setLoadingIndicadoresUnidade(true);
     try {
       const apiClient = getAPIClient();
+      const params: any = {};
+      if (idTipoUnidade) {
+        params.id_tipo_unidade = idTipoUnidade;
+      }
       const response = await apiClient.get(
-        `/indicadores-novo/eixo-unidade/${idEixo}`
+        `/indicadores-novo/eixo-unidade/${idEixo}`,
+        { params }
       );
       const indicadoresData = response.data || [];
 
@@ -752,7 +757,7 @@ export default function PrestacaoServicoInstitucional() {
   async function handleSelectUnidade(unidade: IUnidade) {
     setUnidadeSelecionada(unidade);
     if (unidade.id_eixo) {
-      await loadIndicadoresUnidade(unidade.id_eixo);
+      await loadIndicadoresUnidade(unidade.id_eixo, unidade.id_tipo_unidade);
       if (usuario?.id_municipio) {
         await carregarDadosExistentesUnidade(unidade.id_unidade);
       }
