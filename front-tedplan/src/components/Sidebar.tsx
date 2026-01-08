@@ -230,6 +230,9 @@ const Sidebar = () => {
       "/listarTiposCampo",
       "/listarIndicadores",
       "/listarInfoIndicador",
+      "/tipoUnidade/listar",
+      "/tipoUnidade/adicionar",
+      "/tipoUnidade/editar",
       "/addMenu",
       "/addMenuItem",
       "/addTipoCampoIndicador",
@@ -276,6 +279,10 @@ const Sidebar = () => {
     const menusRoutes = ["/listarGalerias", "/addGaleria"]; 
     return menusRoutes.some(route => router.pathname === route);
   };
+  const isMenusTiposUnidade = () => {
+    const menusRoutes = ["/tipoUnidade/listar", "/tipoUnidade/adicionar", "/tipoUnidade/editar"]; 
+    return menusRoutes.some(route => router.pathname === route);
+  };
 
   const [isCadastroOpen, setIsCadastroOpen] = useState(isCadastroSubmenuActive());
 
@@ -320,6 +327,10 @@ const Sidebar = () => {
 
   function handleGalerias() {
     Router.push("/listarGalerias");
+  }
+
+  function handleTiposUnidade() {
+    Router.push("/tipoUnidade/listar");
   }
 
   function handleSimisab() {
@@ -394,6 +405,10 @@ const Sidebar = () => {
             <SubmenuItem onClick={handleAddIndicador}
             $isActive={isMenusInfoIndicadores()}>
               Informações de Indicador
+            </SubmenuItem>
+            <SubmenuItem onClick={handleTiposUnidade}
+            $isActive={isMenusTiposUnidade()}>
+              Tipos de Unidade
             </SubmenuItem>
             
           </SubmenuContainer>       

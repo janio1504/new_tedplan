@@ -10,6 +10,7 @@ import {
   FaEdit,
   FaTrash,
   FaSearch,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import {
   InputM,
@@ -30,6 +31,7 @@ import {
 import HeadIndicadores from "../../components/headIndicadores";
 import { getAPIClient } from "../../services/axios";
 import MenuIndicadores from "../../components/MenuIndicadores";
+import MapPicker from "../../components/MapPicker";
 import { parseCookies } from "nookies";
 import { GetServerSideProps } from "next";
 import Router from "next/router";
@@ -72,6 +74,23 @@ interface IMunicipio {
   municipio_codigo_ibge: string;
   municipio_nome: string;
   aa_natureza_juridica?: string;
+}
+
+interface IPrestadorServico {
+  id_ps_abastecimento_agua: string; // OGM1001
+  ps_setor_responsavel: string; // OGM1002
+  ps_abrangencia: string; // OGM1004
+  ps_natureza_juridica: string; // OGM1003
+  ps_cnpj: string; // OGM1005
+  ps_telefone: string; // OGM1006
+  ps_cep: string; // OGM1007
+  ps_endereco: string; // OGM1008
+  ps_numero: string; // OGM1009
+  ps_bairro: string; // OGM1010
+  ps_nome_responsavel: string; // OGM1011
+  ps_cargo: string; // OGM1012
+  ps_email: string; // OGM1013
+  id_municipio: string; // OGM1014
 }
 
 interface ISelectOption {
@@ -149,6 +168,8 @@ const CampoIndicador = ({
   setValue,
   dadosMunicipio,
   watch,
+  prestadoresServicos,
+  onOpenMapModal,
 }: {
   indicador: IIndicador;
   register: any;
@@ -159,6 +180,8 @@ const CampoIndicador = ({
   setValue?: any;
   dadosMunicipio?: IMunicipio;
   watch?: any;
+  prestadoresServicos?: IPrestadorServico[];
+  onOpenMapModal?: (fieldName: string) => void;
 }) => {
   // Verificações de segurança
   if (!indicador || !anoSelected) {
@@ -171,6 +194,8 @@ const CampoIndicador = ({
       />
     );
   }
+
+  
 
   const tipoCampo =
     indicador.tiposCampo && indicador.tiposCampo.length > 0
@@ -197,7 +222,7 @@ const CampoIndicador = ({
       const newStates = { ...fieldStates };
     }
   }
-
+  
   // Campo não configurado ou com erro
   if (!tipoCampo) {
     const hasError = indicador._hasError;
@@ -291,14 +316,15 @@ const CampoIndicador = ({
       setValue(campoDestino, novoValor, { shouldValidate: false, shouldDirty: false });
     }
   }, [campoPrecisaSoma, setValue, anoSelected, campoDestino, camposOrigem.join(',')]);
-  
 
   
   // Configuração de campos dependentes (campo dependente: campo de controle)
   // Campos que só são habilitados quando o campo de controle tem valor "Sim"
   const camposDependentes: { [key: string]: string } = {
     "GFI1109": "GFI1108",
+    "GFI1013": "GFI1012",
     "GFI1013A": "GFI1013",
+    "GFI1016": "GFI1015",
     "GFI1016A": "GFI1016",
     "GFI1020A": "GFI1019",
     "GFI1021A": "GFI1020",
@@ -317,8 +343,22 @@ const CampoIndicador = ({
     "GFI1034": "GFI1019",
     "GFI1035": "GFI1019",
     "GFI1035A": "GFI1035",
+    "CAD2002A": "CAD2002",
+    "CAD2004A": "CAD2004",
+    "GFI1010": "GFI1009",
+    "GFI1010A": "GFI1010",
     // Adicione mais campos dependentes aqui conforme necessário
     // Exemplo: "GFI1110": "GFI1108",
+  };
+
+  // Campos com condições personalizadas de habilitação
+  // Mapeia campo dependente para o valor que deve ter no campo de controle
+  const camposComCondicaoEspecial: { [key: string]: string } = {
+    "CAD2002A": "Outra situação (especificar).",
+    "CAD2004A": "Outro (especifique).",
+    "GFI1010A": "Outro (especifique)",
+    "GFI1013A": "Outro (especifique)",
+    "GFI1016A": "Outro (especifique)",
   };
 
   // Verificar se este campo é dependente de outro campo
@@ -328,16 +368,82 @@ const CampoIndicador = ({
   // Observar o valor do campo de controle se existir
   const valorCampoControle = nomeCampoControle && watch ? watch(nomeCampoControle) : null;
   
+  // Verificar se este campo tem uma condição especial de habilitação
+  const valorEsperadoEspecial = camposComCondicaoEspecial[indicador.codigo_indicador];
+  
   // Determinar se o campo deve estar habilitado
-  // Se for um campo dependente, só habilita se o campo de controle for "Sim"
+  // Se for um campo dependente, só habilita se o campo de controle tiver o valor esperado
+  // Campos com condição especial: verifica se valorCampoControle é igual ao valorEsperadoEspecial
+  // Campos normais: verifica se valorCampoControle é "Sim" ou "Outro"
   // Caso contrário, usa a configuração padrão do tipoCampo.enable
   const campoHabilitado = campoControle 
-    ? (valorCampoControle === "Sim" || valorCampoControle === "Outro") && tipoCampo.enable
+    ? valorEsperadoEspecial
+      ? (valorCampoControle === valorEsperadoEspecial && tipoCampo.enable)
+      : ((valorCampoControle === "Sim" || valorCampoControle === "Outro") && tipoCampo.enable)
     : tipoCampo.enable;
 
 
   // Se o campo não está habilitado (seja por configuração ou por dependência)
   if (!campoHabilitado) {
+    // Campo especial GTA2204 com botão de mapa (mesmo quando desabilitado, permite seleção)
+    if (indicador.codigo_indicador === "GTA2204" && onOpenMapModal) {
+      const fieldValue = watch ? watch(fieldName) : null;
+      const hasValue = fieldValue && fieldValue !== "";
+      
+      console.log("=== DEBUG CampoIndicador GTA2204 (campo desabilitado) ===");
+      console.log("fieldName:", fieldName);
+      console.log("fieldValue:", fieldValue);
+      console.log("hasValue:", hasValue);
+      console.log("register existe?", !!register);
+
+      // Sempre renderizar o input (mesmo que escondido) para garantir que seja registrado
+      return (
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "90%" }}>
+          <input
+            {...register(fieldName)}
+            type="text"
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              flex: hasValue ? 1 : 0,
+              padding: "8px 12px",
+              border: "1px solid #ddd",
+              borderRadius: "4px",
+              fontSize: "13px",
+              cursor: "not-allowed",
+              color: "#6c757d",
+              display: hasValue ? "block" : "none",
+              width: hasValue ? "auto" : "0",
+              minWidth: hasValue ? "auto" : "0",
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => onOpenMapModal(fieldName)}
+            style={{
+              padding: hasValue ? "8px 16px" : "10px 20px",
+              backgroundColor: hasValue ? "#ff9800" : "#1e88e5",
+              color: "white",
+              border: "none",
+              borderRadius: "4px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontSize: hasValue ? "13px" : "14px",
+              fontWeight: "500",
+              width: hasValue ? "auto" : "90%",
+              justifyContent: "center",
+            }}
+            title={hasValue ? "Alterar localização" : "Selecionar Localização no Mapa"}
+          >
+            <FaMapMarkerAlt />
+            {hasValue ? "Alterar" : "Selecionar Localização no Mapa"}
+          </button>
+        </div>
+      );
+    }
+
     // Se for um campo select dependente, renderizar como select desabilitado
     if (campoControle && tipoCampo.type?.toLowerCase() === "select") {
       const options = tipoCampo.selectOptions || [];
@@ -463,6 +569,313 @@ const CampoIndicador = ({
     case "select":
       let options = tipoCampo.selectOptions || [];
 
+      // Select personalizado para CAD2001
+      if (indicador.codigo_indicador === "CAD2001" && prestadoresServicos && prestadoresServicos.length > 0) {
+        const prestador = prestadoresServicos[0];
+        const psAbrangencia = prestador?.ps_abrangencia?.trim(); // TEDP001
+        const psNaturezaJuridica = prestador?.ps_natureza_juridica?.trim(); // OGM1003
+
+        console.log("CAD2001 - psAbrangencia:", psAbrangencia, "psNaturezaJuridica:", psNaturezaJuridica);
+
+        let opcoesPersonalizadas = null;
+
+        // Condição 1: TEDP001 = "Local" E OGM1003 = "Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"
+        const condicao1_naturezaJuridicaValidas = [
+          "Município",
+          "Autarquia",
+          "Empresa pública",
+          "Sociedade de economia mista"
+        ];
+        const condicao1_atendida = psAbrangencia === "Local" && condicao1_naturezaJuridicaValidas.includes(psNaturezaJuridica);
+        console.log("CAD2001 - Condição 1 atendida:", condicao1_atendida);
+        if (condicao1_atendida) {
+          opcoesPersonalizadas = [
+            { value: "Sem Atendimento", descricao: "Sem Atendimento" },
+            { value: "Sede e Localidades", descricao: "Sede e Localidades" },
+            { value: "Somente Sede", descricao: "Somente Sede" },
+            { value: "Somente Localidades", descricao: "Somente Localidades" }
+          ];
+          console.log("CAD2001 - Opções personalizadas definidas:", opcoesPersonalizadas);
+        }
+
+        // Condição 2: TEDP001 = "Regional" E OGM1003 = "Autarquia", "Empresa pública", "Sociedade de economia mista", "Empresa privada"
+        const condicao2_naturezaJuridicaValidas = [
+          "Autarquia",
+          "Empresa pública",
+          "Sociedade de economia mista",
+          "Empresa privada"
+        ];
+        if (!opcoesPersonalizadas && psAbrangencia === "Regional" && condicao2_naturezaJuridicaValidas.includes(psNaturezaJuridica)) {
+          opcoesPersonalizadas = [
+            { value: "Sem delegação atendendo Sede e Localidades - SDSL", descricao: "Sem delegação atendendo Sede e Localidades - SDSL" },
+            { value: "Sem delegação atendendo Sede - SDS", descricao: "Sem delegação atendendo Sede - SDS" },
+            { value: "Sem delegação atendendo Localidades - SDL", descricao: "Sem delegação atendendo Localidades - SDL" },
+            { value: "Com delegação sem atendimento - DSA", descricao: "Com delegação sem atendimento - DSA" },
+            { value: "Com delegação atendendo Sede e Localidades - DSL", descricao: "Com delegação atendendo Sede e Localidades - DSL" },
+            { value: "Com Delegação atendendo apenas Sede - DS", descricao: "Com Delegação atendendo apenas Sede - DS" },
+            { value: "Com Delegação atendendo apenas localidades - DL", descricao: "Com Delegação atendendo apenas localidades - DL" }
+          ];
+        }
+
+        // Condição 3: TEDP001 = "Local" OU "Regional" E OGM1003 = "Associação privada"
+        if (!opcoesPersonalizadas && (psAbrangencia === "Local" || psAbrangencia === "Regional") && psNaturezaJuridica === "Associação privada") {
+          opcoesPersonalizadas = [
+            { value: "Sem Atendimento", descricao: "Sem Atendimento" },
+            { value: "Sede e Localidades", descricao: "Sede e Localidades" },
+            { value: "Somente Sede", descricao: "Somente Sede" },
+            { value: "Somente Localidades", descricao: "Somente Localidades" }
+          ];
+        }
+
+        // Se alguma condição foi atendida, renderizar select com opções personalizadas
+        console.log("CAD2001 - opcoesPersonalizadas:", opcoesPersonalizadas);
+        if (opcoesPersonalizadas) {
+          console.log("CAD2001 - Renderizando select personalizado");
+          return (
+            <select
+              {...baseProps}
+              style={{ ...baseProps.style }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#1e88e5";
+                e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#ddd";
+                e.target.style.boxShadow = "none";
+              }}
+            >
+              <option value="">Selecione...</option>
+              {opcoesPersonalizadas.map((option, index) => (
+                <option
+                  key={index}
+                  value={option.value}
+                >
+                  {option.descricao}
+                </option>
+              ))}
+            </select>
+          );
+        } else {
+          console.log("CAD2001 - Usando select padrão");
+        }
+      }
+
+      // Select personalizado para CAD2002
+      if (indicador.codigo_indicador === "CAD2002" && prestadoresServicos && prestadoresServicos.length > 0) {
+        const prestador = prestadoresServicos[0];
+        const psAbrangencia = prestador?.ps_abrangencia?.trim(); // TEDP001
+        const psNaturezaJuridica = prestador?.ps_natureza_juridica?.trim(); // OGM1003
+
+        let opcoesPersonalizadas = null;
+
+        // Condição 1: TEDP001 = "Local" E OGM1003 = "Município"
+        if (psAbrangencia === "Local" && psNaturezaJuridica === "Município") {
+          opcoesPersonalizadas = [
+            { value: "Prestação direta por órgão da administração pública direta.", descricao: "Prestação direta por órgão da administração pública direta." }
+          ];
+        }
+
+        // Condição 2: TEDP001 = "Local" E OGM1003 = "Autarquia", "Empresa pública", "Sociedade de economia mista"
+        if (!opcoesPersonalizadas && psAbrangencia === "Local") {
+          const condicao2_naturezaJuridicaValidas = [
+            "Autarquia",
+            "Empresa pública",
+            "Sociedade de economia mista"
+          ];
+          if (condicao2_naturezaJuridicaValidas.includes(psNaturezaJuridica)) {
+            opcoesPersonalizadas = [
+              { value: "Prestação direta por entidade da administração pública indireta.", descricao: "Prestação direta por entidade da administração pública indireta." }
+            ];
+          }
+        }
+
+        // Condição 3: TEDP001 = "Regional" E OGM1003 = "Autarquia", "Empresa pública", "Sociedade de economia mista"
+        if (!opcoesPersonalizadas && psAbrangencia === "Regional") {
+          const condicao3_naturezaJuridicaValidas = [
+            "Autarquia",
+            "Empresa pública",
+            "Sociedade de economia mista"
+          ];
+          if (condicao3_naturezaJuridicaValidas.includes(psNaturezaJuridica)) {
+            opcoesPersonalizadas = [
+              { value: "Prestação indireta delegada mediante concessão para empresa privada ou estatal", descricao: "Prestação indireta delegada mediante concessão para empresa privada ou estatal" },
+              { value: "Prestação indireta delegada mediante contrato de programa", descricao: "Prestação indireta delegada mediante contrato de programa" },
+              { value: "Outra situação (especificar)", descricao: "Outra situação (especificar)" }
+            ];
+          }
+        }
+
+        // Condição 4: TEDP001 = "Local" OU "Regional" E OGM1003 = "Empresa privada"
+        if (!opcoesPersonalizadas && (psAbrangencia === "Local" || psAbrangencia === "Regional") && psNaturezaJuridica === "Empresa privada") {
+          opcoesPersonalizadas = [
+            { value: "Prestação indireta delegada mediante concessão para empresa privada", descricao: "Prestação indireta delegada mediante concessão para empresa privada" },
+            { value: "Prestação indireta delegada mediante concessão para empresa estatal", descricao: "Prestação indireta delegada mediante concessão para empresa estatal" },
+            { value: "Outra situação (especificar)", descricao: "Outra situação (especificar)" }
+          ];
+        }
+
+        // Condição 5: TEDP001 = "Local" OU "Regional" E OGM1003 = "Associação privada"
+        if (!opcoesPersonalizadas && (psAbrangencia === "Local" || psAbrangencia === "Regional") && psNaturezaJuridica === "Associação privada") {
+          opcoesPersonalizadas = [
+            { value: "Prestação indireta delegada para associação civil", descricao: "Prestação indireta delegada para associação civil" },
+            { value: "Prestação indireta delegada para associação comunitária", descricao: "Prestação indireta delegada para associação comunitária" },
+            { value: "Outra situação (especificar)", descricao: "Outra situação (especificar)" }
+          ];
+        }
+
+        // Se alguma condição foi atendida, renderizar select com opções personalizadas
+        if (opcoesPersonalizadas) {
+          return (
+            <select
+              {...baseProps}
+              style={{ ...baseProps.style }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#1e88e5";
+                e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#ddd";
+                e.target.style.boxShadow = "none";
+              }}
+            >
+              <option value="">Selecione...</option>
+              {opcoesPersonalizadas.map((option, index) => (
+                <option
+                  key={index}
+                  value={option.value}
+                >
+                  {option.descricao}
+                </option>
+              ))}
+            </select>
+          );
+        }
+      }
+
+      // Select personalizado para CAD2004
+      if (indicador.codigo_indicador === "CAD2004" && prestadoresServicos && prestadoresServicos.length > 0) {
+        const prestador = prestadoresServicos[0];
+        const psAbrangencia = prestador?.ps_abrangencia?.trim(); // TEDP001
+        const psNaturezaJuridica = prestador?.ps_natureza_juridica?.trim(); // OGM1003
+
+        let opcoesPersonalizadas = null;
+
+        // Condição 1: TEDP001 = "Local" E OGM1003 = "Município", "Autarquia", "Empresa pública", "Sociedade de economia mista"
+        if (psAbrangencia === "Local") {
+          const condicao1_naturezaJuridicaValidas = [
+            "Município",
+            "Autarquia",
+            "Empresa pública",
+            "Sociedade de economia mista"
+          ];
+          if (condicao1_naturezaJuridicaValidas.includes(psNaturezaJuridica)) {
+            opcoesPersonalizadas = [
+              { value: "Inexistente", descricao: "Inexistente" }
+            ];
+          }
+        }
+
+        // Condição 2: TEDP001 = "Regional" E OGM1003 = "Autarquia", "Empresa pública", "Sociedade de economia mista"
+        if (!opcoesPersonalizadas && psAbrangencia === "Regional") {
+          const condicao2_naturezaJuridicaValidas = [
+            "Autarquia",
+            "Empresa pública",
+            "Sociedade de economia mista"
+          ];
+          if (condicao2_naturezaJuridicaValidas.includes(psNaturezaJuridica)) {
+            opcoesPersonalizadas = [
+              { value: "Contrato de programa", descricao: "Contrato de programa" },
+              { value: "Contrato de concessão", descricao: "Contrato de concessão" },
+              { value: "Inexistente", descricao: "Inexistente" },
+              { value: "Outro (especifique).", descricao: "Outro (especifique)." }
+            ];
+          }
+        }
+
+        // Condição 3: TEDP001 = "Local" OU "Regional" E OGM1003 = "Empresa privada"
+        if (!opcoesPersonalizadas && (psAbrangencia === "Local" || psAbrangencia === "Regional") && psNaturezaJuridica === "Empresa privada") {
+          opcoesPersonalizadas = [
+            { value: "Contrato de concessão", descricao: "Contrato de concessão" },
+            { value: "Inexistente", descricao: "Inexistente" },
+            { value: "Outro (especifique).", descricao: "Outro (especifique)." }
+          ];
+        }
+
+        // Condição 4: TEDP001 = "Local" OU "Regional" E OGM1003 = "Associação privada"
+        if (!opcoesPersonalizadas && (psAbrangencia === "Local" || psAbrangencia === "Regional") && psNaturezaJuridica === "Associação privada") {
+          opcoesPersonalizadas = [
+            { value: "Convênio administrativo (para associações civis ou comunitárias)", descricao: "Convênio administrativo (para associações civis ou comunitárias)" },
+            { value: "Inexistente", descricao: "Inexistente" },
+            { value: "Outro (especifique).", descricao: "Outro (especifique)." }
+          ];
+        }
+
+        // Se alguma condição foi atendida, renderizar select com opções personalizadas
+        if (opcoesPersonalizadas) {
+          return (
+            <select
+              {...baseProps}
+              style={{ ...baseProps.style }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#1e88e5";
+                e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#ddd";
+                e.target.style.boxShadow = "none";
+              }}
+            >
+              <option value="">Selecione...</option>
+              {opcoesPersonalizadas.map((option, index) => (
+                <option
+                  key={index}
+                  value={option.value}
+                >
+                  {option.descricao}
+                </option>
+              ))}
+            </select>
+          );
+        }
+      }
+
+      // Select personalizado para GFI1010, GFI1013 e GFI1016
+      const camposComOpcoesPadrao = ["GFI1010", "GFI1013", "GFI1016"];
+      if (camposComOpcoesPadrao.includes(indicador.codigo_indicador) && campoHabilitado) {
+        const opcoesPersonalizadas = [
+          { value: "Até 5m³", descricao: "Até 5m³" },
+          { value: "Até 10m³", descricao: "Até 10m³" },
+          { value: "Até 15m³", descricao: "Até 15m³" },
+          { value: "Outro (especifique)", descricao: "Outro (especifique)" }
+        ];
+
+        return (
+          <select
+            {...baseProps}
+            style={{ ...baseProps.style }}
+            onFocus={(e) => {
+              e.target.style.borderColor = "#1e88e5";
+              e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+            }}
+            onBlur={(e) => {
+              e.target.style.borderColor = "#ddd";
+              e.target.style.boxShadow = "none";
+            }}
+          >
+            <option value="">Selecione...</option>
+            {opcoesPersonalizadas.map((option, index) => (
+              <option
+                key={index}
+                value={option.value}
+              >
+                {option.descricao}
+              </option>
+            ))}
+          </select>
+        );
+      }
+
+      // Select padrão (comportamento normal)
       return (
         <select
           {...baseProps}
@@ -585,6 +998,76 @@ const CampoIndicador = ({
 
     case "text":
     default:
+      // Campo especial GTA2204 com botão de mapa
+      if (indicador.codigo_indicador === "GTA2204" && onOpenMapModal) {
+        const fieldValue = watch ? watch(fieldName) : null;
+        const hasValue = fieldValue && fieldValue !== "";
+        
+        console.log("=== DEBUG CampoIndicador GTA2204 (campo habilitado) ===");
+        console.log("fieldName:", fieldName);
+        console.log("fieldValue:", fieldValue);
+        console.log("hasValue:", hasValue);
+        console.log("baseProps existe?", !!baseProps);
+
+        // Sempre renderizar o input (mesmo que escondido) para garantir que seja registrado
+        return (
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", width: "90%" }}>
+            <input
+              {...baseProps}
+              type="text"
+              readOnly
+              style={{ 
+                ...baseProps.style,
+                flex: hasValue ? 1 : 0,
+                cursor: "not-allowed",
+                backgroundColor: "#f8f9fa",
+                display: hasValue ? "block" : "none",
+                width: hasValue ? "auto" : "0",
+                minWidth: hasValue ? "auto" : "0",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "#1e88e5";
+                e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "#ddd";
+                e.target.style.boxShadow = "none";
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => onOpenMapModal(fieldName)}
+              style={{
+                padding: hasValue ? "8px 16px" : "10px 20px",
+                backgroundColor: hasValue ? "#ff9800" : "#1e88e5",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: hasValue ? "13px" : "14px",
+                fontWeight: "500",
+                transition: "background-color 0.2s ease",
+                width: hasValue ? "auto" : "90%",
+                justifyContent: "center",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = hasValue ? "#f57c00" : "#1565c0";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = hasValue ? "#ff9800" : "#1e88e5";
+              }}
+              title={hasValue ? "Alterar localização" : "Selecionar Localização no Mapa"}
+            >
+              <FaMapMarkerAlt />
+              {hasValue ? "Alterar" : "Selecionar Localização no Mapa"}
+            </button>
+          </div>
+        );
+      }
+
       return (
         <input
           {...baseProps}
@@ -615,6 +1098,7 @@ export default function PrestacaoServicoAgua() {
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors },
   } = useForm();
 
@@ -628,7 +1112,7 @@ export default function PrestacaoServicoAgua() {
     cad1002Value: null,
     cad2001Value: null,
   });
-
+  const [prestadoresServicos, setPrestadoresServicos] = useState([]);
   const [dadosCarregados, setDadosCarregados] = useState([]);
   const [loadingDados, setLoadingDados] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -637,6 +1121,8 @@ export default function PrestacaoServicoAgua() {
   const [unidades, setUnidades] = useState<IUnidade[]>([]);
   const [loadingUnidades, setLoadingUnidades] = useState(false);
   const [isModalUnidadeVisible, setModalUnidadeVisible] = useState(false);
+  const [isModalMapVisible, setIsModalMapVisible] = useState(false);
+  const [mapFieldName, setMapFieldName] = useState<string | null>(null);
   const [isEditingUnidade, setIsEditingUnidade] = useState(false);
   const [unidadeEditando, setUnidadeEditando] = useState<IUnidade | null>(null);
   const [searchTermUnidades, setSearchTermUnidades] = useState("");
@@ -665,7 +1151,77 @@ export default function PrestacaoServicoAgua() {
 
   const eixoValue = watchUnidade("id_eixo");
   const municipioValue = watchUnidade("id_municipio");
-  const tipoUnidadeValue = watchUnidade("id_tipo_unidade");
+  const tipoUnidadeValue = watchUnidade("id_tipo_unidade"); 
+
+  // Função para abrir o modal do mapa
+  const handleOpenMapModal = (fieldName: string) => {
+    console.log("=== DEBUG handleOpenMapModal ===");
+    console.log("fieldName recebido:", fieldName);
+    setMapFieldName(fieldName);
+    setIsModalMapVisible(true);
+    console.log("Modal aberto, mapFieldName state será:", fieldName);
+  };
+
+  // Função para fechar o modal do mapa
+  const handleCloseMapModal = () => {
+    setIsModalMapVisible(false);
+    setMapFieldName(null);
+  };
+
+  // Função para quando o usuário seleciona uma localização no mapa
+  const handleLocationSelect = (lat: number, lng: number) => {
+    console.log("=== DEBUG handleLocationSelect ===");
+    console.log("lat:", lat, "lng:", lng);
+    console.log("mapFieldName:", mapFieldName);
+    console.log("anoSelected:", anoSelected);
+    console.log("setValue existe?", !!setValue);
+    
+    if (mapFieldName && setValue && anoSelected) {
+      try {
+        const latValue = lat.toFixed(7);
+        const lngValue = lng.toFixed(7);
+        
+        console.log("Valores formatados - latValue:", latValue, "lngValue:", lngValue);
+        
+        // Preencher GTA2204 (latitude)
+        console.log("Preenchendo campo:", mapFieldName, "com valor:", latValue);
+        setValue(mapFieldName, latValue, { shouldValidate: true, shouldDirty: true });
+        
+        // Preencher GTA2205 (longitude) - substituir GTA2204 por GTA2205 no nome do campo
+        const longitudeFieldName = mapFieldName.replace("GTA2204", "GTA2205");
+        console.log("Preenchendo campo:", longitudeFieldName, "com valor:", lngValue);
+        setValue(longitudeFieldName, lngValue, { shouldValidate: true, shouldDirty: true });
+        
+        // Verificar valores após setValue
+        setTimeout(() => {
+          const latAfterSet = watch ? watch(mapFieldName) : null;
+          const lngAfterSet = watch ? watch(longitudeFieldName) : null;
+          console.log("Valores após setValue:");
+          console.log("  Latitude campo:", mapFieldName, "valor:", latAfterSet);
+          console.log("  Longitude campo:", longitudeFieldName, "valor:", lngAfterSet);
+        }, 100);
+        
+        // Fechar o modal
+        handleCloseMapModal();
+        
+        toast.success("Localização selecionada com sucesso!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } catch (error) {
+        console.error("Erro ao preencher campos:", error);
+        toast.error("Erro ao preencher campos. Tente novamente.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } else {
+      console.log("Condições não atendidas:");
+      console.log("  mapFieldName existe?", !!mapFieldName);
+      console.log("  setValue existe?", !!setValue);
+      console.log("  anoSelected existe?", !!anoSelected);
+    }
+  };
 
   useEffect(() => {
     loadEixos();
@@ -753,11 +1309,24 @@ export default function PrestacaoServicoAgua() {
     }
   }
 
+  
+  async function getPrestadoresServicos() {
+    const res = await api.get("/prestadores-servicos", {
+      params: { id_municipio: usuario.id_municipio, eixo: "agua" },
+    }).then((response) => {
+      setPrestadoresServicos(response.data);
+    });
+  }
+
   async function getMenus() {
     const res = await api.get("menus/eixo/" + 1).then((response) => {
       setMenus(response.data);
     });
   }
+
+  useEffect(() => {
+    getPrestadoresServicos();
+  }, []);
 
   async function loadUnidades() {
     setLoadingUnidades(true);
@@ -2494,6 +3063,9 @@ export default function PrestacaoServicoAgua() {
                                           setFieldStates={setFieldStates}
                                           setValue={setValue}
                                           dadosMunicipio={dadosMunicipio}
+                                          watch={watch}
+                                          prestadoresServicos={prestadoresServicos}
+                                          onOpenMapModal={handleOpenMapModal}
                                         />
                                       </div>
                                     ) : (
@@ -2608,6 +3180,9 @@ export default function PrestacaoServicoAgua() {
                                       setFieldStates={setFieldStates}
                                       setValue={setValue}
                                       dadosMunicipio={dadosMunicipio}
+                                      watch={watch}
+                                      prestadoresServicos={prestadoresServicos}
+                                      onOpenMapModal={handleOpenMapModal}
                                     />
                                   ) : (
                                     <input
@@ -3253,6 +3828,9 @@ export default function PrestacaoServicoAgua() {
                                             setFieldStates={setFieldStates}
                                             setValue={setValue}
                                             dadosMunicipio={dadosMunicipio}
+                                            watch={watch}
+                                            prestadoresServicos={prestadoresServicos}
+                                            onOpenMapModal={handleOpenMapModal}
                                           />
                                         </div>
                                       </div>
@@ -3349,6 +3927,9 @@ export default function PrestacaoServicoAgua() {
                                         setFieldStates={setFieldStates}
                                         setValue={setValue}
                                         dadosMunicipio={dadosMunicipio}
+                                        watch={watch}
+                                        prestadoresServicos={prestadoresServicos}
+                                        onOpenMapModal={handleOpenMapModal}
                                       />
                                     </div>
                                   )}
@@ -3705,6 +4286,24 @@ export default function PrestacaoServicoAgua() {
                 </Form>
               </div>
             </div>
+          </Modal>
+        </ContainerModal>
+      )}
+
+      {/* Modal do Mapa para seleção de coordenadas */}
+      {isModalMapVisible && (
+        <ContainerModal>
+          <Modal style={{ maxWidth: "900px", width: "90%" }}>
+            <CloseModalButton onClick={handleCloseMapModal}>×</CloseModalButton>
+            <TituloModal>Selecionar Localização no Mapa</TituloModal>
+            <ConteudoModal>
+              <TextoModal style={{ marginBottom: "15px", color: "#666" }}>
+                Clique no mapa para selecionar a localização. As coordenadas (latitude e longitude) serão preenchidas automaticamente.
+              </TextoModal>
+              <div style={{ position: "relative", width: "100%" }}>
+                <MapPicker onLocationSelect={handleLocationSelect} />
+              </div>
+            </ConteudoModal>
           </Modal>
         </ContainerModal>
       )}

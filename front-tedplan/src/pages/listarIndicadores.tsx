@@ -63,6 +63,7 @@ interface IIndicador {
   informacoes_indicador: string;
   indicador_correspondente_ou_similar_snis: string;
   id_menu_item: string;
+  id_tipo_unidade?: string;
   created_at: string;
   updated_at: string;
   is_unidade?: boolean;
@@ -72,6 +73,10 @@ interface IIndicador {
     menu?: {
       titulo: string;
     };
+  };
+  tipoUnidade?: {
+    id_tipo_unidade: string;
+    nome_tipo_unidade: string;
   };
   tiposCampo?: ITipoCampoIndicador[];
 }
@@ -784,6 +789,19 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                             {indicador.is_unidade ? "✓ Campo de unidade" : "✗ Campo de unidade"}
                           </span>
                         </div>
+
+                        {indicador.is_unidade && indicador.tipoUnidade && (
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              color: "#666",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            <strong>Tipo de Unidade:</strong>{" "}
+                            {indicador.tipoUnidade.nome_tipo_unidade}
+                          </div>
+                        )}
 
                         {indicador.unidade_indicador && (
                           <div
