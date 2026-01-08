@@ -29,7 +29,6 @@ interface IIndicador {
   codigo_indicador: string;
   nome_indicador: string;
   grupo_indicador: string;
-  palavra_chave: string;
   unidade_indicador: string;
   formula_calculo_indicador: string;
   informacoes_indicador: string;
@@ -249,7 +248,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
               reset({
                 codigo_indicador: indicador.codigo_indicador,
                 nome_indicador: indicador.nome_indicador,
-                palavra_chave: indicador.palavra_chave,
                 unidade_indicador: indicador.unidade_indicador,
                 formula_calculo_indicador: indicador.formula_calculo_indicador,
                 informacoes_indicador: indicador.informacoes_indicador,
@@ -266,7 +264,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             reset({
               codigo_indicador: indicador.codigo_indicador,
               nome_indicador: indicador.nome_indicador,
-              palavra_chave: indicador.palavra_chave,
               unidade_indicador: indicador.unidade_indicador,
               formula_calculo_indicador: indicador.formula_calculo_indicador,
               informacoes_indicador: indicador.informacoes_indicador,
@@ -284,7 +281,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           reset({
             codigo_indicador: indicador.codigo_indicador,
             nome_indicador: indicador.nome_indicador,
-            palavra_chave: indicador.palavra_chave,
             unidade_indicador: indicador.unidade_indicador,
             formula_calculo_indicador: indicador.formula_calculo_indicador,
             informacoes_indicador: indicador.informacoes_indicador,
@@ -301,7 +297,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         reset({
           codigo_indicador: indicador.codigo_indicador,
           nome_indicador: indicador.nome_indicador,
-          palavra_chave: indicador.palavra_chave,
           unidade_indicador: indicador.unidade_indicador,
           formula_calculo_indicador: indicador.formula_calculo_indicador,
           informacoes_indicador: indicador.informacoes_indicador,
@@ -474,7 +469,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   async function handleAddIndicador({
     codigo_indicador,
     nome_indicador,
-    palavra_chave,
     unidade_indicador,
     formula_calculo_indicador,
     informacoes_indicador,
@@ -491,7 +485,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       const indicadorData = {
         codigo_indicador,
         nome_indicador,
-        palavra_chave: palavra_chave || null,
         unidade_indicador: unidade_indicador || null,
         formula_calculo_indicador: formula_calculo_indicador || null,
         informacoes_indicador: informacoes_indicador || null,
@@ -557,7 +550,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       reset({
         codigo_indicador: "",
         nome_indicador: "",
-        palavra_chave: "",
         unidade_indicador: "",
         formula_calculo_indicador: "",
         informacoes_indicador: "",

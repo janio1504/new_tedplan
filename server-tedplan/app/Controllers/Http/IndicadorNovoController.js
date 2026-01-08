@@ -138,15 +138,19 @@ class IndicadorNovoController {
     }
   }
 
-  async getIndicadoresByEixoAndUnidade({ params, response }) {
+  async getIndicadoresByEixoAndUnidade({ params, request, response }) {
     try {
       const { id_eixo } = params;
+      const { id_tipo_unidade } = request.get();
       
       if (!id_eixo) {
         return response.status(400).json({ error: 'ID do eixo é obrigatório' });
       }
 
-      const indicadores = await this.indicadorRepository.getIndicadoresByEixoAndUnidade(id_eixo);
+      const indicadores = await this.indicadorRepository.getIndicadoresByEixoAndUnidade(
+        id_eixo,
+        id_tipo_unidade || null
+      );
       return response.status(200).json(indicadores);
     } catch (error) {
       console.log('Erro no IndicadorNovoController.getIndicadoresByEixoAndUnidade:', error);
