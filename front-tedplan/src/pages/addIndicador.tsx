@@ -29,7 +29,6 @@ interface IIndicador {
   codigo_indicador: string;
   nome_indicador: string;
   grupo_indicador: string;
-  palavra_chave: string;
   unidade_indicador: string;
   formula_calculo_indicador: string;
   informacoes_indicador: string;
@@ -50,6 +49,12 @@ interface IMenuItem {
 interface IEixo {
   id_eixo: string;
   nome: string;
+}
+
+interface ITipoUnidade {
+  id_tipo_unidade: string;
+  nome_tipo_unidade: string;
+  id_eixo?: string;
 }
 
 interface ITipoCampoIndicador {
@@ -99,6 +104,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   const [selectedEixo, setSelectedEixo] = useState<string>("");
   const [isEditing, setIsEditing] = useState(false);
   const [indicadorId, setIndicadorId] = useState<string | null>(null);
+  const [tiposUnidade, setTiposUnidade] = useState<ITipoUnidade[]>([]);
+  const [tiposUnidadeFiltrados, setTiposUnidadeFiltrados] = useState<ITipoUnidade[]>([]);
   const [tipoCampoIndicador, setTipoCampoIndicador] =
     useState<ITipoCampoIndicador | null>(null);
   const [selectOptions, setSelectOptions] = useState<ISelectOption[]>([]);
@@ -116,6 +123,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   const { signOut } = useContext(AuthContext);
   // Observar o campo tipo para mostrar/ocultar opções de select
   const tipoCampoSelecionado = watch("tipo_campo");
+  // Observar o campo is_unidade para mostrar/ocultar select de tipo_unidade
+  const isUnidadeSelecionado = watch("is_unidade");
 
   // Tipos de campo disponíveis
   const tiposCampo = [
@@ -152,6 +161,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     }
     getEixos();
     getMenuItems();
+    getTiposUnidade();
 
     // Verificar se é edição
     if (router.query.id) {
@@ -171,11 +181,18 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       setMenuItemsData(filtered);
       // Resetar a seleção do item de menu quando o eixo mudar
       setValue("id_menu_item", "");
+
+      // Filtrar tipos de unidade pelo eixo selecionado
+      const tiposFiltrados = tiposUnidade.filter((tipo: ITipoUnidade) => {
+        return tipo.id_eixo?.toString() === selectedEixo.toString();
+      });
+      setTiposUnidadeFiltrados(tiposFiltrados);
     } else {
       // Se nenhum eixo estiver selecionado, mostrar todos os menuItems
       setMenuItemsData(allMenuItems);
+      setTiposUnidadeFiltrados(tiposUnidade);
     }
-  }, [selectedEixo, allMenuItems, setValue]);
+  }, [selectedEixo, allMenuItems, tiposUnidade, setValue]);
 
   async function getEixos() {
     try {
@@ -195,6 +212,17 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       setMenuItemsData(resMenuItems.data);
     } catch (error) {
       console.error("Erro ao carregar itens de menu:", error);
+    }
+  }
+
+  async function getTiposUnidade() {
+    try {
+      const apiClient = getAPIClient();
+      const resTiposUnidade = await apiClient.get("/tipo-unidade");
+      setTiposUnidade(resTiposUnidade.data);
+      setTiposUnidadeFiltrados(resTiposUnidade.data);
+    } catch (error) {
+      console.error("Erro ao carregar tipos de unidade:", error);
     }
   }
 
@@ -220,7 +248,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
               reset({
                 codigo_indicador: indicador.codigo_indicador,
                 nome_indicador: indicador.nome_indicador,
-                palavra_chave: indicador.palavra_chave,
                 unidade_indicador: indicador.unidade_indicador,
                 formula_calculo_indicador: indicador.formula_calculo_indicador,
                 informacoes_indicador: indicador.informacoes_indicador,
@@ -229,6 +256,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                 id_menu_item: indicador.id_menu_item?.toString(),
                 nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
                 is_unidade: indicador.is_unidade || false,
+                id_tipo_unidade: indicador.id_tipo_unidade?.toString() || "",
               });
             }, 300);
           } else {
@@ -236,7 +264,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             reset({
               codigo_indicador: indicador.codigo_indicador,
               nome_indicador: indicador.nome_indicador,
-              palavra_chave: indicador.palavra_chave,
               unidade_indicador: indicador.unidade_indicador,
               formula_calculo_indicador: indicador.formula_calculo_indicador,
               informacoes_indicador: indicador.informacoes_indicador,
@@ -244,6 +271,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                 indicador.indicador_correspondente_ou_similar_snis,
               id_menu_item: indicador.id_menu_item?.toString(),
               nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
+              is_unidade: indicador.is_unidade || false,
+              id_tipo_unidade: indicador.id_tipo_unidade?.toString() || "",
             });
           }
         } catch (error) {
@@ -252,7 +281,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           reset({
             codigo_indicador: indicador.codigo_indicador,
             nome_indicador: indicador.nome_indicador,
-            palavra_chave: indicador.palavra_chave,
             unidade_indicador: indicador.unidade_indicador,
             formula_calculo_indicador: indicador.formula_calculo_indicador,
             informacoes_indicador: indicador.informacoes_indicador,
@@ -260,6 +288,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
               indicador.indicador_correspondente_ou_similar_snis,
             id_menu_item: indicador.id_menu_item?.toString(),
             nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
+            is_unidade: indicador.is_unidade || false,
+            id_tipo_unidade: indicador.id_tipo_unidade?.toString() || "",
           });
         }
       } else {
@@ -267,7 +297,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         reset({
           codigo_indicador: indicador.codigo_indicador,
           nome_indicador: indicador.nome_indicador,
-          palavra_chave: indicador.palavra_chave,
           unidade_indicador: indicador.unidade_indicador,
           formula_calculo_indicador: indicador.formula_calculo_indicador,
           informacoes_indicador: indicador.informacoes_indicador,
@@ -275,6 +304,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
             indicador.indicador_correspondente_ou_similar_snis,
           id_menu_item: indicador.id_menu_item?.toString(),
           nome_campo: indicador.codigo_indicador, // Preencher nome_campo com codigo_indicador
+          is_unidade: indicador.is_unidade || false,
+          id_tipo_unidade: indicador.id_tipo_unidade?.toString() || "",
         });
       }
 
@@ -438,7 +469,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   async function handleAddIndicador({
     codigo_indicador,
     nome_indicador,
-    palavra_chave,
     unidade_indicador,
     formula_calculo_indicador,
     informacoes_indicador,
@@ -447,6 +477,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     tipo_campo,
     campo_ativo,
     is_unidade,
+    id_tipo_unidade,
   }) {
     try {
       const apiClient = getAPIClient();
@@ -454,7 +485,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       const indicadorData = {
         codigo_indicador,
         nome_indicador,
-        palavra_chave: palavra_chave || null,
         unidade_indicador: unidade_indicador || null,
         formula_calculo_indicador: formula_calculo_indicador || null,
         informacoes_indicador: informacoes_indicador || null,
@@ -462,6 +492,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           indicador_correspondente_ou_similar_snis || null,
         id_menu_item: id_menu_item ? parseInt(id_menu_item) : null,
         is_unidade: is_unidade || false,
+        id_tipo_unidade: id_tipo_unidade ? parseInt(id_tipo_unidade) : null,
       };
 
       let indicadorResponse;
@@ -519,7 +550,6 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
       reset({
         codigo_indicador: "",
         nome_indicador: "",
-        palavra_chave: "",
         unidade_indicador: "",
         formula_calculo_indicador: "",
         informacoes_indicador: "",
@@ -529,6 +559,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         nome_campo: "",
         campo_ativo: true,
         is_unidade: false,
+        id_tipo_unidade: "",
       });
 
       setSelectOptions([]);
@@ -1079,6 +1110,84 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
                     <span style={{ fontWeight: "500" }}>Campo de unidade</span>
                   </label>
                 </div>
+
+                {/* Select de Tipo de Unidade - aparece quando is_unidade está marcado */}
+                {isUnidadeSelecionado && (
+                  <div style={{ marginBottom: "20px" }}>
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "8px",
+                        fontWeight: "600",
+                        color: "#333",
+                        fontSize: "14px",
+                      }}
+                    >
+                      Tipo de Unidade *
+                    </label>
+                    <select
+                      {...register("id_tipo_unidade", { 
+                        required: isUnidadeSelecionado 
+                      })}
+                      name="id_tipo_unidade"
+                      style={{
+                        width: "100%",
+                        padding: "12px 16px",
+                        border: `1px solid ${
+                          errors.id_tipo_unidade ? "#e74c3c" : "#e0e0e0"
+                        }`,
+                        borderRadius: "8px",
+                        fontSize: "14px",
+                        transition: "all 0.3s ease",
+                        backgroundColor: "white",
+                      }}
+                      onFocus={(e) => {
+                        (e.target as HTMLSelectElement).style.borderColor =
+                          "#3498db";
+                        (e.target as HTMLSelectElement).style.boxShadow =
+                          "0 0 0 3px rgba(52, 152, 219, 0.1)";
+                      }}
+                      onBlur={(e) => {
+                        (e.target as HTMLSelectElement).style.borderColor =
+                          errors.id_tipo_unidade ? "#e74c3c" : "#e0e0e0";
+                        (e.target as HTMLSelectElement).style.boxShadow = "none";
+                      }}
+                    >
+                      <option value="">Selecione um tipo de unidade</option>
+                      {tiposUnidadeFiltrados?.map((tipo, key) => (
+                        <option key={key} value={tipo.id_tipo_unidade}>
+                          {tipo.nome_tipo_unidade}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.id_tipo_unidade &&
+                      errors.id_tipo_unidade.type === "required" && (
+                        <span
+                          style={{
+                            color: "#e74c3c",
+                            fontSize: "12px",
+                            marginTop: "4px",
+                            display: "block",
+                          }}
+                        >
+                          O campo Tipo de Unidade é obrigatório quando o campo é de unidade!
+                        </span>
+                      )}
+                    <small
+                      style={{
+                        color: "#666",
+                        fontSize: "12px",
+                        marginTop: "8px",
+                        display: "block",
+                        lineHeight: "1.4",
+                      }}
+                    >
+                      {selectedEixo 
+                        ? "Tipos de unidade filtrados pelo eixo selecionado" 
+                        : "Selecione um eixo para filtrar os tipos de unidade disponíveis"}
+                    </small>
+                  </div>
+                )}
 
                 {/* Seção para configurar opções do select */}
                 {tipoCampoSelecionado === "select" && (

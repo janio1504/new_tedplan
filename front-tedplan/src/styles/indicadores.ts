@@ -1623,7 +1623,7 @@ export const CollapseButton = styled.button`
 `;
 
 export const MainContent = styled.div<{ isCollapsed: boolean }>`
-  // margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
+  margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
 

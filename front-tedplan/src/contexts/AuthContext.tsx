@@ -81,12 +81,15 @@ export function AuthProvider({ children }) {
 
     const { "tedplan.id_usuario": id_usuario } = parseCookies();
 
-    hasPermission();    
-
     if (!usuario && token && id_usuario) {
       recoverUserInformation(id_usuario).then((response) => {
         setUser(response[0]);
       });
+    }
+    
+    // Chama hasPermission apenas se o usuário estiver disponível
+    if (usuario && usuario.id_usuario) {
+      hasPermission();
     }
   }, [usuario]);
 
@@ -104,10 +107,18 @@ export function AuthProvider({ children }) {
 
   async function hasPermission() { 
       let editorSimisab = false;
-      const editorSimisabPorAno = await permissionByYear(usuario?.id_usuario); 
-      if(editorSimisabPorAno && editorSimisabPorAno?.id_usuario === usuario?.id_usuario) {
-        editorSimisab = true;
-        setAno(editorSimisabPorAno?.ano);
+      
+      // Só busca permissão se o usuário estiver disponível e tiver id_usuario
+      if (usuario && usuario.id_usuario) {
+        try {
+          const editorSimisabPorAno = await permissionByYear(usuario.id_usuario); 
+          if(editorSimisabPorAno && editorSimisabPorAno?.id_usuario === usuario.id_usuario) {
+            editorSimisab = true;
+            setAno(editorSimisabPorAno?.ano);
+          }
+        } catch (error) {
+          console.error('Erro ao buscar permissão por ano:', error);
+        }
       }
    
       const permissao = {
@@ -137,7 +148,13 @@ export function AuthProvider({ children }) {
           api.defaults.headers["Authorization"] = `Bearer ${response.token}`;
 
           recoverUserInformation(response.id_usuario).then((value) => {
-            setUser(value[0]);
+            if (value && value[0]) {
+              setUser(value[0]);
+              // Chama hasPermission após carregar o usuário
+              setTimeout(() => {
+                hasPermission();
+              }, 100);
+            }
           });
         }
         return response;

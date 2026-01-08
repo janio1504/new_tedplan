@@ -1,5 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import {
+  submenuFields,
+  getSubmenuName,
+  getAllSubmenuFields,
+  getRequiredFields,
+} from "../../utils/submenuFields";
+import {
+  stepToSubmenuMap,
+  getStepSubmenuName,
+  validateStepIndex,
+} from "../../utils/prestadoresSteps";
 import { FaBars } from "react-icons/fa";
 import {
   Container,
@@ -60,6 +71,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     watch,
     setValue,
     control,
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm<Municipio>({});
   const [activeForm, setActiveForm] = useState("dadosMunicipio");
@@ -100,8 +113,10 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       const rural = parseInt(popRural || "0");
       const total = urban + rural;
 
-      if (!isNaN(total)) {
-        setValue("dd_populacao_total", total.toString());
+      if (!isNaN(total) && total > 0) {
+        setValue("dd_populacao_total", total.toString(), { shouldValidate: false, shouldDirty: false });
+      } else if (urban === 0 && rural === 0) {
+        setValue("dd_populacao_total", "", { shouldValidate: false, shouldDirty: false });
       }
     } catch (error) {
       console.error("Error calculating total population:", error);
@@ -114,11 +129,13 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       const rural = parseInt(estabRural || "0");
       const total = urban + rural;
 
-      if (!isNaN(total)) {
-        setValue("OGM4003", total.toString());
+      if (!isNaN(total) && total > 0) {
+        setValue("OGM4003", total.toString(), { shouldValidate: false, shouldDirty: false });
+      } else if (urban === 0 && rural === 0) {
+        setValue("OGM4003", "", { shouldValidate: false, shouldDirty: false });
       }
     } catch (error) {
-      console.error("Error calculating total population:", error);
+      console.error("Error calculating total establishments:", error);
     }
   }, [estabUrbano, estabRural, setValue]);
 
@@ -128,25 +145,29 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       const rural = parseInt(domiRural || "0");
       const total = urban + rural;
 
-      if (!isNaN(total)) {
-        setValue("OGM4006", total.toString());
+      if (!isNaN(total) && total > 0) {
+        setValue("OGM4006", total.toString(), { shouldValidate: false, shouldDirty: false });
+      } else if (urban === 0 && rural === 0) {
+        setValue("OGM4006", "", { shouldValidate: false, shouldDirty: false });
       }
     } catch (error) {
-      console.error("Error calculating total population:", error);
+      console.error("Error calculating total domiciles:", error);
     }
   }, [domiUrbano, domiRural, setValue]);
 
   useEffect(() => {
     try {
-      const urban = parseInt(viaPublicaPavimento || "0");
-      const rural = parseInt(viaPublicaSemPavimento || "0");
-      const total = urban + rural;
+      const pavimento = parseFloat(viaPublicaPavimento || "0");
+      const semPavimento = parseFloat(viaPublicaSemPavimento || "0");
+      const total = pavimento + semPavimento;
 
-      if (!isNaN(total)) {
-        setValue("OGM4009", total.toString());
+      if (!isNaN(total) && total > 0) {
+        setValue("OGM4009", total.toFixed(2), { shouldValidate: false, shouldDirty: false });
+      } else if (pavimento === 0 && semPavimento === 0) {
+        setValue("OGM4009", "", { shouldValidate: false, shouldDirty: false });
       }
     } catch (error) {
-      console.error("Error calculating total population:", error);
+      console.error("Error calculating total public roads:", error);
     }
   }, [viaPublicaPavimento, viaPublicaSemPavimento, setValue]);
 
@@ -167,7 +188,31 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   useEffect(() => {
     if (dadosMunicipio) {
       Object.entries(dadosMunicipio).forEach(([key, value]) => {
-        setValue(key as keyof Municipio, value);
+        // Normalizar campos com máscara ao carregar do banco
+        if (value && typeof value === 'string') {
+          // Campos CNPJ: remover máscara (manter apenas números)
+          if (key.includes('_cnpj')) {
+            const normalizedValue = value.replace(/\D/g, '');
+            setValue(key as keyof Municipio, normalizedValue as any, { shouldValidate: false, shouldDirty: false });
+            return;
+          }
+          // Campos telefone: remover máscara (manter apenas números)
+          if (key.includes('_telefone')) {
+            const normalizedValue = value.replace(/\D/g, '');
+            setValue(key as keyof Municipio, normalizedValue as any, { shouldValidate: false, shouldDirty: false });
+            return;
+          }
+          // Campos CEP: remover máscara (manter apenas números)
+          if (key.includes('_cep') && !key.includes('_endereco')) {
+            const normalizedValue = value.replace(/\D/g, '');
+            setValue(key as keyof Municipio, normalizedValue as any, { shouldValidate: false, shouldDirty: false });
+            return;
+          }
+        }
+        const isCalculatedField = ['dd_populacao_total', 'OGM4003', 'OGM4006', 'OGM4009'].includes(key);
+        if (!isCalculatedField) {
+          setValue(key as keyof Municipio, value, { shouldValidate: false, shouldDirty: false });
+        }
       });
     }
     getResponsaveisSimisab();
@@ -201,11 +246,179 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     }
   }, [copiaParaEsgoto, activeStep, watch, setValue]);
 
-  const handleNext = () => {
-    if (activeStep === 0 && copiaParaEsgoto) {
-      setActiveStep(2);
-    } else {
-      setActiveStep((prevStep) => prevStep + 1);
+  const handleNext = async (e?: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevenir comportamento padrão do botão
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
+    try {
+      // Salvar o step atual antes de avançar
+      // Criar uma Promise que resolve apenas se o salvamento for bem-sucedido
+      const saveSuccess = await new Promise<boolean>(async (resolve) => {
+        const stepIndex = activeStep;
+        const submenuName = getStepSubmenuName(stepIndex);
+        
+        if (!submenuName) {
+          resolve(false);
+          return;
+        }
+        
+        // Verificar permissão
+        if (usuario?.id_permissao === 4) {
+          toast.warning("Você não tem permissão para salvar dados", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+          resolve(false);
+          return;
+        }
+        
+        // Validar apenas campos do submenu
+        const isValid = await validateSubmenu(submenuName);
+        if (!isValid) {
+          const submenuDisplayName = getSubmenuName(submenuName);
+          toast.error(
+            `Por favor, preencha todos os campos obrigatórios de ${submenuDisplayName}`,
+            {
+              position: "top-right",
+              autoClose: 5000,
+            }
+          );
+          resolve(false);
+          return;
+        }
+        
+        // Se chegou aqui, a validação passou, então salvar
+        try {
+          const submenuData = getSubmenuData(submenuName);
+          const dataKeys = Object.keys(submenuData).filter(
+            (key) => key !== "id_municipio"
+          );
+          
+          if (dataKeys.length === 0) {
+            toast.warning("Nenhum dado para salvar", {
+              position: "top-right",
+              autoClose: 3000,
+            });
+            resolve(false);
+            return;
+          }
+          
+          const loadingToast = toast.loading("Salvando dados...", {
+            position: "top-right",
+          });
+          
+          await updateMunicipio(submenuData);
+          await loadMunicipio();
+          
+          toast.dismiss(loadingToast);
+          const submenuDisplayName = getSubmenuName(submenuName);
+          toast.success(`${submenuDisplayName} salvos com sucesso!`, {
+            position: "top-right",
+            autoClose: 3000,
+          });
+          
+          resolve(true);
+        } catch (error) {
+          console.error("Erro ao salvar submenu:", error);
+          const submenuDisplayName = getSubmenuName(submenuName);
+          toast.error(
+            `Erro ao salvar ${submenuDisplayName}. Tente novamente.`,
+            {
+              position: "top-right",
+              autoClose: 5000,
+            }
+          );
+          resolve(false);
+        }
+      });
+      
+      // Se o salvamento foi bem-sucedido e estamos no step 0 com checkbox marcado
+      if (saveSuccess && activeStep === 0 && copiaParaEsgoto) {
+        // Também salvar os dados de Esgotamento Sanitário (clonados de Abastecimento de Água)
+        try {
+          const loadingToastEsgoto = toast.loading("Salvando Esgotamento Sanitário...", {
+            position: "top-right",
+          });
+
+          // Obter dados de Abastecimento de Água
+          const allData = getValues();
+          
+          // Criar objeto com dados clonados de aa_* para es_*
+          const esgotoData: any = {
+            id_municipio: usuario?.id_municipio,
+          };
+
+          // Mapear campos de aa_* para es_*
+          const fieldMapping = [
+            { from: 'aa_secretaria_setor_responsavel', to: 'es_secretaria_setor_responsavel' },
+            { from: 'aa_abrangencia', to: 'es_abrangencia' },
+            { from: 'aa_natureza_juridica', to: 'es_natureza_juridica' },
+            { from: 'aa_cnpj', to: 'es_cnpj' },
+            { from: 'aa_telefone', to: 'es_telefone' },
+            { from: 'aa_cep', to: 'es_cep' },
+            { from: 'aa_endereco', to: 'es_endereco' },
+            { from: 'aa_numero', to: 'es_numero' },
+            { from: 'aa_bairro', to: 'es_bairro' },
+            { from: 'aa_responsavel', to: 'es_responsavel' },
+            { from: 'aa_cargo', to: 'es_cargo' },
+            { from: 'aa_email', to: 'es_email' },
+          ];
+
+          // Clonar apenas campos que têm valor
+          fieldMapping.forEach(({ from, to }) => {
+            if (allData[from] !== undefined && allData[from] !== null && allData[from] !== '') {
+              esgotoData[to] = allData[from];
+            }
+          });
+
+          // Incluir id_ps_esgotamento_sanitario se existir
+          if (allData.id_ps_esgotamento_sanitario !== undefined) {
+            esgotoData.id_ps_esgotamento_sanitario = allData.id_ps_esgotamento_sanitario || null;
+          }
+
+          // Verificar se há dados para salvar
+          const dataKeys = Object.keys(esgotoData).filter(
+            (key) => key !== "id_municipio" && key !== "id_ps_esgotamento_sanitario"
+          );
+          
+          if (dataKeys.length > 0) {
+            // Salvar dados de Esgotamento Sanitário
+            await updateMunicipio(esgotoData);
+            await loadMunicipio();
+            
+            toast.dismiss(loadingToastEsgoto);
+            toast.success("Esgotamento Sanitário salvo com sucesso!", {
+              position: "top-right",
+              autoClose: 3000,
+            });
+          } else {
+            toast.dismiss(loadingToastEsgoto);
+          }
+
+          // Pular para o step 2 (Drenagem e Águas Pluviais)
+          setActiveStep(2);
+        } catch (error) {
+          console.error("Erro ao salvar Esgotamento Sanitário:", error);
+          toast.error("Erro ao salvar Esgotamento Sanitário. Tente novamente.", {
+            position: "top-right",
+            autoClose: 5000,
+          });
+          // Mesmo com erro, pular para o próximo step
+          setActiveStep(2);
+        }
+      } else if (saveSuccess && activeStep < steps.length - 1) {
+        // Avançar normalmente para o próximo step
+        setActiveStep((prevStep) => prevStep + 1);
+      }
+    } catch (error) {
+      console.error("Erro em handleNext:", error);
+      toast.error("Erro ao processar. Tente novamente.", {
+        position: "top-right",
+        autoClose: 5000,
+      });
     }
   };
 
@@ -217,12 +430,245 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     setActiveStep(step);
   };
 
+  /**
+   * Valida apenas os campos do submenu especificado
+   * Fase 2: Função de Validação por Submenu
+   */
+  const validateSubmenu = async (submenuName: string): Promise<boolean> => {
+    try {
+      // Obter todos os dados do formulário para verificar condições
+      const formData = getValues();
+      
+      // Obter campos obrigatórios (incluindo condicionais) apenas do submenu específico
+      const requiredFields = getRequiredFields(submenuName, formData);
+      
+      if (requiredFields.length === 0) {
+        return true;
+      }
+
+      // Normalizar valores de campos com máscara antes de validar
+      // Apenas normalizar campos que pertencem ao submenu sendo validado
+      const allSubmenuFields = getAllSubmenuFields(submenuName);
+      const fieldsToNormalize = [
+        // Prestadores de Serviços
+        'aa_cnpj', 'es_cnpj', 'da_cnpj', 'rs_cnpj', 
+        'aa_telefone', 'es_telefone', 'da_telefone', 'rs_telefone',
+        'aa_cep', 'es_cep', 'da_cep', 'rs_cep',
+        // Controle Social e Responsável SIMISAB
+        'cs_telefone', 'simisab_telefone',
+        // Outros
+        'municipio_telefone', 'ts_telefone', 'ts_telefone_comercial', 'rf_telefone'
+      ];
+      
+      // Normalizar apenas campos que pertencem ao submenu sendo validado
+      fieldsToNormalize.forEach(field => {
+        if (allSubmenuFields.includes(field) && formData[field] && typeof formData[field] === 'string') {
+          const normalizedValue = formData[field].replace(/\D/g, '');
+          if (normalizedValue !== formData[field]) {
+            setValue(field as any, normalizedValue, { shouldValidate: false });
+          }
+        }
+      });
+
+      // Validar apenas os campos obrigatórios do submenu específico
+      // O trigger do react-hook-form valida APENAS os campos passados no array
+      // Usar shouldFocus: false para não focar em campos de outras abas
+      const validationResult = await trigger(requiredFields as any, { shouldFocus: false });
+      
+      // Se o trigger retornou true, todos os campos do submenu são válidos
+      if (validationResult) {
+        return true;
+      }
+      
+      // Se o trigger retornou false, verificar quais campos do submenu falharam
+      // Aguardar um momento para que os erros sejam atualizados no estado do react-hook-form
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Verificar se há erros APENAS nos campos do submenu sendo validado
+      // Ignorar erros de campos de outras abas
+      const failedFields: string[] = [];
+      requiredFields.forEach(field => {
+        const fieldError = errors[field as keyof typeof errors];
+        if (fieldError !== undefined) {
+          failedFields.push(field);
+        }
+      });
+      
+      // Se há erros nos campos do submenu, retornar false
+      if (failedFields.length > 0) {
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error(`Erro ao validar submenu ${submenuName}:`, error);
+      return false;
+    }
+  };
+
+  /**
+   * Filtra e retorna apenas os dados do submenu especificado
+   * Fase 2: Função de Filtragem de Dados
+   */
+  const getSubmenuData = (submenuName: string): any => {
+    try {
+      const allData = getValues();
+      const submenuFieldsList = getAllSubmenuFields(submenuName);
+      
+      const submenuData: any = {
+        id_municipio: usuario?.id_municipio,
+      };
+      
+      submenuFieldsList.forEach((field) => {
+        const isOptionalId = field.startsWith('id_');
+        if (isOptionalId) {
+          submenuData[field] = allData[field] || null;
+        } else {
+          const isCalculatedField = ['dd_populacao_total', 'OGM4003', 'OGM4006', 'OGM4009'].includes(field);
+          if (isCalculatedField) {
+            if (allData[field] !== undefined && allData[field] !== null && allData[field] !== '') {
+              submenuData[field] = allData[field];
+            }
+          } else if (allData[field] !== undefined && allData[field] !== null && allData[field] !== '') {
+            submenuData[field] = allData[field];
+          }
+        }
+      });
+
+      const config = submenuFields[submenuName];
+      if (config?.conditional) {
+        config.conditional.forEach((conditional) => {
+          if (conditional.condition(allData)) {
+            if (allData[conditional.field] !== undefined && 
+                allData[conditional.field] !== null && 
+                allData[conditional.field] !== '') {
+              submenuData[conditional.field] = allData[conditional.field];
+            }
+          }
+        });
+      }
+
+      return submenuData;
+    } catch (error) {
+      console.error(`Erro ao obter dados do submenu ${submenuName}:`, error);
+      return { id_municipio: usuario?.id_municipio };
+    }
+  };
+
+  /**
+   * Salva apenas os dados do submenu especificado
+   * Fase 3: Função de Salvamento Individual
+   */
+  const handleSaveSubmenu = async (submenuName: string) => {
+    try {
+      // Verificar permissão
+      if (usuario?.id_permissao === 4) {
+        toast.warning("Você não tem permissão para salvar dados", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+
+      // Validar apenas campos do submenu
+      const isValid = await validateSubmenu(submenuName);
+      if (!isValid) {
+        const submenuDisplayName = getSubmenuName(submenuName);
+        toast.error(
+          `Por favor, preencha todos os campos obrigatórios de ${submenuDisplayName}`,
+          {
+            position: "top-right",
+            autoClose: 5000,
+          }
+        );
+        return;
+      }
+
+      // Obter dados filtrados do submenu
+      const submenuData = getSubmenuData(submenuName);
+
+      // Verificar se há dados para salvar
+      const dataKeys = Object.keys(submenuData).filter(
+        (key) => key !== "id_municipio"
+      );
+      if (dataKeys.length === 0) {
+        toast.warning("Nenhum dado para salvar", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
+      }
+
+      // Mostrar toast de carregamento
+      const loadingToast = toast.loading("Salvando dados...", {
+        position: "top-right",
+      });
+
+      // Salvar no backend
+      await updateMunicipio(submenuData);
+
+      // Recarregar dados do município
+      await loadMunicipio();
+
+      // Fechar toast de carregamento e mostrar sucesso
+      toast.dismiss(loadingToast);
+      const submenuDisplayName = getSubmenuName(submenuName);
+      toast.success(`${submenuDisplayName} salvos com sucesso!`, {
+        position: "top-right",
+        autoClose: 3000,
+      });
+    } catch (error) {
+      console.error("Erro ao salvar submenu:", error);
+      const submenuDisplayName = getSubmenuName(submenuName);
+      toast.error(
+        `Erro ao salvar ${submenuDisplayName}. Tente novamente.`,
+        {
+          position: "top-right",
+          autoClose: 5000,
+        }
+      );
+    }
+  };
+
+  /**
+   * Salva apenas os dados do step ativo do Stepper de Prestadores de Serviços
+   * Fase 2: Função de Salvamento por Step
+   */
+  const handleSaveStep = async (stepIndex: number) => {
+    // Validar stepIndex usando função auxiliar
+    if (!validateStepIndex(stepIndex)) {
+      console.error(`Step index ${stepIndex} não possui submenu mapeado`);
+      toast.error("Erro: Step inválido", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    // Obter nome do submenu usando função auxiliar
+    const submenuName = getStepSubmenuName(stepIndex);
+    
+    if (!submenuName) {
+      console.error(`Step index ${stepIndex} não possui submenu mapeado`);
+      toast.error("Erro: Step inválido", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
+
+    // Usar a função handleSaveSubmenu existente
+    await handleSaveSubmenu(submenuName);
+  };
+
+  /**
+   * Função original mantida para compatibilidade (pode ser removida após Fase 4)
+   */
   async function handleCadastro(data: any) {
     try {
       if (usuario?.id_permissao === 4) {
         return;
       }
-      console.log("Dados enviados:", data);
 
       const submitData = {
         ...data,
@@ -727,7 +1173,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton type="button" onClick={() => handleSaveSubmenu("dadosMunicipio")}>
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
 
@@ -955,7 +1403,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </table>
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton type="button" onClick={() => handleSaveSubmenu("titularServicos")}>
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
@@ -2373,6 +2823,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
                   <StepperNavigation>
                     <StepperButton
+                      type="button"
                       secondary
                       onClick={handleBack}
                       disabled={activeStep === 0}
@@ -2380,13 +2831,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       Voltar
                     </StepperButton>
                     <StepperButton
-                      onClick={
-                        activeStep === steps.length - 1
-                          ? () => handleSubmit(handleCadastro)()
-                          : handleNext
-                      }
+                      type="button"
+                      onClick={handleNext}
+                      disabled={usuario?.id_permissao === 4}
                     >
-                      {activeStep === steps.length - 1 ? "Gravar" : "Próximo"}
+                      {activeStep === steps.length - 1 ? "Salvar e Finalizar" : "Salvar e Próximo"}
                     </StepperButton>
                   </StepperNavigation>
                 </StepperContainer>
@@ -2524,14 +2973,29 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         <label>
                           Função<span> *</span>
                         </label>
-                        <select {...register("rf_funcao")}>
-                          <option value={dadosMunicipio?.rf_funcao}>
-                            {dadosMunicipio?.rf_funcao}
-                          </option>
-                          <option value="Encargo Direto">Encargo Direto</option>
-                          <option value="Concursado">Concursado</option>
-                          <option value="Outro">Outro</option>
-                        </select>
+                        <Controller
+                          name="rf_funcao"
+                          control={control}
+                          rules={{ required: "A função é obrigatória" }}
+                          render={({ field: { onChange, value } }) => {
+                            const currentValue = value || dadosMunicipio?.rf_funcao || "";
+                            return (
+                              <select
+                                value={currentValue}
+                                onChange={onChange}
+                              >
+                                <option value="">
+                                  Selecione...
+                                </option>
+                                <option value="Encargo Direto">
+                                  Encargo Direto
+                                </option>
+                                <option value="Concursado">Concursado</option>
+                                <option value="Outro">Outro</option>
+                              </select>
+                            );
+                          }}
+                        />
                       </InputG>
                     </td>
                     <td>
@@ -2633,7 +3097,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <div style={{ color: "#fff" }}>;</div>
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton type="button" onClick={() => handleSaveSubmenu("reguladorFiscalizador")}>
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
@@ -2746,6 +3212,21 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     <span>{errors.cs_email.message}</span>
                   )}
                 </InputG>
+
+                <SubmitButtonContainer>
+                  {usuario?.id_permissao !== 4 && (
+                    <SubmitButton 
+                      type="button" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSaveSubmenu("controleSocial");
+                      }}
+                    >
+                      Gravar
+                    </SubmitButton>
+                  )}
+                </SubmitButtonContainer>
               </div>
 
               <div
@@ -2847,6 +3328,14 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     <span>{errors.simisab_email.message}</span>
                   )}
                 </InputG>
+
+                <SubmitButtonContainer>
+                  {usuario?.id_permissao !== 4 && (
+                    <SubmitButton type="button" onClick={() => handleSaveSubmenu("responsavelSimisab")}>
+                      Gravar
+                    </SubmitButton>
+                  )}
+                </SubmitButtonContainer>
               </div>
 
               <div
@@ -2938,16 +3427,25 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     rows={4}
                   />
                 )}
-              </div>
-              {errors.descricao_outros && (
-                <span>{errors.descricao_outros.message}</span>
-              )}
-
-              <SubmitButtonContainer>
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                {errors.descricao_outros && (
+                  <span>{errors.descricao_outros.message}</span>
                 )}
-              </SubmitButtonContainer>
+
+                <SubmitButtonContainer>
+                  {usuario?.id_permissao !== 4 && (
+                    <SubmitButton 
+                      type="button" 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleSaveSubmenu("conselhoMunicipal");
+                      }}
+                    >
+                      Gravar
+                    </SubmitButton>
+                  )}
+                </SubmitButtonContainer>
+              </div>
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "dadosGeograficos"}>
@@ -3019,18 +3517,25 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       Urbana ou Microrregião legalmente instituída?
                     </td>
                     <td >
-                      <select
-                       
-                        {...register("OGM0003", {
-                          required: "Campo obrigatório",
-                        })}
+                      <Controller
                         name="OGM0003"
-                      >
-                        <option value="">Selecione</option>
-                        <option value="Sim">Sim</option>
-                        <option value="Não">Não</option>
-                      </select>
-                      {errors.OGM0003 && <span>{errors.OGM0003.message}</span>}
+                        control={control}
+                        rules={{ required: "Campo obrigatório" }}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                          <>
+                            <select
+                              onChange={onChange}
+                              value={value || ""}
+                              name="OGM0003"
+                            >
+                              <option value="">Selecione</option>
+                              <option value="Sim">Sim</option>
+                              <option value="Não">Não</option>
+                            </select>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
                     </td>
                     <td></td>
                   </tr>
@@ -3280,18 +3785,25 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       Existem Aldeias Indígenas no município?
                     </td>
                     <td>
-                      <select
-                       
-                        {...register("OGM0101", {
-                          required: "Campo obrigatório",
-                        })}
+                      <Controller
                         name="OGM0101"
-                      >
-                        <option value="">Selecione</option>
-                        <option value="Sim">Sim</option>
-                        <option value="Não">Não</option>
-                      </select>
-                      {errors.OGM0101 && <span>{errors.OGM0101.message}</span>}
+                        control={control}
+                        rules={{ required: "Campo obrigatório" }}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                          <>
+                            <select
+                              onChange={onChange}
+                              value={value || ""}
+                              name="OGM0101"
+                            >
+                              <option value="">Selecione</option>
+                              <option value="Sim">Sim</option>
+                              <option value="Não">Não</option>
+                            </select>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
                     </td>
                     <td></td>
                   </tr>
@@ -3358,18 +3870,25 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       Existem Comunidades Quilombolas no município?
                     </td>
                     <td >
-                      <select
-                       
-                        {...register("OGM0104", {
-                          required: "Campo obrigatório",
-                        })}
+                      <Controller
                         name="OGM0104"
-                      >
-                        <option value="">Selecione</option>
-                        <option value="Sim">Sim</option>
-                        <option value="Não">Não</option>
-                      </select>
-                      {errors.OGM0104 && <span>{errors.OGM0104.message}</span>}
+                        control={control}
+                        rules={{ required: "Campo obrigatório" }}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                          <>
+                            <select
+                              onChange={onChange}
+                              value={value || ""}
+                              name="OGM0104"
+                            >
+                              <option value="">Selecione</option>
+                              <option value="Sim">Sim</option>
+                              <option value="Não">Não</option>
+                            </select>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
                     </td>
                     <td></td>
                   </tr>
@@ -3437,18 +3956,25 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                       Existem Comunidades Extrativistas no município?
                     </td>
                     <td >
-                      <select
-                       
-                        {...register("OGM0107", {
-                          required: "Campo obrigatório",
-                        })}
+                      <Controller
                         name="OGM0107"
-                      >
-                        <option value="">Selecione</option>
-                        <option value="Sim">Sim</option>
-                        <option value="Não">Não</option>
-                      </select>
-                      {errors.OGM0107 && <span>{errors.OGM0107.message}</span>}
+                        control={control}
+                        rules={{ required: "Campo obrigatório" }}
+                        render={({ field: { onChange, value }, fieldState: { error } }) => (
+                          <>
+                            <select
+                              onChange={onChange}
+                              value={value || ""}
+                              name="OGM0107"
+                            >
+                              <option value="">Selecione</option>
+                              <option value="Sim">Sim</option>
+                              <option value="Não">Não</option>
+                            </select>
+                            {error && <span>{error.message}</span>}
+                          </>
+                        )}
+                      />
                     </td>
                     <td></td>
                   </tr>
@@ -3515,7 +4041,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton type="button" onClick={() => handleSaveSubmenu("dadosGeograficos")}>
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
@@ -3542,7 +4070,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         })}
                         type="text"
                         name="dd_populacao_urbana"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
+                          // Permitir teclas de controle (Backspace, Delete, Tab, etc.)
+                          if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                              e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || 
+                              e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End' ||
+                              (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                            return;
+                          }
+                          // Permitir apenas números
                           if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
                           }
@@ -3568,7 +4104,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         })}
                         type="text"
                         name="dd_populacao_rural"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
+                          // Permitir teclas de controle (Backspace, Delete, Tab, etc.)
+                          if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                              e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || 
+                              e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End' ||
+                              (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                            return;
+                          }
+                          // Permitir apenas números
                           if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
                           }
@@ -3638,7 +4182,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         })}
                         type="text"
                         name="OGM4001"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
+                          // Permitir teclas de controle (Backspace, Delete, Tab, etc.)
+                          if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                              e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || 
+                              e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End' ||
+                              (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                            return;
+                          }
+                          // Permitir apenas números
                           if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
                           }
@@ -3663,7 +4215,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         })}
                         type="text"
                         name="OGM4002"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
+                          // Permitir teclas de controle (Backspace, Delete, Tab, etc.)
+                          if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                              e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || 
+                              e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End' ||
+                              (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                            return;
+                          }
+                          // Permitir apenas números
                           if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
                           }
@@ -3705,7 +4265,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         })}
                         type="text"
                         name="OGM4004"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
+                          // Permitir teclas de controle (Backspace, Delete, Tab, etc.)
+                          if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                              e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || 
+                              e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End' ||
+                              (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                            return;
+                          }
+                          // Permitir apenas números
                           if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
                           }
@@ -3728,7 +4296,15 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                         })}
                         type="text"
                         name="OGM4005"
-                        onKeyPress={(e) => {
+                        onKeyDown={(e) => {
+                          // Permitir teclas de controle (Backspace, Delete, Tab, etc.)
+                          if (e.key === 'Backspace' || e.key === 'Delete' || e.key === 'Tab' || 
+                              e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || 
+                              e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End' ||
+                              (e.ctrlKey && (e.key === 'a' || e.key === 'c' || e.key === 'v' || e.key === 'x'))) {
+                            return;
+                          }
+                          // Permitir apenas números
                           if (!/[0-9]/.test(e.key)) {
                             e.preventDefault();
                           }
@@ -3825,7 +4401,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
               <SubmitButtonContainer>
                 {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
+                  <SubmitButton type="button" onClick={() => handleSaveSubmenu("dadosDemograficos")}>
+                    Gravar
+                  </SubmitButton>
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>

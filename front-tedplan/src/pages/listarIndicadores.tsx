@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useMemo } from "react";
 import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
 import { getAPIClient } from "../services/axios";
@@ -57,12 +57,12 @@ interface IIndicador {
   codigo_indicador: string;
   nome_indicador: string;
   grupo_indicador: string;
-  palavra_chave: string;
   unidade_indicador: string;
   formula_calculo_indicador: string;
   informacoes_indicador: string;
   indicador_correspondente_ou_similar_snis: string;
   id_menu_item: string;
+  id_tipo_unidade?: string;
   created_at: string;
   updated_at: string;
   is_unidade?: boolean;
@@ -72,6 +72,10 @@ interface IIndicador {
     menu?: {
       titulo: string;
     };
+  };
+  tipoUnidade?: {
+    id_tipo_unidade: string;
+    nome_tipo_unidade: string;
   };
   tiposCampo?: ITipoCampoIndicador[];
 }
@@ -258,6 +262,7 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
   const [filtroGrupo, setFiltroGrupo] = useState<string>("todos");
   const [filtroTipoCampo, setFiltroTipoCampo] = useState<string>("todos");
   const [loadingTipos, setLoadingTipos] = useState(false);
+  const [viewMode, setViewMode] = useState<"normal" | "porTipoUnidade">("normal");
 
   // Grupos únicos dos indicadores
   const gruposUnicos = Array.from(
@@ -503,10 +508,6 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
         indicador.codigo_indicador
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        (indicador.palavra_chave &&
-          indicador.palavra_chave
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())) ||
         (indicador.unidade_indicador &&
           indicador.unidade_indicador
             .toLowerCase()
@@ -550,6 +551,38 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
     };
     return tipos[type] || type;
   };
+
+  // Agrupar indicadores de unidade por tipo_unidade
+  const indicadoresPorTipoUnidade = useMemo(() => {
+    const indicadoresUnidade = indicadoresFiltrados.filter(
+      (ind) => ind.is_unidade && ind.tipoUnidade
+    );
+
+    const agrupados: {
+      [key: string]: {
+        tipoUnidade: { id_tipo_unidade: string; nome_tipo_unidade: string };
+        indicadores: IIndicador[];
+      };
+    } = {};
+
+    indicadoresUnidade.forEach((indicador) => {
+      const tipoUnidadeId = indicador.tipoUnidade!.id_tipo_unidade;
+      if (!agrupados[tipoUnidadeId]) {
+        agrupados[tipoUnidadeId] = {
+          tipoUnidade: indicador.tipoUnidade!,
+          indicadores: [],
+        };
+      }
+      agrupados[tipoUnidadeId].indicadores.push(indicador);
+    });
+
+    // Ordenar por nome do tipo de unidade
+    return Object.values(agrupados).sort((a, b) =>
+      a.tipoUnidade.nome_tipo_unidade.localeCompare(
+        b.tipoUnidade.nome_tipo_unidade
+      )
+    );
+  }, [indicadoresFiltrados]);
 
   async function handleSignOut() {
     signOut();
@@ -668,6 +701,27 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                 ))}
               </select>
             </div>
+            <button
+              onClick={() =>
+                setViewMode(
+                  viewMode === "normal" ? "porTipoUnidade" : "normal"
+                )
+              }
+              style={{
+                padding: "10px 20px",
+                border: "1px solid #ddd",
+                borderRadius: "8px",
+                fontSize: "16px",
+                backgroundColor: viewMode === "porTipoUnidade" ? "#007bff" : "white",
+                color: viewMode === "porTipoUnidade" ? "white" : "#333",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+            >
+              {viewMode === "normal"
+                ? "📋 Ver por Tipo de Unidade"
+                : "📋 Ver Lista Normal"}
+            </button>
             {/* {(permission?.adminGeral || permission?.adminTedPlan) && ( */}
             <BotaoAdicionar
               onClick={handleAddIndicador}
@@ -687,8 +741,25 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
           <div
             style={{ marginBottom: "15px", fontSize: "14px", color: "#666" }}
           >
-            Mostrando {indicadoresFiltrados.length} de {indicadoresList.length}{" "}
-            indicadores
+            {viewMode === "porTipoUnidade" ? (
+              <>
+                Mostrando {indicadoresPorTipoUnidade.length}{" "}
+                {indicadoresPorTipoUnidade.length === 1
+                  ? "tipo de unidade"
+                  : "tipos de unidade"}{" "}
+                com{" "}
+                {indicadoresPorTipoUnidade.reduce(
+                  (acc, grupo) => acc + grupo.indicadores.length,
+                  0
+                )}{" "}
+                indicadores
+              </>
+            ) : (
+              <>
+                Mostrando {indicadoresFiltrados.length} de{" "}
+                {indicadoresList.length} indicadores
+              </>
+            )}
             {loadingTipos && (
               <span style={{ marginLeft: "10px", color: "#007bff" }}>
                 (Carregando detalhes dos campos...)
@@ -697,7 +768,189 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
           </div>
 
           <div style={{ width: "100%" }}>
-            {indicadoresFiltrados.length === 0 ? (
+            {viewMode === "porTipoUnidade" ? (
+              // Visualização agrupada por tipo de unidade
+              indicadoresPorTipoUnidade.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px" }}>
+                  <p>Nenhum indicador de unidade encontrado.</p>
+                </div>
+              ) : (
+                indicadoresPorTipoUnidade.map((grupo) => (
+                  <div
+                    key={grupo.tipoUnidade.id_tipo_unidade}
+                    style={{ marginBottom: "30px" }}
+                  >
+                    <div
+                      style={{
+                        backgroundColor: "#007bff",
+                        color: "white",
+                        padding: "15px 20px",
+                        borderRadius: "8px 8px 0 0",
+                        marginBottom: "0",
+                      }}
+                    >
+                      <h3 style={{ margin: 0, fontSize: "20px", fontWeight: "600" }}>
+                        {grupo.tipoUnidade.nome_tipo_unidade}
+                      </h3>
+                      <p style={{ margin: "5px 0 0 0", fontSize: "14px", opacity: 0.9 }}>
+                        {grupo.indicadores.length}{" "}
+                        {grupo.indicadores.length === 1
+                          ? "indicador"
+                          : "indicadores"}
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        border: "1px solid #e0e0e0",
+                        borderTop: "none",
+                        borderRadius: "0 0 8px 8px",
+                        padding: "15px",
+                        backgroundColor: "#f8f9fa",
+                      }}
+                    >
+                      {grupo.indicadores.map((indicador) => (
+                        <div
+                          key={indicador.id_indicador}
+                          style={{
+                            marginBottom: "15px",
+                            padding: "15px",
+                            backgroundColor: "white",
+                            borderRadius: "6px",
+                            border: "1px solid #e0e0e0",
+                          }}
+                        >
+                          <div
+                            style={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "flex-start",
+                            }}
+                          >
+                            <div style={{ flex: 1 }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                  marginBottom: "10px",
+                                }}
+                              >
+                                <h4 style={{ margin: 0, color: "#333" }}>
+                                  {indicador.nome_indicador}
+                                </h4>
+                                {indicador.grupo_indicador && (
+                                  <GrupoBadge grupo={indicador.grupo_indicador} />
+                                )}
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#666",
+                                  marginBottom: "5px",
+                                }}
+                              >
+                                <strong>Código:</strong> {indicador.codigo_indicador}
+                              </div>
+
+                              {indicador.unidade_indicador && (
+                                <div
+                                  style={{
+                                    fontSize: "14px",
+                                    color: "#666",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  <strong>Unidade:</strong>{" "}
+                                  {indicador.unidade_indicador}
+                                </div>
+                              )}
+
+                              {indicador.menuItem && (
+                                <div
+                                  style={{
+                                    fontSize: "14px",
+                                    color: "#666",
+                                    marginBottom: "5px",
+                                  }}
+                                >
+                                  <strong>Menu:</strong>{" "}
+                                  {indicador.menuItem.menu?.titulo} -{" "}
+                                  {indicador.menuItem.nome_menu_item}
+                                </div>
+                              )}
+
+                              {indicador.tiposCampo &&
+                              indicador.tiposCampo.length > 0 ? (
+                                <TipoCampoInfo
+                                  tipoCampo={indicador.tiposCampo[0]}
+                                />
+                              ) : (
+                                <div
+                                  style={{
+                                    backgroundColor: "#fff3cd",
+                                    padding: "10px",
+                                    borderRadius: "4px",
+                                    marginTop: "10px",
+                                    border: "1px solid #ffeaa7",
+                                    fontSize: "14px",
+                                    color: "#856404",
+                                  }}
+                                >
+                                  <strong>⚠️ Campo de entrada não configurado</strong>
+                                </div>
+                              )}
+
+                              <div
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#888",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                <span>ID: {indicador.id_indicador}</span>
+                              </div>
+                            </div>
+
+                            {(permission?.adminGeral ||
+                              permission?.adminTedPlan) && (
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "10px",
+                                  marginLeft: "20px",
+                                }}
+                              >
+                                <BotaoEditar
+                                  onClick={() => handleEditIndicador(indicador)}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                  }}
+                                >
+                                  <FaEdit /> Editar
+                                </BotaoEditar>
+                                <BotaoRemover
+                                  onClick={() => handleOpenConfirm(indicador)}
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: "6px",
+                                  }}
+                                >
+                                  <FaTrash /> Remover
+                                </BotaoRemover>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )
+            ) : indicadoresFiltrados.length === 0 ? (
               <div style={{ textAlign: "center", padding: "40px" }}>
                 <p>
                   {indicadoresList.length === 0
@@ -785,6 +1038,19 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                           </span>
                         </div>
 
+                        {indicador.is_unidade && indicador.tipoUnidade && (
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              color: "#666",
+                              marginBottom: "5px",
+                            }}
+                          >
+                            <strong>Tipo de Unidade:</strong>{" "}
+                            {indicador.tipoUnidade.nome_tipo_unidade}
+                          </div>
+                        )}
+
                         {indicador.unidade_indicador && (
                           <div
                             style={{
@@ -809,19 +1075,6 @@ export default function ListarIndicadores({ indicadores }: IndicadorProps) {
                             <strong>Menu:</strong>{" "}
                             {indicador.menuItem.menu?.titulo} -{" "}
                             {indicador.menuItem.nome_menu_item}
-                          </div>
-                        )}
-
-                        {indicador.palavra_chave && (
-                          <div
-                            style={{
-                              fontSize: "14px",
-                              color: "#666",
-                              marginBottom: "5px",
-                            }}
-                          >
-                            <strong>Palavras-chave:</strong>{" "}
-                            {indicador.palavra_chave}
                           </div>
                         )}
 

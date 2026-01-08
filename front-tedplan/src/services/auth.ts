@@ -37,8 +37,17 @@ export async function recoverUserInformation(id) {
 }
 
 export async function permissionByYear(id) {
-  const api = getAPIClient();
-  const permissaoEdito = await api.get("/get-editor-simisab-por-ano/"+id);
+  // Valida se o id é válido antes de fazer a requisição
+  if (!id || id === 'undefined' || id === 'null') {
+    return null;
+  }
   
-  return permissaoEdito?.data[0];
+  const api = getAPIClient();
+  try {
+    const permissaoEdito = await api.get("/get-editor-simisab-por-ano/"+id);
+    return permissaoEdito?.data?.[0] || null;
+  } catch (error) {
+    console.error('Erro ao buscar permissão por ano:', error);
+    return null;
+  }
 }
