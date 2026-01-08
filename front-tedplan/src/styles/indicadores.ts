@@ -238,7 +238,7 @@ export const StatusMunicipio = styled.div`
 `;
 
 export const MenuMunicipioItem = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'menuOpen',
+  shouldForwardProp: (prop) => prop !== '$menuOpen',
 })<{ $menuOpen?: boolean }>`
   padding: 20px;
   float: right;
@@ -305,8 +305,8 @@ export const HamburgerMenu = styled.div`
   display: none;
 
   span {
-  fontSize: 20,
-  cursor: pointer
+    font-size: 20px;
+    cursor: pointer;
   }
   
   @media (max-width: 768px) {

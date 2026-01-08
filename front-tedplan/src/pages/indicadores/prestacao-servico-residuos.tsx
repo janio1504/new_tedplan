@@ -602,6 +602,7 @@ export default function PrestacaoServicoResiduos() {
           params: { id_municipio: usuario.id_municipio },
         })
         .then((response) => {
+          console.log(response.data);
           setDadosMunicipio(response.data);
         });
     } catch (error) {
