@@ -1223,7 +1223,9 @@ export default function GestaoIndicadores({
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={[]}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       
        

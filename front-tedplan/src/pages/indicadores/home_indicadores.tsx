@@ -241,7 +241,9 @@ export default function HomeIndicadores() {
       `}</style>
       <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={nomeMunicipio}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={""}
+      ></MenuHorizontal>
       <StatusMunicipio>
         Relatório SIMISAB correspondente ao ano {new Date().getFullYear()} - Estado PENDENTE
       </StatusMunicipio>

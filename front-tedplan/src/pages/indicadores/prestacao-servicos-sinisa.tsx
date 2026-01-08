@@ -162,7 +162,9 @@ const ServiceIcon = styled.div<{ rotation: number }>`
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={municipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <BreadCrumbStyle $isCollapsed={isCollapsed}>
               <nav>

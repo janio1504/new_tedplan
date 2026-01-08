@@ -165,7 +165,9 @@ export default function PrestacaoServicos({ Imunicipio }: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={municipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
      
       <CircularContainer>

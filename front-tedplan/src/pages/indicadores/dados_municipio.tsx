@@ -818,7 +818,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       {loading && <Loading />}
 
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={[]}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       
       {isCollapsed ? (
