@@ -81,7 +81,7 @@ export default function AddPublicacao({
         })
         .then((response) => {
           const pub = response.data[0];
-
+          
           const tipoPublicacaoId = tipoPublicacao.find(
             (tp) => tp.nome.trim() === pub.tipo_publicacao.trim()
           )?.id_tipo_publicacao;
@@ -837,18 +837,25 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     // Buscar municípios
     const municipiosResponse = await apiClient.get("/getMunicipios");
-    const municipios = municipiosResponse.data;
+    const municipiosData = municipiosResponse.data || [];
+    // Transformar municipio_nome para nome para manter compatibilidade
+    const municipios = Array.isArray(municipiosData) 
+      ? municipiosData.map((m: any) => ({
+          id_municipio: m.id_municipio,
+          nome: m.municipio_nome || m.nome,
+        }))
+      : [];
 
     // Buscar tipos de publicação
-    const tipoPublicacaoResponse = await apiClient.get("/getTipoPublicacao");
-    const tipoPublicacao = tipoPublicacaoResponse.data;
+    const tipoPublicacaoResponse = await apiClient.get("/listTipoPublicacao");
+    const tipoPublicacao = tipoPublicacaoResponse.data || [];
 
     return {
       props: {
-        eixos: eixos || [],
-        categorias: categorias || [],
-        municipios: municipios || [],
-        tipoPublicacao: tipoPublicacao || [],
+        eixos: Array.isArray(eixos) ? eixos : [],
+        categorias: Array.isArray(categorias) ? categorias : [],
+        municipios: municipios,
+        tipoPublicacao: Array.isArray(tipoPublicacao) ? tipoPublicacao : [],
       },
     };
   } catch (error) {

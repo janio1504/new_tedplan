@@ -55,12 +55,12 @@ export const ButtonAdicionarPresidente = styled.button`
   justify-content: center;
   align-items: center;
 
-  &:disabled{
-  background: #ccc;
-  cursor: not-allowed;
-  color: #666;
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    color: #666;
   }
-`
+`;
 
 export const IconeColeta = styled.div`
   display: flex;
@@ -206,7 +206,6 @@ export const DivCenter = styled.div`
   flex-direction: column;
 
   @media (max-width: 1000px) {
- 
   }
 `;
 
@@ -215,8 +214,6 @@ export const MenuMunicipio = styled.div`
   float: left;
   width: 100%;
   background: #0085bd;
-
-  
 `;
 
 export const StatusMunicipio = styled.div`
@@ -233,12 +230,12 @@ export const StatusMunicipio = styled.div`
   color: #000;
 
   @media (max-width: 768px) {
-  text-align: center;
+    text-align: center;
   }
 `;
 
 export const MenuMunicipioItem = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== '$menuOpen',
+  shouldForwardProp: (prop) => prop !== "$menuOpen",
 })<{ $menuOpen?: boolean }>`
   padding: 20px;
   float: right;
@@ -308,7 +305,7 @@ export const HamburgerMenu = styled.div`
     font-size: 20px;
     cursor: pointer;
   }
-  
+
   @media (max-width: 768px) {
     display: flex;
     position: absolute;
@@ -346,7 +343,6 @@ export const ContainerPs = styled.div`
   flex-wrap: nowrap;
   margin: 50px 0;
   box-sizing: border-box;
-
 `;
 export const Ps1 = styled.div`
   display: flex;
@@ -357,9 +353,6 @@ export const Ps1 = styled.div`
   width: 30px;
   height: 100px;
   background-color: #2dd9d0;
-
-
- 
 `;
 export const Ps2 = styled.div`
   display: flex;
@@ -375,9 +368,6 @@ export const Ps2 = styled.div`
     margin-top: -30px;
     width: 80px;
   }
-
-  
-
 `;
 
 export const Ps3 = styled.div`
@@ -446,8 +436,6 @@ export const PsImage = styled.div`
   margin: -150px 0 0px 0;
   width: 100px;
   cursor: pointer;
-
-  
 `;
 
 export const TitlePsOnMouse = styled.div`
@@ -484,7 +472,6 @@ export const PsImageEsquerda = styled.div`
   width: 100px;
   left: -30px;
   cursor: pointer;
-  
 `;
 export const Ps3ImageDireita = styled.div`
   float: right;
@@ -492,7 +479,6 @@ export const Ps3ImageDireita = styled.div`
   width: 100px;
   left: -30px;
   cursor: pointer;
-   
 `;
 export const Ps3ImageEsquerda = styled.div`
   float: left;
@@ -500,7 +486,6 @@ export const Ps3ImageEsquerda = styled.div`
   width: 100px;
   right: -30px;
   cursor: pointer;
-   
 `;
 export const PsImageDireita = styled.div`
   float: right;
@@ -508,7 +493,6 @@ export const PsImageDireita = styled.div`
   width: 100px;
   left: -30px;
   cursor: pointer;
-   
 `;
 export const DivConteudo = styled.div`
   max-width: 65%;
@@ -556,10 +540,8 @@ export const DivColRelatorios = styled.div`
     padding: 5px;
   }
 
-
   @media (max-width: 1000px) {
     width: 90%;
-
   }
 `;
 
@@ -616,27 +598,19 @@ export const DivForm = styled.div`
 `;
 
 export const DivTituloForm = styled.div`
-  // width: 95%;
-  // padding: 15px 10px;
-  // color: #fff;
-  // margin: -11px -10px 0 -11px;
-  // background-color: #0085bd;
-  // border-top-right-radius: 12px;
-  // border-top-left-radius: 12px;
-  // font-weight: bolder;
+  display: flex;
+  width: 100%;
+  padding: 0.95rem 1.9rem;
+  background-color: #0085bd;
+  color: white;
+  font-weight: bold;
+  font-size: 17px;
+  margin: 0 -1.9rem 1.9rem 0px;
+  border-radius: 7.6px 7.6px 0 0;
+  box-sizing: border-box;
 
-  width: calc(100% + 3.8rem);
-    padding: 0.95rem 1.9rem;
-    background-color: #0085bd;
-    color: white;
-    font-weight: bold;
-    font-size: 1.19rem;
-    margin: 0 -1.9rem 1.9rem;
-    border-radius: 7.6px 7.6px 0 0;
-    box-sizing: border-box;
-
-    @media (max-width: 768px) {
-  text-align: center; 
+  @media (max-width: 768px) {
+    text-align: center;
   }
 `;
 
@@ -648,7 +622,6 @@ export const Tooltip = styled.span`
     visibility: visible;
     opacity: 1;
   }
-    
 `;
 
 export const TooltipText = styled.span`
@@ -659,7 +632,7 @@ export const TooltipText = styled.span`
   text-align: justify;
   border-radius: 6px;
   font-weight: normal !important;
-  padding: 8px 12px; 
+  padding: 8px 12px;
   position: absolute;
   z-index: 1;
   top: 130%;
@@ -671,35 +644,30 @@ export const TooltipText = styled.span`
 
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
-
-  
 `;
 
 export const Tabela = styled.div`
-  
   display: flex;
-  width: 100%;
+  width: 97%;
   overflow: hidden;
   height: 100%;
-  margin-bottom: 30px;
+  margin: 0 20px 30px 20px;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
   table {
-    
     flex: 1;
     margin-top: -15px;
     border-collapse: separate;
     border-spacing: 0;
     min-width: 600px;
 
-
-    th { 
+    th {
       flex: 1;
       background: #0085bd;
       color: #fff;
-      padding: 16px 20px;
+      padding: 10px 20px;
       text-align: left;
       font-weight: 600;
       font-size: 14px;
@@ -708,7 +676,7 @@ export const Tabela = styled.div`
       position: sticky;
       top: 0;
       z-index: 10;
-
+  
       &:first-child {
         padding-left: 24px;
       }
@@ -760,7 +728,6 @@ export const Tabela = styled.div`
     }
 
     tr {
-
       transition: all 0.2s ease;
 
       &:hover td {
@@ -769,8 +736,6 @@ export const Tabela = styled.div`
 
       &:last-child td {
         border-bottom: none;
-
-      
       }
     }
   }
@@ -797,10 +762,10 @@ export const Tabela = styled.div`
     }
   }
 
-    @media (max-width: 1000px) {
-    overflow-x: visible
-    }
-  `;
+  @media (max-width: 1000px) {
+    overflow-x: visible;
+  }
+`;
 
 export const Actions = styled.div`
   display: flex;
@@ -932,19 +897,18 @@ export const SubmitButton = styled.button`
   }
 
   @media (max-width: 768px) {
-  width: 100%;
-  float: none;
-  margin: 10px;
-  right: 0;
+    width: 100%;
+    float: none;
+    margin: 10px;
+    right: 0;
     bottom: 0;
   }
 `;
 
 export const SubmitButtonModal = styled.button`
-
   padding: 10px 15px;
   margin-top: 390px;
-  margin-right: -30px;  
+  margin-right: -30px;
   color: #fff;
   position: relative;
   border: 10px;
@@ -978,10 +942,9 @@ export const InputP = styled.div`
     padding: 10px;
     padding: 22px 0;
   }
-@media (max-width: 768px) {
-  width: 100%;
+  @media (max-width: 768px) {
+    width: 100%;
   }
-
 `;
 
 export const InputM = styled.div`
@@ -994,7 +957,7 @@ export const InputM = styled.div`
   }
 
   @media (max-width: 768px) {
-  width: 100%;
+    width: 100%;
   }
 `;
 
@@ -1018,8 +981,8 @@ export const DivEixo = styled.div`
   flex-direction: row;
   margin: 10px;
   display: flex;
-  width: 95%;
-  border-bottom: #2dd9d0 solid 2px;
+  width: 98%;
+  border-bottom: #ccc solid 2px;
   padding: 5px;
   color: #666;
   font-weight: bold;
@@ -1068,14 +1031,14 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #2dd9d0;
+    border: 2px solid #999;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #2dd9d0;
+    border: 1px solid #999;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -1191,7 +1154,6 @@ export const ModalForm = styled(Modal)`
 
 export const ModalFormUnidade = styled(ModalForm)`
   padding: 0;
-  
 
   .modal-header {
     background: #1caecc;
@@ -1212,7 +1174,6 @@ export const ModalFormUnidade = styled(ModalForm)`
 `;
 
 export const ConteudoModal = styled.div`
-
   width: 100%;
   color: #4a5568;
   font-size: 15px;
@@ -1316,7 +1277,7 @@ export const CloseModalButton = styled.button`
 
   border-radius: 50%;
   // border: 2px solid #e2e8f0;
-  border:none;
+  border: none;
   color: #4a5568;
   font-size: 18px;
   display: flex;
@@ -1458,7 +1419,6 @@ export const DivMenuCadastro = styled.div`
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
   @media (max-width: 855px) {
-    
   }
 `;
 
@@ -1504,16 +1464,17 @@ export const BotaoMenuCadastro = styled.div`
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 500;
   font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
   letter-spacing: -0.01em;
   border: 2px solid transparent;
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.15);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:active {
     transform: translateY(0);
   }
@@ -1525,7 +1486,7 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
   font-weight: 600;
   border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  
+
   &:hover {
     background: rgba(255, 255, 255, 0.25);
     transform: translateY(-1px);
@@ -1540,9 +1501,9 @@ export const BotaoMenuActiveCadastro = styled(BotaoMenuCadastro)`
 // `;
 
 export const Sidebar = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'isCollapsed',
+  shouldForwardProp: (prop) => prop !== "$isCollapsed",
 })<{ $isCollapsed: boolean }>`
-  width: ${(props) => (props.$isCollapsed ? "0": "270px")};
+  width: ${(props) => (props.$isCollapsed ? "0" : "270px")};
   background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
   padding: ${(props) => (props.$isCollapsed ? "0" : "32px 24px")};
   position: absolute;
@@ -1601,16 +1562,14 @@ export const ExpandButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #f3f4f6;  
+    background-color: #f3f4f6;
   }
 
   @media (max-width: 1000px) {
     width: 100%;
     border-radius: 0;
     margin: 0;
-    
   }
-  
 `;
 
 export const CollapseButton = styled.button`
@@ -1622,7 +1581,9 @@ export const CollapseButton = styled.button`
   margin-bottom: 16px;
 `;
 
-export const MainContent = styled.div<{ isCollapsed: boolean }>`
+export const MainContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "isCollapsed",
+})<{ isCollapsed: boolean }>`
   margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
@@ -1630,12 +1591,13 @@ export const MainContent = styled.div<{ isCollapsed: boolean }>`
   @media (max-width: 1000px) {
     min-height: 0;
     height: 80%;
-    margin: 30px; ;
-    }
-  
+    margin: 30px;
+  }
 `;
 
-export const SidebarItem = styled.div<{ active?: boolean }>`
+export const SidebarItem = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "active",
+})<{ active?: boolean }>`
   cursor: pointer;
   padding: 0.75rem 1rem;
   margin-bottom: 0.25rem;
@@ -1659,10 +1621,8 @@ export const SidebarItem = styled.div<{ active?: boolean }>`
     margin-bottom: 0;
   }
   &:first-child {
-    margin-top: 40px;
+    margin-top: 5px;
   }
-
-   
 `;
 
 export const SidebarTitle = styled.h2`
@@ -1862,14 +1822,14 @@ export const SubmitButtonContainer = styled.div`
   width: 100%;
 
   @media (max-width: 768px) {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  padding: 0;
-  margin: 0;
-  position: static;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    position: static;
   }
 `;
 
@@ -1883,170 +1843,171 @@ export const TextArea = styled.div`
   flex-direction: column;
   display: flex;
   width: 100%;
-  
+
   margin: 10px;
   border-radius: 5px;
 `;
 
-export const DivFormCadastro = styled.div<{ active?: boolean }>`
+export const DivFormCadastro = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "active",
+})<{ active?: boolean }>`
   display: ${(props) => (props.active ? "block" : "none")};
-    background-color: white;
-    padding: 0 1.9rem 1.9rem;
-    border-radius: 7.6px;
-    box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
-    width: 90%;
-    z-index: 1;
-    margin: 0px auto;
-    position: relative;
+  background-color: white;
+  padding: 0 0 1.9rem;
+  border-radius: 7.6px;
+  box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  z-index: 1;
+  margin: 0px auto;
+  position: relative;
+  color: #333;
+  overflow: hidden;
+
+  ${DivTituloForm} {
+    display: flex;
+    width: auto;
+    padding: 15px;
+    color: #fff;
+    margin: 0;
+    background-color: #0085bd;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    font-weight: bolder;
+  }
+
+  .form-header {
+    background-color: none;
+    color: white;
+    padding: 0.95rem;
+    margin: -1.9rem -1.9rem 0.95rem -1.9rem;
+    border-radius: 7.6px 7.6px 0 0;
+  }
+
+  .form-title {
+    margin: 0;
+    font-size: 14px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    padding: 9.5px 10px 0 10px;
+    border-spacing: 0 9.5px;
+  }
+
+  td {
+    padding: 0 0.475rem;
+    vertical-align: top;
+  }
+
+  ${InputG}, ${InputM}, ${InputP} {
+    margin-bottom: 1.2rem;
+  }
+
+  ${InputG}, ${InputM}, ${InputP} {
+    width: 95%;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.475rem;
+    font-weight: bold;
+    font-size: 15.2px;
     color: #333;
-    overflow: hidden;
-  
-    ${DivTituloForm} {
-      width: calc(100% + 3.8rem);
-      padding: 0.95rem 1.9rem;
-      background-color: #0085bd;
-      color: white;
-      font-weight: bold;
-      font-size: 1.19rem;
-      margin: 0 -1.9rem 1.9rem;
-      border-radius: 7.6px 7.6px 0 0;
-      box-sizing: border-box;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 1.5;
+    transition: all 0.3s ease;
+    color: #333;
+    background-color: #fff;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: #008080;
+      box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
     }
-  
-    .form-header {
-      background-color: #008080;
-      color: white;
-      padding: 0.95rem;
-      margin: -1.9rem -1.9rem 0.95rem -1.9rem;
-      border-radius: 7.6px 7.6px 0 0;
+
+    &:hover {
+      border-color: #999;
     }
-  
-    .form-title {
-      margin: 0;
-      font-size: 17.1px;
-      text-align: center;
-      font-weight: bold;
+
+    &::placeholder {
+      color: #999;
+      opacity: 1;
     }
-  
-    table {
-      width: 95%;
-      border-collapse: separate;
-      padding-top: 9.5px;
-      border-spacing: 0 9.5px;
+
+    &:disabled {
+      background-color: #f5f5f5;
+      cursor: not-allowed;
     }
-  
+  }
+
+  select {
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+  }
+  .required::after {
+    content: "*";
+    color: red;
+    margin-left: 0.2375rem;
+  }
+
+  ${SubmitButtonContainer} {
+    margin-top: 11.4rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  ${SubmitButton} {
+    background-color: #0085bd;
+    color: white;
+    border: none;
+    margin: 6.65px 1.9px 0.95px 0;
+    padding: 0.7125rem 1.9rem;
+    border-radius: 3.8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: bold;
+    transition: background-color 0.285s ease, transform 0.095s ease;
+
+    &:hover {
+      background-color: #006666;
+    }
+
+    &:active {
+      transform: translateY(0.95px);
+    }
+  }
+
+  @media (max-width: 1000px) {
+    width: 95%;
+    margin: 0;
+
     td {
-      padding: 0 0.475rem;
-      vertical-align: top;
-    }
-  
-    ${InputG}, ${InputM}, ${InputP} {
-      margin-bottom: 1.2rem;
-    }
-  
-    ${InputG}, ${InputM}, ${InputP} {
-      width: 95%;
-    }
-  
-    label {
-      display: block;
-      margin-bottom: 0.475rem;
-      font-weight: bold;
-      font-size: 15.2px;
-      color: #333;
-    }
-  
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"],
-    select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      font-size: 16px;
-      line-height: 1.5;
-      transition: all 0.3s ease;
-      color: #333;
-      background-color: #fff;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      appearance: none;
-  
-      &:focus {
-        outline: none;
-        border-color: #008080;
-        box-shadow: 0 0 0 3px rgba(0, 128, 128, 0.1);
-      }
-  
-      &:hover {
-        border-color: #999;
-      }
-  
-      &::placeholder {
-        color: #999;
-        opacity: 1;
-      }
-  
-      &:disabled {
-        background-color: #f5f5f5;
-        cursor: not-allowed;
-      }
-    }
-  
-    select {
-      padding-right: 2rem;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23333' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 12px;
-    }
-    .required::after {
-      content: "*";
-      color: red;
-      margin-left: 0.2375rem;
-    }
-  
-    ${SubmitButtonContainer} {
-      margin-top: 11.4rem;
-      display: flex;
-      justify-content: flex-end;
-    }
-  
-    ${SubmitButton} {
-      background-color: #0085bd;
-      color: white;
-      border: none;
-      margin: 6.65px 1.9px 0.95px 0;
-      padding: 0.7125rem 1.9rem;
-      border-radius: 3.8px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: bold;
-      transition: background-color 0.285s ease, transform 0.095s ease;
-  
-      &:hover {
-        background-color: #006666;
-      }
-  
-      &:active {
-        transform: translateY(0.95px);
-      }
-    }
-  
-      @media (max-width: 1000px) {
-      width: 95%;
-      margin: 0;
-  
-      td  {
       display: flex;
       flex-direction: column;
       align-items: stretch;
       width: 95%;
-      }
-  
-      }
+    }
+  }
 `;
 
 export const StepperContainer = styled.div`
@@ -2118,8 +2079,11 @@ export const StepperNavigation = styled.div`
   border-top: 1px solid #ddd;
 `;
 
-export const SteppButton = styled.button<{ active?: boolean; completed?: boolean }>`
-padding: 10px 20px;
+export const SteppButton = styled.button<{
+  active?: boolean;
+  completed?: boolean;
+}>`
+  padding: 10px 20px;
   border: none;
   border-radius: 5px;
   background-color: ${(props) => (props.active ? "#666" : "#008080")};
@@ -2136,7 +2100,7 @@ padding: 10px 20px;
     background-color: #ddd;
     cursor: not-allowed;
   }
-`
+`;
 
 export const StepperButton = styled.button<{ secondary?: boolean }>`
   padding: 10px 20px;
@@ -2310,7 +2274,7 @@ export const ModalStepContent = styled.div<{ active?: boolean }>`
 `;
 
 export const BreadCrumbStyle = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'isCollapsed',
+  shouldForwardProp: (prop) => prop !== "isCollapsed",
 })<{ $isCollapsed: boolean }>`
   font-size: 15px;
   display: flex;
@@ -2319,43 +2283,42 @@ export const BreadCrumbStyle = styled.div.withConfig({
   width: 100%;
   padding: 10px;
   color: #666;
-  
+
   nav {
     margin-bottom: 2px;
   }
 
-  ol{
+  ol {
     list-style: none;
     display: flex;
     margin: 0;
     color: #666;
     font-weight: bold;
-
   }
 
-  li{
+  li {
     display: flex;
     height: 100%;
   }
 
-  a{
-  color: #666;
-  text-decoration: none;
-  margin-top: 4px;
-  box-sizing: border-box;
-  display: flex;
-  height: 100%;
-  width: 100%;
-  transition: background 0.2s;
+  a {
+    color: #666;
+    text-decoration: none;
+    margin-top: 4px;
+    box-sizing: border-box;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    transition: background 0.2s;
   }
 
   a:hover {
-  color: #0085bd;
-  border-radius: 8px;
+    color: #0085bd;
+    border-radius: 8px;
   }
 
-  span{
-  margin: 5px;
-  color: #666 !important;
+  span {
+    margin: 5px;
+    color: #666 !important;
   }
 `;
