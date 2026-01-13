@@ -1645,13 +1645,15 @@ export const TextArea = styled.div`
   border-radius: 5px;
 `;
 
-export const DivFormCadastro = styled.div<{ active?: boolean }>`
+export const DivFormCadastro = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "active",
+})<{ active?: boolean }>`
   display: ${(props) => (props.active ? "block" : "none")};
   background-color: white;
-  padding: 0 1.9rem 1.9rem;
+  padding: 0 0 1.9rem;
   border-radius: 7.6px;
   box-shadow: 0 3.8px 5.7px rgba(0, 0, 0, 0.1);
-  width: 90%;
+  width: 100%;
   z-index: 1;
   margin: 0px auto;
   position: relative;

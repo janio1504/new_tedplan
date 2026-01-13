@@ -5,7 +5,7 @@ const Municipio = use("App/Models/Municipio");
 // Helper function para sanitizar valores integer
 function sanitizeInteger(value) {
   // Se for undefined, null, string vazia ou string "undefined"/"null", retorna null
-  if (value === undefined || value === null || value === '' || 
+  if (value === undefined || value === null || value === '' ||
       (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
     return null;
   }
@@ -21,7 +21,7 @@ function sanitizeInteger(value) {
 // Helper function para sanitizar valores decimal
 function sanitizeDecimal(value) {
   // Se for undefined, null, string vazia ou string "undefined"/"null", retorna null
-  if (value === undefined || value === null || value === '' || 
+  if (value === undefined || value === null || value === '' ||
       (typeof value === 'string' && (value.toLowerCase() === 'undefined' || value.toLowerCase() === 'null'))) {
     return null;
   }
@@ -176,39 +176,39 @@ class MunicipioController {
           "dd.total_moradias as dd_total_moradias",
 
           // Campos de dados demográficos completos
-          "dd.OGM4001 as OGM4001",
-          "dd.OGM4002 as OGM4002",
-          "dd.OGM4003 as OGM4003",
-          "dd.OGM4004 as OGM4004",
-          "dd.OGM4005 as OGM4005",
-          "dd.OGM4006 as OGM4006",
-          "dd.OGM4007 as OGM4007",
-          "dd.OGM4008 as OGM4008",
-          "dd.OGM4009 as OGM4009",
+          // "dd.OGM4001 as OGM4001",
+          // "dd.OGM4002 as OGM4002",
+          // "dd.OGM4003 as OGM4003",
+          // "dd.OGM4004 as OGM4004",
+          // "dd.OGM4005 as OGM4005",
+          // "dd.OGM4006 as OGM4006",
+          // "dd.OGM4007 as OGM4007",
+          // "dd.OGM4008 as OGM4008",
+          // "dd.OGM4009 as OGM4009",
 
           // Campos de dados geográficos completos
-          "dg.id_dados_geograficos as id_dados_geograficos",
-          "dg.ogm0001 as OGM0001",
-          "dg.ogm0002 as OGM0002",
-          "dg.ogm0003 as OGM0003",
-          "dg.ogm0004 as OGM0004",
-          "dg.ogm0005 as OGM0005",
-          "dg.ogm0006 as OGM0006",
-          "dg.ogm0007 as OGM0007",
-          "dg.ogm0008 as OGM0008",
-          "dg.ogm0009 as OGM0009",
-          "dg.ogm0010 as OGM0010",
-          "dg.ogm0011 as OGM0011",
-          "dg.ogm0012 as OGM0012",
-          "dg.ogm0101 as OGM0101",
-          "dg.ogm0102 as OGM0102",
-          "dg.ogm0103 as OGM0103",
-          "dg.ogm0104 as OGM0104",
-          "dg.ogm0105 as OGM0105",
-          "dg.ogm0106 as OGM0106",
-          "dg.ogm0107 as OGM0107",
-          "dg.ogm0108 as OGM0108",
-          "dg.ogm0109 as OGM0109"
+          // "dg.id_dados_geograficos as id_dados_geograficos",
+          // "dg.ogm0001 as OGM0001",
+          // "dg.ogm0002 as OGM0002",
+          // "dg.ogm0003 as OGM0003",
+          // "dg.ogm0004 as OGM0004",
+          // "dg.ogm0005 as OGM0005",
+          // "dg.ogm0006 as OGM0006",
+          // "dg.ogm0007 as OGM0007",
+          // "dg.ogm0008 as OGM0008",
+          // "dg.ogm0009 as OGM0009",
+          // "dg.ogm0010 as OGM0010",
+          // "dg.ogm0011 as OGM0011",
+          // "dg.ogm0012 as OGM0012",
+          // "dg.ogm0101 as OGM0101",
+          // "dg.ogm0102 as OGM0102",
+          // "dg.ogm0103 as OGM0103",
+          // "dg.ogm0104 as OGM0104",
+          // "dg.ogm0105 as OGM0105",
+          // "dg.ogm0106 as OGM0106",
+          // "dg.ogm0107 as OGM0107",
+          // "dg.ogm0108 as OGM0108",
+          // "dg.ogm0109 as OGM0109"
         )
         .from("tedplan.municipios as m")
         .where("m.id_municipio", municipioId)
@@ -276,7 +276,12 @@ class MunicipioController {
 
       return response.status(200).json(municipio);
     } catch (error) {
-      return response.status(500).json({ error: 'Erro ao buscar município' });
+      console.error('Erro em getMunicipio:', error);
+      console.error('Stack:', error.stack);
+      return response.status(500).json({
+        error: 'Erro ao buscar município',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
     }
   }
 

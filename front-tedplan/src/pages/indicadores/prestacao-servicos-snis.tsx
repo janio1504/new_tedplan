@@ -143,7 +143,9 @@ export default function HomeIndicadores({ Imunicipio }: MunicipioProps) {
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio?.municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={municipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
 
       <BreadCrumbStyle $isCollapsed={isCollapsed}>

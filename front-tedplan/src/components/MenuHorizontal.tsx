@@ -1,46 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/jsx-no-undef */
-import React, { useContext, useEffect, useState } from "react";
-import Image from "next/image";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Container,
-  DivConteudo,
-  DivColRelatorios,
   MenuMunicipio,
   Municipio,
   MenuMunicipioItem,
-  ContainerPs,
-  Ps1,
-  Ps2,
-  Ps3,
-  Ps4,
-  Ps5,
-  PsImage,
-  PsImageEsquerda,
-  PsImageDireita,
-  Ps3ImageEsquerda,
-  Ps3ImageDireita,
   HamburgerMenu
 } from "../styles/indicadores";
-import HeadIndicadores from "../components/headIndicadores";
-import MenuIndicadores from "../components/MenuIndicadores";
 import {FaAngleDown} from "react-icons/fa";
 import Router from "next/router";
-import { parseCookies } from "nookies";
 import { AuthContext } from "../contexts/AuthContext";
-import api from "../services/api";
-import { GetServerSideProps } from "next";
-import { getAPIClient } from "../services/axios";
-import Geral from "../../img/geral.png"
-import Financeiro from "../../img/financeiro.png"
-import Agua from "../../img/agua.png"
-import Drenagem from "../../img/drenagem.png"
-import Esgoto from "../../img/esgoto.png"
-import Residuos from "../../img/residuos.png"
-import Qualidade from "../../img/qualidade.png"
-import Balanco from "../../img/balanco.png"
-import Tarifas from "../../img/tarifas.png"
-import styled from "styled-components/dist/constructors/styled";
 
 interface IMunicipio {
   id_municipio: string;
@@ -63,7 +33,7 @@ interface MunicipioProps {
 
 
 
-export default function MenuHorizontal({municipio}) {
+export default function MenuHorizontal({municipio}: {municipio: string | IMunicipio[]}) {
   const { signOut, permission } = useContext(AuthContext);
   async function handleSignOut() {
     signOut();
@@ -97,8 +67,28 @@ export default function MenuHorizontal({municipio}) {
   }
 
   const [menuOpen, setMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <Container>
+        <MenuMunicipio>
+          <Municipio 
+            style={{
+              display: "flex",
+              flexDirection: "row", 
+              justifyContent: "space-around"
+            }}>
+            Bem vindos Município de {Array.isArray(municipio) ? municipio[0]?.municipio_nome || '' : municipio}
+          </Municipio>
+        </MenuMunicipio>
+      </Container>
+    )
+  }
 
   return (
     <Container>
@@ -110,7 +100,7 @@ export default function MenuHorizontal({municipio}) {
         flexDirection: "row", 
         justifyContent: "space-around"
         }}>
-          Bem vindos Município de {municipio} 
+          Bem vindos Município de {Array.isArray(municipio) ? municipio[0]?.municipio_nome || '' : municipio} 
         <HamburgerMenu onClick={() => setMenuOpen(!menuOpen)}>
           <span> <FaAngleDown /> </span>
         </HamburgerMenu>

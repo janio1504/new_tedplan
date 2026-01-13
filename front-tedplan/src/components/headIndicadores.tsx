@@ -27,13 +27,17 @@ export default function MenuSuperior(usuarios: UsuarioProps){
     const { signOut, usuario } = useContext(AuthContext)
     const [ name, setName ] = useState('')
     const [ user, setUser] = useState<IUsuario | any>(usuarios)
+    const [mounted, setMounted] = useState(false)
    
 
       useEffect(() => { 
+        setMounted(true)
         if(usuario){
           setUser(usuario)
-          const nome = usuario.nome.split(" ")
-          setName(nome[0]+" "+`${nome[1] ? nome[1] : ""}`)
+          if(usuario.nome){
+            const nome = usuario.nome.split(" ")
+            setName(nome[0]+" "+`${nome[1] ? nome[1] : ""}`)
+          }
         }               
         
       }, [usuario])
@@ -48,7 +52,7 @@ export default function MenuSuperior(usuarios: UsuarioProps){
     return (
       
         <Menu>
-          <DivCenterHead>
+          <DivCenterHead suppressHydrationWarning>
             <Logo>
                 <Image         
                 src={logo}
@@ -61,16 +65,16 @@ export default function MenuSuperior(usuarios: UsuarioProps){
                 alt="TedPlan"          
                 />                      
            </Logo_si>
-           <TextoHead>
+           <TextoHead suppressHydrationWarning>
             <h3>Sistema Municipal<br/>
                 de Informações de Saneamento Básico</h3>
             </TextoHead>
-           <UsuarioLogado>
+           <UsuarioLogado suppressHydrationWarning>
                 <p>Usuário Logado:</p>
-                <p>{name}</p>
+                <p suppressHydrationWarning>{mounted ? name : ''}</p>
                 <br />
                 <p>Ultimo login:</p>
-                <p>{user.ultimo_login}</p>
+                <p suppressHydrationWarning>{mounted && user?.ultimo_login ? user.ultimo_login : ''}</p>
            </UsuarioLogado>
             <UsuarioAvatar>
                 <Image         

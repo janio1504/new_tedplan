@@ -124,7 +124,9 @@ export default function Manuais({
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio || municipio[0]?.municipio_nome}
+      ></MenuHorizontal>
       <DivCenter>     
 
         <DivFormConteudo>

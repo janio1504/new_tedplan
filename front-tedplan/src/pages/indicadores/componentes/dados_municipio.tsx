@@ -600,7 +600,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     <Container>
       
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={municipio[0]?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
       <Sidebar $isCollapsed={isCollapsed}>
         <SidebarItem

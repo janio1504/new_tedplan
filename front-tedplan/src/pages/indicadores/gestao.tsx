@@ -32,9 +32,9 @@ import {
   Tooltip,
   TooltipText,
   ExpandButton,
-  CollapseButton
+  CollapseButton,
 } from "../../styles/indicadores";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaList, FaCaretDown } from "react-icons/fa";
 import Link from "next/link";
 import Editar from "../../img/editar.png";
 import ajuda from "../../img/ajuda.png";
@@ -73,6 +73,24 @@ import {
 import { DivTitulo } from "@/styles/drenagem-indicadores";
 
 const InputMask = require("react-input-mask");
+
+// Styled component para container de tabelas lado a lado
+const TablesContainer = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+  width: 98%;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  > div {
+    flex: 1;
+    min-width: 0;
+  }
+`;
 
 const ModalSubmitButton = styled.button`
   background: #008080;
@@ -194,30 +212,42 @@ export default function GestaoIndicadores({
   const [dadosMunicipio, setDadosMunicipio] = useState(null);
   const [dadosGestao, setGestao] = useState<IGestao | any>(gestao);
   const [representantes, setRepresentantes] = useState(null);
-  const [conselho, setConselho] = useState(null);
-  const [conselhoMunicipal, setConselhoMunicipal] = useState(null);
+  const [conselho, setConselho] = useState([]);
+  const [conselhoMunicipal, setConselhoMunicipal] = useState([]);
   const [isClient, setIsClient] = useState(null);
   const [updatePresidente, setUpdatePresidente] = useState(null);
   const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
-
+  const [innerWidth, setInnerWidth] = useState(0);
 
   useEffect(() => {
+    // Inicializa innerWidth apenas no cliente
+    if (typeof window !== "undefined") {
+      setInnerWidth(window.innerWidth);
+    }
+
     const handleResize = () => {
-      if (window.innerWidth <= 1000) {
-        setIsCollapsed(true);
-      } else {
-        setIsCollapsed(false);
+      if (typeof window !== "undefined") {
+        const width = window.innerWidth;
+        setInnerWidth(width);
+        if (width <= 1000) {
+          setIsCollapsed(true);
+        } else {
+          setIsCollapsed(false);
+        }
       }
     };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    
+    if (typeof window !== "undefined") {
+      handleResize();
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }
   }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
-  }
+  };
 
   const {
     register,
@@ -416,29 +446,39 @@ export default function GestaoIndicadores({
     }
   }
   async function getConselhoMunicipal() {
-    const res = await api.get(
-      `get-conselhos-municipais/${usuario?.id_municipio}`,
-      {
-        params: { id_municipio: usuario?.id_municipio },
-      }
-    );
-    const conselhos = res.data;
-    if (conselhos) {
-      const resConselhoMunicipal = await Promise.all(
-        conselhos.map(async (p) => {
-          const file = await api
-            .get("getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => URL.createObjectURL(response.data))
-            .catch((error) => {
-              console.log(error);
-            });
-          return { ...p, file };
-        })
+    try {
+      const res = await api.get(
+        `get-conselhos-municipais/${usuario?.id_municipio}`,
+        {
+          params: { id_municipio: usuario?.id_municipio },
+        }
       );
-      setConselhoMunicipal(resConselhoMunicipal);
+      const conselhos = res.data;
+      if (conselhos && Array.isArray(conselhos) && conselhos.length > 0) {
+        const resConselhoMunicipal = await Promise.all(
+          conselhos.map(async (p) => {
+            let file = null;
+            if (p.id_arquivo) {
+              try {
+                const fileResponse = await api.get("getFile", {
+                  params: { id: p.id_arquivo },
+                  responseType: "blob",
+                });
+                file = URL.createObjectURL(fileResponse.data);
+              } catch (error) {
+                console.log("Erro ao buscar arquivo:", error);
+              }
+            }
+            return { ...p, file };
+          })
+        );
+        setConselhoMunicipal(resConselhoMunicipal);
+      } else {
+        setConselhoMunicipal([]);
+      }
+    } catch (error) {
+      console.log("Erro ao buscar conselhos municipais:", error);
+      setConselhoMunicipal([]);
     }
   }
   async function getPlanos() {
@@ -515,14 +555,26 @@ export default function GestaoIndicadores({
     setGestao(resGestao.data[0]);
   }
   async function getPresidentesConselho() {
-    if (!usuario?.id_municipio) return;
+    if (!usuario?.id_municipio) {
+      setConselho([]);
+      return;
+    }
     try {
       const resPresidentes = await api.get(
         `get-all-presidencia-conselho-municipal/${usuario.id_municipio}`
       );
-      setConselho(resPresidentes.data);
+      const presidentes = resPresidentes.data;
+      if (presidentes && Array.isArray(presidentes) && presidentes.length > 0) {
+        setConselho(presidentes);
+      } else {
+        setConselho([]);
+      }
     } catch (error) {
-      toast.error("Erro ao buscar presidentes do conselho!", { position: "top-right", autoClose: 5000 });
+      console.log("Erro ao buscar presidentes do conselho:", error);
+      toast.error("Erro ao buscar presidentes do conselho!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       setConselho([]);
     }
   }
@@ -531,7 +583,10 @@ export default function GestaoIndicadores({
 
   async function handleAddPresidente(data) {
     if (!usuario.id_municipio) {
-      toast.error("Não existe Município, entre novamente no sistema! ", { position: "top-right", autoClose: 5000 });
+      toast.error("Não existe Município, entre novamente no sistema! ", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       signOut();
     }
 
@@ -547,16 +602,22 @@ export default function GestaoIndicadores({
           data.id_conselho_municipal_saneamento_basico || null,
       })
       .then((response) => {
-        toast.success("Presidência do Conselho Municipal adicionada com sucesso", {
-          position: "top-right",
-          autoClose: 7000,
-        });
+        toast.success(
+          "Presidência do Conselho Municipal adicionada com sucesso",
+          {
+            position: "top-right",
+            autoClose: 7000,
+          }
+        );
         setShowModalPresidente(false);
         reset();
         return response;
       })
       .catch((error) => {
-        toast.error("Erro ao adicionar a Presidência do Conselho Municipal", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao adicionar a Presidência do Conselho Municipal", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getPresidentesConselho();
   }
@@ -571,20 +632,29 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.success("Gestão Associada cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Gestão Associada cadastrada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         resetGestao();
         getGestao();
         getRepresentantes();
       })
       .catch(() => {
-        toast.error("Erro ao cadastrar Gestão Associada!", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao cadastrar Gestão Associada!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
 
     console.log("Dados enviados:", data);
   }
   async function handleAddConselhoMunicipal(data) {
     if (!usuario.id_municipio) {
-      toast.error("Não existe Município, entre novamente no sistema!", { position: "top-right", autoClose: 5000 });
+      toast.error("Não existe Município, entre novamente no sistema!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       signOut();
       return;
     }
@@ -593,18 +663,34 @@ export default function GestaoIndicadores({
     formData.append("titulo", data.titulo || "");
     formData.append("ano", data.ano || "");
     formData.append("id_municipio", usuario.id_municipio);
-    formData.append("arquivo", data.arquivo[0]);
+    formData.append("situacao", conselhoSituacao || "operante");
+    if (data.arquivo && data.arquivo.length > 0 && data.arquivo[0]) {
+      formData.append("arquivo", data.arquivo[0]);
+    }
 
     await api
       .post("create-conselho-municipal", formData)
       .then(() => {
-        toast.success("Conselho Municipal cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Conselho Municipal cadastrado com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         getConselhoMunicipal();
-        resetConselho();
+        // Reset dos campos do conselho
+        setValue("conselho_titulo", "");
+        setValue("conselho_ano", "");
+        setValue("conselho_arquivo", null);
+        if (resetConselho) {
+          resetConselho();
+        }
       })
-      .catch(() => {
-        toast.error("Erro ao cadastrar o Conselho Municipal!", { position: "top-right", autoClose: 5000 });
-        console.log(data);
+      .catch((error) => {
+        console.error("Erro ao cadastrar conselho:", error);
+        const errorMessage = error.response?.data?.message || "Erro ao cadastrar o Conselho Municipal!";
+        toast.error(errorMessage, {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
   }
   async function handleAddPolitica(data) {
@@ -619,22 +705,31 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.success("Política Municipal de Saneamento cadastrada com sucesso!", {
-          position: "top-right",
-          autoClose: 7000,
-        });
+        toast.success(
+          "Política Municipal de Saneamento cadastrada com sucesso!",
+          {
+            position: "top-right",
+            autoClose: 7000,
+          }
+        );
         resetPolitica();
         getPoliticas();
       })
       .catch(() => {
-        toast.error("Erro ao cadastrar Política Municipal de Saneamento!", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao cadastrar Política Municipal de Saneamento!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
 
     console.log("Dados enviados:", data);
   }
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
-      toast.error("Não existe Município, entre novamente no sistema! ", { position: "top-right", autoClose: 5000 });
+      toast.error("Não existe Município, entre novamente no sistema! ", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       signOut();
     }
 
@@ -647,12 +742,18 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.success("Representante cadastrado com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Representante cadastrado com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         setShowModal(false);
         return response;
       })
       .catch((error) => {
-        toast.error("Não foi possivel cadastrar o representante! ", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel cadastrar o representante! ", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getRepresentantes();
   }
@@ -668,12 +769,18 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.success("Plano Municipal de Saneamento cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Plano Municipal de Saneamento cadastrada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         resetPlano();
         getPlanos();
       })
       .catch(() => {
-        toast.error("Erro ao cadastrar Plano Municipal de Saneamento!", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao cadastrar Plano Municipal de Saneamento!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
 
     console.log("Dados enviados:", data);
@@ -690,15 +797,21 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.success("Participação e Controle Social de Saneamento cadastrado com sucesso!", {
-          position: "top-right",
-          autoClose: 7000,
-        });
+        toast.success(
+          "Participação e Controle Social de Saneamento cadastrado com sucesso!",
+          {
+            position: "top-right",
+            autoClose: 7000,
+          }
+        );
         resetParticipacao();
         getParticipacoes();
       })
       .catch(() => {
-        toast.error("Erro ao cadastrar Participação e Controle Social!", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao cadastrar Participação e Controle Social!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
 
     console.log("Dados enviados:", data);
@@ -714,12 +827,18 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.success("Descrição Saneamento Rural cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Descrição Saneamento Rural cadastrada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         resetSR();
         // getSR();
       })
       .catch(() => {
-        toast.error("Erro ao cadastrar Descrição Saneamento Rural!", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao cadastrar Descrição Saneamento Rural!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
 
     console.log("Dados enviados:", data);
@@ -736,12 +855,18 @@ export default function GestaoIndicadores({
     await api
       .post("addGestaoIndicadores", formData)
       .then(() => {
-        toast.success("Comunidades Tradicionais cadastrada com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Comunidades Tradicionais cadastrada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         resetCT();
         // getCT();
       })
       .catch(() => {
-        toast.error("Erro ao cadastrar Comunidades Tradicionais!", { position: "top-right", autoClose: 5000 });
+        toast.error("Erro ao cadastrar Comunidades Tradicionais!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
 
     console.log("Dados enviados:", data);
@@ -752,10 +877,16 @@ export default function GestaoIndicadores({
   async function handleRemoverPresidente({ id }) {
     try {
       await api.delete(`delete-presidencia-conselho-municipal/${id}`);
-      toast.success("Presidente removido com sucesso!", { position: "top-right", autoClose: 5000 });
+      toast.success("Presidente removido com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       getPresidentesConselho();
     } catch (error) {
-      toast.error("Não foi possível remover o presidente!", { position: "top-right", autoClose: 5000 });
+      toast.error("Não foi possível remover o presidente!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
     }
   }
   async function handleRemoverParticipacao({ id, id_arquivo }) {
@@ -764,10 +895,16 @@ export default function GestaoIndicadores({
         params: { id: id, id_arquivo: id_arquivo },
       })
       .then((response) => {
-        toast.success("Participacão removido com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Participacão removido com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       })
       .catch((error) => {
-        toast.error("Não foi possivel remover a participação! ", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel remover a participação! ", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getParticipacoes();
   }
@@ -777,10 +914,16 @@ export default function GestaoIndicadores({
         params: { id: id, id_arquivo: id_arquivo },
       })
       .then((response) => {
-        toast.success("Política removida com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Política removida com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       })
       .catch((error) => {
-        toast.error("Não foi possivel remover a politica municipal! ", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel remover a politica municipal! ", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getPoliticas();
   }
@@ -790,10 +933,16 @@ export default function GestaoIndicadores({
         params: { id: id, id_arquivo: id_arquivo },
       })
       .then((response) => {
-        toast.success("Plano removido com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Plano removido com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       })
       .catch((error) => {
-        toast.error("Não foi possivel remover o plano municipal! ", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel remover o plano municipal! ", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getPlanos();
   }
@@ -803,10 +952,16 @@ export default function GestaoIndicadores({
         params: { id: id },
       })
       .then((response) => {
-        toast.success("Representante removido com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Representante removido com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       })
       .catch((error) => {
-        toast.error("Não foi possivel remover o representante!", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel remover o representante!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getRepresentantes();
   }
@@ -814,10 +969,16 @@ export default function GestaoIndicadores({
     await api
       .delete(`delete-conselho-municipal/${id}`)
       .then((response) => {
-        toast.success("Conselho Municipal removido com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Conselho Municipal removido com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       })
       .catch((error) => {
-        toast.error("Não foi possivel remover o conselho municipal! ", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel remover o conselho municipal! ", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
     getConselhoMunicipal();
   }
@@ -844,6 +1005,21 @@ export default function GestaoIndicadores({
     if (usuario?.id_permissao === 4) {
       return;
     }
+
+    // Se estiver no formulário de conselho e houver dados para salvar, chama handleAddConselhoMunicipal
+    if (activeForm === "conselhoSaneamento" && conselhoSituacao !== "nao_tem") {
+      if (data.conselho_titulo && data.conselho_ano) {
+        // Prepara os dados no formato esperado por handleAddConselhoMunicipal
+        const conselhoData = {
+          titulo: data.conselho_titulo,
+          ano: data.conselho_ano,
+          arquivo: data.conselho_arquivo && data.conselho_arquivo.length > 0 ? data.conselho_arquivo : [],
+        };
+        await handleAddConselhoMunicipal(conselhoData);
+        return; // Retorna para não executar o resto da função
+      }
+    }
+
     const formData = new FormData();
 
     formData.append("id_municipio", usuario.id_municipio);
@@ -974,7 +1150,10 @@ export default function GestaoIndicadores({
         }
       })
       .catch((error) => {
-        toast.error("Não foi possivel cadastrar o representante! ", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possivel cadastrar o representante! ", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         console.log(error);
       });
 
@@ -998,7 +1177,10 @@ export default function GestaoIndicadores({
 
   async function updateRepresentantesServicos(data) {
     if (!usuario.id_municipio || !data.id_representante_servicos_ga) {
-      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
+      toast.error("Dados insuficientes para atualizar!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       return;
     }
 
@@ -1012,13 +1194,19 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.success("Representante atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Representante atualizado com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         getRepresentantes();
         setShowModal(false);
         setUpdateRepresentantes(null);
       })
       .catch((error) => {
-        toast.error("Não foi possível atualizar o representante!", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possível atualizar o representante!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         console.log(error);
       });
   }
@@ -1027,7 +1215,10 @@ export default function GestaoIndicadores({
     console.log("Antes de atualizar politicas", data);
 
     if (!usuario.id_municipio || !data.id_politica_municipal) {
-      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
+      toast.error("Dados insuficientes para atualizar!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       return;
     }
 
@@ -1039,13 +1230,19 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.success("Politica Municipal atualizada com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Politica Municipal atualizada com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         getPoliticas();
         setShowModalPolitica(false);
         setUpdatePolitica(null);
       })
       .catch((error) => {
-        toast.error("Não foi possível atualizar a política municipal!", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possível atualizar a política municipal!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
   }
 
@@ -1091,7 +1288,10 @@ export default function GestaoIndicadores({
 
   async function updateParticipacaoControleSocial(data: IParticipacao) {
     if (!usuario.id_municipio || !data.id_participacao_controle_social) {
-      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
+      toast.error("Dados insuficientes para atualizar!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       return;
     }
 
@@ -1103,13 +1303,19 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.success("Participação e Controle Social atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success(
+          "Participação e Controle Social atualizado com sucesso!",
+          { position: "top-right", autoClose: 5000 }
+        );
         getParticipacoes();
         setShowModalParticipacao(false);
         setUpdateParticipacao(null);
       })
       .catch((error) => {
-        toast.error("Não foi possível atualizar a participação!", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possível atualizar a participação!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
   }
 
@@ -1119,7 +1325,10 @@ export default function GestaoIndicadores({
       !usuario.id_municipio ||
       !data.id_presidencia_conselho_municipal_saneamento_basico
     ) {
-      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
+      toast.error("Dados insuficientes para atualizar!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       return;
     }
 
@@ -1135,7 +1344,10 @@ export default function GestaoIndicadores({
         id_municipio: usuario.id_municipio,
       })
       .then((response) => {
-        toast.success("Presidente atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Presidente atualizado com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         getPresidentesConselho(); // Atualiza a lista
         setShowModalPresidente(false);
         setUpdatePresidente(null);
@@ -1145,7 +1357,10 @@ export default function GestaoIndicadores({
           "Erro ao atualizar presidente:",
           error.response?.data || error
         );
-        toast.error("Não foi possível atualizar o presidente!", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possível atualizar o presidente!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
   }
 
@@ -1177,13 +1392,14 @@ export default function GestaoIndicadores({
     setValue("plano_ano", plano.ano);
   }
 
-
-  
   async function updatePlanoMunicipal(data: IPlanos) {
     console.log("Antes de atualizar plano", data);
 
     if (!usuario.id_municipio || !data.id_plano_municipal) {
-      toast.error("Dados insuficientes para atualizar!", { position: "top-right", autoClose: 5000 });
+      toast.error("Dados insuficientes para atualizar!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
       return;
     }
 
@@ -1196,13 +1412,19 @@ export default function GestaoIndicadores({
         situacao: planoSituacao,
       })
       .then((response) => {
-        toast.success("Plano Municipal atualizado com sucesso!", { position: "top-right", autoClose: 5000 });
+        toast.success("Plano Municipal atualizado com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
         getPlanos();
         setShowModalPlano(false);
         setUpdatePlano(null);
       })
       .catch((error) => {
-        toast.error("Não foi possível atualizar o plano municipal!", { position: "top-right", autoClose: 5000 });
+        toast.error("Não foi possível atualizar o plano municipal!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
       });
   }
 
@@ -1219,150 +1441,426 @@ export default function GestaoIndicadores({
   //   return () => window.removeEventListener("resize", handleResize);
   // }, []);
 
+  // Styled components para menu
+  const StaticMenuHeader = styled.div.withConfig({
+    shouldForwardProp: (prop) => prop !== '$isActive',
+  })<{ $isActive?: boolean }>`
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-weight: bold;
+    color: ${props => props.$isActive ? "#0085bd" : "#000"};
+    transition: color 0.3s ease;
+    user-select: none;
+
+    &:hover {
+      color: #0085bd;
+    }
+
+    > div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      svg {
+        color: ${props => props.$isActive ? "#0085bd" : "#666"};
+        transition: color 0.3s ease;
+        font-size: 14px;
+      }
+    }
+
+    &:hover > div:first-child svg {
+      color: #0085bd;
+    }
+  `;
 
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={[]}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={dadosMunicipio?.municipio_nome}
+      ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
-      
-       
 
-    {isCollapsed ? (
-              <ExpandButton onClick={toggleSidebar}>
-                <FaBars /> 
-              </ExpandButton>
-          ) : (
-      <Sidebar $isCollapsed={isCollapsed}>
-              <CollapseButton onClick={toggleSidebar}>
-                          <FaBars /> 
-              </CollapseButton>
-        <SidebarItem
-          active={activeForm === "gestaoAssociada"}
-          onClick={() => setActiveForm("gestaoAssociada")}
-        >
-          Gestão Associada
-        </SidebarItem>
-        <SidebarItem
-          active={activeForm === "politicaSaneamento"}
-          onClick={() => setActiveForm("politicaSaneamento")}
-        >
-          Política Municipal de Saneamento
-        </SidebarItem>
-        <SidebarItem
-          active={activeForm === "planoSaneamento"}
-          onClick={() => setActiveForm("planoSaneamento")}
-        >
-          Plano Municipal de Saneamento
-        </SidebarItem>
-        <SidebarItem
-          active={activeForm === "conselhoSaneamento"}
-          onClick={() => setActiveForm("conselhoSaneamento")}
-        >
-          Conselho Municipal de Saneamento Básico
-        </SidebarItem>
-        <SidebarItem
-          active={activeForm === "participacaoSocial"}
-          onClick={() => setActiveForm("participacaoSocial")}
-        >
-          Participação e controle social
-        </SidebarItem>
-        <SidebarItem
-          active={activeForm === "saneamentoRural"}
-          onClick={() => setActiveForm("saneamentoRural")}
-        >
-          Saneamento Rural
-        </SidebarItem>
-        <SidebarItem
-          active={activeForm === "comunidadesTradicionais"}
-          onClick={() => setActiveForm("comunidadesTradicionais")}
-        >
-          Comunidades Tradicionais
-        </SidebarItem>
-      
-      </Sidebar>
+      {isCollapsed ? (
+        <ExpandButton onClick={toggleSidebar}>
+          <FaBars />
+        </ExpandButton>
+      ) : (
+        <Sidebar $isCollapsed={isCollapsed}>
+          <CollapseButton onClick={toggleSidebar}>
+            <FaBars />
+          </CollapseButton>
+          <StaticMenuHeader
+            $isActive={activeForm === "gestaoAssociada"}
+            onClick={() => setActiveForm("gestaoAssociada")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Gestão Associada
+            </div>
+          </StaticMenuHeader>
+          <StaticMenuHeader
+            $isActive={activeForm === "politicaSaneamento"}
+            onClick={() => setActiveForm("politicaSaneamento")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Política Municipal de Saneamento
+            </div>
+          </StaticMenuHeader>
+          <StaticMenuHeader
+            $isActive={activeForm === "planoSaneamento"}
+            onClick={() => setActiveForm("planoSaneamento")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Plano Municipal de Saneamento
+            </div>
+          </StaticMenuHeader>
+          <StaticMenuHeader
+            $isActive={activeForm === "conselhoSaneamento"}
+            onClick={() => setActiveForm("conselhoSaneamento")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Conselho Municipal de Saneamento Básico
+            </div>
+          </StaticMenuHeader>
+          <StaticMenuHeader
+            $isActive={activeForm === "participacaoSocial"}
+            onClick={() => setActiveForm("participacaoSocial")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Participação e controle social
+            </div>
+          </StaticMenuHeader>
+          <StaticMenuHeader
+            $isActive={activeForm === "saneamentoRural"}
+            onClick={() => setActiveForm("saneamentoRural")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Saneamento Rural
+            </div>
+          </StaticMenuHeader>
+          <StaticMenuHeader
+            $isActive={activeForm === "comunidadesTradicionais"}
+            onClick={() => setActiveForm("comunidadesTradicionais")}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+              }}
+            >
+              <FaList style={{ fontSize: "14px" }} />
+              Comunidades Tradicionais
+            </div>
+          </StaticMenuHeader>
+        </Sidebar>
       )}
       <MainContent isCollapsed={isCollapsed}>
         <DivCenter>
           <Form onSubmit={handleSubmit(handleCadastro)}>
-             <BreadCrumbStyle $isCollapsed={isCollapsed}>
-                    <nav>
-                      <ol>
-                        <li>
-                          <Link href="/indicadores/home_indicadores">Home</Link>
-                          <span> / </span>
-                        </li>
-                        <li>
-                          <span>Gestão</span>
-                        </li>
-                      </ol>
-                    </nav>
-              </BreadCrumbStyle>
+            <BreadCrumbStyle $isCollapsed={isCollapsed}>
+              <nav>
+                <ol>
+                  <li>
+                    <Link href="/indicadores/home_indicadores">Home</Link>
+                    <span> / </span>
+                  </li>
+                  <li>
+                    <span>Gestão</span>
+                  </li>
+                </ol>
+              </nav>
+            </BreadCrumbStyle>
             <DivFormCadastro active={activeForm === "gestaoAssociada"}>
               <DivTituloForm>Gestão Associada</DivTituloForm>
-              <table>
-                <tr>
-                  <td>
-                    <InputG>
-                      <label>Nome da associação</label>
-                      <input
-                        {...register("nome_associacao")}
-                        defaultValue={dadosGestao?.ga_nome}
-                        onChange={handleOnChange}
-                        type="text"
-                      ></input>
-                    </InputG>
-                  </td>
-                  <td>
-                    <InputG>
-                      <label>
-                        Norma da associação<span> *</span>
-                      </label>
-                      <input
-                        {...register("norma_associacao")}
-                        defaultValue={dadosGestao?.ga_norma}
-                        onChange={handleOnChange}
-                        type="text"
-                      ></input>
-                    </InputG>
-                  </td>
-                </tr>
+              <table
+                style={{
+                  width: "97%",
+                  borderRadius: "10px",
+                  border: "1px solid #eee",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  padding: "15px",
+                }}
+              >
+                <tbody>
+                  <tr>
+                    <td style={{ width: "50%", padding: "10px" }}>
+                      <InputG>
+                        <label>Nome da associação</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("nome_associacao")}
+                          defaultValue={dadosGestao?.ga_nome}
+                          onChange={handleOnChange}
+                          type="text"
+                        ></input>
+                      </InputG>
+                    </td>
+                    <td style={{ width: "50%", padding: "10px" }}>
+                      <InputG>
+                        <label>
+                          Norma da associação<span> *</span>
+                        </label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("norma_associacao")}
+                          defaultValue={dadosGestao?.ga_norma}
+                          onChange={handleOnChange}
+                          type="text"
+                        ></input>
+                      </InputG>
+                    </td>
+                    <td>
+                    {usuario?.id_permissao !== 4 && (
+                  <button
+                    type="submit"
+                    style={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      transition: "all 0.2s",
+                      backgroundColor: "#0085bd",
+                      color: "#fff",
+                      border: "none",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Gravar
+                  </button>
+                )}
+                    </td>
+                  </tr>
+                </tbody>
               </table>
-              <DivEixo>
-                Representantes{" "}
-                <span
+
+              <div
+                style={{
+                  marginBottom: "20px",
+                  marginLeft: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: "97%",
+                  position: "relative",
+                }}
+              >
+               
+              </div>
+
+              <DivEixo
+                style={{
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                Representantes
+                <ButtonAdicionarPresidente
                   onClick={() => {
                     handleShowModal();
                   }}
                 >
                   Adicionar
-                </span>
+                </ButtonAdicionarPresidente>
               </DivEixo>
 
-              <Tabela>
-                <table cellSpacing={0}>
-                  <tbody>
-                    {representantes && (
-                      <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Cargo</th>
-                        <th>Telefone</th>
-                        <th>email</th>
-                        <th>Ações</th>
-                      </tr>
-                    )}
-
-                    {representantes?.map((representante, index) => (
+              <table
+                cellSpacing={0}
+                style={{
+                  width: "98%",
+                  borderRadius: "10px",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopLeftRadius: "10px",
+                      }}
+                    >
+                      ID
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Nome
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Cargo
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Telefone
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Email
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopRightRadius: "10px",
+                      }}
+                    >
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {representantes && representantes.length > 0 ? (
+                    representantes.map((representante, index) => (
                       <tr role="row" key={index}>
-                        <td>{representante.id_representante_servicos_ga}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {representante.id_representante_servicos_ga}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <InputM>{representante.nome}</InputM>
                         </td>
-                        <td>{representante.cargo}</td>
-                        <td>{representante.telefone}</td>
-                        <td>{representante.email}</td>
-                        <td style={{ justifyContent: "center" }}>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {representante.cargo}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {representante.telefone}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {representante.email}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <Actions>
                             <Image
                               title="Editar"
@@ -1389,20 +1887,23 @@ export default function GestaoIndicadores({
                           </Actions>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Tabela>
-              <SubmitButtonContainer
-                style={{
-                  bottom: "-50px",
-                  right: "-10px",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton type="submit">Gravar</SubmitButton>
-                )}
-              </SubmitButtonContainer>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={6}
+                        style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#999",
+                        }}
+                      >
+                        Nenhum representante cadastrado
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "politicaSaneamento"}>
@@ -1420,14 +1921,19 @@ export default function GestaoIndicadores({
                 >
                   Situação da Política Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "20px",
+                    flexDirection: innerWidth > 0 && innerWidth <= 768 ? "column" : "row",
+                  }}
+                >
                   <label
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: "5px",
                       cursor: "pointer",
-                     
                     }}
                   >
                     <input
@@ -1444,7 +1950,6 @@ export default function GestaoIndicadores({
                       alignItems: "center",
                       gap: "5px",
                       cursor: "pointer",
-                      
                     }}
                   >
                     <input
@@ -1492,77 +1997,204 @@ export default function GestaoIndicadores({
                 </div>
               </div>
 
-              <table>
-                <tr>
-                  <td>
-                    <InputG>
-                      <label>Título</label>
-                      <input
-                        {...register("politica_titulo")}
-                        defaultValue={dadosGestao?.politica_titulo}
-                        onChange={(e) => {
-                          const value = capitalizeFrasal(e.target.value);
-                          setValue("politica_titulo", value);
-                        }}
-                        type="text"
-                        //aceita apenas letras e caracteres especiais
-                        onKeyPress={onlyLettersAndCharacters}
-                        disabled={politicaSituacao === "nao_tem"}
-                      ></input>
-                    </InputG>
-                  </td>
-                  <td>
-                    <InputP>
-                      <label>Ano</label>
-                      <input
-                        {...register("politica_ano")}
-                        defaultValue={dadosGestao?.politica_ano}
-                        onChange={handleOnChange}
-                        type="text"
-                        //aceita apenas números
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                        disabled={politicaSituacao === "nao_tem"}
-                      ></input>
-                    </InputP>
-                  </td>
-                  <td>
-                    <InputM>
-                      <label>Arquivo</label>
-                      <input
-                        {...register("politica_arquivo")}
-                        type="file"
-                        disabled={politicaSituacao === "nao_tem"}
-                      ></input>
-                    </InputM>
-                  </td>
-                </tr>
+              <table
+                style={{
+                  width: "97%",
+                  borderRadius: "10px",
+                  border: "1px solid #eee",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  padding: "15px",
+                }}
+              >
+                <tbody>
+                  <tr>
+                    <td style={{ width: "50%", padding: "10px" }}>
+                      <InputG>
+                        <label>Título</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("politica_titulo")}
+                          defaultValue={dadosGestao?.politica_titulo}
+                          onChange={(e) => {
+                            const value = capitalizeFrasal(e.target.value);
+                            setValue("politica_titulo", value);
+                          }}
+                          type="text"
+                          onKeyPress={onlyLettersAndCharacters}
+                          disabled={politicaSituacao === "nao_tem"}
+                        ></input>
+                      </InputG>
+                    </td>
+                    <td style={{ width: "15%", padding: "10px" }}>
+                      <InputP>
+                        <label>Ano</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("politica_ano")}
+                          defaultValue={dadosGestao?.politica_ano}
+                          onChange={handleOnChange}
+                          type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                          disabled={politicaSituacao === "nao_tem"}
+                        ></input>
+                      </InputP>
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      <InputM>
+                        <label>Arquivo</label>
+                        <input
+                          {...register("politica_arquivo")}
+                          type="file"
+                          disabled={politicaSituacao === "nao_tem"}
+                        ></input>
+                      </InputM>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
+
+              <div
+                style={{
+                  marginBottom: "20px",
+                  marginLeft: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: "97%",
+                  position: "relative",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton
+                    type="submit"
+                    disabled={politicaSituacao === "nao_tem"}
+                    style={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      transition: "all 0.2s",
+                      opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
+                )}
+              </div>
 
               <DivEixo>Atualizações</DivEixo>
 
-              <Tabela>
-                <table cellSpacing={0}>
-                  <tbody>
-                    {listPoliticas && (
-                      <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Ano</th>
-                        <th>Ações</th>
-                      </tr>
-                    )}
-                    {listPoliticas?.map((politica, index) => (
+              <table
+                cellSpacing={0}
+                style={{
+                  width: "98%",
+                  borderRadius: "10px",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopLeftRadius: "10px",
+                      }}
+                    >
+                      ID
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Título
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Ano
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopRightRadius: "10px",
+                      }}
+                    >
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listPoliticas && listPoliticas.length > 0 ? (
+                    listPoliticas.map((politica, index) => (
                       <tr key={index}>
-                        <td>{politica.id_politica_municipal}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {politica.id_politica_municipal}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <InputG>{politica.titulo}</InputG>
                         </td>
-                        <td>{politica.ano}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {politica.ano}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <Actions>
                             <Image
                               title="Editar"
@@ -1623,29 +2255,23 @@ export default function GestaoIndicadores({
                           </Actions>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Tabela>
-
-              <SubmitButtonContainer
-                style={{
-                  bottom: "-50px",
-                  right: "-10px",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton
-                    type="submit"
-                    disabled={politicaSituacao === "nao_tem"}
-                    style={{
-                      opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
-                    }}
-                  >
-                    Gravar
-                  </SubmitButton>
-                )}
-              </SubmitButtonContainer>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#999",
+                        }}
+                      >
+                        Nenhuma política cadastrada
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "planoSaneamento"}>
@@ -1662,7 +2288,13 @@ export default function GestaoIndicadores({
                 >
                   Situação do Plano Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "20px",
+                    flexDirection: innerWidth > 0 && innerWidth <= 768 ? "column" : "row",
+                  }}
+                >
                   <label
                     style={{
                       display: "flex",
@@ -1731,72 +2363,200 @@ export default function GestaoIndicadores({
                   </label>
                 </div>
               </div>
-              <table>
-                <tr>
-                  <td>
-                    <InputG>
-                      <label>Título</label>
-                      <input
-                        {...register("plano_titulo")}
-                        type="text"
-                        onChange={(e) => {
-                          const value = capitalizeFrasal(e.target.value);
-                          setValue("plano_titulo", value);
-                        }}
-                        onKeyPress={onlyLettersAndCharacters}
-                        disabled={planoSituacao === "nao_tem"}
-                      />
-                    </InputG>
-                  </td>
-                  <td>
-                    <InputP>
-                      <label>Ano</label>
-                      <input
-                        {...register("plano_ano")}
-                        type="text"
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                        disabled={planoSituacao === "nao_tem"}
-                      />
-                    </InputP>
-                  </td>
-                  <td>
-                    <InputM>
-                      <label>Arquivo</label>
-                      <input
-                        {...register("plano_arquivo")}
-                        type="file"
-                        disabled={planoSituacao === "nao_tem"}
-                      />
-                    </InputM>
-                  </td>
-                </tr>
+              <table
+                style={{
+                  width: "97%",
+                  borderRadius: "10px",
+                  border: "1px solid #eee",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  padding: "15px",
+                }}
+              >
+                <tbody>
+                  <tr>
+                    <td style={{ width: "50%", padding: "10px" }}>
+                      <InputG>
+                        <label>Título</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("plano_titulo")}
+                          type="text"
+                          onChange={(e) => {
+                            const value = capitalizeFrasal(e.target.value);
+                            setValue("plano_titulo", value);
+                          }}
+                          onKeyPress={onlyLettersAndCharacters}
+                          disabled={planoSituacao === "nao_tem"}
+                        />
+                      </InputG>
+                    </td>
+                    <td style={{ width: "15%", padding: "10px" }}>
+                      <InputP>
+                        <label>Ano</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("plano_ano")}
+                          type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                          disabled={planoSituacao === "nao_tem"}
+                        />
+                      </InputP>
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      <InputM>
+                        <label>Arquivo</label>
+                        <input
+                          {...register("plano_arquivo")}
+                          type="file"
+                          disabled={planoSituacao === "nao_tem"}
+                        />
+                      </InputM>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
 
-              <DivEixo>Atualizações</DivEixo>
-              <Tabela>
-                <table cellSpacing={0}>
-                  <tbody>
-                    {listPlanos && (
-                      <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Ano</th>
-                        <th>Ações</th>
-                      </tr>
-                    )}
+              <div
+                style={{
+                  marginBottom: "20px",
+                  marginLeft: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: "97%",
+                  position: "relative",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton
+                    type="submit"
+                    disabled={planoSituacao === "nao_tem"}
+                    style={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      transition: "all 0.2s",
+                      opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
+                )}
+              </div>
 
-                    {listPlanos?.map((plano, index) => (
+              <DivEixo>Atualizações</DivEixo>
+              <table
+                cellSpacing={0}
+                style={{
+                  width: "98%",
+                  borderRadius: "10px",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopLeftRadius: "10px",
+                      }}
+                    >
+                      ID
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Título
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Ano
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopRightRadius: "10px",
+                      }}
+                    >
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listPlanos && listPlanos.length > 0 ? (
+                    listPlanos.map((plano, index) => (
                       <tr key={index}>
-                        <td>{plano.id_plano_municipal}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {plano.id_plano_municipal}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <InputG>{plano.titulo}</InputG>
                         </td>
-                        <td>{plano.ano}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {plano.ano}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <Actions>
                             <Image
                               title="Editar"
@@ -1852,28 +2612,23 @@ export default function GestaoIndicadores({
                           </Actions>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Tabela>
-              <SubmitButtonContainer
-                style={{
-                  bottom: "-50px",
-                  right: "-10px",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton
-                    type="submit"
-                    disabled={planoSituacao === "nao_tem"}
-                    style={{
-                      opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
-                    }}
-                  >
-                    Gravar
-                  </SubmitButton>
-                )}
-              </SubmitButtonContainer>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#999",
+                        }}
+                      >
+                        Nenhum plano cadastrado
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "conselhoSaneamento"}>
@@ -1890,7 +2645,13 @@ export default function GestaoIndicadores({
                 >
                   Situação do Conselho Municipal:
                 </label>
-                <div style={{ display: "flex", gap: "20px", flexDirection: innerWidth <= 768 ? 'column' : 'row' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "20px",
+                    flexDirection: innerWidth > 0 && innerWidth <= 768 ? "column" : "row",
+                  }}
+                >
                   <label
                     style={{
                       display: "flex",
@@ -1943,202 +2704,75 @@ export default function GestaoIndicadores({
                   </label>
                 </div>
               </div>
-              <table>
-                <tr>
-                  <td>
-                    <InputG>
-                      <label>Título</label>
-                      <input
-                        {...register("conselho_titulo")}
-                        defaultValue={dadosGestao?.conselho_titulo}
-                        onChange={(e) => {
-                          const value = capitalizeFrasal(e.target.value);
-                          setValue("conselho_titulo", value);
-                        }}
-                        onKeyPress={onlyLettersAndCharacters}
-                        disabled={conselhoSituacao === "nao_tem"}
-                      />
-                    </InputG>
-                  </td>
-                  <td>
-                    <InputP>
-                      <label>Ano</label>
-                      <input
-                        {...register("conselho_ano")}
-                        defaultValue={dadosGestao?.conselho_ano}
-                        onChange={handleOnChange}
-                        type="text"
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                        disabled={conselhoSituacao === "nao_tem"}
-                      />
-                    </InputP>
-                  </td>
-                  <td>
-                    <InputM>
-                      <label>Arquivo</label>
-                      <input
-                        {...register("conselho_arquivo")}
-                        type="file"
-                        disabled={conselhoSituacao === "nao_tem"}
-                      ></input>
-                    </InputM>
-                  </td>
-                </tr>
-              </table>
-              <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
-              Presidente{" "}
-               <ButtonAdicionarPresidente
-               onClick={handleShowModalPresidente}
-               disabled={!conselhoMunicipal || conselhoMunicipal.length === 0}
-               >
-                Adicionar Presidente
-              </ButtonAdicionarPresidente>
-            </DivEixo>
-
-              <Tabela style={{ overflow: "scroll" }}>
-                <table cellSpacing={0}>
-                  <tbody>
-                    {conselho && (
-                      <tr>
-                        <th>ID</th>
-                        <th>Presidente</th>
-                        <th>Telefone</th>
-                        <th>email</th>
-                        <th>Setor Responsável</th>
-                        <th>Integrantes</th>
-                        <th>Município</th>
-                        <th>Ações</th>
-                      </tr>
-                    )}
-
-                    {conselho?.map((presidente, index) => (
-                      <tr role="row" key={index}>
-                        <td>
-                          {
-                            presidente.id_presidencia_conselho_municipal_saneamento_basico
-                          }
-                        </td>
-                        <td>
-                          <InputM>{presidente.nome_presidente}</InputM>
-                        </td>
-
-                        <td style={{ whiteSpace: "nowrap" }}>
-                          {presidente.telefone_presidente}
-                        </td>
-                        <td>{presidente.email_presidente}</td>
-                        <td>{presidente.setor_responsavel}</td>
-                        <td
-                          style={{
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {presidente.integrantes}
-                        </td>
-                        <td>{presidente.id_municipio}</td>
-                        <td>
-                          <Actions>
-                            <Image
-                              title="Editar"
-                              onClick={() => handleEditarPresidente(presidente)}
-                              src={Editar}
-                              alt="Editar"
-                              width={25}
-                              height={25}
-                              style={{
-                                cursor:
-                                  conselhoSituacao === "nao_tem"
-                                    ? "not-allowed"
-                                    : "pointer",
-                                opacity:
-                                  conselhoSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                              {...(conselhoSituacao === "nao_tem"
-                                ? { onClick: (e) => e.preventDefault() }
-                                : {})}
-                            />
-
-                            <Image
-                              onClick={() => {
-                                if (conselhoSituacao !== "nao_tem") {
-                                  handleRemoverPresidente({
-                                    id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
-                                  });
-                                }
-                              }}
-                              src={Excluir}
-                              alt="Excluir"
-                              width={25}
-                              height={25}
-                              style={{
-                                cursor:
-                                  conselhoSituacao === "nao_tem"
-                                    ? "not-allowed"
-                                    : "pointer",
-                                opacity:
-                                  conselhoSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                            />
-                          </Actions>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Tabela>
-              <DivEixo style={{justifyContent: "space-between", alignItems: "center"}}>
-              Atualizações
-            </DivEixo>
-            <Tabela>
-            <table cellSpacing={0}>
+              <table
+                style={{
+                  width: "97%",
+                  borderRadius: "10px",
+                  border: "1px solid #eee",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  padding: "15px",
+                }}
+              >
                 <tbody>
-                  {conselhoMunicipal && (
-                    <tr>
-                      <th>ID</th>
-                      <th>Título</th>
-                      <th>Ano</th>
-                      <th>Ações</th>
-                    </tr>
-                  )}
-
-                  {conselhoMunicipal?.map((conselho, index) => (
-                    <tr key={index}>
-                      <td>{conselho.id_conselho_municipal_saneamento_basico}</td>
-                      <td>
-                        <InputG>{conselho.titulo}</InputG>
-                      </td>
-                      <td>{conselho.ano}</td>
-                      <td>
-                        <Actions>
-                          <a href={conselho.file} rel="noreferrer" target="_blank">
-                            <FaFilePdf></FaFilePdf>
-                          </a>
-                          <Image
-                            src={Excluir}
-                            alt="Excluir"
-                            width={25}
-                            height={25}
-                            onClick={() => {
-                              handleRemoverConselho({
-                                id: conselho.id_conselho_municipal_saneamento_basico,
-                              });
-                            }}
-                          />
-                        </Actions>
-                      </td>
-                    </tr>
-                  ))}
+                  <tr>
+                    <td style={{ width: "50%", padding: "10px" }}>
+                      <InputG>
+                        <label>Título</label>
+                        <input
+                          style={{ width: "100%" }}
+                          type="text"
+                          {...register("conselho_titulo")}
+                          defaultValue={dadosGestao?.conselho_titulo}
+                          onChange={(e) => {
+                            const value = capitalizeFrasal(e.target.value);
+                            setValue("conselho_titulo", value);
+                          }}
+                          onKeyPress={onlyLettersAndCharacters}
+                          disabled={conselhoSituacao === "nao_tem"}
+                        />
+                      </InputG>
+                    </td>
+                    <td style={{ width: "15%", padding: "10px" }}>
+                      <InputP>
+                        <label>Ano</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("conselho_ano")}
+                          defaultValue={dadosGestao?.conselho_ano}
+                          onChange={handleOnChange}
+                          type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                          disabled={conselhoSituacao === "nao_tem"}
+                        />
+                      </InputP>
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      <InputM>
+                        <label>Arquivo</label>
+                        <input
+                          {...register("conselho_arquivo")}
+                          type="file"
+                          disabled={conselhoSituacao === "nao_tem"}
+                        ></input>
+                      </InputM>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
-             </Tabela>
 
-              <SubmitButtonContainer
+              <div
                 style={{
-                  bottom: "-50px",
-                  right: "-10px",
+                  marginBottom: "20px",
+                  marginLeft: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: "97%",
+                  position: "relative",
                 }}
               >
                 {usuario?.id_permissao !== 4 && (
@@ -2146,78 +2780,508 @@ export default function GestaoIndicadores({
                     type="submit"
                     disabled={conselhoSituacao === "nao_tem"}
                     style={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      transition: "all 0.2s",
                       opacity: conselhoSituacao === "nao_tem" ? 0.5 : 1,
                     }}
                   >
                     Gravar
                   </SubmitButton>
                 )}
-              </SubmitButtonContainer>
+              </div>
+
+              <TablesContainer>
+                <div>
+                  <DivEixo
+                    style={{
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    Presidentes
+                    <ButtonAdicionarPresidente
+                      onClick={handleShowModalPresidente}
+                      disabled={!conselhoMunicipal || conselhoMunicipal.length === 0}
+                    >
+                      Adicionar Presidente
+                    </ButtonAdicionarPresidente>
+                  </DivEixo>
+                  <table
+                    cellSpacing={0}
+                    style={{
+                      width: "98%",
+                      borderRadius: "10px",
+                      boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                      margin: "0 0 20px 20px",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th
+                          style={{
+                            background: "#0085bd",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            textAlign: "left",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            borderTopLeftRadius: "10px",
+                          }}
+                        >
+                          Presidente
+                        </th>
+                        <th
+                          style={{
+                            background: "#0085bd",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            textAlign: "left",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                          }}
+                        >
+                          Setor Responsável
+                        </th>
+                        <th
+                          style={{
+                            background: "#0085bd",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            textAlign: "left",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            borderTopRightRadius: "10px",
+                          }}
+                        >
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {conselho && conselho.length > 0 ? (
+                        conselho.map((presidente, index) => (
+                        <tr role="row" key={index}>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            <InputM>{presidente.nome_presidente}</InputM>
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {presidente.setor_responsavel}
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            <Actions>
+                              <Image
+                                title="Editar"
+                                onClick={() =>
+                                  handleEditarPresidente(presidente)
+                                }
+                                src={Editar}
+                                alt="Editar"
+                                width={25}
+                                height={25}
+                                style={{
+                                  cursor:
+                                    conselhoSituacao === "nao_tem"
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  opacity:
+                                    conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                                {...(conselhoSituacao === "nao_tem"
+                                  ? { onClick: (e) => e.preventDefault() }
+                                  : {})}
+                              />
+                              <Image
+                                onClick={() => {
+                                  if (conselhoSituacao !== "nao_tem") {
+                                    handleRemoverPresidente({
+                                      id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
+                                    });
+                                  }
+                                }}
+                                src={Excluir}
+                                alt="Excluir"
+                                width={25}
+                                height={25}
+                                style={{
+                                  cursor:
+                                    conselhoSituacao === "nao_tem"
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  opacity:
+                                    conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                              />
+                            </Actions>
+                          </td>
+                        </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={3}
+                            style={{
+                              padding: "20px",
+                              textAlign: "center",
+                              color: "#999",
+                            }}
+                          >
+                            Nenhum presidente cadastrado
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style={{ marginTop: "16px" }}>
+                  <DivEixo>Atualizações</DivEixo>
+                  <table
+                    cellSpacing={0}
+                    style={{
+                      width: "98%",
+                      borderRadius: "10px",
+                      boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                      margin: "0 0 20px 20px",
+                      borderCollapse: "separate",
+                      borderSpacing: 0,
+                    }}
+                  >
+                    <thead>
+                      <tr>
+                        <th
+                          style={{
+                            background: "#0085bd",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            textAlign: "left",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            borderTopLeftRadius: "10px",
+                          }}
+                        >
+                          Título
+                        </th>
+                        <th
+                          style={{
+                            background: "#0085bd",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            textAlign: "left",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                          }}
+                        >
+                          Ano
+                        </th>
+                        <th
+                          style={{
+                            background: "#0085bd",
+                            color: "#fff",
+                            padding: "10px 20px",
+                            textAlign: "left",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            borderTopRightRadius: "10px",
+                          }}
+                        >
+                          Ações
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {conselhoMunicipal && conselhoMunicipal.length > 0 ? (
+                        conselhoMunicipal.map((conselho, index) => (
+                          <tr key={index}>
+                            <td
+                              style={{
+                                padding: "16px 20px",
+                                color: "#4a5568",
+                                borderBottom: "1px solid #e2e8f0",
+                                fontSize: "15px",
+                              }}
+                            >
+                              <InputG>{conselho.titulo}</InputG>
+                            </td>
+                            <td
+                              style={{
+                                padding: "16px 20px",
+                                color: "#4a5568",
+                                borderBottom: "1px solid #e2e8f0",
+                                fontSize: "15px",
+                              }}
+                            >
+                              {conselho.ano}
+                            </td>
+                            <td
+                              style={{
+                                padding: "16px 20px",
+                                color: "#4a5568",
+                                borderBottom: "1px solid #e2e8f0",
+                                fontSize: "15px",
+                              }}
+                            >
+                              <Actions>
+                                {conselho.file && (
+                                  <a
+                                    href={conselho.file}
+                                    rel="noreferrer"
+                                    target="_blank"
+                                  >
+                                    <FaFilePdf></FaFilePdf>
+                                  </a>
+                                )}
+                                <Image
+                                  src={Excluir}
+                                  alt="Excluir"
+                                  width={25}
+                                  height={25}
+                                  onClick={() => {
+                                    handleRemoverConselho({
+                                      id: conselho.id_conselho_municipal_saneamento_basico,
+                                    });
+                                  }}
+                                />
+                              </Actions>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td
+                            colSpan={3}
+                            style={{
+                              padding: "20px",
+                              textAlign: "center",
+                              color: "#999",
+                            }}
+                          >
+                            Nenhum conselho cadastrado
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </TablesContainer>
             </DivFormCadastro>
 
             <DivFormCadastro active={activeForm === "participacaoSocial"}>
               <DivTituloForm>Participação e Controle Social</DivTituloForm>
-              <table>
-                <tr>
-                  <td>
-                    <InputG>
-                      <label>Titulo</label>
-                      <input
-                        {...register("pcs_titulo")}
-                        onChange={(e) => {
-                          const value = capitalizeFrasal(e.target.value);
-                          setValue("pcs_titulo", value);
-                        }}
-                        type="text"
-                        onKeyPress={onlyLettersAndCharacters}
-                      ></input>
-                    </InputG>
-                  </td>
-                  <td>
-                    <InputP>
-                      <label>Ano</label>
-                      <input
-                        {...register("pcs_ano")}
-                        type="text"
-                        onKeyPress={(e) => {
-                          if (!/[0-9]/.test(e.key)) {
-                            e.preventDefault();
-                          }
-                        }}
-                      ></input>
-                    </InputP>
-                  </td>
-                  <td>
-                    <InputM>
-                      <label>Arquivo</label>
-                      <input {...register("pcs_arquivo")} type="file"></input>
-                    </InputM>
-                  </td>
-                </tr>
+              <table
+                style={{
+                  width: "97%",
+                  borderRadius: "10px",
+                  border: "1px solid #eee",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  padding: "15px",
+                }}
+              >
+                <tbody>
+                  <tr>
+                    <td style={{ width: "50%", padding: "10px" }}>
+                      <InputG>
+                        <label>Titulo</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("pcs_titulo")}
+                          onChange={(e) => {
+                            const value = capitalizeFrasal(e.target.value);
+                            setValue("pcs_titulo", value);
+                          }}
+                          type="text"
+                          onKeyPress={onlyLettersAndCharacters}
+                        ></input>
+                      </InputG>
+                    </td>
+                    <td style={{ width: "15%", padding: "10px" }}>
+                      <InputP>
+                        <label>Ano</label>
+                        <input
+                          style={{ width: "100%" }}
+                          {...register("pcs_ano")}
+                          type="text"
+                          onKeyPress={(e) => {
+                            if (!/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                        ></input>
+                      </InputP>
+                    </td>
+                    <td style={{ padding: "10px" }}>
+                      <InputM>
+                        <label>Arquivo</label>
+                        <input {...register("pcs_arquivo")} type="file"></input>
+                      </InputM>
+                    </td>
+                  </tr>
+                </tbody>
               </table>
+
+              <div
+                style={{
+                  marginBottom: "20px",
+                  marginLeft: "20px",
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  width: "97%",
+                  position: "relative",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton
+                    type="submit"
+                    style={{
+                      padding: "12px 24px",
+                      fontSize: "14px",
+                      fontWeight: "500",
+                      borderRadius: "6px",
+                      transition: "all 0.2s",
+                    }}
+                  >
+                    Gravar
+                  </SubmitButton>
+                )}
+              </div>
 
               <DivEixo>Atualizações</DivEixo>
 
-              <Tabela>
-                <table cellSpacing={0}>
-                  <tbody>
-                    {listParticipacoes && (
-                      <tr>
-                        <th>ID</th>
-                        <th>Nome</th>
-                        <th>Ano</th>
-                        <th>Ações</th>
-                      </tr>
-                    )}
-
-                    {listParticipacoes?.map((participacao, index) => (
+              <table
+                cellSpacing={0}
+                style={{
+                  width: "98%",
+                  borderRadius: "10px",
+                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                  margin: "0 0 20px 20px",
+                  borderCollapse: "separate",
+                  borderSpacing: 0,
+                }}
+              >
+                <thead>
+                  <tr>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopLeftRadius: "10px",
+                      }}
+                    >
+                      ID
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Título
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Ano
+                    </th>
+                    <th
+                      style={{
+                        background: "#0085bd",
+                        color: "#fff",
+                        padding: "10px 20px",
+                        textAlign: "left",
+                        fontWeight: 600,
+                        fontSize: "14px",
+                        borderTopRightRadius: "10px",
+                      }}
+                    >
+                      Ações
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {listParticipacoes && listParticipacoes.length > 0 ? (
+                    listParticipacoes.map((participacao, index) => (
                       <tr key={index}>
-                        <td>{participacao.id_participacao_controle_social}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {participacao.id_participacao_controle_social}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <InputG>{participacao.titulo}</InputG>
                         </td>
-                        <td>{participacao.ano}</td>
-                        <td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
+                          {participacao.ano}
+                        </td>
+                        <td
+                          style={{
+                            padding: "16px 20px",
+                            color: "#4a5568",
+                            borderBottom: "1px solid #e2e8f0",
+                            fontSize: "15px",
+                          }}
+                        >
                           <Actions>
                             <Image
                               title="Editar"
@@ -2251,10 +3315,66 @@ export default function GestaoIndicadores({
                           </Actions>
                         </td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </Tabela>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        style={{
+                          padding: "20px",
+                          textAlign: "center",
+                          color: "#999",
+                        }}
+                      >
+                        Nenhuma participação cadastrada
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </DivFormCadastro>
+
+            <DivFormCadastro
+              active={activeForm === "saneamentoRural"}
+              style={{
+                minWidth: innerWidth > 0 && innerWidth <= 1000 ? "95%" : "1045px",
+                minHeight: "380px",
+              }}
+            >
+              <DivTituloForm
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                Saneamento Rural
+                <Actions>
+                  <Tooltip>
+                    <Image
+                      src={ajuda}
+                      alt="Ajuda"
+                      width={20}
+                      height={20}
+                      style={{ cursor: "pointer" }}
+                    />
+                    <TooltipText>
+                      Insira informações sobre o saneamento rural, como por
+                      exemplo: informações sobre população rural, situação atual
+                      dos serviços de saneamento, aspectos ambientais, etc.
+                    </TooltipText>
+                  </Tooltip>
+                </Actions>
+              </DivTituloForm>
+              <DivTextArea>
+                <label>Breve Descrição</label>
+                <textarea
+                  ref={txtArea}
+                  {...register("sr_descricao")}
+                  onChange={handleOnChange}
+                  // required
+                ></textarea>
+              </DivTextArea>
 
               <SubmitButtonContainer
                 style={{
@@ -2268,69 +3388,34 @@ export default function GestaoIndicadores({
               </SubmitButtonContainer>
             </DivFormCadastro>
 
-            <DivFormCadastro active={activeForm === "saneamentoRural"}
-            style={{minWidth: innerWidth <= 1000 ? "95%" : "1045px", minHeight: "380px",}}>
-              <DivTituloForm style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px"}}>
-                Saneamento Rural
+            <DivFormCadastro
+              active={activeForm === "comunidadesTradicionais"}
+              style={{
+                minWidth: innerWidth > 0 && innerWidth <= 1000 ? "95%" : "1045px",
+                height: "658px",
+              }}
+            >
+              <DivTituloForm
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                Comunidades Tradicionais
                 <Actions>
                   <Tooltip>
-                  <Image
-                    src={ajuda}
-                    alt="Ajuda"
-                    width={20}
-                    height={20}
-                    style={{ cursor: "pointer" }}
-                  />
+                    <Image
+                      src={ajuda}
+                      alt="Ajuda"
+                      width={20}
+                      height={20}
+                      style={{ cursor: "pointer" }}
+                    />
                     <TooltipText>
-                      Insira informações sobre o saneamento rural, como por exemplo:
-                      informações sobre população rural, situação atual dos serviços de saneamento,
-                      aspectos ambientais, etc.
+                      Insira informações sobre as comunidades tradicionais, como
+                      por exemplo: condições da infraestrutura e serviços de
+                      saneamento nessas comunidades.
                     </TooltipText>
                   </Tooltip>
                 </Actions>
-                </DivTituloForm>
-              <DivTextArea>
-                <label>Breve Descrição</label>
-                <textarea
-                  ref={txtArea}
-                  {...register("sr_descricao")}
-                  onChange={handleOnChange}
-                  // required
-                ></textarea>
-              </DivTextArea>
-
-              <SubmitButtonContainer style={{
-                bottom: "-50px",
-                right: "-10px"
-              }}>
-                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
-              </SubmitButtonContainer>
-            </DivFormCadastro>
-
-            <DivFormCadastro active={activeForm === "comunidadesTradicionais"}
-            style={{minWidth: innerWidth <= 1000 ? "95%" : "1045px", height: "658px"}}
-           >
-            <DivTituloForm style={{display: "flex", alignItems: "center", gap: "10px"}}>Comunidades Tradicionais
-              <Actions>
-                  <Tooltip>
-                  <Image
-                    src={ajuda}
-                    alt="Ajuda"
-                    width={20}
-                    height={20}
-                    style={{ cursor: "pointer" }}
-                  />
-                    <TooltipText>
-                      Insira informações sobre as comunidades tradicionais, como por exemplo:
-                      condições da infraestrutura e serviços de saneamento nessas comunidades.
-                    </TooltipText>
-                  </Tooltip>
-                </Actions>
-
-            </DivTituloForm>
+              </DivTituloForm>
 
               <DivTextArea>
                 <label>Nome das Comunidades Beneficiadas</label>
@@ -2349,16 +3434,18 @@ export default function GestaoIndicadores({
                   // required
                 ></textarea>
               </DivTextArea>
-              
-              <SubmitButtonContainer style={{
-                bottom: "-50px",
-                right: "-10px"
-              }}>
-                {usuario?.id_permissao !== 4 && <SubmitButton type="submit">Gravar</SubmitButton>}
+
+              <SubmitButtonContainer
+                style={{
+                  bottom: "-50px",
+                  right: "-10px",
+                }}
+              >
+                {usuario?.id_permissao !== 4 && (
+                  <SubmitButton type="submit">Gravar</SubmitButton>
+                )}
               </SubmitButtonContainer>
-
             </DivFormCadastro>
-
           </Form>
 
           {ShowModalPresidente && (

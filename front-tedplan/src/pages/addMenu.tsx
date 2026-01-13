@@ -44,8 +44,21 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
     register,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm();
+
+  // Monitorar o valor do módulo selecionado
+  const selectedModulo = watch("id_modulo");
+  const isModuloIndicadores = selectedModulo === "2" || selectedModulo === 2;
+
+  // Limpar campo eixo quando o módulo não for Indicadores
+  useEffect(() => {
+    if (!isModuloIndicadores) {
+      setValue("id_eixo", null, { shouldValidate: false });
+    }
+  }, [selectedModulo, isModuloIndicadores, setValue]);
 
   const [eixosData, setEixosData] = useState<any>(eixos);
   const [modulosData, setModulosData] = useState<any>(modulos);
@@ -129,7 +142,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
         titulo,
         descricao,
         id_modulo: parseInt(id_modulo),
-        id_eixo: parseInt(id_eixo),
+        id_eixo: id_eixo ? parseInt(id_eixo) : null,
       };
 
       if (isEditing && menuId) {
@@ -152,7 +165,7 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
         titulo: "",
         descricao: "",
         id_modulo: "",
-        id_eixo: "",
+        id_eixo: null,
       });
 
       setTimeout(() => {
@@ -459,11 +472,14 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
                         color: "#333",
                       }}
                     >
-                      Eixo *
+                      Eixo {isModuloIndicadores && "*"}
                     </label>
                     <select
-                      {...register("id_eixo", { required: true })}
+                      {...register("id_eixo", { 
+                        required: isModuloIndicadores 
+                      })}
                       name="id_eixo"
+                      disabled={!isModuloIndicadores}
                       style={{
                         width: "100%",
                         padding: "12px 16px",
@@ -472,9 +488,11 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
                           ? "2px solid #e74c3c"
                           : "2px solid #e0e0e0",
                         borderRadius: "8px",
-                        backgroundColor: "white",
+                        backgroundColor: isModuloIndicadores ? "white" : "#f5f5f5",
                         transition: "all 0.3s ease",
                         outline: "none",
+                        cursor: isModuloIndicadores ? "pointer" : "not-allowed",
+                        opacity: isModuloIndicadores ? 1 : 0.6,
                       }}
                       onFocus={(e) => {
                         (e.target as HTMLSelectElement).style.borderColor =
@@ -505,8 +523,20 @@ export default function AddMenu({ menu, eixos, modulos }: MenuProps) {
                           display: "block",
                         }}
                       >
-                        Selecionar um eixo é obrigatório!
+                        Selecionar um eixo é obrigatório quando o módulo for Indicadores!
                       </span>
+                    )}
+                    {!isModuloIndicadores && (
+                      <small
+                        style={{
+                          color: "#666",
+                          fontSize: "14px",
+                          marginTop: "5px",
+                          display: "block",
+                        }}
+                      >
+                        O campo Eixo só é obrigatório quando o módulo for Indicadores.
+                      </small>
                     )}
                   </div>
 

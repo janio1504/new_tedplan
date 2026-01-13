@@ -112,7 +112,9 @@ export default function Relatorios({
   return (
     <Container>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
-      <MenuHorizontal municipio={municipio[0].municipio_nome}></MenuHorizontal>
+      <MenuHorizontal
+        municipio={municipio[0]?.municipio_nome}
+      ></MenuHorizontal>
       <DivCenter>     
 
         <DivFormConteudo>

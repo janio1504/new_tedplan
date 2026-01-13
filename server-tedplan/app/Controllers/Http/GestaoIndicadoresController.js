@@ -410,6 +410,16 @@ class GestaoIndicadoresController {
     try {
       const { titulo, ano, id_municipio, operacao, situacao } = request.all();
 
+      // Validação dos campos obrigatórios
+      if (!titulo || !ano || !id_municipio) {
+        return response.status(400).send({
+          message: "Título, ano e id_municipio são obrigatórios",
+        });
+      }
+
+      let id_arquivo = null;
+
+      // Processa arquivo se fornecido
       if (request.file("arquivo")) {
         const upload_file = request.file("arquivo", { size: "100mb" });
         const fileName = `${Date.now()}.${upload_file.subtype}`;
@@ -426,27 +436,29 @@ class GestaoIndicadoresController {
           type: upload_file.type,
           subtype: upload_file.subtype,
         });
-        console.log(request.all());
-
-        await Cmsb.create({
-          titulo: titulo,
-          ano: ano,
-          id_municipio: id_municipio,
-          operacao: operacao,
-          situacao: situacao || "operante", // Adiciona o campo situacao
-          id_arquivo: file.id,
-        });
-
-        return response.status(200).send({
-          message:
-            "Conselho Municipal de Saneamento Básico adicionado com sucesso",
-        });
+        id_arquivo = file.id;
       }
-      return response.status(400).send({
-        message: "Erro ao adicionar o Conselho Municipal de Saneamento Básico",
+
+      // Cria o conselho com ou sem arquivo
+      await Cmsb.create({
+        titulo: titulo,
+        ano: ano,
+        id_municipio: id_municipio,
+        operacao: operacao || null,
+        situacao: situacao || "operante",
+        id_arquivo: id_arquivo,
+      });
+
+      return response.status(200).send({
+        message:
+          "Conselho Municipal de Saneamento Básico adicionado com sucesso",
       });
     } catch (error) {
-      console.log(error);
+      console.log("Erro ao adicionar conselho municipal:", error);
+      return response.status(500).send({
+        message: "Erro ao adicionar o Conselho Municipal de Saneamento Básico",
+        error: error.message,
+      });
     }
   }
 
