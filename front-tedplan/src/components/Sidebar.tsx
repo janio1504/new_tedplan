@@ -361,7 +361,7 @@ const Sidebar = () => {
       <MenuTitle suppressHydrationWarning>
         {mounted ? (usuario?.permissao_usuario || '') : ''}
       </MenuTitle>
-      {safePermission.adminGeral || safePermission.adminTedPlan || safePermission.editorTedPlan ? (
+      {safePermission.adminGeral /*|| safePermission.adminTedPlan || safePermission.editorTedPlan */ ? (
        <>   
           <MenuItem
           onClick={handleDashboard}

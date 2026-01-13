@@ -81,7 +81,7 @@ export default function AddPublicacao({
         })
         .then((response) => {
           const pub = response.data[0];
-
+          
           const tipoPublicacaoId = tipoPublicacao.find(
             (tp) => tp.nome.trim() === pub.tipo_publicacao.trim()
           )?.id_tipo_publicacao;
@@ -131,18 +131,18 @@ export default function AddPublicacao({
       formData.append("id_categoria", data.id_categoria);
       formData.append("id_municipio", data.id_municipio);
 
-      if (data.imagem && data.imagem[0]) {
-        formData.append("imagem", data.imagem[0]);
-      }
-
-      if (data.arquivo && data.arquivo[0]) {
-        formData.append("arquivo", data.arquivo[0]);
-      }
+      // O backend exige que ambos os arquivos sejam enviados
+      // O react-hook-form já valida, mas garantimos aqui também
+      formData.append("imagem", data.imagem[0]);
+      // O backend espera "file" e não "arquivo"
+      formData.append("file", data.arquivo[0]);
 
       const apiClient = getAPIClient();
+      // Não definir Content-Type manualmente - o axios faz isso automaticamente para FormData
       const response = await apiClient.post("addPublicacao", formData);
 
-      if (response.data.success) {
+      // O backend retorna o resultado do insert, não um objeto com success
+      if (response.data && !response.data.error) {
         toast.success("Publicação cadastrada com sucesso!", {
           position: "top-right",
           autoClose: 5000,
@@ -152,7 +152,7 @@ export default function AddPublicacao({
           router.push("/listarPublicacoes");
         }, 2000);
       } else {
-        toast.error("Erro ao cadastrar publicação!", {
+        toast.error(response.data?.error || "Erro ao cadastrar publicação!", {
           position: "top-right",
           autoClose: 5000,
         });
@@ -620,10 +620,10 @@ export default function AddPublicacao({
                       color: "#333",
                     }}
                   >
-                    Imagem (Opcional)
+                    Imagem *
                   </label>
                   <input
-                    {...register("imagem")}
+                    {...register("imagem", { required: true })}
                     type="file"
                     name="imagem"
                     accept="image/*"
@@ -631,7 +631,9 @@ export default function AddPublicacao({
                       width: "100%",
                       padding: "12px 16px",
                       fontSize: "16px",
-                      border: "2px solid #e0e0e0",
+                      border: errors.imagem
+                        ? "2px solid #e74c3c"
+                        : "2px solid #e0e0e0",
                       borderRadius: "8px",
                       backgroundColor: "white",
                       transition: "all 0.3s ease",
@@ -646,10 +648,22 @@ export default function AddPublicacao({
                     }}
                     onBlur={(e) => {
                       (e.target as HTMLInputElement).style.borderColor =
-                        "#e0e0e0";
+                        errors.imagem ? "#e74c3c" : "#e0e0e0";
                       (e.target as HTMLInputElement).style.boxShadow = "none";
                     }}
                   />
+                  {errors.imagem && errors.imagem.type === "required" && (
+                    <span
+                      style={{
+                        color: "#e74c3c",
+                        fontSize: "14px",
+                        marginTop: "5px",
+                        display: "block",
+                      }}
+                    >
+                      A imagem é obrigatória!
+                    </span>
+                  )}
                   <small
                     style={{
                       color: "#666",
@@ -673,10 +687,10 @@ export default function AddPublicacao({
                       color: "#333",
                     }}
                   >
-                    Arquivo (Opcional)
+                    Arquivo *
                   </label>
                   <input
-                    {...register("arquivo")}
+                    {...register("arquivo", { required: true })}
                     type="file"
                     name="arquivo"
                     accept=".pdf,.doc,.docx"
@@ -684,7 +698,9 @@ export default function AddPublicacao({
                       width: "100%",
                       padding: "12px 16px",
                       fontSize: "16px",
-                      border: "2px solid #e0e0e0",
+                      border: errors.arquivo
+                        ? "2px solid #e74c3c"
+                        : "2px solid #e0e0e0",
                       borderRadius: "8px",
                       backgroundColor: "white",
                       transition: "all 0.3s ease",
@@ -699,10 +715,22 @@ export default function AddPublicacao({
                     }}
                     onBlur={(e) => {
                       (e.target as HTMLInputElement).style.borderColor =
-                        "#e0e0e0";
+                        errors.arquivo ? "#e74c3c" : "#e0e0e0";
                       (e.target as HTMLInputElement).style.boxShadow = "none";
                     }}
                   />
+                  {errors.arquivo && errors.arquivo.type === "required" && (
+                    <span
+                      style={{
+                        color: "#e74c3c",
+                        fontSize: "14px",
+                        marginTop: "5px",
+                        display: "block",
+                      }}
+                    >
+                      O arquivo é obrigatório!
+                    </span>
+                  )}
                   <small
                     style={{
                       color: "#666",
@@ -837,18 +865,25 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
     // Buscar municípios
     const municipiosResponse = await apiClient.get("/getMunicipios");
-    const municipios = municipiosResponse.data;
+    const municipiosData = municipiosResponse.data || [];
+    // Transformar municipio_nome para nome para manter compatibilidade
+    const municipios = Array.isArray(municipiosData) 
+      ? municipiosData.map((m: any) => ({
+          id_municipio: m.id_municipio,
+          nome: m.municipio_nome || m.nome,
+        }))
+      : [];
 
     // Buscar tipos de publicação
-    const tipoPublicacaoResponse = await apiClient.get("/getTipoPublicacao");
-    const tipoPublicacao = tipoPublicacaoResponse.data;
+    const tipoPublicacaoResponse = await apiClient.get("/listTipoPublicacao");
+    const tipoPublicacao = tipoPublicacaoResponse.data || [];
 
     return {
       props: {
-        eixos: eixos || [],
-        categorias: categorias || [],
-        municipios: municipios || [],
-        tipoPublicacao: tipoPublicacao || [],
+        eixos: Array.isArray(eixos) ? eixos : [],
+        categorias: Array.isArray(categorias) ? categorias : [],
+        municipios: municipios,
+        tipoPublicacao: Array.isArray(tipoPublicacao) ? tipoPublicacao : [],
       },
     };
   } catch (error) {
