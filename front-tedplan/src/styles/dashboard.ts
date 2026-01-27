@@ -286,8 +286,7 @@ export const ItensMenu = styled.div`
 export const DivCenter = styled.div`
   max-width: 100%;
   width: 100%;
-  max-height: 100vh;
-  height: 100vh;
+  min-height: calc(100vh - 100px);
   overflow-y: auto;
   overflow-x: hidden;
   color:rgb(38, 38, 38);
@@ -318,7 +317,7 @@ export const DivCenter = styled.div`
   }
 
   @media (max-width: 1000px) {
-    max-height: calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
     padding: 10px;
   }
 `;

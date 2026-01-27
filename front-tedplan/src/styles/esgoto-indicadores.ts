@@ -1389,7 +1389,9 @@ export const Sidebar = styled.div`
   }
 `;
 
-export const MainContent = styled.div<{ isCollapsed: boolean }>`
+export const MainContent = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== "isCollapsed",
+})<{ isCollapsed: boolean }>`
   margin-left: ${(props) => (props.isCollapsed ? "70px" : "320px")};
   padding: 1.25rem;
   min-height: calc(100vh - 160px);
@@ -1646,7 +1648,11 @@ export const TextArea = styled.div`
 `;
 
 export const DivFormCadastro = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== "active",
+  shouldForwardProp: (prop) => {
+    // Não passar 'active' para o DOM
+    if (prop === "active") return false;
+    return true;
+  },
 })<{ active?: boolean }>`
   display: ${(props) => (props.active ? "block" : "none")};
   background-color: white;

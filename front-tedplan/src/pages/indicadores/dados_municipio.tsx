@@ -3700,7 +3700,8 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               <DivTituloForm>
                 Controle Social & Responsável pelo SIMISAB
               </DivTituloForm>
-
+              <div style={{ padding: "20px" }}>
+                
               <TabContainer>
                 <TabButton
                   active={activeTab === "controleSocial"}
@@ -4041,6 +4042,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                     </SubmitButton>
                   )}
                 </SubmitButtonContainer>
+              </div>
               </div>
             </DivFormCadastro>
 

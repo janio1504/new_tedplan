@@ -997,23 +997,25 @@ export const DivEixo = styled.div`
 `;
 
 export const Form = styled.form`
-  background-color: #f3f4f6;
+  display: flex;  
+  background-color: #fff;
   width: 100%;
   font-size: 14px;
-  display: flex;
   flex-direction: column;
+  border-radius: 10px;
   align-items: center;
+  justify-content: center;
   input {
     border: 2px solid #ccc;
     border-radius: 5px;
     padding: 15px 15px;
-    margin: 10px;
+    margin: 0px 5px 10px 5px;
     color: #666;
     float: left;
   }
 
   input:focus-within {
-    border-color: 2px solid #008080;
+   
   }
 
   textarea {
@@ -1031,14 +1033,14 @@ export const Form = styled.form`
   }
 
   select {
-    border: 2px solid #999;
+    border: 2px solid #999999;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
     background: #fff;
   }
   option {
-    border: 1px solid #999;
+    border: 1px solid #999999;
     border-radius: 5px;
     padding: 10px 15px;
     margin: 10px;
@@ -1048,9 +1050,6 @@ export const Form = styled.form`
   span {
     color: red;
     font-weight: bold;
-  }
-
-  @media (max-width: 768px) {
   }
 `;
 
@@ -1114,8 +1113,9 @@ export const ContainerModal = styled.div`
 `;
 
 export const Modal = styled.div`
+  
   position: relative;
-  width: 95%;
+  width: 100%;
   max-width: 1320px;
   min-width: 320px;
   background: #fff;
