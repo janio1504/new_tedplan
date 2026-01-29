@@ -67,10 +67,12 @@ import {
 } from "@/util/util";
 import {
   DivFormCadastro,
+  DivTituloForm as DivTituloFormIndicadores,
   MainContent,
   SidebarItem,
 } from "@/styles/esgoto-indicadores";
-import { DivTitulo } from "@/styles/drenagem-indicadores";
+import { DivFormConteudo, DivTitulo } from "@/styles/drenagem-indicadores";
+import { DivFormEixo, DivTituloConteudo } from "@/styles/financeiro";
 import { MenuHeader, MenuItemsContainer } from "@/styles/residuo-solidos-in";
 
 const InputMask = require("react-input-mask");
@@ -470,6 +472,7 @@ const CampoIndicadorPolitica = ({
                   disabled={!tipoCampo.enable}
                   style={{ transform: "scale(1.1)" }}
                   onChange={(e) => {
+                    // Forçar o React Hook Form a registrar corretamente usando setValue
                     if (setValue) {
                       if (e.target.checked) {
                         setValue(checkboxFieldName, true);
@@ -716,6 +719,7 @@ const CampoIndicadorPlano = ({
                   disabled={!tipoCampo.enable}
                   style={{ transform: "scale(1.1)" }}
                   onChange={(e) => {
+                    // Forçar o React Hook Form a registrar corretamente usando setValue
                     if (setValue) {
                       if (e.target.checked) {
                         setValue(checkboxFieldName, true);
@@ -962,6 +966,7 @@ const CampoIndicadorConselho = ({
                   disabled={!tipoCampo.enable}
                   style={{ transform: "scale(1.1)" }}
                   onChange={(e) => {
+                    // Forçar o React Hook Form a registrar corretamente usando setValue
                     if (setValue) {
                       if (e.target.checked) {
                         setValue(checkboxFieldName, true);
@@ -1414,21 +1419,21 @@ export default function GestaoIndicadores({
   useEffect(() => {
     if (dadosGestao) {
       // Verifica se os dados realmente mudaram para evitar loops
-      const dadosMudaram = 
+      const dadosMudaram =
         prevDadosGestaoRef.current?.ga_nome !== dadosGestao.ga_nome ||
         prevDadosGestaoRef.current?.ga_norma !== dadosGestao.ga_norma;
-      
+
       if (dadosMudaram) {
-        const nomeAssociacao = dadosGestao.ga_nome !== null && dadosGestao.ga_nome !== undefined 
-          ? dadosGestao.ga_nome 
+        const nomeAssociacao = dadosGestao.ga_nome !== null && dadosGestao.ga_nome !== undefined
+          ? dadosGestao.ga_nome
           : "";
-        const normaAssociacao = dadosGestao.ga_norma !== null && dadosGestao.ga_norma !== undefined 
-          ? dadosGestao.ga_norma 
+        const normaAssociacao = dadosGestao.ga_norma !== null && dadosGestao.ga_norma !== undefined
+          ? dadosGestao.ga_norma
           : "";
-        
+
         setValueGestao("nome_associacao", nomeAssociacao, { shouldDirty: false });
         setValueGestao("norma_associacao", normaAssociacao, { shouldDirty: false });
-        
+
         // Atualiza a referência
         prevDadosGestaoRef.current = {
           ga_nome: dadosGestao.ga_nome,
@@ -1473,20 +1478,20 @@ export default function GestaoIndicadores({
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data[0]);
+        setDadosMunicipio(response.data);
       });
   }
   async function getPoliticas() {
     if (!usuario?.id_municipio) {
       return;
     }
-    
+
     try {
       const resPoliticas = await api.get("getPoliticas", {
         params: { id_municipio: usuario.id_municipio },
       });
       const politicas = resPoliticas.data;
-      
+
       if (politicas && Array.isArray(politicas) && politicas.length > 0) {
         const politicasComArquivo = await Promise.all(
           politicas.map(async (p) => {
@@ -1628,17 +1633,17 @@ export default function GestaoIndicadores({
       const resGestao = await api.get("/getGestao", {
         params: { id_municipio: usuario?.id_municipio },
       });
-      
+
       if (resGestao.data && resGestao.data.length > 0) {
         const gestaoData = resGestao.data[0];
-        
+
         // Garantir que valores null sejam tratados como strings vazias
         if (gestaoData.ga_nome === null || gestaoData.ga_nome === undefined) gestaoData.ga_nome = "";
         if (gestaoData.ga_norma === null || gestaoData.ga_norma === undefined) gestaoData.ga_norma = "";
         if (gestaoData.sr_descricao === null || gestaoData.sr_descricao === undefined || gestaoData.sr_descricao === "null" || gestaoData.sr_descricao === "undefined") gestaoData.sr_descricao = "";
         if (gestaoData.nomes_comunidades_beneficiadas === null || gestaoData.nomes_comunidades_beneficiadas === undefined || gestaoData.nomes_comunidades_beneficiadas === "null" || gestaoData.nomes_comunidades_beneficiadas === "undefined") gestaoData.nomes_comunidades_beneficiadas = "";
         if (gestaoData.ct_descricao === null || gestaoData.ct_descricao === undefined || gestaoData.ct_descricao === "null" || gestaoData.ct_descricao === "undefined") gestaoData.ct_descricao = "";
-        
+
         setGestao(gestaoData);
       } else {
         setGestao(null);
@@ -1874,17 +1879,128 @@ export default function GestaoIndicadores({
   }
 
   function preencherFormularioPolitica(dados: any[]) {
+    // Resetar todos os valores dos checkboxes antes de preencher
+    indicadoresPolitica.forEach((indicador) => {
+      const tipoCheckbox = indicador.tiposCampo?.find(
+        (tipo) => tipo.type === "checkbox"
+      );
+      if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+        tipoCheckbox.checkBoxItems.forEach((item) => {
+          item.valor = false;
+        });
+      }
+    });
+
+    // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
 
     dados.forEach((dado) => {
       const codigoIndicador = dado.codigo_indicador;
       const ano = dado.ano;
       const valor = dado.valor_indicador;
 
-      const fieldName = `${codigoIndicador}_${ano}`;
-      valoresFormulario[fieldName] = valor;
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
     });
 
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresPolitica.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
     resetIndicadoresPolitica(valoresFormulario);
   }
 
@@ -1924,19 +2040,111 @@ export default function GestaoIndicadores({
       return;
     }
 
+    // Processar os dados para salvar valores dos indicadores
     const valoresIndicadores = [];
+    const checkBoxSelecionados = [];
+
+    // Agrupar checkboxes por código do indicador
+    const checkBoxAgrupados = new Map();
 
     Object.keys(data).forEach((key) => {
       const valor = data[key];
 
-      if (valor !== null && valor !== undefined && valor !== "") {
+      // Verificar se é um campo checkbox
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
         const parts = key.split("_");
         const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2
 
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          // Encontrar a descrição do checkbox selecionado
+          const indicador = indicadoresPolitica.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              // Tentar encontrar por id_item_check_box
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+
+              if (!checkBoxItem) {
+                // Se não encontrou, tentar encontrar por qualquer correspondência
+                const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    item.id_item_check_box.toString() ===
+                    idItemCheckBox.toString() ||
+                    item.descricao
+                      .toLowerCase()
+                      .includes(idItemCheckBox.toLowerCase())
+                );
+
+                // Usar o resultado da busca alternativa se encontrou
+                if (checkBoxItemAlt) {
+                  checkBoxItem = checkBoxItemAlt;
+                }
+              }
+
+              if (checkBoxItem) {
+                // Agrupar checkboxes por indicador
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados
+                  .get(codigoIndicador)
+                  .push(checkBoxItem.descricao);
+
+                // Salvar para tabela item_check_box
+                const checkBoxData = {
+                  id_item_check_box: checkBoxItem.id_item_check_box,
+                  descricao: checkBoxItem.descricao,
+                  valor: true, // boolean true para item selecionado
+                  id_indicador: indicador.id_indicador,
+                };
+
+                checkBoxSelecionados.push(checkBoxData);
+              }
+            }
+          }
+        }
+      } else {
+        // Campo normal (não checkbox) - formato: "CODIGO_ANO"
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
+
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelectedPolitica),
+            valor_indicador: valor,
+            id_municipio: usuario.id_municipio,
+          });
+        }
+      }
+    });
+
+    // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadoresPolitica.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        // Salvar array JSON com descrições na tabela indicadores-municipio
         valoresIndicadores.push({
           codigo_indicador: codigoIndicador,
           ano: parseInt(anoSelectedPolitica),
-          valor_indicador: valor,
+          valor_indicador: JSON.stringify(descricoes), // Array JSON
           id_municipio: usuario.id_municipio,
         });
       }
@@ -2222,17 +2430,128 @@ export default function GestaoIndicadores({
   }
 
   function preencherFormularioPlano(dados: any[]) {
+    // Resetar todos os valores dos checkboxes antes de preencher
+    indicadoresPlano.forEach((indicador) => {
+      const tipoCheckbox = indicador.tiposCampo?.find(
+        (tipo) => tipo.type === "checkbox"
+      );
+      if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+        tipoCheckbox.checkBoxItems.forEach((item) => {
+          item.valor = false;
+        });
+      }
+    });
+
+    // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
 
     dados.forEach((dado) => {
       const codigoIndicador = dado.codigo_indicador;
       const ano = dado.ano;
       const valor = dado.valor_indicador;
 
-      const fieldName = `${codigoIndicador}_${ano}`;
-      valoresFormulario[fieldName] = valor;
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
     });
 
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresPlano.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
     resetIndicadoresPlano(valoresFormulario);
   }
 
@@ -2263,19 +2582,111 @@ export default function GestaoIndicadores({
       return;
     }
 
+    // Processar os dados para salvar valores dos indicadores
     const valoresIndicadores = [];
+    const checkBoxSelecionados = [];
+
+    // Agrupar checkboxes por código do indicador
+    const checkBoxAgrupados = new Map();
 
     Object.keys(data).forEach((key) => {
       const valor = data[key];
 
-      if (valor !== null && valor !== undefined && valor !== "") {
+      // Verificar se é um campo checkbox
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
         const parts = key.split("_");
         const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2
 
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          // Encontrar a descrição do checkbox selecionado
+          const indicador = indicadoresPlano.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              // Tentar encontrar por id_item_check_box
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+
+              if (!checkBoxItem) {
+                // Se não encontrou, tentar encontrar por qualquer correspondência
+                const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    item.id_item_check_box.toString() ===
+                    idItemCheckBox.toString() ||
+                    item.descricao
+                      .toLowerCase()
+                      .includes(idItemCheckBox.toLowerCase())
+                );
+
+                // Usar o resultado da busca alternativa se encontrou
+                if (checkBoxItemAlt) {
+                  checkBoxItem = checkBoxItemAlt;
+                }
+              }
+
+              if (checkBoxItem) {
+                // Agrupar checkboxes por indicador
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados
+                  .get(codigoIndicador)
+                  .push(checkBoxItem.descricao);
+
+                // Salvar para tabela item_check_box
+                const checkBoxData = {
+                  id_item_check_box: checkBoxItem.id_item_check_box,
+                  descricao: checkBoxItem.descricao,
+                  valor: true, // boolean true para item selecionado
+                  id_indicador: indicador.id_indicador,
+                };
+
+                checkBoxSelecionados.push(checkBoxData);
+              }
+            }
+          }
+        }
+      } else {
+        // Campo normal (não checkbox) - formato: "CODIGO_ANO"
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
+
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelectedPlano),
+            valor_indicador: valor,
+            id_municipio: usuario.id_municipio,
+          });
+        }
+      }
+    });
+
+    // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadoresPlano.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        // Salvar array JSON com descrições na tabela indicadores-municipio
         valoresIndicadores.push({
           codigo_indicador: codigoIndicador,
           ano: parseInt(anoSelectedPlano),
-          valor_indicador: valor,
+          valor_indicador: JSON.stringify(descricoes), // Array JSON
           id_municipio: usuario.id_municipio,
         });
       }
@@ -2548,17 +2959,128 @@ export default function GestaoIndicadores({
   }
 
   function preencherFormularioConselho(dados: any[]) {
+    // Resetar todos os valores dos checkboxes antes de preencher
+    indicadoresConselho.forEach((indicador) => {
+      const tipoCheckbox = indicador.tiposCampo?.find(
+        (tipo) => tipo.type === "checkbox"
+      );
+      if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+        tipoCheckbox.checkBoxItems.forEach((item) => {
+          item.valor = false;
+        });
+      }
+    });
+
+    // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
 
     dados.forEach((dado) => {
       const codigoIndicador = dado.codigo_indicador;
       const ano = dado.ano;
       const valor = dado.valor_indicador;
 
-      const fieldName = `${codigoIndicador}_${ano}`;
-      valoresFormulario[fieldName] = valor;
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
     });
 
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresConselho.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
     resetIndicadoresConselho(valoresFormulario);
   }
 
@@ -2665,6 +3187,16 @@ export default function GestaoIndicadores({
     }
   }
 
+  async function selectAno(ano: string) {
+    setAnoSelected(ano);
+    if (ano && usuario?.id_municipio) {
+      await carregarDadosExistentes(ano);
+    } else {
+      setDadosCarregados([]);
+      resetIndicadores();
+    }
+  }
+
   async function carregarDadosExistentes(ano: string) {
     if (!usuario?.id_municipio || !ano) return;
 
@@ -2704,18 +3236,273 @@ export default function GestaoIndicadores({
   }
 
   function preencherFormulario(dados: any[]) {
+    // Criar objeto com os valores para preencher o formulário
     const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
 
     dados.forEach((dado) => {
       const codigoIndicador = dado.codigo_indicador;
       const ano = dado.ano;
       const valor = dado.valor_indicador;
 
-      const fieldName = `${codigoIndicador}_${ano}`;
-      valoresFormulario[fieldName] = valor;
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
     });
 
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadores.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
     resetIndicadores(valoresFormulario);
+  }
+
+  async function handleCadastroIndicadores(data: any) {
+    if (!usuario?.id_municipio) {
+      toast.error("Não existe Município, entre novamente no sistema!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+    if (!anoSelected) {
+      toast.error("Erro: Ano não selecionado!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+    const valoresIndicadores: { codigo_indicador: string; ano: number; valor_indicador: string; id_municipio: number }[] = [];
+    const checkBoxAgrupados = new Map<string, string[]>();
+
+    Object.keys(data).forEach((key) => {
+      const valor = data[key];
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
+        const parts = key.split("_");
+        const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2];
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          const indicador = indicadores.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+            if (tipoCheckbox?.checkBoxItems) {
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+              if (!checkBoxItem) {
+                checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    String(item.id_item_check_box) === String(idItemCheckBox) ||
+                    item.descricao?.toLowerCase().includes(String(idItemCheckBox).toLowerCase())
+                );
+              }
+              if (checkBoxItem) {
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados.get(codigoIndicador)!.push(checkBoxItem.descricao);
+              }
+            }
+          }
+        }
+      } else {
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0];
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelected),
+            valor_indicador: String(valor),
+            id_municipio: Number(usuario.id_municipio),
+          });
+        }
+      }
+    });
+
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadores.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        valoresIndicadores.push({
+          codigo_indicador: codigoIndicador,
+          ano: parseInt(anoSelected),
+          valor_indicador: JSON.stringify(descricoes),
+          id_municipio: Number(usuario.id_municipio) as number,
+        });
+      }
+    });
+
+    if (valoresIndicadores.length === 0) {
+      toast.warning("Nenhum valor foi preenchido!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    const apiClient = getAPIClient();
+    try {
+      const existingDataResponse = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${anoSelected}`
+      );
+      const existingData = existingDataResponse.data || [];
+
+      if (existingData.length > 0) {
+        const existingDataMap = new Map<string, { id_incicador_municipio: number }>();
+        existingData.forEach((record: any) => {
+          const key = `${record.codigo_indicador}_${record.ano}`;
+          existingDataMap.set(key, record);
+        });
+        for (const valorIndicador of valoresIndicadores) {
+          const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}`;
+          const existingRecord = existingDataMap.get(key);
+          try {
+            if (existingRecord) {
+              await apiClient.put(
+                `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                valorIndicador
+              );
+            } else {
+              await apiClient.post("/indicadores-municipio", valorIndicador);
+            }
+          } catch (saveError) {
+            console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+        toast.success("Dados atualizados com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      } else {
+        for (const valorIndicador of valoresIndicadores) {
+          await apiClient.post("/indicadores-municipio", valorIndicador);
+        }
+        toast.success("Dados salvos com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+      await carregarDadosExistentes(anoSelected);
+    } catch (error) {
+      console.error("Erro ao verificar dados existentes:", error);
+      for (const valorIndicador of valoresIndicadores) {
+        try {
+          await apiClient.post("/indicadores-municipio", valorIndicador);
+        } catch (saveError) {
+          console.error("Erro ao salvar valor:", valorIndicador, saveError);
+          throw saveError;
+        }
+      }
+      toast.success("Dados salvos com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      await carregarDadosExistentes(anoSelected);
+    }
   }
 
   async function handleCadastroIndicadoresConselho(data: any) {
@@ -2735,19 +3522,111 @@ export default function GestaoIndicadores({
       return;
     }
 
+    // Processar os dados para salvar valores dos indicadores
     const valoresIndicadores = [];
+    const checkBoxSelecionados = [];
+
+    // Agrupar checkboxes por código do indicador
+    const checkBoxAgrupados = new Map();
 
     Object.keys(data).forEach((key) => {
       const valor = data[key];
 
-      if (valor !== null && valor !== undefined && valor !== "") {
+      // Verificar se é um campo checkbox
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
         const parts = key.split("_");
         const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2
 
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          // Encontrar a descrição do checkbox selecionado
+          const indicador = indicadoresConselho.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              // Tentar encontrar por id_item_check_box
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+
+              if (!checkBoxItem) {
+                // Se não encontrou, tentar encontrar por qualquer correspondência
+                const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    item.id_item_check_box.toString() ===
+                    idItemCheckBox.toString() ||
+                    item.descricao
+                      .toLowerCase()
+                      .includes(idItemCheckBox.toLowerCase())
+                );
+
+                // Usar o resultado da busca alternativa se encontrou
+                if (checkBoxItemAlt) {
+                  checkBoxItem = checkBoxItemAlt;
+                }
+              }
+
+              if (checkBoxItem) {
+                // Agrupar checkboxes por indicador
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados
+                  .get(codigoIndicador)
+                  .push(checkBoxItem.descricao);
+
+                // Salvar para tabela item_check_box
+                const checkBoxData = {
+                  id_item_check_box: checkBoxItem.id_item_check_box,
+                  descricao: checkBoxItem.descricao,
+                  valor: true, // boolean true para item selecionado
+                  id_indicador: indicador.id_indicador,
+                };
+
+                checkBoxSelecionados.push(checkBoxData);
+              }
+            }
+          }
+        }
+      } else {
+        // Campo normal (não checkbox) - formato: "CODIGO_ANO"
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
+
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelectedConselho),
+            valor_indicador: valor,
+            id_municipio: usuario.id_municipio,
+          });
+        }
+      }
+    });
+
+    // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadoresConselho.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        // Salvar array JSON com descrições na tabela indicadores-municipio
         valoresIndicadores.push({
           codigo_indicador: codigoIndicador,
           ano: parseInt(anoSelectedConselho),
-          valor_indicador: valor,
+          valor_indicador: JSON.stringify(descricoes), // Array JSON
           id_municipio: usuario.id_municipio,
         });
       }
@@ -3699,8 +4578,11 @@ export default function GestaoIndicadores({
     getMenus();
   }, []);
 
+  // Formulário dinâmico: exibir quando um item do menu lateral (Política/Plano/Conselho) foi selecionado
+  const isDynamicMenuItemActive = !!grupo;
+
   return (
-    <Container>
+    <Container suppressHydrationWarning>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
@@ -3825,7 +4707,7 @@ export default function GestaoIndicadores({
 
             <div suppressHydrationWarning>
               {menus?.filter((menu) => {
-                return menu.titulo !== "Plano Municipal" && menu.titulo !== "Politica Municipal";
+                return menu.titulo !== "Plano Municipal" && menu.titulo !== "Politica Municipal" && menu.titulo !== "Conselho Municipal";
               }).map((menu) => {
                 const isOpen = openMenuId === menu.id_menu;
                 return (
@@ -3851,7 +4733,7 @@ export default function GestaoIndicadores({
                     </MenuHeader>
                     <MenuItemsContainer $isOpen={isOpen}>
                       {menu.menuItems?.map((menuItem) => (
-                        <SidebarItem
+                        <SidebarItem style={{ marginTop: "10px" }}
                           key={menuItem.id_menu_item}
                           active={activeForm === menuItem.nome_menu_item}
                           onClick={() => {
@@ -3873,8 +4755,8 @@ export default function GestaoIndicadores({
           </Sidebar>
         )}
       </div>
-      <MainContent isCollapsed={isCollapsed}>
-        <DivCenter>
+      <MainContent isCollapsed={isCollapsed} suppressHydrationWarning>
+        <DivCenter suppressHydrationWarning>
           <BreadCrumbStyle $isCollapsed={isCollapsed}>
             <nav>
               <ol>
@@ -3904,32 +4786,32 @@ export default function GestaoIndicadores({
                 <tbody>
                   <tr>
                     <td style={{ width: "40%", padding: "10px" }}>
-                      
-                        <label>Nome da associação</label>
-                        <input
-                          style={{ width: "100%" }}
-                          {...registerGestao("nome_associacao")}
-                          defaultValue={dadosGestao?.ga_nome || ""}
-                          onChange={(e) => {
-                            setValueGestao("nome_associacao", e.target.value);
-                          }}
-                          type="text"
-                        ></input>
-                      
+
+                      <label>Nome da associação</label>
+                      <input
+                        style={{ width: "100%" }}
+                        {...registerGestao("nome_associacao")}
+                        defaultValue={dadosGestao?.ga_nome || ""}
+                        onChange={(e) => {
+                          setValueGestao("nome_associacao", e.target.value);
+                        }}
+                        type="text"
+                      ></input>
+
                     </td>
                     <td style={{ width: "40%", padding: "10px" }}>
-                        <label>
-                          Norma da associação<span> *</span>
-                        </label>
-                        <input
-                          style={{ width: "100%" }}
-                          {...registerGestao("norma_associacao")}
-                          defaultValue={dadosGestao?.ga_norma || ""}
-                          onChange={(e) => {
-                            setValueGestao("norma_associacao", e.target.value);
-                          }}
-                          type="text"
-                        ></input>
+                      <label>
+                        Norma da associação<span> *</span>
+                      </label>
+                      <input
+                        style={{ width: "100%" }}
+                        {...registerGestao("norma_associacao")}
+                        defaultValue={dadosGestao?.ga_norma || ""}
+                        onChange={(e) => {
+                          setValueGestao("norma_associacao", e.target.value);
+                        }}
+                        type="text"
+                      ></input>
                     </td>
                     <td style={{ textAlign: "right", width: "10%" }}>
                       {usuario?.id_permissao !== 4 && (
@@ -3954,7 +4836,7 @@ export default function GestaoIndicadores({
                   </tr>
                 </tbody>
               </table>
-           
+
 
               <DivEixo
                 style={{
@@ -4189,7 +5071,7 @@ export default function GestaoIndicadores({
             <DivTituloForm>
               Política Municipal de Saneamento Básico
             </DivTituloForm>
-            <div style={{ borderBottom: "1px solid #eee",  marginLeft: "20px" }}>
+            <div style={{ borderBottom: "1px solid #eee", marginLeft: "20px" }}>
               <TabContainer>
                 <TabButton
                   $active={activeTabPolitica === "politicaMunicipal"}
@@ -4356,7 +5238,7 @@ export default function GestaoIndicadores({
                         ></input>
 
                       </td>
-                      <td style={{ width: "10%" , textAlign: "right" }}>
+                      <td style={{ width: "10%", textAlign: "right" }}>
                         {usuario?.id_permissao !== 4 && (
                           <button
                             type="submit"
@@ -4571,7 +5453,9 @@ export default function GestaoIndicadores({
                 </table>
               </div>
             </Form>
-            <div style={{ display: activeTabPolitica === "dadosComplementaresPolitica" ? "block" : "none", marginLeft: "20px" }} suppressHydrationWarning>
+
+
+            <div style={{ display: activeTabPolitica === "dadosComplementaresPolitica" ? "block" : "none" }} suppressHydrationWarning>
               <Form style={{ backgroundColor: "white" }} onSubmit={handleSubmitIndicadoresPolitica(handleCadastroIndicadoresPolitica)}>
 
                 <div
@@ -4708,25 +5592,28 @@ export default function GestaoIndicadores({
                           gap: isMounted && innerWidth > 768 ? "15px" : "10px",
                           alignItems: "center",
                           padding: "0 15px",
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "14px",
                         }}
                         suppressHydrationWarning
                       >
-                        <div suppressHydrationWarning>
-                          {isMounted && innerWidth > 768 ? (
-                            <>
-                              <div>CÓDIGO</div>
-                              <div>DESCRIÇÃO DO INDICADOR</div>
-                              <div style={{ textAlign: "center" }}>
-                                VALOR - ANO: {anoSelectedPolitica || "____"}
-                              </div>
-                              <div style={{ textAlign: "center" }}>
-                                UNIDADE
-                              </div>
-                            </>
-                          ) : (
-                            <div>INDICADORES - ANO: {anoSelectedPolitica || "____"}</div>
-                          )}
-                        </div>
+                        {isMounted && innerWidth > 768 ? (
+                          <>
+                            <div suppressHydrationWarning>CÓDIGO</div>
+                            <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              VALOR - ANO: {anoSelectedPolitica || "____"}
+                            </div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              UNIDADE
+                            </div>
+                          </>
+                        ) : (
+                          <div suppressHydrationWarning>
+                            INDICADORES - ANO: {anoSelectedPolitica || "____"}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -5016,94 +5903,94 @@ export default function GestaoIndicadores({
             </div>
             <Form onSubmit={handleSubmitPlano(handleAddPlano)}>
               <div style={{ width: "100%", padding: "20px", borderRadius: "10px", display: activeTabPlano === "planoMunicipal" ? "block" : "none" }} suppressHydrationWarning>
-                
+
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                    marginLeft: "20px",
+                  }}
+                >
+                  Situação do Plano Municipal:
+                </label>
+                <div
+                  style={{
+                    display: "flex",
+                    marginLeft: "20px",
+                    gap: "20px",
+                    flexDirection: innerWidth <= 768 ? "column" : "row",
+                  }}
+                  suppressHydrationWarning
+                >
                   <label
                     style={{
-                      display: "block",
-                      marginBottom: "10px",
-                      fontWeight: "bold",
-                      marginLeft: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
                     }}
                   >
-                    Situação do Plano Municipal:
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "aprovado"}
+                      onChange={() => handlePlanoSituacaoChange("aprovado")}
+                    />
+                    Aprovado
                   </label>
-                  <div
+                  <label
                     style={{
                       display: "flex",
-                      marginLeft: "20px",
-                      gap: "20px",
-                      flexDirection: innerWidth <= 768 ? "column" : "row",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
                     }}
-                    suppressHydrationWarning
                   >
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="plano_situacao"
-                        checked={planoSituacao === "aprovado"}
-                        onChange={() => handlePlanoSituacaoChange("aprovado")}
-                      />
-                      Aprovado
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="plano_situacao"
-                        checked={planoSituacao === "elaborado"}
-                        onChange={() => handlePlanoSituacaoChange("elaborado")}
-                      />
-                      Elaborado
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="plano_situacao"
-                        checked={planoSituacao === "em_construcao"}
-                        onChange={() =>
-                          handlePlanoSituacaoChange("em_construcao")
-                        }
-                      />
-                      Em construção
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="plano_situacao"
-                        checked={planoSituacao === "nao_tem"}
-                        onChange={() => handlePlanoSituacaoChange("nao_tem")}
-                      />
-                      Não tem
-                    </label>
-                  </div>
-                
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "elaborado"}
+                      onChange={() => handlePlanoSituacaoChange("elaborado")}
+                    />
+                    Elaborado
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "em_construcao"}
+                      onChange={() =>
+                        handlePlanoSituacaoChange("em_construcao")
+                      }
+                    />
+                    Em construção
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="plano_situacao"
+                      checked={planoSituacao === "nao_tem"}
+                      onChange={() => handlePlanoSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+
                 <table
                   style={{
                     width: "97%",
@@ -5368,7 +6255,7 @@ export default function GestaoIndicadores({
                 </table>
               </div>
             </Form>
-            <div style={{ display: activeTabPlano === "dadosComplementaresPlano" ? "block" : "none", marginLeft: "20px" }}>
+            <div style={{ display: activeTabPlano === "dadosComplementaresPlano" ? "block" : "none" }}>
               <Form style={{ backgroundColor: "white" }} onSubmit={handleSubmitIndicadoresPlano(handleCadastroIndicadoresPlano)}>
 
                 <div
@@ -5504,25 +6391,28 @@ export default function GestaoIndicadores({
                           gap: isMounted && innerWidth > 768 ? "15px" : "10px",
                           alignItems: "center",
                           padding: "0 15px",
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "14px",
                         }}
                         suppressHydrationWarning
                       >
-                        <div suppressHydrationWarning>
-                          {isMounted && innerWidth > 768 ? (
-                            <>
-                              <div>CÓDIGO</div>
-                              <div>DESCRIÇÃO DO INDICADOR</div>
-                              <div style={{ textAlign: "center" }}>
-                                VALOR - ANO: {anoSelectedPlano || "____"}
-                              </div>
-                              <div style={{ textAlign: "center" }}>
-                                UNIDADE
-                              </div>
-                            </>
-                          ) : (
-                            <div>INDICADORES - ANO: {anoSelectedPlano || "____"}</div>
-                          )}
-                        </div>
+                        {isMounted && innerWidth > 768 ? (
+                          <>
+                            <div suppressHydrationWarning>CÓDIGO</div>
+                            <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              VALOR - ANO: {anoSelectedPlano || "____"}
+                            </div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              UNIDADE
+                            </div>
+                          </>
+                        ) : (
+                          <div suppressHydrationWarning>
+                            INDICADORES - ANO: {anoSelectedPlano || "____"}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -5822,78 +6712,78 @@ export default function GestaoIndicadores({
                 }}
                 suppressHydrationWarning
               >
-                
+
+                <label
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    fontWeight: "bold",
+                    marginLeft: "20px",
+                  }}
+                >
+                  Situação do Conselho Municipal:
+                </label>
+                <div
+                  style={{
+                    display: "flex",
+                    marginLeft: "20px",
+                    gap: "20px",
+                    flexDirection: innerWidth <= 768 ? "column" : "row",
+                  }}
+                  suppressHydrationWarning
+                >
                   <label
                     style={{
-                      display: "block",
-                      marginBottom: "10px",
-                      fontWeight: "bold",
-                      marginLeft: "20px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
                     }}
                   >
-                    Situação do Conselho Municipal:
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "operante"}
+                      onChange={() => handleConselhoSituacaoChange("operante")}
+                    />
+                    Operante
                   </label>
-                  <div
+                  <label
                     style={{
                       display: "flex",
-                      marginLeft: "20px",
-                      gap: "20px",
-                      flexDirection: innerWidth <= 768 ? "column" : "row",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
                     }}
-                    suppressHydrationWarning
                   >
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="conselho_situacao"
-                        checked={conselhoSituacao === "operante"}
-                        onChange={() => handleConselhoSituacaoChange("operante")}
-                      />
-                      Operante
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="conselho_situacao"
-                        checked={conselhoSituacao === "nao_operante"}
-                        onChange={() =>
-                          handleConselhoSituacaoChange("nao_operante")
-                        }
-                      />
-                      Não operante
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        name="conselho_situacao"
-                        checked={conselhoSituacao === "nao_tem"}
-                        onChange={() => handleConselhoSituacaoChange("nao_tem")}
-                      />
-                      Não tem
-                    </label>
-                  </div>
-                
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "nao_operante"}
+                      onChange={() =>
+                        handleConselhoSituacaoChange("nao_operante")
+                      }
+                    />
+                    Não operante
+                  </label>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name="conselho_situacao"
+                      checked={conselhoSituacao === "nao_tem"}
+                      onChange={() => handleConselhoSituacaoChange("nao_tem")}
+                    />
+                    Não tem
+                  </label>
+                </div>
+
                 <table
                   style={{
                     width: "97%",
@@ -6292,7 +7182,7 @@ export default function GestaoIndicadores({
                 </TablesContainer>
               </div>
             </Form>
-            <div style={{ display: activeTabConselho === "dadosComplementaresConselho" ? "block" : "none", marginLeft: "20px" }} suppressHydrationWarning>
+            <div style={{ display: activeTabConselho === "dadosComplementaresConselho" ? "block" : "none" }} suppressHydrationWarning>
               <Form style={{ backgroundColor: "white" }} onSubmit={handleSubmitIndicadoresConselho(handleCadastroIndicadoresConselho)}>
 
                 <div
@@ -6428,25 +7318,28 @@ export default function GestaoIndicadores({
                           gap: isMounted && innerWidth > 768 ? "15px" : "10px",
                           alignItems: "center",
                           padding: "0 15px",
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "14px",
                         }}
                         suppressHydrationWarning
                       >
-                        <div suppressHydrationWarning>
-                          {isMounted && innerWidth > 768 ? (
-                            <>
-                              <div>CÓDIGO</div>
-                              <div>DESCRIÇÃO DO INDICADOR</div>
-                              <div style={{ textAlign: "center" }}>
-                                VALOR - ANO: {anoSelectedConselho || "____"}
-                              </div>
-                              <div style={{ textAlign: "center" }}>
-                                UNIDADE
-                              </div>
-                            </>
-                          ) : (
-                            <div>INDICADORES - ANO: {anoSelectedConselho || "____"}</div>
-                          )}
-                        </div>
+                        {isMounted && innerWidth > 768 ? (
+                          <>
+                            <div suppressHydrationWarning>CÓDIGO</div>
+                            <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              VALOR - ANO: {anoSelectedConselho || "____"}
+                            </div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              UNIDADE
+                            </div>
+                          </>
+                        ) : (
+                          <div suppressHydrationWarning>
+                            INDICADORES - ANO: {anoSelectedConselho || "____"}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -7048,7 +7941,7 @@ export default function GestaoIndicadores({
               <DivTextArea>
                 <label style={{ margin: "10px 0 0 30px" }}>Nome das Comunidades Beneficiadas</label>
 
-                <textarea 
+                <textarea
                   style={{ width: "95%", margin: "10px 0 0 30px" }}
                   ref={txtArea}
                   {...registerCT("ct_nomes_comunidades")}
@@ -7077,6 +7970,486 @@ export default function GestaoIndicadores({
               </SubmitButtonContainer>
             </DivFormCadastro>
           </Form>
+
+          {isDynamicMenuItemActive && ( 
+            <Form  onSubmit={handleSubmitIndicadores(handleCadastroIndicadores)}>
+              <DivTituloForm style={{ margin: 0 }}  >{grupo}</DivTituloForm>
+
+              <div
+                style={{ width: "97%", padding: "20px", borderBottom: "1px solid #eee" }}
+                suppressHydrationWarning
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "20px",
+                    flexWrap: "wrap",
+                    
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <label>Selecionar Ano:</label>
+                    <select
+                      value={anoSelected || ""}
+                      onChange={(e) => selectAno(e.target.value)}
+                      disabled={loadingDados}
+                      style={{ marginLeft: "10px", padding: "5px" }}
+                    >
+                      <option value="">Selecione o ano</option>
+                      {anosSelect().map((ano) => (
+                        <option key={ano} value={ano}>
+                          {ano}
+                        </option>
+                      ))}
+                    </select>
+                    {loadingDados && (
+                      <span style={{ marginLeft: "10px", color: "#12B2D5" }}>
+                        Carregando dados...
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ fontSize: "14px", color: "#666" }}>
+                    <strong>{indicadores.length}</strong> indicador
+                    {indicadores.length !== 1 ? "es" : ""} encontrado
+                    {indicadores.length !== 1 ? "s" : ""}
+                  </div>
+                </div>
+              </div>
+
+           
+
+                  {!grupo ? (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "40px",
+                        backgroundColor: "#f8f9fa",
+                      }}
+                    >
+                      <p>👈 Selecione um item do menu lateral para começar</p>
+                    </div>
+                  ) : loadingIndicadores ? (
+                    <div style={{ textAlign: "center", padding: "40px" }}>
+                      <p>Carregando indicadores...</p>
+                    </div>
+                  ) : indicadores.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px" }}>
+                      <p>Nenhum indicador encontrado para este grupo.</p>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        overflow: "hidden",
+                        width: "97%",
+                        margin: "20px 20px",
+                      }}
+                    >
+                      {/* Cabeçalho da Tabela */}
+                      <div
+                        style={{
+                          backgroundColor: "#1e88e5",
+                          color: "white",
+                          padding: "15px 0",
+                          fontWeight: "600",
+                          fontSize: "13px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              isMounted && innerWidth > 768
+                                ? "180px 1fr 280px 100px"
+                                : "1fr",
+                            gap: isMounted && innerWidth > 768 ? "15px" : "10px",
+                            alignItems: "center",
+                            padding: "0 15px",
+                          }}
+                          suppressHydrationWarning
+                        >
+                          {isMounted && innerWidth > 768 ? (
+                            <>
+                              <div suppressHydrationWarning>CÓDIGO</div>
+                              <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                              <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                                VALOR - ANO: {anoSelected || "____"}
+                              </div>
+                              <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                                UNIDADE
+                              </div>
+                            </>
+                          ) : (
+                            <div suppressHydrationWarning>
+                              INDICADORES - ANO: {anoSelected || "____"}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Linhas da Tabela */}
+                      {indicadores.map((indicador, index) => {
+                        const tipoCampo =
+                          indicador.tiposCampo &&
+                            indicador.tiposCampo.length > 0
+                            ? indicador.tiposCampo[0]
+                            : null;
+                        const isEven = index % 2 === 0;
+                        const fieldName = anoSelected
+                          ? `${indicador.codigo_indicador}_${anoSelected}`
+                          : null;
+
+                        return (
+                          <div
+                            key={indicador.id_indicador}
+                            style={{
+                              backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                              borderBottom:
+                                index < indicadores.length - 1
+                                  ? "1px solid #dee2e6"
+                                  : "none",
+                              padding: "15px 0",
+                              transition: "background-color 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "#e8f4fd";
+                              e.currentTarget.style.borderLeft =
+                                "3px solid #1e88e5";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = isEven
+                                ? "#f8f9fa"
+                                : "#ffffff";
+                              e.currentTarget.style.borderLeft = "none";
+                            }}
+                          >
+                            {isMounted && innerWidth > 768 ? (
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns:
+                                    "180px 1fr 280px 100px",
+                                  gap: "15px",
+                                  alignItems: "center",
+                                  padding: "0 15px",
+                                }}
+                                suppressHydrationWarning
+                              >
+                                {/* Código */}
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: "15px",
+                                      fontWeight: "bold",
+                                      color: "#1e88e5",
+                                    }}
+                                  >
+                                    {indicador.codigo_indicador}
+                                  </div>
+                                </div>
+
+                                {/* Descrição */}
+                                <div
+                                  style={{
+                                    fontSize: "14px",
+                                    color: "#495057",
+                                    lineHeight: "1.3",
+                                  }}
+                                >
+                                  {indicador.nome_indicador}
+                                </div>
+
+                                {/* Campo de Input */}
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  {anoSelected && fieldName ? (
+                                    <div style={{ width: "260px" }}>
+                                      {tipoCampo?.type === "number" ? (
+                                        <input
+                                          {...registerIndicadores(fieldName as any)}
+                                          type="number"
+                                          step="any"
+                                          style={{
+                                            width: "100%",
+                                            padding: "8px 12px",
+                                            border: "1px solid #dee2e6",
+                                            borderRadius: "4px",
+                                          }}
+                                        />
+                                      ) : tipoCampo?.type === "select" ? (
+                                        <select
+                                          {...registerIndicadores(fieldName as any)}
+                                          style={{
+                                            width: "100%",
+                                            padding: "8px 12px",
+                                            border: "1px solid #dee2e6",
+                                            borderRadius: "4px",
+                                          }}
+                                        >
+                                          <option value="">Selecione...</option>
+                                          {tipoCampo.selectOptions
+                                            ?.sort(
+                                              (a, b) =>
+                                                (a.ordem_option || 0) -
+                                                (b.ordem_option || 0)
+                                            )
+                                            .map((option) => (
+                                              <option
+                                                key={option.id_select_option}
+                                                value={option.value}
+                                              >
+                                                {option.descricao || option.value}
+                                              </option>
+                                            ))}
+                                        </select>
+                                      ) : (
+                                        <input
+                                          {...registerIndicadores(fieldName as any)}
+                                          type="text"
+                                          style={{
+                                            width: "100%",
+                                            padding: "8px 12px",
+                                            border: "1px solid #dee2e6",
+                                            borderRadius: "4px",
+                                          }}
+                                        />
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder="Selecione um ano"
+                                      disabled
+                                      style={{
+                                        width: "260px",
+                                        backgroundColor: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                        padding: "8px 12px",
+                                        color: "#6c757d",
+                                        textAlign: "center",
+                                        fontSize: "12px",
+                                      }}
+                                    />
+                                  )}
+                                </div>
+
+                                {/* Unidade */}
+                                <div
+                                  style={{
+                                    textAlign: "center",
+                                    fontSize: "12px",
+                                    color: "#495057",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      fontWeight: "500",
+                                      padding: "5px 6px",
+                                      backgroundColor: "#e9ecef",
+                                      borderRadius: "3px",
+                                      fontSize: "11px",
+                                    }}
+                                  >
+                                    {indicador.unidade_indicador || "-"}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              /* Layout Mobile */
+                              <div
+                                style={{
+                                  padding: "0 15px",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "10px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <div>
+                                    <div
+                                      style={{
+                                        fontSize: "16px",
+                                        fontWeight: "bold",
+                                        color: "#1e88e5",
+                                      }}
+                                    >
+                                      {indicador.codigo_indicador}
+                                    </div>
+                                    <div
+                                      style={{
+                                        fontSize: "11px",
+                                        color: "#6c757d",
+                                      }}
+                                    >
+                                      {indicador.unidade_indicador || "-"}
+                                    </div>
+                                  </div>
+                                  {tipoCampo && (
+                                    <div
+                                      style={{
+                                        fontSize: "10px",
+                                        color: "#6c757d",
+                                        backgroundColor: "#f8f9fa",
+                                        padding: "3px 6px",
+                                        borderRadius: "3px",
+                                      }}
+                                    >
+                                      {tipoCampo.type}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    color: "#495057",
+                                    lineHeight: "1.3",
+                                    marginBottom: "8px",
+                                  }}
+                                >
+                                  {indicador.nome_indicador}
+                                </div>
+
+                                {anoSelected && fieldName ? (
+                                  tipoCampo?.type === "number" ? (
+                                    <input
+                                      {...registerIndicadores(fieldName as any)}
+                                      type="number"
+                                      step="any"
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                      }}
+                                    />
+                                  ) : tipoCampo?.type === "select" ? (
+                                    <select
+                                      {...registerIndicadores(fieldName as any)}
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                      }}
+                                    >
+                                      <option value="">Selecione...</option>
+                                      {tipoCampo.selectOptions
+                                        ?.sort(
+                                          (a, b) =>
+                                            (a.ordem_option || 0) -
+                                            (b.ordem_option || 0)
+                                        )
+                                        .map((option) => (
+                                          <option
+                                            key={option.id_select_option}
+                                            value={option.value}
+                                          >
+                                            {option.descricao || option.value}
+                                          </option>
+                                        ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      {...registerIndicadores(fieldName as any)}
+                                      type="text"
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                      }}
+                                    />
+                                  )
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="Selecione um ano primeiro"
+                                    disabled
+                                    style={{
+                                      backgroundColor: "#f8f9fa",
+                                      border: "1px solid #dee2e6",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      color: "#6c757d",
+                                      textAlign: "center",
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                {usuario?.id_permissao !== 4 &&
+                  indicadores.length > 0 &&
+                  anoSelected && (
+                    <div
+                      style={{
+                        marginTop: "30px",
+                        padding: "20px",
+                        textAlign: "center",
+                        borderTop: "1px solid #e1e5e9",
+                      }}
+                    >
+                      <button
+                        type="submit"
+                        style={{
+                          backgroundColor: "#28a745",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "12px 40px",
+                          fontSize: "16px",
+                          fontWeight: "500",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#218838";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 8px rgba(40,167,69,0.3)";
+                          e.currentTarget.style.transform =
+                            "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#28a745";
+                          e.currentTarget.style.boxShadow =
+                            "0 2px 4px rgba(40,167,69,0.2)";
+                          e.currentTarget.style.transform =
+                            "translateY(0)";
+                        }}
+                      >
+                        💾 Salvar Dados dos Indicadores
+                      </button>
+                    </div>
+                  )}
+             
+
+            </Form>
+          )}
+
 
           {ShowModalPresidente && (
             <ContainerModal>
@@ -7316,7 +8689,7 @@ export default function GestaoIndicadores({
                       justifyContent: "space-between",
                       alignItems: "flex-start",
                       padding: "24px 32px",
-                     
+
                     }}
                     suppressHydrationWarning
                   >
@@ -7336,7 +8709,7 @@ export default function GestaoIndicadores({
                         ? "Editar Representante"
                         : "Adicionar Representante"}
                     </h2>
-                    
+
                   </div>
                   <ConteudoModal
                     style={{

@@ -79,7 +79,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     getValues,
     formState: { errors },
   } = useForm<Municipio>({});
-  
+
   // Formulário separado para os indicadores dinâmicos
   const {
     register: registerIndicadores,
@@ -87,7 +87,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
     reset: resetIndicadores,
     formState: { errors: errorsIndicadores },
   } = useForm<any>({});
-  
+
   const [activeForm, setActiveForm] = useState("dadosMunicipio");
   const { usuario, signOut } = useAuth();
   const [content, setContent] = useState("");
@@ -123,7 +123,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
       setMenus([]);
     }
   }
-  
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 1000) {
@@ -932,7 +932,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
   // Styled components para menu expansível
   const MenuHeader = styled.div.withConfig({
     shouldForwardProp: (prop) => prop !== '$isOpen',
-  })<{ $isOpen: boolean }>`
+  }) <{ $isOpen: boolean }>`
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -974,7 +974,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   const MenuItemsContainer = styled.div.withConfig({
     shouldForwardProp: (prop) => prop !== '$isOpen',
-  })<{ $isOpen: boolean }>`
+  }) <{ $isOpen: boolean }>`
     max-height: ${props => props.$isOpen ? "1000px" : "0"};
     overflow: hidden;
     transition: max-height 0.3s ease-in-out;
@@ -988,7 +988,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
 
   const StaticMenuHeader = styled.div.withConfig({
     shouldForwardProp: (prop) => prop !== '$isActive',
-  })<{ $isActive?: boolean }>`
+  }) <{ $isActive?: boolean }>`
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -1460,9 +1460,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
         </Sidebar>
       )}
       <MainContent isCollapsed={isCollapsed}>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
-            {!isDynamicMenuItemActive && (
+      {!isDynamicMenuItemActive && (
               <BreadCrumbStyle $isCollapsed={isCollapsed}>
                 <nav>
                   <ol>
@@ -1477,6 +1475,9 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 </nav>
               </BreadCrumbStyle>
             )}
+        <DivCenter>
+          <Form  onSubmit={handleSubmit(handleCadastro)}>
+           
             <DivFormCadastro active={activeForm === "dadosMunicipio"}>
               <DivTituloForm>Dados do Município</DivTituloForm>
 
@@ -2002,11 +2003,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
               </SubmitButtonContainer>
             </DivFormCadastro>
 
-            <DivFormCadastro active={activeForm === "prestadoresServicos"}>
+            <DivFormCadastro  active={activeForm === "prestadoresServicos"}>
               <DivTituloForm>
                 Prestadores dos Serviços Municipais de Saneamento Básico
               </DivTituloForm>
-              <div className="form-content">
+              <div style={{ padding: "30px" }} className="form-content">
                 <StepperContainer>
                   <StepperWrapper>
                     {steps.map((label, index) => (
@@ -3701,348 +3702,348 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                 Controle Social & Responsável pelo SIMISAB
               </DivTituloForm>
               <div style={{ padding: "20px" }}>
-                
-              <TabContainer>
-                <TabButton
-                  active={activeTab === "controleSocial"}
-                  onClick={() => setActiveTab("controleSocial")}
-                >
-                  Controle Social
-                </TabButton>
-                <TabButton
-                  active={activeTab === "responsaveisSimisab"}
-                  onClick={() => setActiveTab("responsaveisSimisab")}
-                >
-                  Responsável SIMISAB
-                </TabButton>
-                <TabButton
-                  active={activeTab === "conselhoMunicipal"}
-                  onClick={() => setActiveTab("conselhoMunicipal")}
-                >
-                  Conselho Municipal
-                </TabButton>
-              </TabContainer>
 
-              <div
-                style={{
-                  display: activeTab === "controleSocial" ? "block" : "none",
-                }}
-              >
-                <input {...register("id_controle_social_sms")} type="hidden" />
-                <InputG>
-                  <label>
-                    Setor Responsável<span> *</span>
-                  </label>
-                  <input
-                    {...register("cs_setor_responsavel", {
-                      required: "Campo obrigatório",
-                    })}
-                    style={{ textTransform: "capitalize" }}
-                    onChange={(e) => {
-                      const value = toTitleCase(e.target.value);
-                      setValue("cs_setor_responsavel", value);
-                    }}
-                    onKeyPress={onlyLettersAndCharacters}
-                    type="text"
-                  ></input>
-                  {errors.cs_setor_responsavel && (
-                    <span>{errors.cs_setor_responsavel.message}</span>
-                  )}
-                </InputG>
-
-                <InputP>
-                  <label>
-                    Telefone<span> *</span>
-                  </label>
-
-                  <Controller
-                    name="cs_telefone"
-                    control={control}
-                    rules={{ required: "O telefone é obrigatório" }}
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <InputMask
-                          mask="(99) 99999-9999"
-                          maskChar={null}
-                          value={value}
-                          onChange={(e) => {
-                            const justNumbers = e.target.value.replace(
-                              /\D/g,
-                              ""
-                            );
-                            if (justNumbers.length <= 11) {
-                              onChange(justNumbers);
-                            }
-                          }}
-                        >
-                          {(inputProps) => (
-                            <input {...inputProps} type="text" />
-                          )}
-                        </InputMask>
-                        {error && <span>{error.message}</span>}
-                      </>
-                    )}
-                  />
-                </InputP>
-                <InputG>
-                  <label>
-                    Email<span> *</span>
-                  </label>
-
-                  <input
-                    {...register("cs_email", {
-                      required: "Campo obrigatório",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Endereço de email inválido",
-                      },
-                    })}
-                    type="text"
-                  />
-                  {errors.cs_email && errors.cs_email.type && (
-                    <span>{errors.cs_email.message}</span>
-                  )}
-                </InputG>
-
-                <SubmitButtonContainer>
-                  {usuario?.id_permissao !== 4 && (
-                    <SubmitButton
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleSaveSubmenu("controleSocial");
-                      }}
-                    >
-                      Gravar
-                    </SubmitButton>
-                  )}
-                </SubmitButtonContainer>
-              </div>
-
-              <div
-                style={{
-                  display:
-                    activeTab === "responsaveisSimisab" ? "block" : "none",
-                }}
-              >
-                <input {...register("id_responsavel_simisab")} type="hidden" />
-
-                <InputG>
-                  <label>Usuarios Simisab</label>
-                  <select onChange={(e) => getResSimisab(e.target.value)}>
-                    <option value="">
-                      Selecione um usuário para ser o responsavel Simisab
-                    </option>
-                    {Array.isArray(responsaveisSimisab) &&
-                      responsaveisSimisab.map((resp) => (
-                        <option key={resp.id_usuario} value={resp.id_usuario}>
-                          {resp.nome}
-                        </option>
-                      ))}
-                  </select>
-                </InputG>
-                <InputG>
-                  <label>
-                    Nome<span> *</span>
-                  </label>
-                  <input
-                    {...register("simisab_responsavel", {
-                      required: "Campo obrigatório",
-                    })}
-                    onKeyPress={onlyLettersAndCharacters}
-                    style={{ textTransform: "capitalize" }}
-                    onChange={(e) => {
-                      const value = toTitleCase(e.target.value);
-                      setValue("simisab_responsavel", value);
-                    }}
-                    type="text"
-                  ></input>
-                  {errors.simisab_responsavel && (
-                    <span>{errors.simisab_responsavel.message}</span>
-                  )}
-                </InputG>
-
-                <InputP>
-                  <label>
-                    Telefone<span> *</span>
-                  </label>
-
-                  <Controller
-                    name="simisab_telefone"
-                    control={control}
-                    rules={{ required: "O telefone é obrigatório" }}
-                    render={({
-                      field: { onChange, value },
-                      fieldState: { error },
-                    }) => (
-                      <>
-                        <InputMask
-                          mask="(99) 99999-9999"
-                          maskChar={null}
-                          value={value}
-                          onChange={(e) => {
-                            const justNumbers = e.target.value.replace(
-                              /\D/g,
-                              ""
-                            );
-                            if (justNumbers.length <= 11) {
-                              onChange(justNumbers);
-                            }
-                          }}
-                        >
-                          {(inputProps) => (
-                            <input {...inputProps} type="text" />
-                          )}
-                        </InputMask>
-                        {error && <span>{error.message}</span>}
-                      </>
-                    )}
-                  />
-                </InputP>
-                <InputG>
-                  <label>
-                    Email<span> *</span>
-                  </label>
-
-                  <input
-                    {...register("simisab_email", {
-                      required: "Campo obrigatório",
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: "Endereço de email inválido",
-                      },
-                    })}
-                    type="text"
-                  />
-                  {errors.simisab_email && (
-                    <span>{errors.simisab_email.message}</span>
-                  )}
-                </InputG>
-
-                <SubmitButtonContainer>
-                  {usuario?.id_permissao !== 4 && (
-                    <SubmitButton
-                      type="button"
-                      onClick={() => handleSaveSubmenu("responsavelSimisab")}
-                    >
-                      Gravar
-                    </SubmitButton>
-                  )}
-                </SubmitButtonContainer>
-              </div>
-
-              <div
-                style={{
-                  display: activeTab === "conselhoMunicipal" ? "block" : "none",
-                }}
-              >
-                <input {...register("id_conselho_municipal")} type="hidden" />
-                <div style={{ marginBottom: "20px" }}>
-                  <label style={{ display: "flex", marginBottom: "10px" }}>
-                    Conselho Municipal de Saneamento Básico?
-                    <span style={{ color: "red" }}> *</span>
-                  </label>
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "20px",
-                      alignItems: "center",
-                    }}
+                <TabContainer>
+                  <TabButton
+                    active={activeTab === "controleSocial"}
+                    onClick={() => setActiveTab("controleSocial")}
                   >
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        {...register("possui_conselho", {
-                          required: "É necessário selecionar uma opção",
-                        })}
-                        value="sim"
-                      />
-                      Sim
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        {...register("possui_conselho", {
-                          required: "É necessário selecionar uma opção",
-                        })}
-                        value="nao"
-                      />
-                      Não
-                    </label>
-                    <label
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "5px",
-                      }}
-                    >
-                      <input
-                        type="radio"
-                        {...register("possui_conselho", {
-                          required: "É necessário selecionar uma opção",
-                        })}
-                        value="outros"
-                      />
-                      Outros
-                    </label>
-                  </div>
-                  {errors.possui_conselho && (
-                    <span
-                      style={{
-                        color: "red",
-                        fontSize: "14px",
-                        marginTop: "5px",
-                      }}
-                    >
-                      {errors.possui_conselho.message}
-                    </span>
-                  )}
-                </div>
-                {watch("possui_conselho") === "outros" && (
-                  <textarea
-                    style={{ width: "500px" }}
-                    {...register("descricao_outros", {
-                      required: "Campo obrigatório",
-                    })}
-                    placeholder="Por favor, explique..."
-                    rows={4}
-                  />
-                )}
-                {errors.descricao_outros && (
-                  <span>{errors.descricao_outros.message}</span>
-                )}
+                    Controle Social
+                  </TabButton>
+                  <TabButton
+                    active={activeTab === "responsaveisSimisab"}
+                    onClick={() => setActiveTab("responsaveisSimisab")}
+                  >
+                    Responsável SIMISAB
+                  </TabButton>
+                  <TabButton
+                    active={activeTab === "conselhoMunicipal"}
+                    onClick={() => setActiveTab("conselhoMunicipal")}
+                  >
+                    Conselho Municipal
+                  </TabButton>
+                </TabContainer>
 
-                <SubmitButtonContainer>
-                  {usuario?.id_permissao !== 4 && (
-                    <SubmitButton
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleSaveSubmenu("conselhoMunicipal");
+                <div
+                  style={{
+                    display: activeTab === "controleSocial" ? "block" : "none",
+                  }}
+                >
+                  <input {...register("id_controle_social_sms")} type="hidden" />
+                  <InputG>
+                    <label>
+                      Setor Responsável<span> *</span>
+                    </label>
+                    <input
+                      {...register("cs_setor_responsavel", {
+                        required: "Campo obrigatório",
+                      })}
+                      style={{ textTransform: "capitalize" }}
+                      onChange={(e) => {
+                        const value = toTitleCase(e.target.value);
+                        setValue("cs_setor_responsavel", value);
+                      }}
+                      onKeyPress={onlyLettersAndCharacters}
+                      type="text"
+                    ></input>
+                    {errors.cs_setor_responsavel && (
+                      <span>{errors.cs_setor_responsavel.message}</span>
+                    )}
+                  </InputG>
+
+                  <InputP>
+                    <label>
+                      Telefone<span> *</span>
+                    </label>
+
+                    <Controller
+                      name="cs_telefone"
+                      control={control}
+                      rules={{ required: "O telefone é obrigatório" }}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <>
+                          <InputMask
+                            mask="(99) 99999-9999"
+                            maskChar={null}
+                            value={value}
+                            onChange={(e) => {
+                              const justNumbers = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
+                              if (justNumbers.length <= 11) {
+                                onChange(justNumbers);
+                              }
+                            }}
+                          >
+                            {(inputProps) => (
+                              <input {...inputProps} type="text" />
+                            )}
+                          </InputMask>
+                          {error && <span>{error.message}</span>}
+                        </>
+                      )}
+                    />
+                  </InputP>
+                  <InputG>
+                    <label>
+                      Email<span> *</span>
+                    </label>
+
+                    <input
+                      {...register("cs_email", {
+                        required: "Campo obrigatório",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Endereço de email inválido",
+                        },
+                      })}
+                      type="text"
+                    />
+                    {errors.cs_email && errors.cs_email.type && (
+                      <span>{errors.cs_email.message}</span>
+                    )}
+                  </InputG>
+
+                  <SubmitButtonContainer>
+                    {usuario?.id_permissao !== 4 && (
+                      <SubmitButton
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSaveSubmenu("controleSocial");
+                        }}
+                      >
+                        Gravar
+                      </SubmitButton>
+                    )}
+                  </SubmitButtonContainer>
+                </div>
+
+                <div
+                  style={{
+                    display:
+                      activeTab === "responsaveisSimisab" ? "block" : "none",
+                  }}
+                >
+                  <input {...register("id_responsavel_simisab")} type="hidden" />
+
+                  <InputG>
+                    <label>Usuarios Simisab</label>
+                    <select onChange={(e) => getResSimisab(e.target.value)}>
+                      <option value="">
+                        Selecione um usuário para ser o responsavel Simisab
+                      </option>
+                      {Array.isArray(responsaveisSimisab) &&
+                        responsaveisSimisab.map((resp) => (
+                          <option key={resp.id_usuario} value={resp.id_usuario}>
+                            {resp.nome}
+                          </option>
+                        ))}
+                    </select>
+                  </InputG>
+                  <InputG>
+                    <label>
+                      Nome<span> *</span>
+                    </label>
+                    <input
+                      {...register("simisab_responsavel", {
+                        required: "Campo obrigatório",
+                      })}
+                      onKeyPress={onlyLettersAndCharacters}
+                      style={{ textTransform: "capitalize" }}
+                      onChange={(e) => {
+                        const value = toTitleCase(e.target.value);
+                        setValue("simisab_responsavel", value);
+                      }}
+                      type="text"
+                    ></input>
+                    {errors.simisab_responsavel && (
+                      <span>{errors.simisab_responsavel.message}</span>
+                    )}
+                  </InputG>
+
+                  <InputP>
+                    <label>
+                      Telefone<span> *</span>
+                    </label>
+
+                    <Controller
+                      name="simisab_telefone"
+                      control={control}
+                      rules={{ required: "O telefone é obrigatório" }}
+                      render={({
+                        field: { onChange, value },
+                        fieldState: { error },
+                      }) => (
+                        <>
+                          <InputMask
+                            mask="(99) 99999-9999"
+                            maskChar={null}
+                            value={value}
+                            onChange={(e) => {
+                              const justNumbers = e.target.value.replace(
+                                /\D/g,
+                                ""
+                              );
+                              if (justNumbers.length <= 11) {
+                                onChange(justNumbers);
+                              }
+                            }}
+                          >
+                            {(inputProps) => (
+                              <input {...inputProps} type="text" />
+                            )}
+                          </InputMask>
+                          {error && <span>{error.message}</span>}
+                        </>
+                      )}
+                    />
+                  </InputP>
+                  <InputG>
+                    <label>
+                      Email<span> *</span>
+                    </label>
+
+                    <input
+                      {...register("simisab_email", {
+                        required: "Campo obrigatório",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Endereço de email inválido",
+                        },
+                      })}
+                      type="text"
+                    />
+                    {errors.simisab_email && (
+                      <span>{errors.simisab_email.message}</span>
+                    )}
+                  </InputG>
+
+                  <SubmitButtonContainer>
+                    {usuario?.id_permissao !== 4 && (
+                      <SubmitButton
+                        type="button"
+                        onClick={() => handleSaveSubmenu("responsavelSimisab")}
+                      >
+                        Gravar
+                      </SubmitButton>
+                    )}
+                  </SubmitButtonContainer>
+                </div>
+
+                <div
+                  style={{
+                    display: activeTab === "conselhoMunicipal" ? "block" : "none",
+                  }}
+                >
+                  <input {...register("id_conselho_municipal")} type="hidden" />
+                  <div style={{ marginBottom: "20px" }}>
+                    <label style={{ display: "flex", marginBottom: "10px" }}>
+                      Conselho Municipal de Saneamento Básico?
+                      <span style={{ color: "red" }}> *</span>
+                    </label>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "20px",
+                        alignItems: "center",
                       }}
                     >
-                      Gravar
-                    </SubmitButton>
+                      <label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          {...register("possui_conselho", {
+                            required: "É necessário selecionar uma opção",
+                          })}
+                          value="sim"
+                        />
+                        Sim
+                      </label>
+                      <label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          {...register("possui_conselho", {
+                            required: "É necessário selecionar uma opção",
+                          })}
+                          value="nao"
+                        />
+                        Não
+                      </label>
+                      <label
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "5px",
+                        }}
+                      >
+                        <input
+                          type="radio"
+                          {...register("possui_conselho", {
+                            required: "É necessário selecionar uma opção",
+                          })}
+                          value="outros"
+                        />
+                        Outros
+                      </label>
+                    </div>
+                    {errors.possui_conselho && (
+                      <span
+                        style={{
+                          color: "red",
+                          fontSize: "14px",
+                          marginTop: "5px",
+                        }}
+                      >
+                        {errors.possui_conselho.message}
+                      </span>
+                    )}
+                  </div>
+                  {watch("possui_conselho") === "outros" && (
+                    <textarea
+                      style={{ width: "500px" }}
+                      {...register("descricao_outros", {
+                        required: "Campo obrigatório",
+                      })}
+                      placeholder="Por favor, explique..."
+                      rows={4}
+                    />
                   )}
-                </SubmitButtonContainer>
-              </div>
+                  {errors.descricao_outros && (
+                    <span>{errors.descricao_outros.message}</span>
+                  )}
+
+                  <SubmitButtonContainer>
+                    {usuario?.id_permissao !== 4 && (
+                      <SubmitButton
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSaveSubmenu("conselhoMunicipal");
+                        }}
+                      >
+                        Gravar
+                      </SubmitButton>
+                    )}
+                  </SubmitButtonContainer>
+                </div>
               </div>
             </DivFormCadastro>
 
@@ -5105,11 +5106,11 @@ export default function Cadastro({ municipio }: MunicipioProps) {
             </DivFormCadastro>
 
           </Form>
-          
+
           {/* Renderização de Indicadores para Menu Items Dinâmicos - FORA do formulário principal */}
           {isDynamicMenuItemActive && (
-            <Form onSubmit={handleSubmitIndicadores(handleCadastroIndicadores)}>
-              <BreadCrumbStyle $isCollapsed={isCollapsed}>
+            <div style={{ width: "100%" }}>
+               <BreadCrumbStyle $isCollapsed={isCollapsed}>
                 <nav>
                   <ol>
                     <li>
@@ -5132,489 +5133,491 @@ export default function Cadastro({ municipio }: MunicipioProps) {
                   </ol>
                 </nav>
               </BreadCrumbStyle>
+            
+            <Form onSubmit={handleSubmitIndicadores(handleCadastroIndicadores)}>
+             
               <DivForm style={{ borderColor: "" }}>
                 <DivTituloFormIndicadores>{grupo}</DivTituloFormIndicadores>
 
+                <div
+                  style={{ padding: "20px", borderBottom: "1px solid #eee" }}
+                >
                   <div
-                    style={{ padding: "20px", borderBottom: "1px solid #eee" }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      flexWrap: "wrap",
+                    }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "20px",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <div>
-                        <label>Selecionar Ano:</label>
-                        <select
-                          value={anoSelected || ""}
-                          onChange={(e) => selectAno(e.target.value)}
-                          disabled={loadingDados}
-                          style={{ marginLeft: "10px", padding: "5px" }}
-                        >
-                          <option value="">Selecione o ano</option>
-                          {anosSelect().map((ano) => (
-                            <option key={ano} value={ano}>
-                              {ano}
-                            </option>
-                          ))}
-                        </select>
-                        {loadingDados && (
-                          <span style={{ marginLeft: "10px", color: "#12B2D5" }}>
-                            Carregando dados...
-                          </span>
-                        )}
-                      </div>
+                    <div>
+                      <label>Selecionar Ano:</label>
+                      <select
+                        value={anoSelected || ""}
+                        onChange={(e) => selectAno(e.target.value)}
+                        disabled={loadingDados}
+                        style={{ marginLeft: "10px", padding: "5px" }}
+                      >
+                        <option value="">Selecione o ano</option>
+                        {anosSelect().map((ano) => (
+                          <option key={ano} value={ano}>
+                            {ano}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingDados && (
+                        <span style={{ marginLeft: "10px", color: "#12B2D5" }}>
+                          Carregando dados...
+                        </span>
+                      )}
+                    </div>
 
-                      <div style={{ fontSize: "14px", color: "#666" }}>
-                        <strong>{indicadores.length}</strong> indicador
-                        {indicadores.length !== 1 ? "es" : ""} encontrado
-                        {indicadores.length !== 1 ? "s" : ""}
-                      </div>
+                    <div style={{ fontSize: "14px", color: "#666" }}>
+                      <strong>{indicadores.length}</strong> indicador
+                      {indicadores.length !== 1 ? "es" : ""} encontrado
+                      {indicadores.length !== 1 ? "s" : ""}
                     </div>
                   </div>
+                </div>
 
-                  <DivFormEixo>
-                    <DivFormConteudo
-                      active={!!grupo}
-                      style={{
-                        display: grupo ? "block" : "none",
-                        visibility: grupo ? "visible" : "hidden",
-                        opacity: grupo ? 1 : 0,
-                      }}
-                    >
-                      <DivTitulo>
-                        <DivTituloConteudo>{grupo}</DivTituloConteudo>
-                      </DivTitulo>
+                <DivFormEixo>
+                  <DivFormConteudo
+                    active={!!grupo}
+                    style={{
+                      display: grupo ? "block" : "none",
+                      visibility: grupo ? "visible" : "hidden",
+                      opacity: grupo ? 1 : 0,
+                    }}
+                  >
+                   
 
-                      {!grupo ? (
+                    {!grupo ? (
+                      <div
+                        style={{
+                          textAlign: "center",
+                          padding: "40px",
+                          backgroundColor: "#f8f9fa",
+                        }}
+                      >
+                        <p>👈 Selecione um item do menu lateral para começar</p>
+                      </div>
+                    ) : loadingIndicadores ? (
+                      <div style={{ textAlign: "center", padding: "40px" }}>
+                        <p>Carregando indicadores...</p>
+                      </div>
+                    ) : indicadores.length === 0 ? (
+                      <div style={{ textAlign: "center", padding: "40px" }}>
+                        <p>Nenhum indicador encontrado para este grupo.</p>
+                      </div>
+                    ) : (
+                      <div
+                        style={{
+                          backgroundColor: "#fff",
+                          borderRadius: "8px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                          overflow: "hidden",
+                          marginTop: "20px",
+                        }}
+                      >
+                        {/* Cabeçalho da Tabela */}
                         <div
                           style={{
-                            textAlign: "center",
-                            padding: "40px",
-                            backgroundColor: "#f8f9fa",
+                            backgroundColor: "#1e88e5",
+                            color: "white",
+                            padding: "15px 0",
+                            fontWeight: "600",
+                            fontSize: "13px",
+                            letterSpacing: "0.5px",
                           }}
                         >
-                          <p>👈 Selecione um item do menu lateral para começar</p>
-                        </div>
-                      ) : loadingIndicadores ? (
-                        <div style={{ textAlign: "center", padding: "40px" }}>
-                          <p>Carregando indicadores...</p>
-                        </div>
-                      ) : indicadores.length === 0 ? (
-                        <div style={{ textAlign: "center", padding: "40px" }}>
-                          <p>Nenhum indicador encontrado para este grupo.</p>
-                        </div>
-                      ) : (
-                        <div
-                          style={{
-                            backgroundColor: "#fff",
-                            borderRadius: "8px",
-                            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                            overflow: "hidden",
-                            marginTop: "20px",
-                          }}
-                        >
-                          {/* Cabeçalho da Tabela */}
                           <div
                             style={{
-                              backgroundColor: "#1e88e5",
-                              color: "white",
-                              padding: "15px 0",
-                              fontWeight: "600",
-                              fontSize: "13px",
-                              letterSpacing: "0.5px",
+                              display: "grid",
+                              gridTemplateColumns:
+                                window.innerWidth > 768
+                                  ? "180px 1fr 280px 100px"
+                                  : "1fr",
+                              gap: window.innerWidth > 768 ? "15px" : "10px",
+                              alignItems: "center",
+                              padding: "0 15px",
                             }}
                           >
+                            {window.innerWidth > 768 ? (
+                              <>
+                                <div>CÓDIGO</div>
+                                <div>DESCRIÇÃO DO INDICADOR</div>
+                                <div style={{ textAlign: "center" }}>
+                                  VALOR - ANO: {anoSelected || "____"}
+                                </div>
+                                <div style={{ textAlign: "center" }}>
+                                  UNIDADE
+                                </div>
+                              </>
+                            ) : (
+                              <div>
+                                INDICADORES - ANO: {anoSelected || "____"}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Linhas da Tabela */}
+                        {indicadores.map((indicador, index) => {
+                          const tipoCampo =
+                            indicador.tiposCampo &&
+                              indicador.tiposCampo.length > 0
+                              ? indicador.tiposCampo[0]
+                              : null;
+                          const isEven = index % 2 === 0;
+                          const fieldName = anoSelected
+                            ? `${indicador.codigo_indicador}_${anoSelected}`
+                            : null;
+
+                          return (
                             <div
+                              key={indicador.id_indicador}
                               style={{
-                                display: "grid",
-                                gridTemplateColumns:
-                                  window.innerWidth > 768
-                                    ? "180px 1fr 280px 100px"
-                                    : "1fr",
-                                gap: window.innerWidth > 768 ? "15px" : "10px",
-                                alignItems: "center",
-                                padding: "0 15px",
+                                backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                                borderBottom:
+                                  index < indicadores.length - 1
+                                    ? "1px solid #dee2e6"
+                                    : "none",
+                                padding: "15px 0",
+                                transition: "background-color 0.2s ease",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor =
+                                  "#e8f4fd";
+                                e.currentTarget.style.borderLeft =
+                                  "3px solid #1e88e5";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = isEven
+                                  ? "#f8f9fa"
+                                  : "#ffffff";
+                                e.currentTarget.style.borderLeft = "none";
                               }}
                             >
                               {window.innerWidth > 768 ? (
-                                <>
-                                  <div>CÓDIGO</div>
-                                  <div>DESCRIÇÃO DO INDICADOR</div>
-                                  <div style={{ textAlign: "center" }}>
-                                    VALOR - ANO: {anoSelected || "____"}
+                                <div
+                                  style={{
+                                    display: "grid",
+                                    gridTemplateColumns:
+                                      "180px 1fr 280px 100px",
+                                    gap: "15px",
+                                    alignItems: "center",
+                                    padding: "0 15px",
+                                  }}
+                                >
+                                  {/* Código */}
+                                  <div>
+                                    <div
+                                      style={{
+                                        fontSize: "15px",
+                                        fontWeight: "bold",
+                                        color: "#1e88e5",
+                                      }}
+                                    >
+                                      {indicador.codigo_indicador}
+                                    </div>
                                   </div>
-                                  <div style={{ textAlign: "center" }}>
-                                    UNIDADE
-                                  </div>
-                                </>
-                              ) : (
-                                <div>
-                                  INDICADORES - ANO: {anoSelected || "____"}
-                                </div>
-                              )}
-                            </div>
-                          </div>
 
-                          {/* Linhas da Tabela */}
-                          {indicadores.map((indicador, index) => {
-                            const tipoCampo =
-                              indicador.tiposCampo &&
-                              indicador.tiposCampo.length > 0
-                                ? indicador.tiposCampo[0]
-                                : null;
-                            const isEven = index % 2 === 0;
-                            const fieldName = anoSelected
-                              ? `${indicador.codigo_indicador}_${anoSelected}`
-                              : null;
-
-                            return (
-                              <div
-                                key={indicador.id_indicador}
-                                style={{
-                                  backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
-                                  borderBottom:
-                                    index < indicadores.length - 1
-                                      ? "1px solid #dee2e6"
-                                      : "none",
-                                  padding: "15px 0",
-                                  transition: "background-color 0.2s ease",
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.backgroundColor =
-                                    "#e8f4fd";
-                                  e.currentTarget.style.borderLeft =
-                                    "3px solid #1e88e5";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.backgroundColor = isEven
-                                    ? "#f8f9fa"
-                                    : "#ffffff";
-                                  e.currentTarget.style.borderLeft = "none";
-                                }}
-                              >
-                                {window.innerWidth > 768 ? (
+                                  {/* Descrição */}
                                   <div
                                     style={{
-                                      display: "grid",
-                                      gridTemplateColumns:
-                                        "180px 1fr 280px 100px",
-                                      gap: "15px",
-                                      alignItems: "center",
-                                      padding: "0 15px",
+                                      fontSize: "14px",
+                                      color: "#495057",
+                                      lineHeight: "1.3",
                                     }}
                                   >
-                                    {/* Código */}
-                                    <div>
-                                      <div
-                                        style={{
-                                          fontSize: "15px",
-                                          fontWeight: "bold",
-                                          color: "#1e88e5",
-                                        }}
-                                      >
-                                        {indicador.codigo_indicador}
-                                      </div>
-                                    </div>
-
-                                    {/* Descrição */}
-                                    <div
-                                      style={{
-                                        fontSize: "14px",
-                                        color: "#495057",
-                                        lineHeight: "1.3",
-                                      }}
-                                    >
-                                      {indicador.nome_indicador}
-                                    </div>
-
-                                    {/* Campo de Input */}
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                      }}
-                                    >
-                                      {anoSelected && fieldName ? (
-                                        <div style={{ width: "260px" }}>
-                                          {tipoCampo?.type === "number" ? (
-                                            <input
-                                              {...registerIndicadores(fieldName as any)}
-                                              type="number"
-                                              step="any"
-                                              style={{
-                                                width: "100%",
-                                                padding: "8px 12px",
-                                                border: "1px solid #dee2e6",
-                                                borderRadius: "4px",
-                                              }}
-                                            />
-                                          ) : tipoCampo?.type === "select" ? (
-                                            <select
-                                              {...registerIndicadores(fieldName as any)}
-                                              style={{
-                                                width: "100%",
-                                                padding: "8px 12px",
-                                                border: "1px solid #dee2e6",
-                                                borderRadius: "4px",
-                                              }}
-                                            >
-                                              <option value="">Selecione...</option>
-                                              {tipoCampo.selectOptions
-                                                ?.sort(
-                                                  (a, b) =>
-                                                    (a.ordem_option || 0) -
-                                                    (b.ordem_option || 0)
-                                                )
-                                                .map((option) => (
-                                                  <option
-                                                    key={option.id_select_option}
-                                                    value={option.value}
-                                                  >
-                                                    {option.descricao || option.value}
-                                                  </option>
-                                                ))}
-                                            </select>
-                                          ) : (
-                                            <input
-                                              {...registerIndicadores(fieldName as any)}
-                                              type="text"
-                                              style={{
-                                                width: "100%",
-                                                padding: "8px 12px",
-                                                border: "1px solid #dee2e6",
-                                                borderRadius: "4px",
-                                              }}
-                                            />
-                                          )}
-                                        </div>
-                                      ) : (
-                                        <input
-                                          type="text"
-                                          placeholder="Selecione um ano"
-                                          disabled
-                                          style={{
-                                            width: "260px",
-                                            backgroundColor: "#f8f9fa",
-                                            border: "1px solid #dee2e6",
-                                            borderRadius: "4px",
-                                            padding: "8px 12px",
-                                            color: "#6c757d",
-                                            textAlign: "center",
-                                            fontSize: "12px",
-                                          }}
-                                        />
-                                      )}
-                                    </div>
-
-                                    {/* Unidade */}
-                                    <div
-                                      style={{
-                                        textAlign: "center",
-                                        fontSize: "12px",
-                                        color: "#495057",
-                                      }}
-                                    >
-                                      <div
-                                        style={{
-                                          fontWeight: "500",
-                                          padding: "5px 6px",
-                                          backgroundColor: "#e9ecef",
-                                          borderRadius: "3px",
-                                          fontSize: "11px",
-                                        }}
-                                      >
-                                        {indicador.unidade_indicador || "-"}
-                                      </div>
-                                    </div>
+                                    {indicador.nome_indicador}
                                   </div>
-                                ) : (
-                                  /* Layout Mobile */
+
+                                  {/* Campo de Input */}
                                   <div
                                     style={{
-                                      padding: "0 15px",
                                       display: "flex",
-                                      flexDirection: "column",
-                                      gap: "10px",
+                                      justifyContent: "center",
                                     }}
                                   >
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <div>
-                                        <div
-                                          style={{
-                                            fontSize: "16px",
-                                            fontWeight: "bold",
-                                            color: "#1e88e5",
-                                          }}
-                                        >
-                                          {indicador.codigo_indicador}
-                                        </div>
-                                        <div
-                                          style={{
-                                            fontSize: "11px",
-                                            color: "#6c757d",
-                                          }}
-                                        >
-                                          {indicador.unidade_indicador || "-"}
-                                        </div>
-                                      </div>
-                                      {tipoCampo && (
-                                        <div
-                                          style={{
-                                            fontSize: "10px",
-                                            color: "#6c757d",
-                                            backgroundColor: "#f8f9fa",
-                                            padding: "3px 6px",
-                                            borderRadius: "3px",
-                                          }}
-                                        >
-                                          {tipoCampo.type}
-                                        </div>
-                                      )}
-                                    </div>
-
-                                    <div
-                                      style={{
-                                        fontSize: "13px",
-                                        color: "#495057",
-                                        lineHeight: "1.3",
-                                        marginBottom: "8px",
-                                      }}
-                                    >
-                                      {indicador.nome_indicador}
-                                    </div>
-
                                     {anoSelected && fieldName ? (
-                                      tipoCampo?.type === "number" ? (
-                                        <input
-                                          {...registerIndicadores(fieldName as any)}
-                                          type="number"
-                                          step="any"
-                                          style={{
-                                            width: "100%",
-                                            padding: "8px 12px",
-                                            border: "1px solid #dee2e6",
-                                            borderRadius: "4px",
-                                          }}
-                                        />
-                                      ) : tipoCampo?.type === "select" ? (
-                                        <select
-                                          {...registerIndicadores(fieldName as any)}
-                                          style={{
-                                            width: "100%",
-                                            padding: "8px 12px",
-                                            border: "1px solid #dee2e6",
-                                            borderRadius: "4px",
-                                          }}
-                                        >
-                                          <option value="">Selecione...</option>
-                                          {tipoCampo.selectOptions
-                                            ?.sort(
-                                              (a, b) =>
-                                                (a.ordem_option || 0) -
-                                                (b.ordem_option || 0)
-                                            )
-                                            .map((option) => (
-                                              <option
-                                                key={option.id_select_option}
-                                                value={option.value}
-                                              >
-                                                {option.descricao || option.value}
-                                              </option>
-                                            ))}
-                                        </select>
-                                      ) : (
-                                        <input
-                                          {...registerIndicadores(fieldName as any)}
-                                          type="text"
-                                          style={{
-                                            width: "100%",
-                                            padding: "8px 12px",
-                                            border: "1px solid #dee2e6",
-                                            borderRadius: "4px",
-                                          }}
-                                        />
-                                      )
+                                      <div style={{ width: "260px" }}>
+                                        {tipoCampo?.type === "number" ? (
+                                          <input
+                                            {...registerIndicadores(fieldName as any)}
+                                            type="number"
+                                            step="any"
+                                            style={{
+                                              width: "100%",
+                                              padding: "8px 12px",
+                                              border: "1px solid #dee2e6",
+                                              borderRadius: "4px",
+                                            }}
+                                          />
+                                        ) : tipoCampo?.type === "select" ? (
+                                          <select
+                                            {...registerIndicadores(fieldName as any)}
+                                            style={{
+                                              width: "100%",
+                                              padding: "8px 12px",
+                                              border: "1px solid #dee2e6",
+                                              borderRadius: "4px",
+                                            }}
+                                          >
+                                            <option value="">Selecione...</option>
+                                            {tipoCampo.selectOptions
+                                              ?.sort(
+                                                (a, b) =>
+                                                  (a.ordem_option || 0) -
+                                                  (b.ordem_option || 0)
+                                              )
+                                              .map((option) => (
+                                                <option
+                                                  key={option.id_select_option}
+                                                  value={option.value}
+                                                >
+                                                  {option.descricao || option.value}
+                                                </option>
+                                              ))}
+                                          </select>
+                                        ) : (
+                                          <input
+                                            {...registerIndicadores(fieldName as any)}
+                                            type="text"
+                                            style={{
+                                              width: "100%",
+                                              padding: "8px 12px",
+                                              border: "1px solid #dee2e6",
+                                              borderRadius: "4px",
+                                            }}
+                                          />
+                                        )}
+                                      </div>
                                     ) : (
                                       <input
                                         type="text"
-                                        placeholder="Selecione um ano primeiro"
+                                        placeholder="Selecione um ano"
                                         disabled
                                         style={{
+                                          width: "260px",
                                           backgroundColor: "#f8f9fa",
                                           border: "1px solid #dee2e6",
                                           borderRadius: "4px",
                                           padding: "8px 12px",
                                           color: "#6c757d",
                                           textAlign: "center",
+                                          fontSize: "12px",
                                         }}
                                       />
                                     )}
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </DivFormConteudo>
-                    {usuario?.id_permissao !== 4 &&
-                      indicadores.length > 0 &&
-                      anoSelected && (
-                        <div
+
+                                  {/* Unidade */}
+                                  <div
+                                    style={{
+                                      textAlign: "center",
+                                      fontSize: "12px",
+                                      color: "#495057",
+                                    }}
+                                  >
+                                    <div
+                                      style={{
+                                        fontWeight: "500",
+                                        padding: "5px 6px",
+                                        backgroundColor: "#e9ecef",
+                                        borderRadius: "3px",
+                                        fontSize: "11px",
+                                      }}
+                                    >
+                                      {indicador.unidade_indicador || "-"}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                /* Layout Mobile */
+                                <div
+                                  style={{
+                                    padding: "0 15px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "10px",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      display: "flex",
+                                      justifyContent: "space-between",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <div>
+                                      <div
+                                        style={{
+                                          fontSize: "16px",
+                                          fontWeight: "bold",
+                                          color: "#1e88e5",
+                                        }}
+                                      >
+                                        {indicador.codigo_indicador}
+                                      </div>
+                                      <div
+                                        style={{
+                                          fontSize: "11px",
+                                          color: "#6c757d",
+                                        }}
+                                      >
+                                        {indicador.unidade_indicador || "-"}
+                                      </div>
+                                    </div>
+                                    {tipoCampo && (
+                                      <div
+                                        style={{
+                                          fontSize: "10px",
+                                          color: "#6c757d",
+                                          backgroundColor: "#f8f9fa",
+                                          padding: "3px 6px",
+                                          borderRadius: "3px",
+                                        }}
+                                      >
+                                        {tipoCampo.type}
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  <div
+                                    style={{
+                                      fontSize: "13px",
+                                      color: "#495057",
+                                      lineHeight: "1.3",
+                                      marginBottom: "8px",
+                                    }}
+                                  >
+                                    {indicador.nome_indicador}
+                                  </div>
+
+                                  {anoSelected && fieldName ? (
+                                    tipoCampo?.type === "number" ? (
+                                      <input
+                                        {...registerIndicadores(fieldName as any)}
+                                        type="number"
+                                        step="any"
+                                        style={{
+                                          width: "100%",
+                                          padding: "8px 12px",
+                                          border: "1px solid #dee2e6",
+                                          borderRadius: "4px",
+                                        }}
+                                      />
+                                    ) : tipoCampo?.type === "select" ? (
+                                      <select
+                                        {...registerIndicadores(fieldName as any)}
+                                        style={{
+                                          width: "100%",
+                                          padding: "8px 12px",
+                                          border: "1px solid #dee2e6",
+                                          borderRadius: "4px",
+                                        }}
+                                      >
+                                        <option value="">Selecione...</option>
+                                        {tipoCampo.selectOptions
+                                          ?.sort(
+                                            (a, b) =>
+                                              (a.ordem_option || 0) -
+                                              (b.ordem_option || 0)
+                                          )
+                                          .map((option) => (
+                                            <option
+                                              key={option.id_select_option}
+                                              value={option.value}
+                                            >
+                                              {option.descricao || option.value}
+                                            </option>
+                                          ))}
+                                      </select>
+                                    ) : (
+                                      <input
+                                        {...registerIndicadores(fieldName as any)}
+                                        type="text"
+                                        style={{
+                                          width: "100%",
+                                          padding: "8px 12px",
+                                          border: "1px solid #dee2e6",
+                                          borderRadius: "4px",
+                                        }}
+                                      />
+                                    )
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder="Selecione um ano primeiro"
+                                      disabled
+                                      style={{
+                                        backgroundColor: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                        padding: "8px 12px",
+                                        color: "#6c757d",
+                                        textAlign: "center",
+                                      }}
+                                    />
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </DivFormConteudo>
+                  {usuario?.id_permissao !== 4 &&
+                    indicadores.length > 0 &&
+                    anoSelected && (
+                      <div
+                        style={{
+                          marginTop: "30px",
+                          padding: "20px",
+                          textAlign: "center",
+                          borderTop: "1px solid #e1e5e9",
+                        }}
+                      >
+                        <button
+                          type="submit"
                           style={{
-                            marginTop: "30px",
-                            padding: "20px",
-                            textAlign: "center",
-                            borderTop: "1px solid #e1e5e9",
+                            backgroundColor: "#28a745",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "8px",
+                            padding: "12px 40px",
+                            fontSize: "16px",
+                            fontWeight: "500",
+                            cursor: "pointer",
+                            boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                            transition: "all 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#218838";
+                            e.currentTarget.style.boxShadow =
+                              "0 4px 8px rgba(40,167,69,0.3)";
+                            e.currentTarget.style.transform =
+                              "translateY(-1px)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "#28a745";
+                            e.currentTarget.style.boxShadow =
+                              "0 2px 4px rgba(40,167,69,0.2)";
+                            e.currentTarget.style.transform =
+                              "translateY(0)";
                           }}
                         >
-                          <button
-                            type="submit"
-                            style={{
-                              backgroundColor: "#28a745",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "8px",
-                              padding: "12px 40px",
-                              fontSize: "16px",
-                              fontWeight: "500",
-                              cursor: "pointer",
-                              boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
-                              transition: "all 0.2s ease",
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.backgroundColor = "#218838";
-                              e.currentTarget.style.boxShadow =
-                                "0 4px 8px rgba(40,167,69,0.3)";
-                              e.currentTarget.style.transform =
-                                "translateY(-1px)";
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.backgroundColor = "#28a745";
-                              e.currentTarget.style.boxShadow =
-                                "0 2px 4px rgba(40,167,69,0.2)";
-                              e.currentTarget.style.transform =
-                                "translateY(0)";
-                            }}
-                          >
-                            💾 Salvar Dados dos Indicadores
-                          </button>
-                        </div>
-                      )}
-                  </DivFormEixo>
-                </DivForm>
-              </Form>
-            )}
+                          💾 Salvar Dados dos Indicadores
+                        </button>
+                      </div>
+                    )}
+                </DivFormEixo>
+              </DivForm>
+            </Form>
+            </div>
+          )}
         </DivCenter>
       </MainContent>
     </Container>
