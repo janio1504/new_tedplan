@@ -727,32 +727,40 @@ class GestaoIndicadoresController {
 
   async getGestaoAssociada({ request }) {
     const { id_municipio } = request.all();
-    const resGa = await GA.query()
-      .select(
-        "ga.id as id_gestao_associada",
-        "sr.id_saneamento_rural",
-        "ct.id_comunidades_tradicionais",
-        "ga.nome as ga_nome",
-        "ga.norma as ga_norma",
-        "sr.descricao as sr_descricao",
-        "ct.nomes_comunidades_beneficiadas",
-        "ct.descricao as ct_descricao"
-      )
-      .from("tedplan.gestao_associada as ga")
-      .innerJoin(
-        "tedplan.saneamento_rural as sr",
-        "ga.id_municipio",
-        "sr.id_municipio"
-      )
-      .innerJoin(
-        "tedplan.comunidades_tradicionais as ct",
-        "ga.id_municipio",
-        "ct.id_municipio"
-      )
-      .where("ga.id_municipio", id_municipio)
-      .orderBy("ga.id", "desc")
-      .fetch();
-    return resGa;
+    
+    // Buscar apenas o registro de gestao_associada (sem JOINs que causam produto cartesiano)
+    const gestaoAssociada = await GA.query()
+      .where("id_municipio", id_municipio)
+      .orderBy("id", "desc")
+      .first();
+    
+    if (!gestaoAssociada) {
+      return [];
+    }
+    
+    // Buscar primeiro registro de saneamento_rural se existir
+    const srData = await SaneamentoRural.query()
+      .where("id_municipio", id_municipio)
+      .orderBy("id_saneamento_rural", "desc")
+      .first();
+    
+    // Buscar primeiro registro de comunidades_tradicionais se existir
+    const ctData = await ComunidadesTradicionais.query()
+      .where("id_municipio", id_municipio)
+      .orderBy("id_comunidades_tradicionais", "desc")
+      .first();
+    
+    // Retornar apenas um registro único combinando os dados
+    return [{
+      id_gestao_associada: gestaoAssociada.id,
+      id_saneamento_rural: srData ? srData.id_saneamento_rural : null,
+      id_comunidades_tradicionais: ctData ? ctData.id_comunidades_tradicionais : null,
+      ga_nome: gestaoAssociada.nome,
+      ga_norma: gestaoAssociada.norma,
+      sr_descricao: srData ? srData.descricao : null,
+      nomes_comunidades_beneficiadas: ctData ? ctData.nomes_comunidades_beneficiadas : null,
+      ct_descricao: ctData ? ctData.descricao : null
+    }];
   }
 
   async destroyPolitica({ request }) {

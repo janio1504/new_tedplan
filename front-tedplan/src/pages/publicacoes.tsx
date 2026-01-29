@@ -259,7 +259,7 @@ const PublicacaoMeta = styled.div`
 `;
 
 const PublicacaoBotao = styled.a`
-  width: 100%;
+  width: 92%;
   padding: 12px;
   background: linear-gradient(135deg, #0085bd 0%, #006a9e 100%);
   color: #fff;
