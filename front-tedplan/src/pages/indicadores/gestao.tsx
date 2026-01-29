@@ -34,7 +34,7 @@ import {
   ExpandButton,
   CollapseButton,
 } from "../../styles/indicadores";
-import { FaBars, FaList, FaCaretDown } from "react-icons/fa";
+import { FaBars, FaList, FaCaretDown, FaLink, FaUser, FaEnvelope, FaPhone, FaBriefcase, FaTimes } from "react-icons/fa";
 import Link from "next/link";
 import Editar from "../../img/editar.png";
 import ajuda from "../../img/ajuda.png";
@@ -67,10 +67,13 @@ import {
 } from "@/util/util";
 import {
   DivFormCadastro,
+  DivTituloForm as DivTituloFormIndicadores,
   MainContent,
   SidebarItem,
 } from "@/styles/esgoto-indicadores";
-import { DivTitulo } from "@/styles/drenagem-indicadores";
+import { DivFormConteudo, DivTitulo } from "@/styles/drenagem-indicadores";
+import { DivFormEixo, DivTituloConteudo } from "@/styles/financeiro";
+import { MenuHeader, MenuItemsContainer } from "@/styles/residuo-solidos-in";
 
 const InputMask = require("react-input-mask");
 
@@ -89,6 +92,27 @@ const TablesContainer = styled.div`
   > div {
     flex: 1;
     min-width: 0;
+  }
+`;
+
+const PhoneInput = styled.input`
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #2d3748;
+  transition: all 0.2s ease;
+  background: #fff;
+
+  &:focus {
+    border-color: #0085bd;
+    box-shadow: 0 0 0 3px rgba(0, 133, 189, 0.1);
+    outline: none;
+  }
+
+  &:hover:not(:focus) {
+    border-color: #cbd5e0;
   }
 `;
 
@@ -204,6 +228,903 @@ interface MunicipioProps {
   gestao: IGestao[];
 }
 
+// Interfaces para o componente CampoIndicadorPolitica
+interface ISelectOption {
+  id_select_option: string;
+  value: string;
+  descricao: string;
+  ordem_option?: number;
+}
+
+interface ICheckBoxItem {
+  id_item_check_box: string;
+  descricao: string;
+  valor: string;
+}
+
+interface ITipoCampoIndicadorPolitica {
+  id_tipo_campo_indicador: string;
+  type: string;
+  name_campo: string;
+  enable: boolean;
+  default_value: string;
+  selectOptions?: ISelectOption[];
+  checkBoxItems?: ICheckBoxItem[];
+}
+
+interface IIndicadorPolitica {
+  id_indicador: string;
+  codigo_indicador: string;
+  nome_indicador: string;
+  grupo_indicador: string;
+  unidade_indicador: string;
+  tiposCampo?: ITipoCampoIndicadorPolitica[];
+  _hasError?: boolean;
+}
+
+// Componente CampoIndicadorPolitica baseado no CampoIndicador do prestacao-servico-agua.tsx
+const CampoIndicadorPolitica = ({
+  indicador,
+  register,
+  anoSelected,
+  setValue,
+  watch,
+}: {
+  indicador: IIndicadorPolitica;
+  register: any;
+  anoSelected: string;
+  setValue?: any;
+  watch?: any;
+}) => {
+  // Verificações de segurança
+  if (!indicador || !anoSelected) {
+    return (
+      <input
+        type="text"
+        placeholder="Dados inválidos"
+        disabled
+        style={{ backgroundColor: "#fff3cd", border: "1px solid #ffeaa7" }}
+      />
+    );
+  }
+
+  const tipoCampo =
+    indicador.tiposCampo && indicador.tiposCampo.length > 0
+      ? indicador.tiposCampo[0]
+      : null;
+  const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
+
+  // Campo não configurado ou com erro
+  if (!tipoCampo) {
+    const hasError = indicador._hasError;
+    return (
+      <input
+        {...register(fieldName)}
+        type="text"
+        placeholder={
+          hasError ? "Erro ao carregar configuração" : "Campo sem configuração"
+        }
+        title={
+          hasError
+            ? "Verifique a conectividade com o servidor"
+            : "Este indicador não possui configuração de campo"
+        }
+        style={{
+          backgroundColor: hasError ? "#fff3cd" : "#f8f9fa",
+          border: hasError ? "1px solid #ffeaa7" : "1px solid #dee2e6",
+          color: hasError ? "#856404" : "#6c757d",
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: "4px",
+        }}
+      />
+    );
+  }
+
+  // Pegar o registro do react-hook-form
+  const fieldRegistration = register(fieldName);
+
+  // Propriedades base do campo
+  const baseProps = {
+    ...fieldRegistration,
+    placeholder: tipoCampo.default_value || "",
+    defaultValue: tipoCampo.default_value || "",
+    disabled: !tipoCampo.enable,
+    style: {
+      width: "100%",
+      padding: "8px 12px",
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      fontSize: "13px",
+      transition: "all 0.2s ease",
+      backgroundColor: !tipoCampo.enable ? "#f8f9fa" : "white",
+      color: !tipoCampo.enable ? "#6c757d" : "#333",
+      boxShadow: "none",
+    },
+  };
+
+  // Renderizar conforme o tipo
+  switch (tipoCampo.type?.toLowerCase()) {
+    case "number":
+      return (
+        <input
+          {...baseProps}
+          type="number"
+          step="any"
+          style={{ ...baseProps.style, textAlign: "right" }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      );
+
+    case "select":
+      const options = tipoCampo.selectOptions || [];
+      return (
+        <select
+          {...baseProps}
+          style={{ ...baseProps.style }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        >
+          <option value="">Selecione...</option>
+          {options
+            .sort((a, b) => (a.ordem_option || 0) - (b.ordem_option || 0))
+            .map((option, index) => (
+              <option
+                key={option.id_select_option || index}
+                value={option.value}
+              >
+                {option.descricao || option.value}
+              </option>
+            ))}
+        </select>
+      );
+
+    case "textarea":
+      return (
+        <textarea
+          {...baseProps}
+          rows={3}
+          style={{
+            ...baseProps.style,
+            resize: "vertical",
+            minHeight: "60px",
+          }}
+        />
+      );
+
+    case "date":
+      return (
+        <input {...baseProps} type="date" style={{ ...baseProps.style }} />
+      );
+
+    case "email":
+      return (
+        <input {...baseProps} type="email" style={{ ...baseProps.style }} />
+      );
+
+    case "checkbox":
+      const checkBoxItems = tipoCampo.checkBoxItems || [];
+
+      if (checkBoxItems.length === 0) {
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "40px",
+            }}
+          >
+            <input
+              {...register(fieldName)}
+              type="checkbox"
+              style={{ transform: "scale(1.3)" }}
+            />
+          </div>
+        );
+      }
+
+      return (
+        <div
+          suppressHydrationWarning
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            backgroundColor: !tipoCampo.enable ? "#f8f9fa" : "white",
+          }}
+        >
+          {checkBoxItems.map((item, index) => {
+            const checkboxFieldName = `${fieldName}_${item.id_item_check_box}_${anoSelected}`;
+
+            return (
+              <label
+                key={item.id_item_check_box}
+                suppressHydrationWarning
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "13px",
+                  cursor: !tipoCampo.enable ? "not-allowed" : "pointer",
+                  opacity: !tipoCampo.enable ? 0.6 : 1,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked={Boolean(item.valor)}
+                  disabled={!tipoCampo.enable}
+                  style={{ transform: "scale(1.1)" }}
+                  onChange={(e) => {
+                    // Forçar o React Hook Form a registrar corretamente usando setValue
+                    if (setValue) {
+                      if (e.target.checked) {
+                        setValue(checkboxFieldName, true);
+                      } else {
+                        setValue(checkboxFieldName, false);
+                      }
+                    }
+                  }}
+                />
+                <span>{item.descricao}</span>
+              </label>
+            );
+          })}
+        </div>
+      );
+
+    case "text":
+    default:
+      return (
+        <input
+          {...baseProps}
+          type="text"
+          style={{ ...baseProps.style }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      );
+  }
+};
+
+// Componente CampoIndicadorPlano baseado no CampoIndicadorPolitica
+const CampoIndicadorPlano = ({
+  indicador,
+  register,
+  anoSelected,
+  setValue,
+  watch,
+}: {
+  indicador: IIndicadorPolitica;
+  register: any;
+  anoSelected: string;
+  setValue?: any;
+  watch?: any;
+}) => {
+  // Verificações de segurança
+  if (!indicador || !anoSelected) {
+    return (
+      <input
+        type="text"
+        placeholder="Dados inválidos"
+        disabled
+        style={{ backgroundColor: "#fff3cd", border: "1px solid #ffeaa7" }}
+      />
+    );
+  }
+
+  const tipoCampo =
+    indicador.tiposCampo && indicador.tiposCampo.length > 0
+      ? indicador.tiposCampo[0]
+      : null;
+  const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
+
+  // Campo não configurado ou com erro
+  if (!tipoCampo) {
+    const hasError = indicador._hasError;
+    return (
+      <input
+        {...register(fieldName)}
+        type="text"
+        placeholder={
+          hasError ? "Erro ao carregar configuração" : "Campo sem configuração"
+        }
+        title={
+          hasError
+            ? "Verifique a conectividade com o servidor"
+            : "Este indicador não possui configuração de campo"
+        }
+        style={{
+          backgroundColor: hasError ? "#fff3cd" : "#f8f9fa",
+          border: hasError ? "1px solid #ffeaa7" : "1px solid #dee2e6",
+          color: hasError ? "#856404" : "#6c757d",
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: "4px",
+        }}
+      />
+    );
+  }
+
+  // Pegar o registro do react-hook-form
+  const fieldRegistration = register(fieldName);
+
+  // Propriedades base do campo
+  const baseProps = {
+    ...fieldRegistration,
+    placeholder: tipoCampo.default_value || "",
+    defaultValue: tipoCampo.default_value || "",
+    disabled: !tipoCampo.enable,
+    style: {
+      width: "100%",
+      padding: "8px 12px",
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      fontSize: "13px",
+      transition: "all 0.2s ease",
+      backgroundColor: !tipoCampo.enable ? "#f8f9fa" : "white",
+      color: !tipoCampo.enable ? "#6c757d" : "#333",
+      boxShadow: "none",
+    },
+  };
+
+  // Renderizar conforme o tipo
+  switch (tipoCampo.type?.toLowerCase()) {
+    case "number":
+      return (
+        <input
+          {...baseProps}
+          type="number"
+          step="any"
+          style={{ ...baseProps.style, textAlign: "right" }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      );
+
+    case "select":
+      const options = tipoCampo.selectOptions || [];
+      return (
+        <select
+          {...baseProps}
+          style={{ ...baseProps.style }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        >
+          <option value="">Selecione...</option>
+          {options
+            .sort((a, b) => (a.ordem_option || 0) - (b.ordem_option || 0))
+            .map((option, index) => (
+              <option
+                key={option.id_select_option || index}
+                value={option.value}
+              >
+                {option.descricao || option.value}
+              </option>
+            ))}
+        </select>
+      );
+
+    case "textarea":
+      return (
+        <textarea
+          {...baseProps}
+          rows={3}
+          style={{
+            ...baseProps.style,
+            resize: "vertical",
+            minHeight: "60px",
+          }}
+        />
+      );
+
+    case "date":
+      return (
+        <input {...baseProps} type="date" style={{ ...baseProps.style }} />
+      );
+
+    case "email":
+      return (
+        <input {...baseProps} type="email" style={{ ...baseProps.style }} />
+      );
+
+    case "checkbox":
+      const checkBoxItems = tipoCampo.checkBoxItems || [];
+
+      if (checkBoxItems.length === 0) {
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "40px",
+            }}
+          >
+            <input
+              {...register(fieldName)}
+              type="checkbox"
+              style={{ transform: "scale(1.3)" }}
+            />
+          </div>
+        );
+      }
+
+      return (
+        <div
+          suppressHydrationWarning
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            backgroundColor: !tipoCampo.enable ? "#f8f9fa" : "white",
+          }}
+        >
+          {checkBoxItems.map((item, index) => {
+            const checkboxFieldName = `${fieldName}_${item.id_item_check_box}_${anoSelected}`;
+
+            return (
+              <label
+                key={item.id_item_check_box}
+                suppressHydrationWarning
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "13px",
+                  cursor: !tipoCampo.enable ? "not-allowed" : "pointer",
+                  opacity: !tipoCampo.enable ? 0.6 : 1,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked={Boolean(item.valor)}
+                  disabled={!tipoCampo.enable}
+                  style={{ transform: "scale(1.1)" }}
+                  onChange={(e) => {
+                    // Forçar o React Hook Form a registrar corretamente usando setValue
+                    if (setValue) {
+                      if (e.target.checked) {
+                        setValue(checkboxFieldName, true);
+                      } else {
+                        setValue(checkboxFieldName, false);
+                      }
+                    }
+                  }}
+                />
+                <span>{item.descricao}</span>
+              </label>
+            );
+          })}
+        </div>
+      );
+
+    case "text":
+    default:
+      return (
+        <input
+          {...baseProps}
+          type="text"
+          style={{ ...baseProps.style }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      );
+  }
+};
+
+// Componente CampoIndicadorConselho baseado no CampoIndicadorPolitica
+const CampoIndicadorConselho = ({
+  indicador,
+  register,
+  anoSelected,
+  setValue,
+  watch,
+}: {
+  indicador: IIndicadorPolitica;
+  register: any;
+  anoSelected: string;
+  setValue?: any;
+  watch?: any;
+}) => {
+  // Verificações de segurança
+  if (!indicador || !anoSelected) {
+    return (
+      <input
+        type="text"
+        placeholder="Dados inválidos"
+        disabled
+        style={{ backgroundColor: "#fff3cd", border: "1px solid #ffeaa7" }}
+      />
+    );
+  }
+
+  const tipoCampo =
+    indicador.tiposCampo && indicador.tiposCampo.length > 0
+      ? indicador.tiposCampo[0]
+      : null;
+  const fieldName = `${indicador.codigo_indicador}_${anoSelected}`;
+
+  // Campo não configurado ou com erro
+  if (!tipoCampo) {
+    const hasError = indicador._hasError;
+    return (
+      <input
+        {...register(fieldName)}
+        type="text"
+        placeholder={
+          hasError ? "Erro ao carregar configuração" : "Campo sem configuração"
+        }
+        title={
+          hasError
+            ? "Verifique a conectividade com o servidor"
+            : "Este indicador não possui configuração de campo"
+        }
+        style={{
+          backgroundColor: hasError ? "#fff3cd" : "#f8f9fa",
+          border: hasError ? "1px solid #ffeaa7" : "1px solid #dee2e6",
+          color: hasError ? "#856404" : "#6c757d",
+          width: "100%",
+          padding: "8px 12px",
+          borderRadius: "4px",
+        }}
+      />
+    );
+  }
+
+  // Pegar o registro do react-hook-form
+  const fieldRegistration = register(fieldName);
+
+  // Propriedades base do campo
+  const baseProps = {
+    ...fieldRegistration,
+    placeholder: tipoCampo.default_value || "",
+    defaultValue: tipoCampo.default_value || "",
+    disabled: !tipoCampo.enable,
+    style: {
+      width: "100%",
+      padding: "8px 12px",
+      border: "1px solid #ddd",
+      borderRadius: "4px",
+      fontSize: "13px",
+      transition: "all 0.2s ease",
+      backgroundColor: !tipoCampo.enable ? "#f8f9fa" : "white",
+      color: !tipoCampo.enable ? "#6c757d" : "#333",
+      boxShadow: "none",
+    },
+  };
+
+  // Renderizar conforme o tipo
+  switch (tipoCampo.type?.toLowerCase()) {
+    case "number":
+      return (
+        <input
+          {...baseProps}
+          type="number"
+          step="any"
+          style={{ ...baseProps.style, textAlign: "right" }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      );
+
+    case "select":
+      const options = tipoCampo.selectOptions || [];
+      return (
+        <select
+          {...baseProps}
+          style={{ ...baseProps.style }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        >
+          <option value="">Selecione...</option>
+          {options
+            .sort((a, b) => (a.ordem_option || 0) - (b.ordem_option || 0))
+            .map((option, index) => (
+              <option
+                key={option.id_select_option || index}
+                value={option.value}
+              >
+                {option.descricao || option.value}
+              </option>
+            ))}
+        </select>
+      );
+
+    case "textarea":
+      return (
+        <textarea
+          {...baseProps}
+          rows={3}
+          style={{
+            ...baseProps.style,
+            resize: "vertical",
+            minHeight: "60px",
+          }}
+        />
+      );
+
+    case "date":
+      return (
+        <input {...baseProps} type="date" style={{ ...baseProps.style }} />
+      );
+
+    case "email":
+      return (
+        <input {...baseProps} type="email" style={{ ...baseProps.style }} />
+      );
+
+    case "checkbox":
+      const checkBoxItems = tipoCampo.checkBoxItems || [];
+
+      if (checkBoxItems.length === 0) {
+        return (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "40px",
+            }}
+          >
+            <input
+              {...register(fieldName)}
+              type="checkbox"
+              style={{ transform: "scale(1.3)" }}
+            />
+          </div>
+        );
+      }
+
+      return (
+        <div
+          suppressHydrationWarning
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            padding: "8px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+            backgroundColor: !tipoCampo.enable ? "#f8f9fa" : "white",
+          }}
+        >
+          {checkBoxItems.map((item, index) => {
+            const checkboxFieldName = `${fieldName}_${item.id_item_check_box}_${anoSelected}`;
+
+            return (
+              <label
+                key={item.id_item_check_box}
+                suppressHydrationWarning
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  fontSize: "13px",
+                  cursor: !tipoCampo.enable ? "not-allowed" : "pointer",
+                  opacity: !tipoCampo.enable ? 0.6 : 1,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  defaultChecked={Boolean(item.valor)}
+                  disabled={!tipoCampo.enable}
+                  style={{ transform: "scale(1.1)" }}
+                  onChange={(e) => {
+                    // Forçar o React Hook Form a registrar corretamente usando setValue
+                    if (setValue) {
+                      if (e.target.checked) {
+                        setValue(checkboxFieldName, true);
+                      } else {
+                        setValue(checkboxFieldName, false);
+                      }
+                    }
+                  }}
+                />
+                <span>{item.descricao}</span>
+              </label>
+            );
+          })}
+        </div>
+      );
+
+    case "text":
+    default:
+      return (
+        <input
+          {...baseProps}
+          type="text"
+          style={{ ...baseProps.style }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "#1e88e5";
+            e.target.style.boxShadow = "0 0 0 2px rgba(30,136,229,0.1)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#ddd";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      );
+  }
+};
+
+// Styled Components movidos para fora do componente para evitar criação dinâmica
+const TabContainer = styled.div`
+    display: flex;
+    gap: 10px;
+  margin-bottom: 0px;
+  `;
+
+const TabButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== '$active',
+}) <{ $active?: boolean }>`
+    padding: 10px 20px;
+    border: none;
+  background: ${(props) => (props.$active ? "#007bff" : "#e9ecef")};
+  color: ${(props) => (props.$active ? "white" : "black")};
+    cursor: pointer;
+  border-radius: 5px 5px 0px 0px;
+  `;
+
+const TableContainer = styled.div`
+    margin-bottom: 50px;
+    background-color: #fff;
+    border-radius: 8px;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-top: 20px;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      td {
+        padding: 12px 16px;
+        vertical-align: middle;
+        border-bottom: 1px solid #eee;
+
+        &:first-child {
+          width: 20px;
+        }
+
+        &:nth-child(2) {
+          width: 80%;
+        }
+
+        &:nth-child(3) {
+          width: 10%;
+        }
+        &:nth-child(4) {
+          width: 150px;
+        }
+
+        input,
+        select {
+          width: 150px;
+          height: 36px;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          background-color: #fff;
+          font-size: 14px;
+          margin: 0;
+
+          &:disabled {
+            background-color: #f5f5f5;
+            cursor: not-allowed;
+          }
+
+          &:focus {
+            border-color: #0085bd;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 133, 189, 0.2);
+          }
+        }
+
+        span {
+          color: #ff0000;
+          margin-left: 4px;
+        }
+      }
+
+      tr {
+        &:hover {
+          background-color: #f9f9f9;
+        }
+      }
+    }
+  `;
+
+const StaticMenuHeader = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== '$isActive',
+}) <{ $isActive?: boolean }>`
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  font-weight: bold;
+  color: ${props => props.$isActive ? "#0085bd" : "#000"};
+  transition: color 0.3s ease;
+  user-select: none;
+
+  &:hover {
+    color: #0085bd;
+  }
+
+  > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    svg {
+      color: ${props => props.$isActive ? "#0085bd" : "#666"};
+      transition: color 0.3s ease;
+      font-size: 14px;
+    }
+  }
+
+  &:hover > div:first-child svg {
+    color: #0085bd;
+  }
+`;
+
 export default function GestaoIndicadores({
   municipio,
   gestao,
@@ -219,8 +1140,17 @@ export default function GestaoIndicadores({
   const [updatePolitica, setUpdatePolitica] = useState<IPoliticas | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [innerWidth, setInnerWidth] = useState(0);
+  const [isMounted, setIsMounted] = useState(false);
+  const [activeTabPolitica, setActiveTabPolitica] = useState("politicaMunicipal");
+  const [activeTabPlano, setActiveTabPlano] = useState("planoMunicipal");
+  const [activeTabConselho, setActiveTabConselho] = useState("conselhoMunicipal");
+  const [menus, setMenus] = useState([]);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   useEffect(() => {
+    // Marca como montado apenas no cliente
+    setIsMounted(true);
+
     // Inicializa innerWidth apenas no cliente
     if (typeof window !== "undefined") {
       setInnerWidth(window.innerWidth);
@@ -237,7 +1167,7 @@ export default function GestaoIndicadores({
         }
       }
     };
-    
+
     if (typeof window !== "undefined") {
       handleResize();
       window.addEventListener("resize", handleResize);
@@ -265,6 +1195,7 @@ export default function GestaoIndicadores({
     handleSubmit: handleSubmitGestao,
     reset: resetGestao,
     setValue: setValueGestao,
+    watch: watchGestao,
     formState: { errors: errorsGestao },
     control: controlGestao,
   } = useForm();
@@ -323,6 +1254,43 @@ export default function GestaoIndicadores({
     control: controlCT,
   } = useForm();
 
+  // Formulário separado para os indicadores de Política
+  const {
+    register: registerIndicadoresPolitica,
+    handleSubmit: handleSubmitIndicadoresPolitica,
+    reset: resetIndicadoresPolitica,
+    setValue: setValueIndicadoresPolitica,
+    watch: watchIndicadoresPolitica,
+    formState: { errors: errorsIndicadoresPolitica },
+  } = useForm<any>({});
+
+  // Formulário separado para os indicadores de Plano Municipal
+  const {
+    register: registerIndicadoresPlano,
+    handleSubmit: handleSubmitIndicadoresPlano,
+    reset: resetIndicadoresPlano,
+    setValue: setValueIndicadoresPlano,
+    watch: watchIndicadoresPlano,
+    formState: { errors: errorsIndicadoresPlano },
+  } = useForm<any>({});
+
+  // Formulário separado para os indicadores de Conselho Municipal
+  const {
+    register: registerIndicadoresConselho,
+    handleSubmit: handleSubmitIndicadoresConselho,
+    reset: resetIndicadoresConselho,
+    setValue: setValueIndicadoresConselho,
+    watch: watchIndicadoresConselho,
+    formState: { errors: errorsIndicadoresConselho },
+  } = useForm<any>({});
+
+  const {
+    register: registerIndicadores,
+    handleSubmit: handleSubmitIndicadores,
+    reset: resetIndicadores,
+    formState: { errors: errorsIndicadores },
+  } = useForm<any>({});
+
   const [showModal, setShowModal] = useState(false);
   const [showModalPolitica, setShowModalPolitica] = useState(false);
   const [listParticipacoes, setListParticipacoes] = useState(null);
@@ -338,6 +1306,41 @@ export default function GestaoIndicadores({
   const [showModalParticipacao, setShowModalParticipacao] = useState(false);
   const [updateParticipacao, setUpdateParticipacao] =
     useState<IParticipacao | null>(null);
+
+  // Estados para listagem de indicadores de Política
+  const [indicadoresPolitica, setIndicadoresPolitica] = useState<any[]>([]);
+  const [menuItemsPolitica, setMenuItemsPolitica] = useState<any[]>([]);
+  const [grupoPolitica, setGrupoPolitica] = useState<string>("");
+  const [anoSelectedPolitica, setAnoSelectedPolitica] = useState<string>("");
+  const [loadingIndicadoresPolitica, setLoadingIndicadoresPolitica] = useState(false);
+  const [dadosCarregadosPolitica, setDadosCarregadosPolitica] = useState<any[]>([]);
+  const [loadingDadosPolitica, setLoadingDadosPolitica] = useState(false);
+
+  // Estados para listagem de indicadores de Plano Municipal
+  const [indicadoresPlano, setIndicadoresPlano] = useState<any[]>([]);
+  const [menuItemsPlano, setMenuItemsPlano] = useState<any[]>([]);
+  const [grupoPlano, setGrupoPlano] = useState<string>("");
+  const [anoSelectedPlano, setAnoSelectedPlano] = useState<string>("");
+  const [loadingIndicadoresPlano, setLoadingIndicadoresPlano] = useState(false);
+  const [dadosCarregadosPlano, setDadosCarregadosPlano] = useState<any[]>([]);
+  const [loadingDadosPlano, setLoadingDadosPlano] = useState(false);
+
+  // Estados para listagem de indicadores de Conselho Municipal
+  const [indicadoresConselho, setIndicadoresConselho] = useState<any[]>([]);
+  const [menuItemsConselho, setMenuItemsConselho] = useState<any[]>([]);
+  const [grupoConselho, setGrupoConselho] = useState<string>("");
+  const [anoSelectedConselho, setAnoSelectedConselho] = useState<string>("");
+  const [loadingIndicadoresConselho, setLoadingIndicadoresConselho] = useState(false);
+  const [dadosCarregadosConselho, setDadosCarregadosConselho] = useState<any[]>([]);
+  const [loadingDadosConselho, setLoadingDadosConselho] = useState(false);
+
+  const [grupo, setGrupo] = useState<string | null>(null);
+
+  const [loadingIndicadores, setLoadingIndicadores] = useState(false);
+  const [dadosCarregados, setDadosCarregados] = useState<any[]>([]);
+  const [loadingDados, setLoadingDados] = useState(false);
+  const [indicadores, setIndicadores] = useState<any[]>([]);
+  const [anoSelected, setAnoSelected] = useState<string | null>(null);
 
   const editor = useRef(null);
   let txtArea = useRef();
@@ -378,20 +1381,82 @@ export default function GestaoIndicadores({
     }
   }, [conselho]);
 
+  useEffect(() => {
+    if (activeTabPolitica === "dadosComplementaresPolitica" && usuario?.id_municipio) {
+      getMenuItemsPolitica();
+    } else if (activeTabPolitica !== "dadosComplementaresPolitica") {
+      // Limpar dados quando sair da tab
+      setIndicadoresPolitica([]);
+      setGrupoPolitica("");
+      setAnoSelectedPolitica("");
+    }
+  }, [activeTabPolitica, usuario]);
+
+  useEffect(() => {
+    if (activeTabPlano === "dadosComplementaresPlano" && usuario?.id_municipio) {
+      getMenuItemsPlano();
+    } else if (activeTabPlano !== "dadosComplementaresPlano") {
+      // Limpar dados quando sair da tab
+      setIndicadoresPlano([]);
+      setGrupoPlano("");
+      setAnoSelectedPlano("");
+    }
+  }, [activeTabPlano, usuario]);
+
+  useEffect(() => {
+    if (activeTabConselho === "dadosComplementaresConselho" && usuario?.id_municipio) {
+      getMenuItemsConselho();
+    } else if (activeTabConselho !== "dadosComplementaresConselho") {
+      // Limpar dados quando sair da tab
+      setIndicadoresConselho([]);
+      setGrupoConselho("");
+      setAnoSelectedConselho("");
+    }
+  }, [activeTabConselho, usuario]);
+
+  const prevDadosGestaoRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (dadosGestao) {
+      // Verifica se os dados realmente mudaram para evitar loops
+      const dadosMudaram =
+        prevDadosGestaoRef.current?.ga_nome !== dadosGestao.ga_nome ||
+        prevDadosGestaoRef.current?.ga_norma !== dadosGestao.ga_norma;
+
+      if (dadosMudaram) {
+        const nomeAssociacao = dadosGestao.ga_nome !== null && dadosGestao.ga_nome !== undefined
+          ? dadosGestao.ga_nome
+          : "";
+        const normaAssociacao = dadosGestao.ga_norma !== null && dadosGestao.ga_norma !== undefined
+          ? dadosGestao.ga_norma
+          : "";
+
+        setValueGestao("nome_associacao", nomeAssociacao, { shouldDirty: false });
+        setValueGestao("norma_associacao", normaAssociacao, { shouldDirty: false });
+
+        // Atualiza a referência
+        prevDadosGestaoRef.current = {
+          ga_nome: dadosGestao.ga_nome,
+          ga_norma: dadosGestao.ga_norma,
+        };
+      }
+    }
+  }, [dadosGestao, setValueGestao]);
+
   function handlePoliticaSituacaoChange(situacao) {
     setPoliticaSituacao(situacao);
 
     if (situacao === "nao_tem") {
-      setValue("politica_titulo", "");
-      setValue("politica_ano", "");
+      setValuePolitica("politica_titulo", "");
+      setValuePolitica("politica_ano", "");
     }
   }
   function handlePlanoSituacaoChange(situacao) {
     setPlanoSituacao(situacao);
 
     if (situacao === "nao_tem") {
-      setValue("plano_titulo", "");
-      setValue("plano_ano", "");
+      setValuePlano("plano_titulo", "");
+      setValuePlano("plano_ano", "");
     }
   }
 
@@ -399,9 +1464,9 @@ export default function GestaoIndicadores({
     setConselhoSituacao(situacao);
 
     if (situacao === "nao_tem") {
-      setValue("conselho_titulo", "");
-      setValue("conselho_ano", "");
-      setValue("conselho_arquivo", null);
+      setValueConselho("conselho_titulo", "");
+      setValueConselho("conselho_ano", "");
+      setValueConselho("conselho_arquivo", null);
     }
   }
 
@@ -413,36 +1478,52 @@ export default function GestaoIndicadores({
         params: { id_municipio: usuario.id_municipio },
       })
       .then((response) => {
-        setDadosMunicipio(response.data[0]);
+        setDadosMunicipio(response.data);
       });
   }
   async function getPoliticas() {
-    const resPoliticas = await api.get("getPoliticas", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
-    const politicas = await resPoliticas.data;
-    if (politicas) {
-      const resPoliticas = await Promise.all(
-        politicas.map(async (p) => {
-          const file = await api
-            .get("getFile", {
-              params: { id: p.id_arquivo },
-              responseType: "blob",
-            })
-            .then((response) => {
-              return URL.createObjectURL(response.data);
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          const pf = {
-            ...p,
-            file,
-          };
-          return pf;
-        })
-      );
-      setPoliticas(resPoliticas);
+    if (!usuario?.id_municipio) {
+      return;
+    }
+
+    try {
+      const resPoliticas = await api.get("getPoliticas", {
+        params: { id_municipio: usuario.id_municipio },
+      });
+      const politicas = resPoliticas.data;
+
+      if (politicas && Array.isArray(politicas) && politicas.length > 0) {
+        const politicasComArquivo = await Promise.all(
+          politicas.map(async (p) => {
+            let file = null;
+            if (p.id_arquivo) {
+              try {
+                const fileResponse = await api.get("getFile", {
+                  params: { id: p.id_arquivo },
+                  responseType: "blob",
+                });
+                file = URL.createObjectURL(fileResponse.data);
+              } catch (error) {
+                console.log("Erro ao buscar arquivo:", error);
+              }
+            }
+            return {
+              ...p,
+              file,
+            };
+          })
+        );
+        setPoliticas(politicasComArquivo);
+      } else {
+        setPoliticas([]);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar políticas:", error);
+      toast.error("Erro ao buscar políticas!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setPoliticas([]);
     }
   }
   async function getConselhoMunicipal() {
@@ -548,11 +1629,29 @@ export default function GestaoIndicadores({
     setRepresentantes(representantes);
   }
   async function getGestao() {
-    const resGestao = await api.get("/getGestao", {
-      params: { id_municipio: usuario?.id_municipio },
-    });
+    try {
+      const resGestao = await api.get("/getGestao", {
+        params: { id_municipio: usuario?.id_municipio },
+      });
 
-    setGestao(resGestao.data[0]);
+      if (resGestao.data && resGestao.data.length > 0) {
+        const gestaoData = resGestao.data[0];
+
+        // Garantir que valores null sejam tratados como strings vazias
+        if (gestaoData.ga_nome === null || gestaoData.ga_nome === undefined) gestaoData.ga_nome = "";
+        if (gestaoData.ga_norma === null || gestaoData.ga_norma === undefined) gestaoData.ga_norma = "";
+        if (gestaoData.sr_descricao === null || gestaoData.sr_descricao === undefined || gestaoData.sr_descricao === "null" || gestaoData.sr_descricao === "undefined") gestaoData.sr_descricao = "";
+        if (gestaoData.nomes_comunidades_beneficiadas === null || gestaoData.nomes_comunidades_beneficiadas === undefined || gestaoData.nomes_comunidades_beneficiadas === "null" || gestaoData.nomes_comunidades_beneficiadas === "undefined") gestaoData.nomes_comunidades_beneficiadas = "";
+        if (gestaoData.ct_descricao === null || gestaoData.ct_descricao === undefined || gestaoData.ct_descricao === "null" || gestaoData.ct_descricao === "undefined") gestaoData.ct_descricao = "";
+
+        setGestao(gestaoData);
+      } else {
+        setGestao(null);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar gestão:", error);
+      setGestao(null);
+    }
   }
   async function getPresidentesConselho() {
     if (!usuario?.id_municipio) {
@@ -579,7 +1678,2030 @@ export default function GestaoIndicadores({
     }
   }
 
-  // ------------- Funções ADD -------------
+  // Funções para buscar indicadores de Política
+  async function getMenuItemsPolitica() {
+    try {
+      setLoadingIndicadoresPolitica(true);
+
+      // Buscar menus do módulo 1 (Gestão) - o retorno já vem com menuItems incluídos
+      const resModulo = await api.get(`menus/modulo/1`);
+      const menusModulo = Array.isArray(resModulo.data) ? resModulo.data : [];
+
+      // Procurar o menu "Politica Municipal" (sem acento, como está no banco)
+      // Mas também aceitar com acento para compatibilidade
+      const menuPolitica = menusModulo.find(
+        (menu) => {
+          const tituloLower = menu.titulo?.toLowerCase() || "";
+          return (
+            tituloLower === "politica municipal" ||
+            tituloLower.includes("politica municipal") ||
+            tituloLower.includes("política municipal")
+          );
+        }
+      );
+
+      if (!menuPolitica) {
+        setMenuItemsPolitica([]);
+        setIndicadoresPolitica([]);
+        setGrupoPolitica("");
+        return;
+      }
+
+
+      // Verificar se o menu já tem menuItems incluídos (como no retorno que você mostrou)
+      let itensPolitica = [];
+
+      if (menuPolitica.menuItems && Array.isArray(menuPolitica.menuItems) && menuPolitica.menuItems.length > 0) {
+        // Usar todos os menuItems que já vêm no retorno
+        itensPolitica = menuPolitica.menuItems;
+      } else if (menuPolitica.id_menu) {
+        // Se não tem menuItems no retorno, buscar separadamente (fallback)
+        try {
+          const resMenuItems = await api.get(`menu-items/menu/${menuPolitica.id_menu}`);
+          itensPolitica = Array.isArray(resMenuItems.data) ? resMenuItems.data : [];
+        } catch (e) {
+          console.error("Erro ao buscar menuItems:", e);
+        }
+      }
+
+      setMenuItemsPolitica(itensPolitica);
+
+      // Se houver itens, carregar os indicadores do primeiro item
+      if (itensPolitica.length > 0) {
+        await getIndicadoresPolitica(itensPolitica[0]);
+      } else {
+        setIndicadoresPolitica([]);
+        setGrupoPolitica("");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar menu items de Política:", error);
+      toast.error("Erro ao carregar indicadores de Política", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setMenuItemsPolitica([]);
+      setIndicadoresPolitica([]);
+      setGrupoPolitica("");
+    } finally {
+      setLoadingIndicadoresPolitica(false);
+    }
+  }
+
+  async function getIndicadoresPolitica(menu_item: {
+    id_menu_item: number;
+    nome_menu_item: string;
+  }) {
+    setGrupoPolitica(menu_item.nome_menu_item);
+    setLoadingIndicadoresPolitica(true);
+
+    try {
+      const resIndicadores = await api.get(
+        `indicadores-novo/menu-item/${menu_item?.id_menu_item}`
+      );
+      const indicadoresData = resIndicadores.data || [];
+
+      if (indicadoresData.length === 0) {
+        setIndicadoresPolitica([]);
+        setLoadingIndicadoresPolitica(false);
+        return;
+      }
+
+      const indicadoresComTipos = [];
+
+      for (let i = 0; i < indicadoresData.length; i++) {
+        const indicador = indicadoresData[i];
+
+        try {
+          const tiposResponse = await api.get(
+            `tipos-campo/indicador/${indicador.id_indicador}`
+          );
+          const tiposCampo = tiposResponse.data || [];
+
+          const tiposComOpcoes = [];
+          for (const tipo of tiposCampo) {
+            if (tipo.type === "select") {
+              try {
+                const opcoesResponse = await api.get(
+                  `select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`
+                );
+                const opcoes = opcoesResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  selectOptions: opcoes,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else if (tipo.type === "checkbox") {
+              try {
+                const checkBoxResponse = await api.get(
+                  `item-check-box/indicador/${indicador.id_indicador}`
+                );
+                const checkBoxItems = checkBoxResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  checkBoxItems: checkBoxItems,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else {
+              tiposComOpcoes.push(tipo);
+            }
+          }
+
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: tiposComOpcoes,
+          });
+        } catch (error) {
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: [],
+          });
+        }
+      }
+
+      setIndicadoresPolitica(indicadoresComTipos);
+
+      if (anoSelectedPolitica && usuario?.id_municipio) {
+        await carregarDadosExistentesPolitica(anoSelectedPolitica);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar indicadores:", error);
+      toast.error("Erro ao carregar indicadores", {
+        position: "top-right",
+        autoClose: 7000,
+      });
+      setIndicadoresPolitica([]);
+    } finally {
+      setLoadingIndicadoresPolitica(false);
+    }
+  }
+
+  async function carregarDadosExistentesPolitica(ano: string) {
+    if (!usuario?.id_municipio || !ano) return;
+
+    setLoadingDadosPolitica(true);
+
+    try {
+      const apiClient = getAPIClient();
+
+      const response = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${ano}`
+      );
+      const dados = response.data || [];
+      setDadosCarregadosPolitica(dados);
+
+      // Preencher formulário com valores existentes
+      preencherFormularioPolitica(dados);
+
+      if (dados.length > 0) {
+        toast.info(`Carregados ${dados.length} registro(s) para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.info(`Nenhum dado encontrado para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados existentes:", error);
+      toast.error("Erro ao carregar dados existentes!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setLoadingDadosPolitica(false);
+    }
+  }
+
+  function preencherFormularioPolitica(dados: any[]) {
+    // Resetar todos os valores dos checkboxes antes de preencher
+    indicadoresPolitica.forEach((indicador) => {
+      const tipoCheckbox = indicador.tiposCampo?.find(
+        (tipo) => tipo.type === "checkbox"
+      );
+      if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+        tipoCheckbox.checkBoxItems.forEach((item) => {
+          item.valor = false;
+        });
+      }
+    });
+
+    // Criar objeto com os valores para preencher o formulário
+    const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
+
+    dados.forEach((dado) => {
+      const codigoIndicador = dado.codigo_indicador;
+      const ano = dado.ano;
+      const valor = dado.valor_indicador;
+
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
+    });
+
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresPolitica.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
+    resetIndicadoresPolitica(valoresFormulario);
+  }
+
+  function anosSelect() {
+    const anoAtual = new Date().getFullYear();
+    const anos = [];
+    for (let i = anoAtual; i >= 2000; i--) {
+      anos.push(i.toString());
+    }
+    return anos;
+  }
+
+  async function selectAnoPolitica(ano: string) {
+    setAnoSelectedPolitica(ano);
+
+    if (ano && usuario?.id_municipio) {
+      await carregarDadosExistentesPolitica(ano);
+    } else {
+      setDadosCarregadosPolitica([]);
+    }
+  }
+
+  async function handleCadastroIndicadoresPolitica(data: any) {
+    if (!usuario?.id_municipio) {
+      toast.error("Não existe Município, entre novamente no sistema!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    if (!anoSelectedPolitica) {
+      toast.error("Erro: Ano não selecionado!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    // Processar os dados para salvar valores dos indicadores
+    const valoresIndicadores = [];
+    const checkBoxSelecionados = [];
+
+    // Agrupar checkboxes por código do indicador
+    const checkBoxAgrupados = new Map();
+
+    Object.keys(data).forEach((key) => {
+      const valor = data[key];
+
+      // Verificar se é um campo checkbox
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
+        const parts = key.split("_");
+        const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2
+
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          // Encontrar a descrição do checkbox selecionado
+          const indicador = indicadoresPolitica.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              // Tentar encontrar por id_item_check_box
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+
+              if (!checkBoxItem) {
+                // Se não encontrou, tentar encontrar por qualquer correspondência
+                const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    item.id_item_check_box.toString() ===
+                    idItemCheckBox.toString() ||
+                    item.descricao
+                      .toLowerCase()
+                      .includes(idItemCheckBox.toLowerCase())
+                );
+
+                // Usar o resultado da busca alternativa se encontrou
+                if (checkBoxItemAlt) {
+                  checkBoxItem = checkBoxItemAlt;
+                }
+              }
+
+              if (checkBoxItem) {
+                // Agrupar checkboxes por indicador
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados
+                  .get(codigoIndicador)
+                  .push(checkBoxItem.descricao);
+
+                // Salvar para tabela item_check_box
+                const checkBoxData = {
+                  id_item_check_box: checkBoxItem.id_item_check_box,
+                  descricao: checkBoxItem.descricao,
+                  valor: true, // boolean true para item selecionado
+                  id_indicador: indicador.id_indicador,
+                };
+
+                checkBoxSelecionados.push(checkBoxData);
+              }
+            }
+          }
+        }
+      } else {
+        // Campo normal (não checkbox) - formato: "CODIGO_ANO"
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
+
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelectedPolitica),
+            valor_indicador: valor,
+            id_municipio: usuario.id_municipio,
+          });
+        }
+      }
+    });
+
+    // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadoresPolitica.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        // Salvar array JSON com descrições na tabela indicadores-municipio
+        valoresIndicadores.push({
+          codigo_indicador: codigoIndicador,
+          ano: parseInt(anoSelectedPolitica),
+          valor_indicador: JSON.stringify(descricoes), // Array JSON
+          id_municipio: usuario.id_municipio,
+        });
+      }
+    });
+
+    if (valoresIndicadores.length === 0) {
+      toast.warning("Nenhum valor foi preenchido!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    const apiClient = getAPIClient();
+
+    try {
+      const existingDataResponse = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${anoSelectedPolitica}`
+      );
+
+      const existingData = existingDataResponse.data || [];
+
+      if (existingData.length > 0) {
+        const existingDataMap = new Map();
+        existingData.forEach((record) => {
+          const key = `${record.codigo_indicador}_${record.ano}`;
+          existingDataMap.set(key, record);
+        });
+
+        for (const valorIndicador of valoresIndicadores) {
+          const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}`;
+          const existingRecord = existingDataMap.get(key);
+
+          try {
+            if (existingRecord) {
+              await apiClient.put(
+                `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                valorIndicador
+              );
+            } else {
+              await apiClient.post("/indicadores-municipio", valorIndicador);
+            }
+          } catch (saveError) {
+            console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+
+        toast.success("Dados atualizados com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      } else {
+        for (const valorIndicador of valoresIndicadores) {
+          await apiClient.post("/indicadores-municipio", valorIndicador);
+        }
+
+        toast.success("Dados salvos com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+
+      // Recarregar dados após salvar
+      await carregarDadosExistentesPolitica(anoSelectedPolitica);
+    } catch (error) {
+      console.error("Erro ao verificar dados existentes:", error);
+
+      for (const valorIndicador of valoresIndicadores) {
+        try {
+          await apiClient.post("/indicadores-municipio", valorIndicador);
+        } catch (saveError) {
+          console.error("Erro ao salvar valor:", valorIndicador, saveError);
+          throw saveError;
+        }
+      }
+
+      toast.success("Dados salvos com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+
+      // Recarregar dados após salvar
+      await carregarDadosExistentesPolitica(anoSelectedPolitica);
+    }
+  }
+
+  // Funções para buscar indicadores de Plano Municipal
+  async function getMenuItemsPlano() {
+    try {
+      setLoadingIndicadoresPlano(true);
+
+      // Buscar menus do módulo 1 (Gestão) - o retorno já vem com menuItems incluídos
+      const resModulo = await api.get(`menus/modulo/1`);
+      const menusModulo = Array.isArray(resModulo.data) ? resModulo.data : [];
+
+      // Procurar o menu "Plano Municipal" 
+      const menuPlano = menusModulo.find(
+        (menu) => {
+          const tituloLower = menu.titulo?.toLowerCase() || "";
+          return (
+            tituloLower.includes("plano municipal") ||
+            tituloLower.includes("plano de saneamento")
+          );
+        }
+      );
+
+      if (!menuPlano) {
+        setMenuItemsPlano([]);
+        setIndicadoresPlano([]);
+        setGrupoPlano("");
+        return;
+      }
+
+      // Verificar se o menu já tem menuItems incluídos
+      let itensPlano = [];
+
+      if (menuPlano.menuItems && Array.isArray(menuPlano.menuItems) && menuPlano.menuItems.length > 0) {
+        // Usar todos os menuItems que já vêm no retorno
+        itensPlano = menuPlano.menuItems;
+      } else if (menuPlano.id_menu) {
+        // Se não tem menuItems no retorno, buscar separadamente (fallback)
+        try {
+          const resMenuItems = await api.get(`menu-items/menu/${menuPlano.id_menu}`);
+          itensPlano = Array.isArray(resMenuItems.data) ? resMenuItems.data : [];
+        } catch (e) {
+          console.error("Erro ao buscar menuItems:", e);
+        }
+      }
+
+      setMenuItemsPlano(itensPlano);
+
+      // Se houver itens, carregar os indicadores do primeiro item
+      if (itensPlano.length > 0) {
+        await getIndicadoresPlano(itensPlano[0]);
+      } else {
+        setIndicadoresPlano([]);
+        setGrupoPlano("");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar menu items de Plano:", error);
+      toast.error("Erro ao carregar indicadores de Plano", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setMenuItemsPlano([]);
+      setIndicadoresPlano([]);
+      setGrupoPlano("");
+    } finally {
+      setLoadingIndicadoresPlano(false);
+    }
+  }
+
+  async function getIndicadoresPlano(menu_item: {
+    id_menu_item: number;
+    nome_menu_item: string;
+  }) {
+    setGrupoPlano(menu_item.nome_menu_item);
+    setLoadingIndicadoresPlano(true);
+
+    try {
+      const resIndicadores = await api.get(
+        `indicadores-novo/menu-item/${menu_item?.id_menu_item}`
+      );
+      const indicadoresData = resIndicadores.data || [];
+
+      if (indicadoresData.length === 0) {
+        setIndicadoresPlano([]);
+        setLoadingIndicadoresPlano(false);
+        return;
+      }
+
+      const indicadoresComTipos = [];
+
+      for (let i = 0; i < indicadoresData.length; i++) {
+        const indicador = indicadoresData[i];
+
+        try {
+          const tiposResponse = await api.get(
+            `tipos-campo/indicador/${indicador.id_indicador}`
+          );
+          const tiposCampo = tiposResponse.data || [];
+
+          const tiposComOpcoes = [];
+          for (const tipo of tiposCampo) {
+            if (tipo.type === "select") {
+              try {
+                const opcoesResponse = await api.get(
+                  `select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`
+                );
+                const opcoes = opcoesResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  selectOptions: opcoes,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else if (tipo.type === "checkbox") {
+              try {
+                const checkBoxResponse = await api.get(
+                  `item-check-box/indicador/${indicador.id_indicador}`
+                );
+                const checkBoxItems = checkBoxResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  checkBoxItems: checkBoxItems,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else {
+              tiposComOpcoes.push(tipo);
+            }
+          }
+
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: tiposComOpcoes,
+          });
+        } catch (error) {
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: [],
+          });
+        }
+      }
+
+      setIndicadoresPlano(indicadoresComTipos);
+
+      if (anoSelectedPlano && usuario?.id_municipio) {
+        await carregarDadosExistentesPlano(anoSelectedPlano);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar indicadores:", error);
+      toast.error("Erro ao carregar indicadores", {
+        position: "top-right",
+        autoClose: 7000,
+      });
+      setIndicadoresPlano([]);
+    } finally {
+      setLoadingIndicadoresPlano(false);
+    }
+  }
+
+  async function carregarDadosExistentesPlano(ano: string) {
+    if (!usuario?.id_municipio || !ano) return;
+
+    setLoadingDadosPlano(true);
+
+    try {
+      const apiClient = getAPIClient();
+
+      const response = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${ano}`
+      );
+      const dados = response.data || [];
+      setDadosCarregadosPlano(dados);
+
+      // Preencher formulário com valores existentes
+      preencherFormularioPlano(dados);
+
+      if (dados.length > 0) {
+        toast.info(`Carregados ${dados.length} registro(s) para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.info(`Nenhum dado encontrado para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados existentes:", error);
+      toast.error("Erro ao carregar dados existentes!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setLoadingDadosPlano(false);
+    }
+  }
+
+  function preencherFormularioPlano(dados: any[]) {
+    // Resetar todos os valores dos checkboxes antes de preencher
+    indicadoresPlano.forEach((indicador) => {
+      const tipoCheckbox = indicador.tiposCampo?.find(
+        (tipo) => tipo.type === "checkbox"
+      );
+      if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+        tipoCheckbox.checkBoxItems.forEach((item) => {
+          item.valor = false;
+        });
+      }
+    });
+
+    // Criar objeto com os valores para preencher o formulário
+    const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
+
+    dados.forEach((dado) => {
+      const codigoIndicador = dado.codigo_indicador;
+      const ano = dado.ano;
+      const valor = dado.valor_indicador;
+
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
+    });
+
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresPlano.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
+    resetIndicadoresPlano(valoresFormulario);
+  }
+
+  async function selectAnoPlano(ano: string) {
+    setAnoSelectedPlano(ano);
+
+    if (ano && usuario?.id_municipio) {
+      await carregarDadosExistentesPlano(ano);
+    } else {
+      setDadosCarregadosPlano([]);
+    }
+  }
+
+  async function handleCadastroIndicadoresPlano(data: any) {
+    if (!usuario?.id_municipio) {
+      toast.error("Não existe Município, entre novamente no sistema!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    if (!anoSelectedPlano) {
+      toast.error("Erro: Ano não selecionado!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    // Processar os dados para salvar valores dos indicadores
+    const valoresIndicadores = [];
+    const checkBoxSelecionados = [];
+
+    // Agrupar checkboxes por código do indicador
+    const checkBoxAgrupados = new Map();
+
+    Object.keys(data).forEach((key) => {
+      const valor = data[key];
+
+      // Verificar se é um campo checkbox
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
+        const parts = key.split("_");
+        const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2
+
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          // Encontrar a descrição do checkbox selecionado
+          const indicador = indicadoresPlano.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              // Tentar encontrar por id_item_check_box
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+
+              if (!checkBoxItem) {
+                // Se não encontrou, tentar encontrar por qualquer correspondência
+                const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    item.id_item_check_box.toString() ===
+                    idItemCheckBox.toString() ||
+                    item.descricao
+                      .toLowerCase()
+                      .includes(idItemCheckBox.toLowerCase())
+                );
+
+                // Usar o resultado da busca alternativa se encontrou
+                if (checkBoxItemAlt) {
+                  checkBoxItem = checkBoxItemAlt;
+                }
+              }
+
+              if (checkBoxItem) {
+                // Agrupar checkboxes por indicador
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados
+                  .get(codigoIndicador)
+                  .push(checkBoxItem.descricao);
+
+                // Salvar para tabela item_check_box
+                const checkBoxData = {
+                  id_item_check_box: checkBoxItem.id_item_check_box,
+                  descricao: checkBoxItem.descricao,
+                  valor: true, // boolean true para item selecionado
+                  id_indicador: indicador.id_indicador,
+                };
+
+                checkBoxSelecionados.push(checkBoxData);
+              }
+            }
+          }
+        }
+      } else {
+        // Campo normal (não checkbox) - formato: "CODIGO_ANO"
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
+
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelectedPlano),
+            valor_indicador: valor,
+            id_municipio: usuario.id_municipio,
+          });
+        }
+      }
+    });
+
+    // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadoresPlano.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        // Salvar array JSON com descrições na tabela indicadores-municipio
+        valoresIndicadores.push({
+          codigo_indicador: codigoIndicador,
+          ano: parseInt(anoSelectedPlano),
+          valor_indicador: JSON.stringify(descricoes), // Array JSON
+          id_municipio: usuario.id_municipio,
+        });
+      }
+    });
+
+    if (valoresIndicadores.length === 0) {
+      toast.warning("Nenhum valor foi preenchido!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    const apiClient = getAPIClient();
+
+    try {
+      const existingDataResponse = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${anoSelectedPlano}`
+      );
+
+      const existingData = existingDataResponse.data || [];
+
+      if (existingData.length > 0) {
+        const existingDataMap = new Map();
+        existingData.forEach((record) => {
+          const key = `${record.codigo_indicador}_${record.ano}`;
+          existingDataMap.set(key, record);
+        });
+
+        for (const valorIndicador of valoresIndicadores) {
+          const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}`;
+          const existingRecord = existingDataMap.get(key);
+
+          try {
+            if (existingRecord) {
+              await apiClient.put(
+                `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                valorIndicador
+              );
+            } else {
+              await apiClient.post("/indicadores-municipio", valorIndicador);
+            }
+          } catch (saveError) {
+            console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+      } else {
+        for (const valorIndicador of valoresIndicadores) {
+          try {
+            await apiClient.post("/indicadores-municipio", valorIndicador);
+          } catch (saveError) {
+            console.error("Erro ao salvar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+      }
+
+      toast.success("Dados salvos com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+
+      // Recarregar dados após salvar
+      await carregarDadosExistentesPlano(anoSelectedPlano);
+    } catch (error) {
+      console.error("Erro ao salvar dados:", error);
+      toast.error("Erro ao salvar dados!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    }
+  }
+
+  // Funções para buscar indicadores de Conselho Municipal
+  async function getMenuItemsConselho() {
+    try {
+      setLoadingIndicadoresConselho(true);
+
+      // Buscar menus do módulo 1 (Gestão) - o retorno já vem com menuItems incluídos
+      const resModulo = await api.get(`menus/modulo/1`);
+      const menusModulo = Array.isArray(resModulo.data) ? resModulo.data : [];
+
+      // Procurar o menu "Conselho Municipal" 
+      const menuConselho = menusModulo.find(
+        (menu) => {
+          const tituloLower = menu.titulo?.toLowerCase() || "";
+          return (
+            tituloLower.includes("conselho municipal") ||
+            tituloLower.includes("conselho de saneamento")
+          );
+        }
+      );
+
+      if (!menuConselho) {
+        setMenuItemsConselho([]);
+        setIndicadoresConselho([]);
+        setGrupoConselho("");
+        return;
+      }
+
+      // Verificar se o menu já tem menuItems incluídos
+      let itensConselho = [];
+
+      if (menuConselho.menuItems && Array.isArray(menuConselho.menuItems) && menuConselho.menuItems.length > 0) {
+        // Usar todos os menuItems que já vêm no retorno
+        itensConselho = menuConselho.menuItems;
+      } else if (menuConselho.id_menu) {
+        // Se não tem menuItems no retorno, buscar separadamente (fallback)
+        try {
+          const resMenuItems = await api.get(`menu-items/menu/${menuConselho.id_menu}`);
+          itensConselho = Array.isArray(resMenuItems.data) ? resMenuItems.data : [];
+        } catch (e) {
+          console.error("Erro ao buscar menuItems:", e);
+        }
+      }
+
+      setMenuItemsConselho(itensConselho);
+
+      // Se houver itens, carregar os indicadores do primeiro item
+      if (itensConselho.length > 0) {
+        await getIndicadoresConselho(itensConselho[0]);
+      } else {
+        setIndicadoresConselho([]);
+        setGrupoConselho("");
+      }
+    } catch (error) {
+      console.error("Erro ao carregar menu items de Conselho:", error);
+      toast.error("Erro ao carregar indicadores de Conselho", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      setMenuItemsConselho([]);
+      setIndicadoresConselho([]);
+      setGrupoConselho("");
+    } finally {
+      setLoadingIndicadoresConselho(false);
+    }
+  }
+
+  async function getIndicadoresConselho(menu_item: {
+    id_menu_item: number;
+    nome_menu_item: string;
+  }) {
+    setGrupoConselho(menu_item.nome_menu_item);
+    setLoadingIndicadoresConselho(true);
+
+    try {
+      const resIndicadores = await api.get(
+        `indicadores-novo/menu-item/${menu_item?.id_menu_item}`
+      );
+      const indicadoresData = resIndicadores.data || [];
+
+      if (indicadoresData.length === 0) {
+        setIndicadoresConselho([]);
+        setLoadingIndicadoresConselho(false);
+        return;
+      }
+
+      const indicadoresComTipos = [];
+
+      for (let i = 0; i < indicadoresData.length; i++) {
+        const indicador = indicadoresData[i];
+
+        try {
+          const tiposResponse = await api.get(
+            `tipos-campo/indicador/${indicador.id_indicador}`
+          );
+          const tiposCampo = tiposResponse.data || [];
+
+          const tiposComOpcoes = [];
+          for (const tipo of tiposCampo) {
+            if (tipo.type === "select") {
+              try {
+                const opcoesResponse = await api.get(
+                  `select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`
+                );
+                const opcoes = opcoesResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  selectOptions: opcoes,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else if (tipo.type === "checkbox") {
+              try {
+                const checkBoxResponse = await api.get(
+                  `item-check-box/indicador/${indicador.id_indicador}`
+                );
+                const checkBoxItems = checkBoxResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  checkBoxItems: checkBoxItems,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else {
+              tiposComOpcoes.push(tipo);
+            }
+          }
+
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: tiposComOpcoes,
+          });
+        } catch (error) {
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: [],
+          });
+        }
+      }
+
+      setIndicadoresConselho(indicadoresComTipos);
+
+      if (anoSelectedConselho && usuario?.id_municipio) {
+        await carregarDadosExistentesConselho(anoSelectedConselho);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar indicadores:", error);
+      toast.error("Erro ao carregar indicadores", {
+        position: "top-right",
+        autoClose: 7000,
+      });
+      setIndicadoresConselho([]);
+    } finally {
+      setLoadingIndicadoresConselho(false);
+    }
+  }
+
+  async function carregarDadosExistentesConselho(ano: string) {
+    if (!usuario?.id_municipio || !ano) return;
+
+    setLoadingDadosConselho(true);
+
+    try {
+      const apiClient = getAPIClient();
+
+      const response = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${ano}`
+      );
+      const dados = response.data || [];
+      setDadosCarregadosConselho(dados);
+
+      // Preencher formulário com valores existentes
+      preencherFormularioConselho(dados);
+
+      if (dados.length > 0) {
+        toast.info(`Carregados ${dados.length} registro(s) para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.info(`Nenhum dado encontrado para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados existentes:", error);
+      toast.error("Erro ao carregar dados existentes!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setLoadingDadosConselho(false);
+    }
+  }
+
+  function preencherFormularioConselho(dados: any[]) {
+    // Resetar todos os valores dos checkboxes antes de preencher
+    indicadoresConselho.forEach((indicador) => {
+      const tipoCheckbox = indicador.tiposCampo?.find(
+        (tipo) => tipo.type === "checkbox"
+      );
+      if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+        tipoCheckbox.checkBoxItems.forEach((item) => {
+          item.valor = false;
+        });
+      }
+    });
+
+    // Criar objeto com os valores para preencher o formulário
+    const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
+
+    dados.forEach((dado) => {
+      const codigoIndicador = dado.codigo_indicador;
+      const ano = dado.ano;
+      const valor = dado.valor_indicador;
+
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
+    });
+
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadoresConselho.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
+    resetIndicadoresConselho(valoresFormulario);
+  }
+
+  async function selectAnoConselho(ano: string) {
+    setAnoSelectedConselho(ano);
+
+    if (ano && usuario?.id_municipio) {
+      await carregarDadosExistentesConselho(ano);
+    } else {
+      setDadosCarregadosConselho([]);
+    }
+  }
+
+  async function getIndicadores(menu_item: {
+    id_menu_item: number;
+    nome_menu_item: string;
+  }) {
+    setGrupo(menu_item.nome_menu_item);
+    setLoadingIndicadores(true);
+
+    try {
+      const resIndicadores = await api.get(
+        `indicadores-novo/menu-item/${menu_item?.id_menu_item}`
+      );
+      const indicadoresData = resIndicadores.data || [];
+
+      if (indicadoresData.length === 0) {
+        setIndicadores([]);
+        return;
+      }
+
+      setIndicadores(indicadoresData);
+
+      const indicadoresComTipos = [];
+
+      for (let i = 0; i < indicadoresData.length; i++) {
+        const indicador = indicadoresData[i];
+
+        try {
+          const tiposResponse = await api.get(
+            `tipos-campo/indicador/${indicador.id_indicador}`
+          );
+          const tiposCampo = tiposResponse.data || [];
+
+          const tiposComOpcoes = [];
+          for (const tipo of tiposCampo) {
+            if (tipo.type === "select") {
+              try {
+                const opcoesResponse = await api.get(
+                  `select-options/tipo-campo/${tipo.id_tipo_campo_indicador}`
+                );
+                const opcoes = opcoesResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  selectOptions: opcoes,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else if (tipo.type === "checkbox") {
+              try {
+                const checkBoxResponse = await api.get(
+                  `item-check-box/indicador/${indicador.id_indicador}`
+                );
+                const checkBoxItems = checkBoxResponse.data || [];
+                tiposComOpcoes.push({
+                  ...tipo,
+                  checkBoxItems: checkBoxItems,
+                });
+              } catch (error) {
+                tiposComOpcoes.push(tipo);
+              }
+            } else {
+              tiposComOpcoes.push(tipo);
+            }
+          }
+
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: tiposComOpcoes,
+          });
+        } catch (error) {
+          indicadoresComTipos.push({
+            ...indicador,
+            tiposCampo: [],
+          });
+        }
+      }
+
+      setIndicadores(indicadoresComTipos);
+
+      if (anoSelected && usuario?.id_municipio) {
+        await carregarDadosExistentes(anoSelected);
+      }
+    } catch (error) {
+      console.error("Erro ao carregar indicadores:", error);
+      toast.error("Erro ao carregar indicadores", {
+        position: "top-right",
+        autoClose: 7000,
+      });
+      setIndicadores([]);
+    } finally {
+      setLoadingIndicadores(false);
+    }
+  }
+
+  async function selectAno(ano: string) {
+    setAnoSelected(ano);
+    if (ano && usuario?.id_municipio) {
+      await carregarDadosExistentes(ano);
+    } else {
+      setDadosCarregados([]);
+      resetIndicadores();
+    }
+  }
+
+  async function carregarDadosExistentes(ano: string) {
+    if (!usuario?.id_municipio || !ano) return;
+
+    setLoadingDados(true);
+
+    try {
+      const apiClient = getAPIClient();
+
+      const response = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${ano}`
+      );
+      const dados = response.data || [];
+
+
+      preencherFormulario(dados);
+
+      if (dados.length > 0) {
+        toast.info(`Carregados ${dados.length} registro(s) para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      } else {
+        toast.info(`Nenhum dado encontrado para o ano ${ano}`, {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao carregar dados existentes:", error);
+      toast.error("Erro ao carregar dados existentes!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    } finally {
+      setLoadingDados(false);
+    }
+  }
+
+  function preencherFormulario(dados: any[]) {
+    // Criar objeto com os valores para preencher o formulário
+    const valoresFormulario = {};
+
+    // Agrupar dados por código do indicador para processar checkboxes
+    const dadosAgrupados = new Map();
+
+    dados.forEach((dado) => {
+      const codigoIndicador = dado.codigo_indicador;
+      const ano = dado.ano;
+      const valor = dado.valor_indicador;
+
+      if (!dadosAgrupados.has(codigoIndicador)) {
+        dadosAgrupados.set(codigoIndicador, []);
+      }
+      dadosAgrupados.get(codigoIndicador).push({ ano, valor });
+    });
+
+    // Processar cada grupo de dados de indicadores
+    dadosAgrupados.forEach((valores, codigoIndicador) => {
+      const indicador = indicadores.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+
+      if (indicador) {
+        const tipoCheckbox = indicador.tiposCampo?.find(
+          (tipo) => tipo.type === "checkbox"
+        );
+
+        if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+          // É um checkbox, verificar quais itens estão salvos
+          valores.forEach(({ ano, valor }) => {
+            try {
+              // Se o valor é uma string que parece JSON, tentar fazer parse
+              if (
+                typeof valor === "string" &&
+                (valor.startsWith("[") || valor.startsWith("{"))
+              ) {
+                try {
+                  const jsonParsed = JSON.parse(valor);
+                  if (Array.isArray(jsonParsed)) {
+                    // Para cada descrição no array JSON, encontrar o checkbox correspondente
+                    jsonParsed.forEach((descricao) => {
+                      const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                        (item) => item.descricao === descricao
+                      );
+
+                      if (checkBoxItem) {
+                        const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                        valoresFormulario[fieldName] = true;
+                        // Preencher item.valor para defaultChecked funcionar
+                        checkBoxItem.valor = true;
+                      }
+                    });
+                  }
+                } catch (jsonError) {
+                  // Fallback: tratar como valor único
+                  const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                    (item) => item.descricao === valor
+                  );
+
+                  if (checkBoxItem) {
+                    const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                    valoresFormulario[fieldName] = true;
+                    // Preencher item.valor para defaultChecked funcionar
+                    checkBoxItem.valor = true;
+                  }
+                }
+              } else {
+                // Valor único (não JSON)
+                const checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) => item.descricao === valor || item.valor === valor
+                );
+
+                if (checkBoxItem) {
+                  const fieldName = `${codigoIndicador}_${checkBoxItem.id_item_check_box}_${ano}`;
+                  valoresFormulario[fieldName] = true;
+                  // Preencher item.valor para defaultChecked funcionar
+                  checkBoxItem.valor = true;
+                }
+              }
+            } catch (error) {
+              console.error(
+                "Erro ao processar valor do checkbox:",
+                valor,
+                error
+              );
+            }
+          });
+
+          // Garantir que itens não selecionados tenham valor false
+          tipoCheckbox.checkBoxItems.forEach((item) => {
+            if (item.valor === undefined) {
+              item.valor = false;
+            }
+          });
+        } else {
+          // Campo normal - pegar apenas o primeiro valor (não deve ter múltiplos)
+          const { ano, valor } = valores[0];
+          const fieldName = `${codigoIndicador}_${ano}`;
+          valoresFormulario[fieldName] = valor;
+        }
+      } else {
+        // Fallback para campo normal
+        const { ano, valor } = valores[0];
+        const fieldName = `${codigoIndicador}_${ano}`;
+        valoresFormulario[fieldName] = valor;
+      }
+    });
+
+    // Preencher o formulário
+    resetIndicadores(valoresFormulario);
+  }
+
+  async function handleCadastroIndicadores(data: any) {
+    if (!usuario?.id_municipio) {
+      toast.error("Não existe Município, entre novamente no sistema!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+    if (!anoSelected) {
+      toast.error("Erro: Ano não selecionado!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+    const valoresIndicadores: { codigo_indicador: string; ano: number; valor_indicador: string; id_municipio: number }[] = [];
+    const checkBoxAgrupados = new Map<string, string[]>();
+
+    Object.keys(data).forEach((key) => {
+      const valor = data[key];
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
+        const parts = key.split("_");
+        const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2];
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          const indicador = indicadores.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+            if (tipoCheckbox?.checkBoxItems) {
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+              if (!checkBoxItem) {
+                checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    String(item.id_item_check_box) === String(idItemCheckBox) ||
+                    item.descricao?.toLowerCase().includes(String(idItemCheckBox).toLowerCase())
+                );
+              }
+              if (checkBoxItem) {
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados.get(codigoIndicador)!.push(checkBoxItem.descricao);
+              }
+            }
+          }
+        }
+      } else {
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0];
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelected),
+            valor_indicador: String(valor),
+            id_municipio: Number(usuario.id_municipio),
+          });
+        }
+      }
+    });
+
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadores.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        valoresIndicadores.push({
+          codigo_indicador: codigoIndicador,
+          ano: parseInt(anoSelected),
+          valor_indicador: JSON.stringify(descricoes),
+          id_municipio: Number(usuario.id_municipio) as number,
+        });
+      }
+    });
+
+    if (valoresIndicadores.length === 0) {
+      toast.warning("Nenhum valor foi preenchido!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    const apiClient = getAPIClient();
+    try {
+      const existingDataResponse = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${anoSelected}`
+      );
+      const existingData = existingDataResponse.data || [];
+
+      if (existingData.length > 0) {
+        const existingDataMap = new Map<string, { id_incicador_municipio: number }>();
+        existingData.forEach((record: any) => {
+          const key = `${record.codigo_indicador}_${record.ano}`;
+          existingDataMap.set(key, record);
+        });
+        for (const valorIndicador of valoresIndicadores) {
+          const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}`;
+          const existingRecord = existingDataMap.get(key);
+          try {
+            if (existingRecord) {
+              await apiClient.put(
+                `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                valorIndicador
+              );
+            } else {
+              await apiClient.post("/indicadores-municipio", valorIndicador);
+            }
+          } catch (saveError) {
+            console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+        toast.success("Dados atualizados com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      } else {
+        for (const valorIndicador of valoresIndicadores) {
+          await apiClient.post("/indicadores-municipio", valorIndicador);
+        }
+        toast.success("Dados salvos com sucesso!", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+      await carregarDadosExistentes(anoSelected);
+    } catch (error) {
+      console.error("Erro ao verificar dados existentes:", error);
+      for (const valorIndicador of valoresIndicadores) {
+        try {
+          await apiClient.post("/indicadores-municipio", valorIndicador);
+        } catch (saveError) {
+          console.error("Erro ao salvar valor:", valorIndicador, saveError);
+          throw saveError;
+        }
+      }
+      toast.success("Dados salvos com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      await carregarDadosExistentes(anoSelected);
+    }
+  }
+
+  async function handleCadastroIndicadoresConselho(data: any) {
+    if (!usuario?.id_municipio) {
+      toast.error("Não existe Município, entre novamente no sistema!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    if (!anoSelectedConselho) {
+      toast.error("Erro: Ano não selecionado!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    // Processar os dados para salvar valores dos indicadores
+    const valoresIndicadores = [];
+    const checkBoxSelecionados = [];
+
+    // Agrupar checkboxes por código do indicador
+    const checkBoxAgrupados = new Map();
+
+    Object.keys(data).forEach((key) => {
+      const valor = data[key];
+
+      // Verificar se é um campo checkbox
+      const isCheckboxField = key.includes("_") && key.split("_").length > 2;
+
+      if (isCheckboxField) {
+        const parts = key.split("_");
+        const codigoIndicador = parts[0];
+        const idItemCheckBox = parts[2]; // O id_item_check_box está na posição 2
+
+        if (
+          valor === true ||
+          valor === "true" ||
+          (typeof valor === "string" && valor.length > 0 && valor !== "false")
+        ) {
+          // Encontrar a descrição do checkbox selecionado
+          const indicador = indicadoresConselho.find(
+            (ind) => ind.codigo_indicador === codigoIndicador
+          );
+
+          if (indicador) {
+            const tipoCheckbox = indicador.tiposCampo?.find(
+              (tipo) => tipo.type === "checkbox"
+            );
+
+            if (tipoCheckbox && tipoCheckbox.checkBoxItems) {
+              // Tentar encontrar por id_item_check_box
+              let checkBoxItem = tipoCheckbox.checkBoxItems.find(
+                (item) => item.id_item_check_box === idItemCheckBox
+              );
+
+              if (!checkBoxItem) {
+                // Se não encontrou, tentar encontrar por qualquer correspondência
+                const checkBoxItemAlt = tipoCheckbox.checkBoxItems.find(
+                  (item) =>
+                    item.id_item_check_box.toString() ===
+                    idItemCheckBox.toString() ||
+                    item.descricao
+                      .toLowerCase()
+                      .includes(idItemCheckBox.toLowerCase())
+                );
+
+                // Usar o resultado da busca alternativa se encontrou
+                if (checkBoxItemAlt) {
+                  checkBoxItem = checkBoxItemAlt;
+                }
+              }
+
+              if (checkBoxItem) {
+                // Agrupar checkboxes por indicador
+                if (!checkBoxAgrupados.has(codigoIndicador)) {
+                  checkBoxAgrupados.set(codigoIndicador, []);
+                }
+                checkBoxAgrupados
+                  .get(codigoIndicador)
+                  .push(checkBoxItem.descricao);
+
+                // Salvar para tabela item_check_box
+                const checkBoxData = {
+                  id_item_check_box: checkBoxItem.id_item_check_box,
+                  descricao: checkBoxItem.descricao,
+                  valor: true, // boolean true para item selecionado
+                  id_indicador: indicador.id_indicador,
+                };
+
+                checkBoxSelecionados.push(checkBoxData);
+              }
+            }
+          }
+        }
+      } else {
+        // Campo normal (não checkbox) - formato: "CODIGO_ANO"
+        if (valor !== null && valor !== undefined && valor !== "") {
+          const parts = key.split("_");
+          const codigoIndicador = parts[0]; // Extrair apenas o código, sem o ano
+
+          valoresIndicadores.push({
+            codigo_indicador: codigoIndicador,
+            ano: parseInt(anoSelectedConselho),
+            valor_indicador: valor,
+            id_municipio: usuario.id_municipio,
+          });
+        }
+      }
+    });
+
+    // Processar checkboxes agrupados para salvar na tabela indicadores-municipio
+    checkBoxAgrupados.forEach((descricoes, codigoIndicador) => {
+      const indicador = indicadoresConselho.find(
+        (ind) => ind.codigo_indicador === codigoIndicador
+      );
+      if (indicador) {
+        // Salvar array JSON com descrições na tabela indicadores-municipio
+        valoresIndicadores.push({
+          codigo_indicador: codigoIndicador,
+          ano: parseInt(anoSelectedConselho),
+          valor_indicador: JSON.stringify(descricoes), // Array JSON
+          id_municipio: usuario.id_municipio,
+        });
+      }
+    });
+
+    if (valoresIndicadores.length === 0) {
+      toast.warning("Nenhum valor foi preenchido!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      return;
+    }
+
+    const apiClient = getAPIClient();
+
+    try {
+      const existingDataResponse = await apiClient.get(
+        `/indicadores-municipio/municipio/${usuario.id_municipio}?ano=${anoSelectedConselho}`
+      );
+
+      const existingData = existingDataResponse.data || [];
+
+      if (existingData.length > 0) {
+        const existingDataMap = new Map();
+        existingData.forEach((record) => {
+          const key = `${record.codigo_indicador}_${record.ano}`;
+          existingDataMap.set(key, record);
+        });
+
+        for (const valorIndicador of valoresIndicadores) {
+          const key = `${valorIndicador.codigo_indicador}_${valorIndicador.ano}`;
+          const existingRecord = existingDataMap.get(key);
+
+          try {
+            if (existingRecord) {
+              await apiClient.put(
+                `/indicadores-municipio/${existingRecord.id_incicador_municipio}`,
+                valorIndicador
+              );
+            } else {
+              await apiClient.post("/indicadores-municipio", valorIndicador);
+            }
+          } catch (saveError) {
+            console.error("Erro ao salvar/atualizar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+      } else {
+        for (const valorIndicador of valoresIndicadores) {
+          try {
+            await apiClient.post("/indicadores-municipio", valorIndicador);
+          } catch (saveError) {
+            console.error("Erro ao salvar valor:", valorIndicador, saveError);
+            throw saveError;
+          }
+        }
+      }
+
+      toast.success("Dados salvos com sucesso!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+
+      // Recarregar dados após salvar
+      await carregarDadosExistentesConselho(anoSelectedConselho);
+    } catch (error) {
+      console.error("Erro ao salvar dados:", error);
+      toast.error("Erro ao salvar dados!", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    }
+  }
+
+  // ------------- Funcoes ADD -------------
 
   async function handleAddPresidente(data) {
     if (!usuario.id_municipio) {
@@ -646,8 +3768,6 @@ export default function GestaoIndicadores({
           autoClose: 5000,
         });
       });
-
-    console.log("Dados enviados:", data);
   }
   async function handleAddConselhoMunicipal(data) {
     if (!usuario.id_municipio) {
@@ -660,12 +3780,12 @@ export default function GestaoIndicadores({
     }
 
     const formData = new FormData();
-    formData.append("titulo", data.titulo || "");
-    formData.append("ano", data.ano || "");
+    formData.append("titulo", data.conselho_titulo || "");
+    formData.append("ano", data.conselho_ano || "");
     formData.append("id_municipio", usuario.id_municipio);
     formData.append("situacao", conselhoSituacao || "operante");
-    if (data.arquivo && data.arquivo.length > 0 && data.arquivo[0]) {
-      formData.append("arquivo", data.arquivo[0]);
+    if (data.conselho_arquivo && data.conselho_arquivo.length > 0 && data.conselho_arquivo[0]) {
+      formData.append("arquivo", data.conselho_arquivo[0]);
     }
 
     await api
@@ -677,9 +3797,9 @@ export default function GestaoIndicadores({
         });
         getConselhoMunicipal();
         // Reset dos campos do conselho
-        setValue("conselho_titulo", "");
-        setValue("conselho_ano", "");
-        setValue("conselho_arquivo", null);
+        setValueConselho("conselho_titulo", "");
+        setValueConselho("conselho_ano", "");
+        setValueConselho("conselho_arquivo", null);
         if (resetConselho) {
           resetConselho();
         }
@@ -700,30 +3820,49 @@ export default function GestaoIndicadores({
     formData.append("id_municipio", usuario.id_municipio);
     formData.append("politica_titulo", data.politica_titulo || "");
     formData.append("politica_ano", data.politica_ano || "");
-    formData.append("politica_arquivo", data.politica_arquivo[0] || "");
+    if (data.politica_arquivo && data.politica_arquivo.length > 0 && data.politica_arquivo[0]) {
+      formData.append("politica_arquivo", data.politica_arquivo[0]);
+    }
 
-    await api
-      .post("addGestaoIndicadores", formData)
-      .then(() => {
+    const apiClient = getAPIClient();
+    try {
+      const response = await apiClient.post("addGestaoIndicadores", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data && response.data.success) {
         toast.success(
-          "Política Municipal de Saneamento cadastrada com sucesso!",
+          response.data.message || "Política Municipal de Saneamento cadastrada com sucesso!",
           {
             position: "top-right",
             autoClose: 7000,
           }
         );
         resetPolitica();
-        getPoliticas();
-      })
-      .catch(() => {
-        toast.error("Erro ao cadastrar Política Municipal de Saneamento!", {
+        setTimeout(() => {
+          getPoliticas();
+        }, 500);
+      } else {
+        toast.success("Política Municipal de Saneamento cadastrada com sucesso!", {
           position: "top-right",
-          autoClose: 5000,
+          autoClose: 7000,
         });
+        resetPolitica();
+        setTimeout(() => {
+          getPoliticas();
+        }, 500);
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Erro ao cadastrar Política Municipal de Saneamento!";
+      toast.error(errorMessage, {
+        position: "top-right",
+        autoClose: 5000,
       });
-
-    console.log("Dados enviados:", data);
+    }
   }
+
   async function handleAddRepresentante(data) {
     if (!usuario.id_municipio) {
       toast.error("Não existe Município, entre novamente no sistema! ", {
@@ -764,7 +3903,9 @@ export default function GestaoIndicadores({
     formData.append("id_municipio", usuario.id_municipio);
     formData.append("plano_titulo", data.plano_titulo || "");
     formData.append("plano_ano", data.plano_ano || "");
-    formData.append("plano_arquivo", data.plano_arquivo[0] || "");
+    if (data.plano_arquivo && data.plano_arquivo.length > 0 && data.plano_arquivo[0]) {
+      formData.append("plano_arquivo", data.plano_arquivo[0]);
+    }
 
     await api
       .post("addGestaoIndicadores", formData)
@@ -782,8 +3923,6 @@ export default function GestaoIndicadores({
           autoClose: 5000,
         });
       });
-
-    console.log("Dados enviados:", data);
   }
   async function handleAddParticipacao(data) {
     if (usuario?.id_permissao === 4) return;
@@ -792,7 +3931,9 @@ export default function GestaoIndicadores({
     formData.append("id_municipio", usuario.id_municipio);
     formData.append("pcs_titulo", data.pcs_titulo || "");
     formData.append("pcs_ano", data.pcs_ano || "");
-    formData.append("pcs_arquivo", data.pcs_arquivo[0] || "");
+    if (data.pcs_arquivo && data.pcs_arquivo.length > 0 && data.pcs_arquivo[0]) {
+      formData.append("pcs_arquivo", data.pcs_arquivo[0]);
+    }
 
     await api
       .post("addGestaoIndicadores", formData)
@@ -813,8 +3954,6 @@ export default function GestaoIndicadores({
           autoClose: 5000,
         });
       });
-
-    console.log("Dados enviados:", data);
   }
   async function handleAddSaneamentoRural(data) {
     if (usuario?.id_permissao === 4) return;
@@ -840,8 +3979,6 @@ export default function GestaoIndicadores({
           autoClose: 5000,
         });
       });
-
-    console.log("Dados enviados:", data);
   }
   async function handleAddComunidadesTradicionais(data) {
     if (usuario?.id_permissao === 4) return;
@@ -868,8 +4005,6 @@ export default function GestaoIndicadores({
           autoClose: 5000,
         });
       });
-
-    console.log("Dados enviados:", data);
   }
 
   // ------------- Funções DELETE -------------
@@ -1058,43 +4193,49 @@ export default function GestaoIndicadores({
       data.norma_associacao ? data.norma_associacao : dadosGestao?.ga_norma
     );
 
-    formData.append("pcs_ano", data.pcs_ano);
-    formData.append("pcs_arquivo", data.pcs_arquivo[0]);
-    formData.append("pcs_titulo", data.pcs_titulo);
+    formData.append("pcs_ano", data.pcs_ano || "");
+    if (data.pcs_arquivo && data.pcs_arquivo.length > 0 && data.pcs_arquivo[0]) {
+      formData.append("pcs_arquivo", data.pcs_arquivo[0]);
+    }
+    formData.append("pcs_titulo", data.pcs_titulo || "");
 
     if (planoSituacao !== "nao_tem") {
-      formData.append("plano_ano", data.plano_ano);
-      if (data.plano_arquivo && data.plano_arquivo[0]) {
+      formData.append("plano_ano", data.plano_ano || "");
+      if (data.plano_arquivo && data.plano_arquivo.length > 0 && data.plano_arquivo[0]) {
         formData.append("plano_arquivo", data.plano_arquivo[0]);
       }
-      formData.append("plano_titulo", data.plano_titulo);
+      formData.append("plano_titulo", data.plano_titulo || "");
     }
 
     formData.append("plano_situacao", planoSituacao);
-    formData.append("plano_ano", data.plano_ano);
-    formData.append("plano_arquivo", data.plano_arquivo[0]);
-    formData.append("plano_titulo", data.plano_titulo);
+    formData.append("plano_ano", data.plano_ano || "");
+    if (data.plano_arquivo && data.plano_arquivo.length > 0 && data.plano_arquivo[0]) {
+      formData.append("plano_arquivo", data.plano_arquivo[0]);
+    }
+    formData.append("plano_titulo", data.plano_titulo || "");
 
     if (politicaSituacao !== "nao_tem") {
-      formData.append("politica_ano", data.politica_ano);
-      if (data.politica_arquivo && data.politica_arquivo[0]) {
+      formData.append("politica_ano", data.politica_ano || "");
+      if (data.politica_arquivo && data.politica_arquivo.length > 0 && data.politica_arquivo[0]) {
         formData.append("politica_arquivo", data.politica_arquivo[0]);
       }
-      formData.append("politica_titulo", data.politica_titulo);
+      formData.append("politica_titulo", data.politica_titulo || "");
     }
 
     formData.append("politica_situacao", politicaSituacao);
     if (conselhoSituacao !== "nao_tem") {
-      formData.append("conselho_titulo", data.conselho_titulo);
-      formData.append("conselho_ano", data.conselho_ano);
-      if (data.conselho_arquivo && data.conselho_arquivo[0]) {
+      formData.append("conselho_titulo", data.conselho_titulo || "");
+      formData.append("conselho_ano", data.conselho_ano || "");
+      if (data.conselho_arquivo && data.conselho_arquivo.length > 0 && data.conselho_arquivo[0]) {
         formData.append("conselho_arquivo", data.conselho_arquivo[0]);
       }
     }
     formData.append("conselho_situacao", conselhoSituacao);
 
     formData.append("politica_ano", data.politica_ano);
-    formData.append("politica_arquivo", data.politica_arquivo[0]);
+    if (data.politica_arquivo && data.politica_arquivo.length > 0 && data.politica_arquivo[0]) {
+      formData.append("politica_arquivo", data.politica_arquivo[0]);
+    }
     formData.append("politica_titulo", data.politica_titulo);
 
     formData.append(
@@ -1113,49 +4254,41 @@ export default function GestaoIndicadores({
     );
 
     const apiClient = getAPIClient();
-    const resCad = await apiClient
-      .post("addGestaoIndicadores", formData, {
+    try {
+      const resCad = await apiClient.post("addGestaoIndicadores", formData, {
         headers: {
-          "Content-Type": `multipart/form-data=${formData}`,
+          "Content-Type": "multipart/form-data",
         },
-      })
-      .then((response) => {
-        if (response.data.success) {
-          toast.success(response.data.message, {
-            position: "top-right",
-            autoClose: 7000,
-          });
-          getPoliticas();
-          getPlanos();
-          getParticipacoes();
-          getRepresentantes();
-          reset({
-            pcs_ano: "",
-            pcs_titulo: "",
-            pcs_arquivo: "",
-            plano_ano: "",
-            plano_titulo: "",
-            plano_arquivo: "",
-            politica_ano: "",
-            politica_titulo: "",
-            politica_arquivo: "",
-            ga_nome: "",
-            ga_norma: "",
-          });
-        } else {
-          toast.error(response.data.message, {
-            position: "top-right",
-            autoClose: 7000,
-          });
-        }
-      })
-      .catch((error) => {
-        toast.error("Não foi possivel cadastrar o representante! ", {
-          position: "top-right",
-          autoClose: 5000,
-        });
-        console.log(error);
       });
+
+      if (resCad.data && resCad.data.success) {
+        toast.success(resCad.data.message || "Dados salvos com sucesso!", {
+          position: "top-right",
+          autoClose: 7000,
+        });
+        await getGestao();
+        getPoliticas();
+        getPlanos();
+        getParticipacoes();
+        getRepresentantes();
+      } else {
+        toast.success("Dados salvos com sucesso!", {
+          position: "top-right",
+          autoClose: 7000,
+        });
+        await getGestao();
+        getPoliticas();
+        getPlanos();
+        getParticipacoes();
+        getRepresentantes();
+      }
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      toast.error("Não foi possível salvar os dados! ", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+    }
 
     const resParticipacao = await apiClient.get(
       "getParticipacaoControleSocial",
@@ -1212,7 +4345,6 @@ export default function GestaoIndicadores({
   }
 
   async function updatePoliticaMunicipal(data: IPoliticas) {
-    console.log("Antes de atualizar politicas", data);
 
     if (!usuario.id_municipio || !data.id_politica_municipal) {
       toast.error("Dados insuficientes para atualizar!", {
@@ -1393,8 +4525,6 @@ export default function GestaoIndicadores({
   }
 
   async function updatePlanoMunicipal(data: IPlanos) {
-    console.log("Antes de atualizar plano", data);
-
     if (!usuario.id_municipio || !data.id_plano_municipal) {
       toast.error("Dados insuficientes para atualizar!", {
         position: "top-right",
@@ -1428,195 +4558,220 @@ export default function GestaoIndicadores({
       });
   }
 
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     if (window.innerWidth <= 768) {
-  //       setIsCollapsed(true);
-  //     } else {
-  //       setIsCollapsed(false);
-  //     }
-  //   };
-  //   handleResize();
-  //   window.addEventListener("resize", handleResize);
-  //   return () => window.removeEventListener("resize", handleResize);
-  // }, []);
-
-  // Styled components para menu
-  const StaticMenuHeader = styled.div.withConfig({
-    shouldForwardProp: (prop) => prop !== '$isActive',
-  })<{ $isActive?: boolean }>`
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 0;
-    font-weight: bold;
-    color: ${props => props.$isActive ? "#0085bd" : "#000"};
-    transition: color 0.3s ease;
-    user-select: none;
-
-    &:hover {
-      color: #0085bd;
+  async function getMenus() {
+    try {
+      // Buscar menus do módulo Cadastros (id_modulo = 3)
+      const res = await api.get(`menus/modulo/1`);
+      // Filtrar apenas menus sem eixo (id_eixo é null, undefined ou 0)
+      const menusData = Array.isArray(res.data) ? res.data : [];
+      const menusSemEixo = menusData.filter(
+        (menu) => !menu.id_eixo || menu.id_eixo === null || menu.id_eixo === undefined
+      );
+      setMenus(menusSemEixo);
+    } catch (error) {
+      console.error("Erro ao carregar menus:", error);
+      setMenus([]);
     }
+  }
 
-    > div:first-child {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      
-      svg {
-        color: ${props => props.$isActive ? "#0085bd" : "#666"};
-        transition: color 0.3s ease;
-        font-size: 14px;
-      }
-    }
+  useEffect(() => {
+    getMenus();
+  }, []);
 
-    &:hover > div:first-child svg {
-      color: #0085bd;
-    }
-  `;
+  // Formulário dinâmico: exibir quando um item do menu lateral (Política/Plano/Conselho) foi selecionado
+  const isDynamicMenuItemActive = !!grupo;
 
   return (
-    <Container>
+    <Container suppressHydrationWarning>
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <MenuHorizontal
         municipio={dadosMunicipio?.municipio_nome}
       ></MenuHorizontal>
       <MenuIndicadores></MenuIndicadores>
 
-      {isCollapsed ? (
-        <ExpandButton onClick={toggleSidebar}>
-          <FaBars />
-        </ExpandButton>
-      ) : (
-        <Sidebar $isCollapsed={isCollapsed}>
-          <CollapseButton onClick={toggleSidebar}>
+      <div suppressHydrationWarning>
+        {isCollapsed ? (
+          <ExpandButton onClick={toggleSidebar}>
             <FaBars />
-          </CollapseButton>
-          <StaticMenuHeader
-            $isActive={activeForm === "gestaoAssociada"}
-            onClick={() => setActiveForm("gestaoAssociada")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+          </ExpandButton>
+        ) : (
+          <Sidebar $isCollapsed={isCollapsed}>
+            <CollapseButton onClick={toggleSidebar}>
+              <FaBars />
+            </CollapseButton>
+            <StaticMenuHeader
+              $isActive={activeForm === "gestaoAssociada"}
+              onClick={() => setActiveForm("gestaoAssociada")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Gestão Associada
-            </div>
-          </StaticMenuHeader>
-          <StaticMenuHeader
-            $isActive={activeForm === "politicaSaneamento"}
-            onClick={() => setActiveForm("politicaSaneamento")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Gestão Associada
+              </div>
+            </StaticMenuHeader>
+            <StaticMenuHeader
+              $isActive={activeForm === "politicaSaneamento"}
+              onClick={() => setActiveForm("politicaSaneamento")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Política Municipal de Saneamento
-            </div>
-          </StaticMenuHeader>
-          <StaticMenuHeader
-            $isActive={activeForm === "planoSaneamento"}
-            onClick={() => setActiveForm("planoSaneamento")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Política Municipal de Saneamento
+              </div>
+            </StaticMenuHeader>
+            <StaticMenuHeader
+              $isActive={activeForm === "planoSaneamento"}
+              onClick={() => setActiveForm("planoSaneamento")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Plano Municipal de Saneamento
-            </div>
-          </StaticMenuHeader>
-          <StaticMenuHeader
-            $isActive={activeForm === "conselhoSaneamento"}
-            onClick={() => setActiveForm("conselhoSaneamento")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Plano Municipal de Saneamento
+              </div>
+            </StaticMenuHeader>
+            <StaticMenuHeader
+              $isActive={activeForm === "conselhoSaneamento"}
+              onClick={() => setActiveForm("conselhoSaneamento")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Conselho Municipal de Saneamento Básico
-            </div>
-          </StaticMenuHeader>
-          <StaticMenuHeader
-            $isActive={activeForm === "participacaoSocial"}
-            onClick={() => setActiveForm("participacaoSocial")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Conselho Municipal de Saneamento Básico
+              </div>
+            </StaticMenuHeader>
+            <StaticMenuHeader
+              $isActive={activeForm === "participacaoSocial"}
+              onClick={() => setActiveForm("participacaoSocial")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Participação e controle social
-            </div>
-          </StaticMenuHeader>
-          <StaticMenuHeader
-            $isActive={activeForm === "saneamentoRural"}
-            onClick={() => setActiveForm("saneamentoRural")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Participação e controle social
+              </div>
+            </StaticMenuHeader>
+            <StaticMenuHeader
+              $isActive={activeForm === "saneamentoRural"}
+              onClick={() => setActiveForm("saneamentoRural")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Saneamento Rural
-            </div>
-          </StaticMenuHeader>
-          <StaticMenuHeader
-            $isActive={activeForm === "comunidadesTradicionais"}
-            onClick={() => setActiveForm("comunidadesTradicionais")}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Saneamento Rural
+              </div>
+            </StaticMenuHeader>
+            <StaticMenuHeader
+              $isActive={activeForm === "comunidadesTradicionais"}
+              onClick={() => setActiveForm("comunidadesTradicionais")}
             >
-              <FaList style={{ fontSize: "14px" }} />
-              Comunidades Tradicionais
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                }}
+              >
+                <FaList style={{ fontSize: "14px" }} />
+                Comunidades Tradicionais
+              </div>
+            </StaticMenuHeader>
+
+            <div suppressHydrationWarning>
+              {menus?.filter((menu) => {
+                return menu.titulo !== "Plano Municipal" && menu.titulo !== "Politica Municipal" && menu.titulo !== "Conselho Municipal";
+              }).map((menu) => {
+                const isOpen = openMenuId === menu.id_menu;
+                return (
+                  <div key={menu.id_menu}>
+                    <MenuHeader
+                      $isOpen={isOpen}
+                      onClick={() => {
+                        // Se o menu já está aberto, fecha. Caso contrário, abre e fecha os outros
+                        setOpenMenuId(isOpen ? null : menu.id_menu);
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "8px",
+                        }}
+                      >
+                        <FaList style={{ fontSize: "14px" }} />
+                        {menu.titulo}
+                      </div>
+                      <FaCaretDown />
+                    </MenuHeader>
+                    <MenuItemsContainer $isOpen={isOpen}>
+                      {menu.menuItems?.map((menuItem) => (
+                        <SidebarItem style={{ marginTop: "10px" }}
+                          key={menuItem.id_menu_item}
+                          active={activeForm === menuItem.nome_menu_item}
+                          onClick={() => {
+                            setActiveForm(menuItem.nome_menu_item);
+                            getIndicadores(menuItem);
+                          }}
+                        >
+                          <FaLink
+                            style={{ marginRight: "8px", fontSize: "14px" }}
+                          />
+                          {menuItem.nome_menu_item}
+                        </SidebarItem>
+                      ))}
+                    </MenuItemsContainer>
+                  </div>
+                );
+              })}
             </div>
-          </StaticMenuHeader>
-        </Sidebar>
-      )}
-      <MainContent isCollapsed={isCollapsed}>
-        <DivCenter>
-          <Form onSubmit={handleSubmit(handleCadastro)}>
-            <BreadCrumbStyle $isCollapsed={isCollapsed}>
-              <nav>
-                <ol>
-                  <li>
-                    <Link href="/indicadores/home_indicadores">Home</Link>
-                    <span> / </span>
-                  </li>
-                  <li>
-                    <span>Gestão</span>
-                  </li>
-                </ol>
-              </nav>
-            </BreadCrumbStyle>
-            <DivFormCadastro active={activeForm === "gestaoAssociada"}>
+          </Sidebar>
+        )}
+      </div>
+      <MainContent isCollapsed={isCollapsed} suppressHydrationWarning>
+        <DivCenter suppressHydrationWarning>
+          <BreadCrumbStyle $isCollapsed={isCollapsed}>
+            <nav>
+              <ol>
+                <li>
+                  <Link href="/indicadores/home_indicadores">Home</Link>
+                  <span> / </span>
+                </li>
+                <li>
+                  <span>Gestão</span>
+                </li>
+              </ol>
+            </nav>
+          </BreadCrumbStyle>
+          <Form onSubmit={handleSubmitGestao(handleCadastro)}>
+            <DivFormCadastro active={activeForm === "gestaoAssociada"} suppressHydrationWarning>
               <DivTituloForm>Gestão Associada</DivTituloForm>
               <table
                 style={{
@@ -1630,68 +4785,58 @@ export default function GestaoIndicadores({
               >
                 <tbody>
                   <tr>
-                    <td style={{ width: "50%", padding: "10px" }}>
-                      <InputG>
-                        <label>Nome da associação</label>
-                        <input
-                          style={{ width: "100%" }}
-                          {...register("nome_associacao")}
-                          defaultValue={dadosGestao?.ga_nome}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </InputG>
+                    <td style={{ width: "40%", padding: "10px" }}>
+
+                      <label>Nome da associação</label>
+                      <input
+                        style={{ width: "100%" }}
+                        {...registerGestao("nome_associacao")}
+                        defaultValue={dadosGestao?.ga_nome || ""}
+                        onChange={(e) => {
+                          setValueGestao("nome_associacao", e.target.value);
+                        }}
+                        type="text"
+                      ></input>
+
                     </td>
-                    <td style={{ width: "50%", padding: "10px" }}>
-                      <InputG>
-                        <label>
-                          Norma da associação<span> *</span>
-                        </label>
-                        <input
-                          style={{ width: "100%" }}
-                          {...register("norma_associacao")}
-                          defaultValue={dadosGestao?.ga_norma}
-                          onChange={handleOnChange}
-                          type="text"
-                        ></input>
-                      </InputG>
+                    <td style={{ width: "40%", padding: "10px" }}>
+                      <label>
+                        Norma da associação<span> *</span>
+                      </label>
+                      <input
+                        style={{ width: "100%" }}
+                        {...registerGestao("norma_associacao")}
+                        defaultValue={dadosGestao?.ga_norma || ""}
+                        onChange={(e) => {
+                          setValueGestao("norma_associacao", e.target.value);
+                        }}
+                        type="text"
+                      ></input>
                     </td>
-                    <td>
-                    {usuario?.id_permissao !== 4 && (
-                  <button
-                    type="submit"
-                    style={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      borderRadius: "6px",
-                      transition: "all 0.2s",
-                      backgroundColor: "#0085bd",
-                      color: "#fff",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Gravar
-                  </button>
-                )}
+                    <td style={{ textAlign: "right", width: "10%" }}>
+                      {usuario?.id_permissao !== 4 && (
+                        <button
+                          type="submit"
+                          style={{
+                            padding: "12px 24px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            borderRadius: "6px",
+                            transition: "all 0.2s",
+                            backgroundColor: "#0085bd",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Gravar
+                        </button>
+                      )}
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              <div
-                style={{
-                  marginBottom: "20px",
-                  marginLeft: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  width: "97%",
-                  position: "relative",
-                }}
-              >
-               
-              </div>
 
               <DivEixo
                 style={{
@@ -1701,19 +4846,34 @@ export default function GestaoIndicadores({
                 }}
               >
                 Representantes
-                <ButtonAdicionarPresidente
-                  onClick={() => {
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     handleShowModal();
+                  }}
+                  style={{
+                    padding: "12px 24px",
+                    fontSize: "14px",
+                    fontWeight: "500",
+                    borderRadius: "6px",
+                    transition: "all 0.2s",
+                    backgroundColor: "#0085bd",
+                    color: "#fff",
+                    border: "none",
+                    cursor: "pointer",
+                    marginRight: "20px",
                   }}
                 >
                   Adicionar
-                </ButtonAdicionarPresidente>
+                </button>
               </DivEixo>
 
               <table
                 cellSpacing={0}
                 style={{
-                  width: "98%",
+                  width: "97%",
                   borderRadius: "10px",
                   boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
                   margin: "0 0 20px 20px",
@@ -1905,18 +5065,37 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </DivFormCadastro>
+          </Form>
 
-            <DivFormCadastro active={activeForm === "politicaSaneamento"}>
-              <DivTituloForm>
-                Política Municipal de Saneamento Básico
-              </DivTituloForm>
+          <DivFormCadastro active={activeForm === "politicaSaneamento"} suppressHydrationWarning>
+            <DivTituloForm>
+              Política Municipal de Saneamento Básico
+            </DivTituloForm>
+            <div style={{ borderBottom: "1px solid #eee", marginLeft: "20px" }}>
+              <TabContainer>
+                <TabButton
+                  $active={activeTabPolitica === "politicaMunicipal"}
+                  onClick={() => setActiveTabPolitica("politicaMunicipal")}
+                >
+                  Política Municipal
+                </TabButton>
+                <TabButton
+                  $active={activeTabPolitica === "dadosComplementaresPolitica"}
+                  onClick={() => setActiveTabPolitica("dadosComplementaresPolitica")}
+                >
+                  Dados Complementares
+                </TabButton>
+              </TabContainer>
+            </div>
+            <Form onSubmit={handleSubmitPolitica(handleAddPolitica)}>
+              <div style={{ width: "100%", padding: "20px", borderRadius: "10px", display: activeTabPolitica === "politicaMunicipal" ? "block" : "none" }} suppressHydrationWarning>
 
-              <div style={{ marginBottom: "20px" }}>
                 <label
                   style={{
                     display: "block",
                     marginBottom: "10px",
                     fontWeight: "bold",
+                    marginLeft: "20px",
                   }}
                 >
                   Situação da Política Municipal:
@@ -1925,8 +5104,10 @@ export default function GestaoIndicadores({
                   style={{
                     display: "flex",
                     gap: "20px",
-                    flexDirection: innerWidth > 0 && innerWidth <= 768 ? "column" : "row",
+                    marginLeft: "20px",
+                    flexDirection: innerWidth <= 768 ? "column" : "row",
                   }}
+                  suppressHydrationWarning
                 >
                   <label
                     style={{
@@ -1995,45 +5176,47 @@ export default function GestaoIndicadores({
                     Não tem
                   </label>
                 </div>
-              </div>
 
-              <table
-                style={{
-                  width: "97%",
-                  borderRadius: "10px",
-                  border: "1px solid #eee",
-                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                  margin: "0 0 20px 20px",
-                  padding: "15px",
-                }}
-              >
-                <tbody>
-                  <tr>
-                    <td style={{ width: "50%", padding: "10px" }}>
-                      <InputG>
+
+                <table
+                  style={{
+                    width: "97%",
+                    borderRadius: "10px",
+                    border: "1px solid #eee",
+                    boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                    margin: "0 0 20px 20px",
+                    padding: "15px",
+                  }}
+                >
+                  <tbody>
+                    <tr>
+                      <td style={{ width: "40%", padding: "10px" }}>
+
                         <label>Título</label>
                         <input
                           style={{ width: "100%" }}
-                          {...register("politica_titulo")}
+                          {...registerPolitica("politica_titulo")}
                           defaultValue={dadosGestao?.politica_titulo}
                           onChange={(e) => {
                             const value = capitalizeFrasal(e.target.value);
-                            setValue("politica_titulo", value);
+                            setValuePolitica("politica_titulo", value);
                           }}
                           type="text"
                           onKeyPress={onlyLettersAndCharacters}
                           disabled={politicaSituacao === "nao_tem"}
                         ></input>
-                      </InputG>
-                    </td>
-                    <td style={{ width: "15%", padding: "10px" }}>
-                      <InputP>
+
+                      </td>
+                      <td style={{ width: "10%", padding: "10px" }}>
+
                         <label>Ano</label>
                         <input
                           style={{ width: "100%" }}
-                          {...register("politica_ano")}
+                          {...registerPolitica("politica_ano")}
                           defaultValue={dadosGestao?.politica_ano}
-                          onChange={handleOnChange}
+                          onChange={(e) => {
+                            setValuePolitica("politica_ano", e.target.value);
+                          }}
                           type="text"
                           onKeyPress={(e) => {
                             if (!/[0-9]/.test(e.key)) {
@@ -2042,248 +5225,691 @@ export default function GestaoIndicadores({
                           }}
                           disabled={politicaSituacao === "nao_tem"}
                         ></input>
-                      </InputP>
-                    </td>
-                    <td style={{ padding: "10px" }}>
-                      <InputM>
+
+                      </td>
+                      <td style={{ width: "30%", padding: "10px" }}>
+
                         <label>Arquivo</label>
                         <input
-                          {...register("politica_arquivo")}
+                          style={{ width: "100%" }}
+                          {...registerPolitica("politica_arquivo")}
                           type="file"
                           disabled={politicaSituacao === "nao_tem"}
                         ></input>
-                      </InputM>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
 
-              <div
-                style={{
-                  marginBottom: "20px",
-                  marginLeft: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  width: "97%",
-                  position: "relative",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton
-                    type="submit"
-                    disabled={politicaSituacao === "nao_tem"}
-                    style={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      borderRadius: "6px",
-                      transition: "all 0.2s",
-                      opacity: politicaSituacao === "nao_tem" ? 0.5 : 1,
-                    }}
-                  >
-                    Gravar
-                  </SubmitButton>
-                )}
-              </div>
-
-              <DivEixo>Atualizações</DivEixo>
-
-              <table
-                cellSpacing={0}
-                style={{
-                  width: "98%",
-                  borderRadius: "10px",
-                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                  margin: "0 0 20px 20px",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                        borderTopLeftRadius: "10px",
-                      }}
-                    >
-                      ID
-                    </th>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      Título
-                    </th>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      Ano
-                    </th>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                        borderTopRightRadius: "10px",
-                      }}
-                    >
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listPoliticas && listPoliticas.length > 0 ? (
-                    listPoliticas.map((politica, index) => (
-                      <tr key={index}>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          {politica.id_politica_municipal}
-                        </td>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          <InputG>{politica.titulo}</InputG>
-                        </td>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          {politica.ano}
-                        </td>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          <Actions>
-                            <Image
-                              title="Editar"
-                              onClick={() => handleEditarPolitica(politica)}
-                              src={Editar}
-                              alt="Editar"
-                              width={25}
-                              height={25}
-                              style={{
-                                cursor:
-                                  politicaSituacao === "nao_tem"
-                                    ? "not-allowed"
-                                    : "pointer",
-                                opacity:
-                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                              {...(politicaSituacao === "nao_tem"
-                                ? { onClick: (e) => e.preventDefault() }
-                                : {})}
-                            />
-                            <a
-                              href={politica.file}
-                              rel="noreferrer"
-                              target="_blank"
-                              style={{
-                                pointerEvents:
-                                  politicaSituacao === "nao_tem"
-                                    ? "none"
-                                    : "auto",
-                                opacity:
-                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                            >
-                              <FaFilePdf></FaFilePdf>
-                            </a>
-                            <Image
-                              src={Excluir}
-                              alt="Excluir"
-                              width={25}
-                              height={25}
-                              onClick={() => {
-                                if (politicaSituacao !== "nao_tem") {
-                                  handleRemoverPolitica({
-                                    id: politica.id_politica_municipal,
-                                    id_arquivo: politica.id_arquivo,
-                                  });
-                                }
-                              }}
-                              style={{
-                                cursor:
-                                  politicaSituacao === "nao_tem"
-                                    ? "not-allowed"
-                                    : "pointer",
-                                opacity:
-                                  politicaSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                            />
-                          </Actions>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        style={{
-                          padding: "20px",
-                          textAlign: "center",
-                          color: "#999",
-                        }}
-                      >
-                        Nenhuma política cadastrada
+                      </td>
+                      <td style={{ width: "10%", textAlign: "right" }}>
+                        {usuario?.id_permissao !== 4 && (
+                          <button
+                            type="submit"
+                            disabled={politicaSituacao === "nao_tem"}
+                            style={{
+                              padding: "12px 24px",
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              borderRadius: "6px",
+                              transition: "all 0.2s",
+                              backgroundColor: "#0085bd",
+                              color: "#fff",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Gravar
+                          </button>
+                        )}
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </DivFormCadastro>
+                  </tbody>
+                </table>
 
-            <DivFormCadastro active={activeForm === "planoSaneamento"}>
-              <DivTituloForm>
-                Plano Municipal de Saneamento Básico
-              </DivTituloForm>
-              <div style={{ marginBottom: "20px" }}>
+
+
+                <DivEixo>Atualizações</DivEixo>
+
+                <table
+                  cellSpacing={0}
+                  style={{
+                    width: "97%",
+                    borderRadius: "10px",
+                    boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                    margin: "0 0 20px 20px",
+                    borderCollapse: "separate",
+                    borderSpacing: 0,
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                          borderTopLeftRadius: "10px",
+                        }}
+                      >
+                        ID
+                      </th>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        Título
+                      </th>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        Ano
+                      </th>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                          borderTopRightRadius: "10px",
+                        }}
+                      >
+                        Ações
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listPoliticas && listPoliticas.length > 0 ? (
+                      listPoliticas.map((politica, index) => (
+                        <tr key={index}>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            {politica.id_politica_municipal}
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            <InputG>{politica.titulo}</InputG>
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            {politica.ano}
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            <Actions>
+                              <Image
+                                title="Editar"
+                                onClick={() => handleEditarPolitica(politica)}
+                                src={Editar}
+                                alt="Editar"
+                                width={25}
+                                height={25}
+                                style={{
+                                  cursor:
+                                    politicaSituacao === "nao_tem"
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  opacity:
+                                    politicaSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                                {...(politicaSituacao === "nao_tem"
+                                  ? { onClick: (e) => e.preventDefault() }
+                                  : {})}
+                              />
+                              <a
+                                href={politica.file}
+                                rel="noreferrer"
+                                target="_blank"
+                                style={{
+                                  pointerEvents:
+                                    politicaSituacao === "nao_tem"
+                                      ? "none"
+                                      : "auto",
+                                  opacity:
+                                    politicaSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                              >
+                                <FaFilePdf></FaFilePdf>
+                              </a>
+                              <Image
+                                src={Excluir}
+                                alt="Excluir"
+                                width={25}
+                                height={25}
+                                onClick={() => {
+                                  if (politicaSituacao !== "nao_tem") {
+                                    handleRemoverPolitica({
+                                      id: politica.id_politica_municipal,
+                                      id_arquivo: politica.id_arquivo,
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  cursor:
+                                    politicaSituacao === "nao_tem"
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  opacity:
+                                    politicaSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                              />
+                            </Actions>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={4}
+                          style={{
+                            padding: "20px",
+                            textAlign: "center",
+                            color: "#999",
+                          }}
+                        >
+                          Nenhuma política cadastrada
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Form>
+
+
+            <div style={{ display: activeTabPolitica === "dadosComplementaresPolitica" ? "block" : "none" }} suppressHydrationWarning>
+              <Form style={{ backgroundColor: "white" }} onSubmit={handleSubmitIndicadoresPolitica(handleCadastroIndicadoresPolitica)}>
+
+                <div
+                  style={{ width: "97%", padding: "20px", borderBottom: "1px solid #eee" }}
+                  suppressHydrationWarning
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <label style={{ width: "250px", marginRight: "10px" }}>Selecionar Ano:</label>
+                      <select
+                        value={anoSelectedPolitica || ""}
+                        onChange={(e) => selectAnoPolitica(e.target.value)}
+                        disabled={loadingDadosPolitica}
+                        style={{ padding: "5px" }}
+                      >
+                        <option value="">Selecione o ano</option>
+                        {anosSelect().map((ano) => (
+                          <option key={ano} value={ano}>
+                            {ano}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingDadosPolitica && (
+                        <span style={{ marginLeft: "10px", color: "#12B2D5", whiteSpace: "nowrap" }}>
+                          Carregando dados...
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ fontSize: "14px", color: "#666" }}>
+                      <strong>{indicadoresPolitica.length}</strong> indicador
+                      {indicadoresPolitica.length !== 1 ? "es" : ""} encontrado
+                      {indicadoresPolitica.length !== 1 ? "s" : ""}
+                      {indicadoresPolitica.some((ind) => ind._hasError) && (
+                        <span style={{ color: "#dc3545", marginLeft: "10px" }}>
+                          | ⚠️ Alguns campos com erro
+                        </span>
+                      )}
+                      {dadosCarregadosPolitica.length > 0 && (
+                        <span style={{ color: "#28a745", marginLeft: "10px" }}>
+                          | ✅ {dadosCarregadosPolitica.length} dado
+                          {dadosCarregadosPolitica.length !== 1 ? "s" : ""} carregado
+                          {dadosCarregadosPolitica.length !== 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </div>
+
+                    {grupoPolitica &&
+                      !loadingIndicadoresPolitica &&
+                      indicadoresPolitica.some((ind) => ind._hasError) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const menuItem = menuItemsPolitica.find(
+                              (item) => item.nome_menu_item === grupoPolitica
+                            );
+                            if (menuItem) {
+                              getIndicadoresPolitica(menuItem);
+                            }
+                          }}
+                          style={{
+                            padding: "6px 12px",
+                            fontSize: "12px",
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          🔄 Tentar Novamente
+                        </button>
+                      )}
+                  </div>
+                </div>
+
+                {!grupoPolitica ? (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      backgroundColor: "#f8f9fa",
+                    }}
+                  >
+                    <p>Carregando indicadores...</p>
+                  </div>
+                ) : loadingIndicadoresPolitica ? (
+                  <div style={{ textAlign: "center", padding: "40px" }}>
+                    <p>Carregando indicadores...</p>
+                  </div>
+                ) : indicadoresPolitica.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "40px" }}>
+                    <p>Nenhum indicador encontrado para este grupo.</p>
+                  </div>
+                ) : (
+                  <div
+                    suppressHydrationWarning
+                    style={{
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      overflow: "hidden",
+                      marginTop: "20px",
+                      width: "97%",
+                    }}
+                  >
+                    {/* Cabeçalho da Tabela */}
+                    <div
+                      suppressHydrationWarning
+                      style={{
+                        backgroundColor: "#1e88e5",
+                        color: "white",
+                        padding: "15px 0",
+                        fontWeight: "600",
+                        fontSize: "13px",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns:
+                            isMounted && innerWidth > 768
+                              ? "180px 1fr 280px 100px"
+                              : "1fr",
+                          gap: isMounted && innerWidth > 768 ? "15px" : "10px",
+                          alignItems: "center",
+                          padding: "0 15px",
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                        suppressHydrationWarning
+                      >
+                        {isMounted && innerWidth > 768 ? (
+                          <>
+                            <div suppressHydrationWarning>CÓDIGO</div>
+                            <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              VALOR - ANO: {anoSelectedPolitica || "____"}
+                            </div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              UNIDADE
+                            </div>
+                          </>
+                        ) : (
+                          <div suppressHydrationWarning>
+                            INDICADORES - ANO: {anoSelectedPolitica || "____"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Linhas da Tabela */}
+                    {indicadoresPolitica.map((indicador, index) => {
+                      const tipoCampo =
+                        indicador.tiposCampo &&
+                          indicador.tiposCampo.length > 0
+                          ? indicador.tiposCampo[0]
+                          : null;
+                      const isEven = index % 2 === 0;
+
+                      return (
+                        <div
+                          key={indicador.id_indicador}
+                          suppressHydrationWarning
+                          style={{
+                            backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                            borderBottom:
+                              index < indicadoresPolitica.length - 1
+                                ? "1px solid #dee2e6"
+                                : "none",
+                            padding: "15px 0",
+                            transition: "background-color 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#e8f4fd";
+                            e.currentTarget.style.borderLeft = "3px solid #1e88e5";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isEven
+                              ? "#f8f9fa"
+                              : "#ffffff";
+                            e.currentTarget.style.borderLeft = "none";
+                          }}
+                        >
+                          {isMounted && innerWidth > 768 ? (
+                            <div
+                              suppressHydrationWarning
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns: "180px 1fr 280px 100px",
+                                gap: "15px",
+                                alignItems: "center",
+                                padding: "0 15px",
+                              }}
+                            >
+                              {/* Código */}
+                              <div>
+                                <div
+                                  style={{
+                                    fontSize: "15px",
+                                    fontWeight: "bold",
+                                    color: "#1e88e5",
+                                  }}
+                                >
+                                  {indicador.codigo_indicador}
+                                </div>
+                              </div>
+
+                              {/* Descrição */}
+                              <div
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#495057",
+                                  lineHeight: "1.3",
+                                }}
+                              >
+                                {indicador.nome_indicador}
+                              </div>
+
+                              {/* Campo de Input */}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                {anoSelectedPolitica ? (
+                                  <div style={{ width: "260px" }}>
+                                    <CampoIndicadorPolitica
+                                      indicador={indicador}
+                                      register={registerIndicadoresPolitica}
+                                      anoSelected={anoSelectedPolitica}
+                                      setValue={setValueIndicadoresPolitica}
+                                      watch={watchIndicadoresPolitica}
+                                    />
+                                  </div>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="Selecione um ano"
+                                    disabled
+                                    style={{
+                                      width: "260px",
+                                      backgroundColor: "#f8f9fa",
+                                      border: "1px solid #dee2e6",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      color: "#6c757d",
+                                      textAlign: "center",
+                                      fontSize: "12px",
+                                    }}
+                                  />
+                                )}
+                              </div>
+
+                              {/* Unidade */}
+                              <div
+                                style={{
+                                  textAlign: "center",
+                                  fontSize: "12px",
+                                  color: "#495057",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontWeight: "500",
+                                    padding: "5px 6px",
+                                    backgroundColor: "#e9ecef",
+                                    borderRadius: "3px",
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  {indicador.unidade_indicador || "-"}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Layout Mobile */
+                            <div
+                              suppressHydrationWarning
+                              style={{
+                                padding: "0 15px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "10px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: "16px",
+                                      fontWeight: "bold",
+                                      color: "#1e88e5",
+                                    }}
+                                  >
+                                    {indicador.codigo_indicador}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: "11px",
+                                      color: "#6c757d",
+                                    }}
+                                  >
+                                    {indicador.unidade_indicador || "-"}
+                                  </div>
+                                </div>
+                                {tipoCampo && (
+                                  <div
+                                    style={{
+                                      fontSize: "10px",
+                                      color: "#6c757d",
+                                      backgroundColor: "#f8f9fa",
+                                      padding: "3px 6px",
+                                      borderRadius: "3px",
+                                    }}
+                                  >
+                                    {tipoCampo.type}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  color: "#495057",
+                                  lineHeight: "1.3",
+                                  marginBottom: "8px",
+                                }}
+                              >
+                                {indicador.nome_indicador}
+                              </div>
+
+                              {anoSelectedPolitica ? (
+                                <CampoIndicadorPolitica
+                                  indicador={indicador}
+                                  register={registerIndicadoresPolitica}
+                                  anoSelected={anoSelectedPolitica}
+                                  setValue={setValueIndicadoresPolitica}
+                                  watch={watchIndicadoresPolitica}
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  placeholder="Selecione um ano primeiro"
+                                  disabled
+                                  style={{
+                                    backgroundColor: "#f8f9fa",
+                                    border: "1px solid #dee2e6",
+                                    borderRadius: "4px",
+                                    padding: "8px 12px",
+                                    color: "#6c757d",
+                                    textAlign: "center",
+                                  }}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {indicadoresPolitica.length > 0 && anoSelectedPolitica && (
+                  <div
+                    style={{
+                      marginTop: "30px",
+                      padding: "20px",
+                      textAlign: "center",
+                      borderTop: "1px solid #e1e5e9",
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      style={{
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "12px 40px",
+                        fontSize: "16px",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#218838";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 8px rgba(40,167,69,0.3)";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#28a745";
+                        e.currentTarget.style.boxShadow =
+                          "0 2px 4px rgba(40,167,69,0.2)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      💾 Salvar Dados dos Indicadores
+                    </button>
+                  </div>
+                )}
+
+              </Form>
+            </div>
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "planoSaneamento"} suppressHydrationWarning>
+            <DivTituloForm>
+              Plano Municipal de Saneamento Básico
+            </DivTituloForm>
+            <div style={{ borderBottom: "1px solid #eee", marginLeft: "20px" }}>
+              <TabContainer>
+                <TabButton
+                  $active={activeTabPlano === "planoMunicipal"}
+                  onClick={() => setActiveTabPlano("planoMunicipal")}
+                >
+                  Plano Municipal
+                </TabButton>
+                <TabButton
+                  $active={activeTabPlano === "dadosComplementaresPlano"}
+                  onClick={() => setActiveTabPlano("dadosComplementaresPlano")}
+                >
+                  Dados Complementares
+                </TabButton>
+              </TabContainer>
+            </div>
+            <Form onSubmit={handleSubmitPlano(handleAddPlano)}>
+              <div style={{ width: "100%", padding: "20px", borderRadius: "10px", display: activeTabPlano === "planoMunicipal" ? "block" : "none" }} suppressHydrationWarning>
+
                 <label
                   style={{
                     display: "block",
                     marginBottom: "10px",
                     fontWeight: "bold",
+                    marginLeft: "20px",
                   }}
                 >
                   Situação do Plano Municipal:
@@ -2291,9 +5917,11 @@ export default function GestaoIndicadores({
                 <div
                   style={{
                     display: "flex",
+                    marginLeft: "20px",
                     gap: "20px",
-                    flexDirection: innerWidth > 0 && innerWidth <= 768 ? "column" : "row",
+                    flexDirection: innerWidth <= 768 ? "column" : "row",
                   }}
+                  suppressHydrationWarning
                 >
                   <label
                     style={{
@@ -2362,285 +5990,735 @@ export default function GestaoIndicadores({
                     Não tem
                   </label>
                 </div>
-              </div>
-              <table
-                style={{
-                  width: "97%",
-                  borderRadius: "10px",
-                  border: "1px solid #eee",
-                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                  margin: "0 0 20px 20px",
-                  padding: "15px",
-                }}
-              >
-                <tbody>
-                  <tr>
-                    <td style={{ width: "50%", padding: "10px" }}>
-                      <InputG>
+
+                <table
+                  style={{
+                    width: "97%",
+                    borderRadius: "10px",
+                    border: "1px solid #eee",
+                    boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                    margin: "0 0 20px 20px",
+                    padding: "15px",
+                  }}
+                >
+                  <tbody>
+                    <tr>
+                      <td style={{ width: "40%", padding: "10px" }}>
+
                         <label>Título</label>
                         <input
                           style={{ width: "100%" }}
-                          {...register("plano_titulo")}
+                          {...registerPlano("plano_titulo")}
                           type="text"
                           onChange={(e) => {
                             const value = capitalizeFrasal(e.target.value);
-                            setValue("plano_titulo", value);
+                            setValuePlano("plano_titulo", value);
                           }}
                           onKeyPress={onlyLettersAndCharacters}
                           disabled={planoSituacao === "nao_tem"}
                         />
-                      </InputG>
-                    </td>
-                    <td style={{ width: "15%", padding: "10px" }}>
-                      <InputP>
+                      </td>
+                      <td style={{ width: "10%", padding: "10px" }}>
+
                         <label>Ano</label>
                         <input
                           style={{ width: "100%" }}
-                          {...register("plano_ano")}
+                          {...registerPlano("plano_ano")}
                           type="text"
                           onKeyPress={(e) => {
                             if (!/[0-9]/.test(e.key)) {
                               e.preventDefault();
                             }
                           }}
+                          onChange={(e) => {
+                            setValuePlano("plano_ano", e.target.value);
+                          }}
                           disabled={planoSituacao === "nao_tem"}
                         />
-                      </InputP>
-                    </td>
-                    <td style={{ padding: "10px" }}>
-                      <InputM>
+                      </td>
+                      <td style={{ width: "30%", padding: "10px" }}>
+
                         <label>Arquivo</label>
                         <input
-                          {...register("plano_arquivo")}
+                          style={{ width: "100%" }}
+                          {...registerPlano("plano_arquivo")}
                           type="file"
                           disabled={planoSituacao === "nao_tem"}
                         />
-                      </InputM>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
 
-              <div
-                style={{
-                  marginBottom: "20px",
-                  marginLeft: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  width: "97%",
-                  position: "relative",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton
-                    type="submit"
-                    disabled={planoSituacao === "nao_tem"}
-                    style={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      borderRadius: "6px",
-                      transition: "all 0.2s",
-                      opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
-                    }}
-                  >
-                    Gravar
-                  </SubmitButton>
-                )}
-              </div>
-
-              <DivEixo>Atualizações</DivEixo>
-              <table
-                cellSpacing={0}
-                style={{
-                  width: "98%",
-                  borderRadius: "10px",
-                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                  margin: "0 0 20px 20px",
-                  borderCollapse: "separate",
-                  borderSpacing: 0,
-                }}
-              >
-                <thead>
-                  <tr>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                        borderTopLeftRadius: "10px",
-                      }}
-                    >
-                      ID
-                    </th>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      Título
-                    </th>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                      }}
-                    >
-                      Ano
-                    </th>
-                    <th
-                      style={{
-                        background: "#0085bd",
-                        color: "#fff",
-                        padding: "10px 20px",
-                        textAlign: "left",
-                        fontWeight: 600,
-                        fontSize: "14px",
-                        borderTopRightRadius: "10px",
-                      }}
-                    >
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listPlanos && listPlanos.length > 0 ? (
-                    listPlanos.map((plano, index) => (
-                      <tr key={index}>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          {plano.id_plano_municipal}
-                        </td>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          <InputG>{plano.titulo}</InputG>
-                        </td>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          {plano.ano}
-                        </td>
-                        <td
-                          style={{
-                            padding: "16px 20px",
-                            color: "#4a5568",
-                            borderBottom: "1px solid #e2e8f0",
-                            fontSize: "15px",
-                          }}
-                        >
-                          <Actions>
-                            <Image
-                              title="Editar"
-                              onClick={() => handleEditarPlano(plano)}
-                              src={Editar}
-                              alt="Editar"
-                              width={25}
-                              height={25}
-                              style={{
-                                cursor:
-                                  planoSituacao === "nao_tem"
-                                    ? "not-allowed"
-                                    : "pointer",
-                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                              {...(planoSituacao === "nao_tem"
-                                ? { onClick: (e) => e.preventDefault() }
-                                : {})}
-                            />
-                            <a
-                              href={plano.file}
-                              rel="noreferrer"
-                              target="_blank"
-                              style={{
-                                pointerEvents:
-                                  planoSituacao === "nao_tem" ? "none" : "auto",
-                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                            >
-                              <FaFilePdf></FaFilePdf>
-                            </a>
-                            <Image
-                              src={Excluir}
-                              alt="Excluir"
-                              width={25}
-                              height={25}
-                              onClick={() => {
-                                if (planoSituacao !== "nao_tem") {
-                                  handleRemoverPlano({
-                                    id: plano.id_plano_municipal,
-                                    id_arquivo: plano.id_arquivo,
-                                  });
-                                }
-                              }}
-                              style={{
-                                cursor:
-                                  planoSituacao === "nao_tem"
-                                    ? "not-allowed"
-                                    : "pointer",
-                                opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
-                              }}
-                            />
-                          </Actions>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={4}
-                        style={{
-                          padding: "20px",
-                          textAlign: "center",
-                          color: "#999",
-                        }}
-                      >
-                        Nenhum plano cadastrado
+                      </td>
+                      <td style={{ textAlign: "right", width: "10%" }}>
+                        {usuario?.id_permissao !== 4 && (
+                          <button
+                            type="submit"
+                            disabled={planoSituacao === "nao_tem"}
+                            style={{
+                              padding: "12px 24px",
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              borderRadius: "6px",
+                              transition: "all 0.2s",
+                              backgroundColor: "#0085bd",
+                              color: "#fff",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Gravar
+                          </button>
+                        )}
                       </td>
                     </tr>
-                  )}
-                </tbody>
-              </table>
-            </DivFormCadastro>
+                  </tbody>
+                </table>
 
-            <DivFormCadastro active={activeForm === "conselhoSaneamento"}>
-              <DivTituloForm>
-                Conselho Municipal de Saneamento Básico
-              </DivTituloForm>
-              <div style={{ marginBottom: "20px" }}>
+
+                <DivEixo>Atualizações</DivEixo>
+                <table
+                  cellSpacing={0}
+                  style={{
+                    width: "97%",
+                    borderRadius: "10px",
+                    boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                    margin: "0 0 20px 20px",
+                    borderCollapse: "separate",
+                    borderSpacing: 0,
+                  }}
+                >
+                  <thead>
+                    <tr>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                          borderTopLeftRadius: "10px",
+                        }}
+                      >
+                        ID
+                      </th>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        Título
+                      </th>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                      >
+                        Ano
+                      </th>
+                      <th
+                        style={{
+                          background: "#0085bd",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          textAlign: "left",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                          borderTopRightRadius: "10px",
+                        }}
+                      >
+                        Ações
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listPlanos && listPlanos.length > 0 ? (
+                      listPlanos.map((plano, index) => (
+                        <tr key={index}>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            {plano.id_plano_municipal}
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            <InputG>{plano.titulo}</InputG>
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            {plano.ano}
+                          </td>
+                          <td
+                            style={{
+                              padding: "16px 20px",
+                              color: "#4a5568",
+                              borderBottom: "1px solid #e2e8f0",
+                              fontSize: "15px",
+                            }}
+                          >
+                            <Actions>
+                              <Image
+                                title="Editar"
+                                onClick={() => handleEditarPlano(plano)}
+                                src={Editar}
+                                alt="Editar"
+                                width={25}
+                                height={25}
+                                style={{
+                                  cursor:
+                                    planoSituacao === "nao_tem"
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                                {...(planoSituacao === "nao_tem"
+                                  ? { onClick: (e) => e.preventDefault() }
+                                  : {})}
+                              />
+                              <a
+                                href={plano.file}
+                                rel="noreferrer"
+                                target="_blank"
+                                style={{
+                                  pointerEvents:
+                                    planoSituacao === "nao_tem" ? "none" : "auto",
+                                  opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                              >
+                                <FaFilePdf></FaFilePdf>
+                              </a>
+                              <Image
+                                src={Excluir}
+                                alt="Excluir"
+                                width={25}
+                                height={25}
+                                onClick={() => {
+                                  if (planoSituacao !== "nao_tem") {
+                                    handleRemoverPlano({
+                                      id: plano.id_plano_municipal,
+                                      id_arquivo: plano.id_arquivo,
+                                    });
+                                  }
+                                }}
+                                style={{
+                                  cursor:
+                                    planoSituacao === "nao_tem"
+                                      ? "not-allowed"
+                                      : "pointer",
+                                  opacity: planoSituacao === "nao_tem" ? 0.5 : 1,
+                                }}
+                              />
+                            </Actions>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan={4}
+                          style={{
+                            padding: "20px",
+                            textAlign: "center",
+                            color: "#999",
+                          }}
+                        >
+                          Nenhum plano cadastrado
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </Form>
+            <div style={{ display: activeTabPlano === "dadosComplementaresPlano" ? "block" : "none" }}>
+              <Form style={{ backgroundColor: "white" }} onSubmit={handleSubmitIndicadoresPlano(handleCadastroIndicadoresPlano)}>
+
+                <div
+                  style={{ width: "97%", padding: "20px", borderBottom: "1px solid #eee" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <label style={{ width: "250px", marginRight: "10px" }}>Selecionar Ano:</label>
+                      <select
+                        value={anoSelectedPlano || ""}
+                        onChange={(e) => selectAnoPlano(e.target.value)}
+                        disabled={loadingDadosPlano}
+                        style={{ padding: "5px" }}
+                      >
+                        <option value="">Selecione o ano</option>
+                        {anosSelect().map((ano) => (
+                          <option key={ano} value={ano}>
+                            {ano}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingDadosPlano && (
+                        <span style={{ marginLeft: "10px", color: "#12B2D5", whiteSpace: "nowrap" }}>
+                          Carregando dados...
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ fontSize: "14px", color: "#666" }}>
+                      <strong>{indicadoresPlano.length}</strong> indicador
+                      {indicadoresPlano.length !== 1 ? "es" : ""} encontrado
+                      {indicadoresPlano.length !== 1 ? "s" : ""}
+                      {indicadoresPlano.some((ind) => ind._hasError) && (
+                        <span style={{ color: "#dc3545", marginLeft: "10px" }}>
+                          | ⚠️ Alguns campos com erro
+                        </span>
+                      )}
+                      {dadosCarregadosPlano.length > 0 && (
+                        <span style={{ color: "#28a745", marginLeft: "10px" }}>
+                          | ✅ {dadosCarregadosPlano.length} dado
+                          {dadosCarregadosPlano.length !== 1 ? "s" : ""} carregado
+                          {dadosCarregadosPlano.length !== 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </div>
+
+                    {grupoPlano &&
+                      !loadingIndicadoresPlano &&
+                      indicadoresPlano.some((ind) => ind._hasError) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const menuItem = menuItemsPlano.find(
+                              (item) => item.nome_menu_item === grupoPlano
+                            );
+                            if (menuItem) {
+                              getIndicadoresPlano(menuItem);
+                            }
+                          }}
+                          style={{
+                            padding: "6px 12px",
+                            fontSize: "12px",
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          🔄 Tentar Novamente
+                        </button>
+                      )}
+                  </div>
+                </div>
+
+                {!grupoPlano ? (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      backgroundColor: "#f8f9fa",
+                    }}
+                  >
+                    <p>Carregando indicadores...</p>
+                  </div>
+                ) : loadingIndicadoresPlano ? (
+                  <div style={{ textAlign: "center", padding: "40px" }}>
+                    <p>Carregando indicadores...</p>
+                  </div>
+                ) : indicadoresPlano.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "40px" }}>
+                    <p>Nenhum indicador encontrado para este grupo.</p>
+                  </div>
+                ) : (
+                  <div
+                    suppressHydrationWarning
+                    style={{
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      overflow: "hidden",
+                      marginTop: "20px",
+                      width: "97%",
+                    }}
+                  >
+                    {/* Cabeçalho da Tabela */}
+                    <div
+                      suppressHydrationWarning
+                      style={{
+                        backgroundColor: "#1e88e5",
+                        color: "white",
+                        padding: "15px 0",
+                        fontWeight: "600",
+                        fontSize: "13px",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns:
+                            isMounted && innerWidth > 768
+                              ? "180px 1fr 280px 100px"
+                              : "1fr",
+                          gap: isMounted && innerWidth > 768 ? "15px" : "10px",
+                          alignItems: "center",
+                          padding: "0 15px",
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                        suppressHydrationWarning
+                      >
+                        {isMounted && innerWidth > 768 ? (
+                          <>
+                            <div suppressHydrationWarning>CÓDIGO</div>
+                            <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              VALOR - ANO: {anoSelectedPlano || "____"}
+                            </div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              UNIDADE
+                            </div>
+                          </>
+                        ) : (
+                          <div suppressHydrationWarning>
+                            INDICADORES - ANO: {anoSelectedPlano || "____"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Linhas da Tabela */}
+                    {indicadoresPlano.map((indicador, index) => {
+                      const tipoCampo =
+                        indicador.tiposCampo &&
+                          indicador.tiposCampo.length > 0
+                          ? indicador.tiposCampo[0]
+                          : null;
+                      const isEven = index % 2 === 0;
+
+                      return (
+                        <div
+                          key={indicador.id_indicador}
+                          suppressHydrationWarning
+                          style={{
+                            backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                            borderBottom:
+                              index < indicadoresPlano.length - 1
+                                ? "1px solid #dee2e6"
+                                : "none",
+                            padding: "15px 0",
+                            transition: "background-color 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#e8f4fd";
+                            e.currentTarget.style.borderLeft = "3px solid #1e88e5";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isEven
+                              ? "#f8f9fa"
+                              : "#ffffff";
+                            e.currentTarget.style.borderLeft = "none";
+                          }}
+                        >
+                          {isMounted && innerWidth > 768 ? (
+                            <div
+                              suppressHydrationWarning
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns: "180px 1fr 280px 100px",
+                                gap: "15px",
+                                alignItems: "center",
+                                padding: "0 15px",
+                              }}
+                            >
+                              {/* Código */}
+                              <div>
+                                <div
+                                  style={{
+                                    fontSize: "15px",
+                                    fontWeight: "bold",
+                                    color: "#1e88e5",
+                                  }}
+                                >
+                                  {indicador.codigo_indicador}
+                                </div>
+                              </div>
+
+                              {/* Descrição */}
+                              <div
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#495057",
+                                  lineHeight: "1.3",
+                                }}
+                              >
+                                {indicador.nome_indicador}
+                              </div>
+
+                              {/* Campo de Input */}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                {anoSelectedPlano ? (
+                                  <div style={{ width: "260px" }}>
+                                    <CampoIndicadorPlano
+                                      indicador={indicador}
+                                      register={registerIndicadoresPlano}
+                                      anoSelected={anoSelectedPlano}
+                                      setValue={setValueIndicadoresPlano}
+                                      watch={watchIndicadoresPlano}
+                                    />
+                                  </div>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="Selecione um ano"
+                                    disabled
+                                    style={{
+                                      width: "260px",
+                                      backgroundColor: "#f8f9fa",
+                                      border: "1px solid #dee2e6",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      color: "#6c757d",
+                                      textAlign: "center",
+                                      fontSize: "12px",
+                                    }}
+                                  />
+                                )}
+                              </div>
+
+                              {/* Unidade */}
+                              <div
+                                style={{
+                                  textAlign: "center",
+                                  fontSize: "12px",
+                                  color: "#495057",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontWeight: "500",
+                                    padding: "5px 6px",
+                                    backgroundColor: "#e9ecef",
+                                    borderRadius: "3px",
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  {indicador.unidade_indicador || "-"}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Layout Mobile */
+                            <div
+                              suppressHydrationWarning
+                              style={{
+                                padding: "0 15px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "10px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: "16px",
+                                      fontWeight: "bold",
+                                      color: "#1e88e5",
+                                    }}
+                                  >
+                                    {indicador.codigo_indicador}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: "11px",
+                                      color: "#6c757d",
+                                    }}
+                                  >
+                                    {indicador.unidade_indicador || "-"}
+                                  </div>
+                                </div>
+                                {tipoCampo && (
+                                  <div
+                                    style={{
+                                      fontSize: "10px",
+                                      color: "#6c757d",
+                                      backgroundColor: "#f8f9fa",
+                                      padding: "3px 6px",
+                                      borderRadius: "3px",
+                                    }}
+                                  >
+                                    {tipoCampo.type}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  color: "#495057",
+                                  lineHeight: "1.3",
+                                  marginBottom: "8px",
+                                }}
+                              >
+                                {indicador.nome_indicador}
+                              </div>
+
+                              {anoSelectedPlano ? (
+                                <CampoIndicadorPlano
+                                  indicador={indicador}
+                                  register={registerIndicadoresPlano}
+                                  anoSelected={anoSelectedPlano}
+                                  setValue={setValueIndicadoresPlano}
+                                  watch={watchIndicadoresPlano}
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  placeholder="Selecione um ano primeiro"
+                                  disabled
+                                  style={{
+                                    backgroundColor: "#f8f9fa",
+                                    border: "1px solid #dee2e6",
+                                    borderRadius: "4px",
+                                    padding: "8px 12px",
+                                    color: "#6c757d",
+                                    textAlign: "center",
+                                  }}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {indicadoresPlano.length > 0 && anoSelectedPlano && (
+                  <div
+                    style={{
+                      marginTop: "30px",
+                      padding: "20px",
+                      textAlign: "center",
+                      borderTop: "1px solid #e1e5e9",
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      style={{
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "12px 40px",
+                        fontSize: "16px",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#218838";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 8px rgba(40,167,69,0.3)";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#28a745";
+                        e.currentTarget.style.boxShadow =
+                          "0 2px 4px rgba(40,167,69,0.2)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      💾 Salvar Dados dos Indicadores
+                    </button>
+                  </div>
+                )}
+
+              </Form>
+            </div>
+          </DivFormCadastro>
+
+          <DivFormCadastro active={activeForm === "conselhoSaneamento"} suppressHydrationWarning>
+            <DivTituloForm>
+              Conselho Municipal de Saneamento Básico
+            </DivTituloForm>
+            <div style={{ marginLeft: "20px" }}>
+              <TabContainer>
+                <TabButton
+                  $active={activeTabConselho === "conselhoMunicipal"}
+                  onClick={() => setActiveTabConselho("conselhoMunicipal")}
+                >
+                  Conselho Municipal
+                </TabButton>
+                <TabButton
+                  $active={activeTabConselho === "dadosComplementaresConselho"}
+                  onClick={() => setActiveTabConselho("dadosComplementaresConselho")}
+                >
+                  Dados Complementares
+                </TabButton>
+              </TabContainer>
+            </div>
+            <Form
+              onSubmit={handleSubmitConselho(handleAddConselhoMunicipal)}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  padding: "20px",
+                  borderRadius: "10px",
+                  display: activeTabConselho === "conselhoMunicipal" ? "block" : "none",
+                }}
+                suppressHydrationWarning
+              >
+
                 <label
                   style={{
                     display: "block",
                     marginBottom: "10px",
                     fontWeight: "bold",
+                    marginLeft: "20px",
                   }}
                 >
                   Situação do Conselho Municipal:
@@ -2648,9 +6726,11 @@ export default function GestaoIndicadores({
                 <div
                   style={{
                     display: "flex",
+                    marginLeft: "20px",
                     gap: "20px",
-                    flexDirection: innerWidth > 0 && innerWidth <= 768 ? "column" : "row",
+                    flexDirection: innerWidth <= 768 ? "column" : "row",
                   }}
+                  suppressHydrationWarning
                 >
                   <label
                     style={{
@@ -2703,44 +6783,44 @@ export default function GestaoIndicadores({
                     Não tem
                   </label>
                 </div>
-              </div>
-              <table
-                style={{
-                  width: "97%",
-                  borderRadius: "10px",
-                  border: "1px solid #eee",
-                  boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                  margin: "0 0 20px 20px",
-                  padding: "15px",
-                }}
-              >
-                <tbody>
-                  <tr>
-                    <td style={{ width: "50%", padding: "10px" }}>
-                      <InputG>
+
+                <table
+                  style={{
+                    width: "97%",
+                    borderRadius: "10px",
+                    border: "1px solid #eee",
+                    boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                    margin: "0 0 20px 20px",
+                    padding: "15px",
+                  }}
+                >
+                  <tbody>
+                    <tr>
+                      <td style={{ width: "40%", padding: "10px" }}>
+
                         <label>Título</label>
                         <input
                           style={{ width: "100%" }}
                           type="text"
-                          {...register("conselho_titulo")}
+                          {...registerConselho("conselho_titulo")}
                           defaultValue={dadosGestao?.conselho_titulo}
                           onChange={(e) => {
                             const value = capitalizeFrasal(e.target.value);
-                            setValue("conselho_titulo", value);
+                            setValueConselho("conselho_titulo", value);
                           }}
                           onKeyPress={onlyLettersAndCharacters}
                           disabled={conselhoSituacao === "nao_tem"}
                         />
-                      </InputG>
-                    </td>
-                    <td style={{ width: "15%", padding: "10px" }}>
-                      <InputP>
+                      </td>
+                      <td style={{ width: "10%", padding: "10px" }}>
                         <label>Ano</label>
                         <input
                           style={{ width: "100%" }}
-                          {...register("conselho_ano")}
+                          {...registerConselho("conselho_ano")}
                           defaultValue={dadosGestao?.conselho_ano}
-                          onChange={handleOnChange}
+                          onChange={(e) => {
+                            setValueConselho("conselho_ano", e.target.value);
+                          }}
                           type="text"
                           onKeyPress={(e) => {
                             if (!/[0-9]/.test(e.key)) {
@@ -2749,351 +6829,786 @@ export default function GestaoIndicadores({
                           }}
                           disabled={conselhoSituacao === "nao_tem"}
                         />
-                      </InputP>
-                    </td>
-                    <td style={{ padding: "10px" }}>
-                      <InputM>
+                      </td>
+                      <td style={{ width: "30%", padding: "10px" }}>
                         <label>Arquivo</label>
                         <input
-                          {...register("conselho_arquivo")}
+                          style={{ width: "100%" }}
+                          {...registerConselho("conselho_arquivo")}
                           type="file"
                           disabled={conselhoSituacao === "nao_tem"}
                         ></input>
-                      </InputM>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      </td>
+                      <td style={{ textAlign: "right", width: "10%" }}>
+                        {usuario?.id_permissao !== 4 && (
+                          <button
+                            type="submit"
+                            disabled={conselhoSituacao === "nao_tem"}
+                            style={{
+                              padding: "12px 24px",
+                              fontSize: "14px",
+                              fontWeight: "500",
+                              borderRadius: "6px",
+                              transition: "all 0.2s",
+                              backgroundColor: "#0085bd",
+                              color: "#fff",
+                              border: "none",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Gravar
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
 
-              <div
-                style={{
-                  marginBottom: "20px",
-                  marginLeft: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  width: "97%",
-                  position: "relative",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton
-                    type="submit"
-                    disabled={conselhoSituacao === "nao_tem"}
-                    style={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      borderRadius: "6px",
-                      transition: "all 0.2s",
-                      opacity: conselhoSituacao === "nao_tem" ? 0.5 : 1,
-                    }}
-                  >
-                    Gravar
-                  </SubmitButton>
-                )}
-              </div>
 
-              <TablesContainer>
-                <div>
-                  <DivEixo
-                    style={{
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    Presidentes
-                    <ButtonAdicionarPresidente
-                      onClick={handleShowModalPresidente}
-                      disabled={!conselhoMunicipal || conselhoMunicipal.length === 0}
+
+                <TablesContainer>
+                  <div>
+                    <DivEixo
+                      style={{
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
                     >
-                      Adicionar Presidente
-                    </ButtonAdicionarPresidente>
-                  </DivEixo>
-                  <table
-                    cellSpacing={0}
-                    style={{
-                      width: "98%",
-                      borderRadius: "10px",
-                      boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                      margin: "0 0 20px 20px",
-                      borderCollapse: "separate",
-                      borderSpacing: 0,
-                    }}
-                  >
-                    <thead>
-                      <tr>
-                        <th
-                          style={{
-                            background: "#0085bd",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            textAlign: "left",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                            borderTopLeftRadius: "10px",
-                          }}
-                        >
-                          Presidente
-                        </th>
-                        <th
-                          style={{
-                            background: "#0085bd",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            textAlign: "left",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                          }}
-                        >
-                          Setor Responsável
-                        </th>
-                        <th
-                          style={{
-                            background: "#0085bd",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            textAlign: "left",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                            borderTopRightRadius: "10px",
-                          }}
-                        >
-                          Ações
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {conselho && conselho.length > 0 ? (
-                        conselho.map((presidente, index) => (
-                        <tr role="row" key={index}>
-                          <td
-                            style={{
-                              padding: "16px 20px",
-                              color: "#4a5568",
-                              borderBottom: "1px solid #e2e8f0",
-                              fontSize: "15px",
-                            }}
-                          >
-                            <InputM>{presidente.nome_presidente}</InputM>
-                          </td>
-                          <td
-                            style={{
-                              padding: "16px 20px",
-                              color: "#4a5568",
-                              borderBottom: "1px solid #e2e8f0",
-                              fontSize: "15px",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
-                            {presidente.setor_responsavel}
-                          </td>
-                          <td
-                            style={{
-                              padding: "16px 20px",
-                              color: "#4a5568",
-                              borderBottom: "1px solid #e2e8f0",
-                              fontSize: "15px",
-                            }}
-                          >
-                            <Actions>
-                              <Image
-                                title="Editar"
-                                onClick={() =>
-                                  handleEditarPresidente(presidente)
-                                }
-                                src={Editar}
-                                alt="Editar"
-                                width={25}
-                                height={25}
-                                style={{
-                                  cursor:
-                                    conselhoSituacao === "nao_tem"
-                                      ? "not-allowed"
-                                      : "pointer",
-                                  opacity:
-                                    conselhoSituacao === "nao_tem" ? 0.5 : 1,
-                                }}
-                                {...(conselhoSituacao === "nao_tem"
-                                  ? { onClick: (e) => e.preventDefault() }
-                                  : {})}
-                              />
-                              <Image
-                                onClick={() => {
-                                  if (conselhoSituacao !== "nao_tem") {
-                                    handleRemoverPresidente({
-                                      id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
-                                    });
-                                  }
-                                }}
-                                src={Excluir}
-                                alt="Excluir"
-                                width={25}
-                                height={25}
-                                style={{
-                                  cursor:
-                                    conselhoSituacao === "nao_tem"
-                                      ? "not-allowed"
-                                      : "pointer",
-                                  opacity:
-                                    conselhoSituacao === "nao_tem" ? 0.5 : 1,
-                                }}
-                              />
-                            </Actions>
-                          </td>
-                        </tr>
-                        ))
-                      ) : (
+                      Presidentes
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleShowModalPresidente();
+                        }}
+                        disabled={!conselhoMunicipal || conselhoMunicipal.length === 0}
+                        style={{
+                          padding: "12px 24px",
+                          fontSize: "14px",
+                          fontWeight: "500",
+                          borderRadius: "6px",
+                          transition: "all 0.2s",
+                          backgroundColor: "#0085bd",
+                          color: "#fff",
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Adicionar Presidente
+                      </button>
+                    </DivEixo>
+                    <table
+                      cellSpacing={0}
+                      style={{
+                        width: "98%",
+                        borderRadius: "10px",
+                        boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                        margin: "0 0 20px 20px",
+                        borderCollapse: "separate",
+                        borderSpacing: 0,
+                      }}
+                    >
+                      <thead>
                         <tr>
-                          <td
-                            colSpan={3}
+                          <th
                             style={{
-                              padding: "20px",
-                              textAlign: "center",
-                              color: "#999",
+                              background: "#0085bd",
+                              color: "#fff",
+                              padding: "10px 20px",
+                              textAlign: "left",
+                              fontWeight: 600,
+                              fontSize: "14px",
+                              borderTopLeftRadius: "10px",
                             }}
                           >
-                            Nenhum presidente cadastrado
-                          </td>
+                            Presidente
+                          </th>
+                          <th
+                            style={{
+                              background: "#0085bd",
+                              color: "#fff",
+                              padding: "10px 20px",
+                              textAlign: "left",
+                              fontWeight: 600,
+                              fontSize: "14px",
+                            }}
+                          >
+                            Setor Responsável
+                          </th>
+                          <th
+                            style={{
+                              background: "#0085bd",
+                              color: "#fff",
+                              padding: "10px 20px",
+                              textAlign: "left",
+                              fontWeight: 600,
+                              fontSize: "14px",
+                              borderTopRightRadius: "10px",
+                            }}
+                          >
+                            Ações
+                          </th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div style={{ marginTop: "16px" }}>
-                  <DivEixo>Atualizações</DivEixo>
-                  <table
-                    cellSpacing={0}
-                    style={{
-                      width: "98%",
-                      borderRadius: "10px",
-                      boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
-                      margin: "0 0 20px 20px",
-                      borderCollapse: "separate",
-                      borderSpacing: 0,
-                    }}
-                  >
-                    <thead>
-                      <tr>
-                        <th
-                          style={{
-                            background: "#0085bd",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            textAlign: "left",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                            borderTopLeftRadius: "10px",
-                          }}
-                        >
-                          Título
-                        </th>
-                        <th
-                          style={{
-                            background: "#0085bd",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            textAlign: "left",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                          }}
-                        >
-                          Ano
-                        </th>
-                        <th
-                          style={{
-                            background: "#0085bd",
-                            color: "#fff",
-                            padding: "10px 20px",
-                            textAlign: "left",
-                            fontWeight: 600,
-                            fontSize: "14px",
-                            borderTopRightRadius: "10px",
-                          }}
-                        >
-                          Ações
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {conselhoMunicipal && conselhoMunicipal.length > 0 ? (
-                        conselhoMunicipal.map((conselho, index) => (
-                          <tr key={index}>
+                      </thead>
+                      <tbody>
+                        {conselho && conselho.length > 0 ? (
+                          conselho.map((presidente, index) => (
+                            <tr role="row" key={index}>
+                              <td
+                                style={{
+                                  padding: "16px 20px",
+                                  color: "#4a5568",
+                                  borderBottom: "1px solid #e2e8f0",
+                                  fontSize: "15px",
+                                }}
+                              >
+                                <InputM>{presidente.nome_presidente}</InputM>
+                              </td>
+                              <td
+                                style={{
+                                  padding: "16px 20px",
+                                  color: "#4a5568",
+                                  borderBottom: "1px solid #e2e8f0",
+                                  fontSize: "15px",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {presidente.setor_responsavel}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "16px 20px",
+                                  color: "#4a5568",
+                                  borderBottom: "1px solid #e2e8f0",
+                                  fontSize: "15px",
+                                }}
+                              >
+                                <Actions>
+                                  <Image
+                                    title="Editar"
+                                    onClick={() =>
+                                      handleEditarPresidente(presidente)
+                                    }
+                                    src={Editar}
+                                    alt="Editar"
+                                    width={25}
+                                    height={25}
+                                    style={{
+                                      cursor:
+                                        conselhoSituacao === "nao_tem"
+                                          ? "not-allowed"
+                                          : "pointer",
+                                      opacity:
+                                        conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                                    }}
+                                    {...(conselhoSituacao === "nao_tem"
+                                      ? { onClick: (e) => e.preventDefault() }
+                                      : {})}
+                                  />
+                                  <Image
+                                    onClick={() => {
+                                      if (conselhoSituacao !== "nao_tem") {
+                                        handleRemoverPresidente({
+                                          id: presidente.id_presidencia_conselho_municipal_saneamento_basico,
+                                        });
+                                      }
+                                    }}
+                                    src={Excluir}
+                                    alt="Excluir"
+                                    width={25}
+                                    height={25}
+                                    style={{
+                                      cursor:
+                                        conselhoSituacao === "nao_tem"
+                                          ? "not-allowed"
+                                          : "pointer",
+                                      opacity:
+                                        conselhoSituacao === "nao_tem" ? 0.5 : 1,
+                                    }}
+                                  />
+                                </Actions>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
                             <td
+                              colSpan={3}
                               style={{
-                                padding: "16px 20px",
-                                color: "#4a5568",
-                                borderBottom: "1px solid #e2e8f0",
-                                fontSize: "15px",
+                                padding: "20px",
+                                textAlign: "center",
+                                color: "#999",
                               }}
                             >
-                              <InputG>{conselho.titulo}</InputG>
-                            </td>
-                            <td
-                              style={{
-                                padding: "16px 20px",
-                                color: "#4a5568",
-                                borderBottom: "1px solid #e2e8f0",
-                                fontSize: "15px",
-                              }}
-                            >
-                              {conselho.ano}
-                            </td>
-                            <td
-                              style={{
-                                padding: "16px 20px",
-                                color: "#4a5568",
-                                borderBottom: "1px solid #e2e8f0",
-                                fontSize: "15px",
-                              }}
-                            >
-                              <Actions>
-                                {conselho.file && (
-                                  <a
-                                    href={conselho.file}
-                                    rel="noreferrer"
-                                    target="_blank"
-                                  >
-                                    <FaFilePdf></FaFilePdf>
-                                  </a>
-                                )}
-                                <Image
-                                  src={Excluir}
-                                  alt="Excluir"
-                                  width={25}
-                                  height={25}
-                                  onClick={() => {
-                                    handleRemoverConselho({
-                                      id: conselho.id_conselho_municipal_saneamento_basico,
-                                    });
-                                  }}
-                                />
-                              </Actions>
+                              Nenhum presidente cadastrado
                             </td>
                           </tr>
-                        ))
-                      ) : (
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div style={{ marginTop: "15px" }}>
+                    <DivEixo style={{ paddingBottom: "14px" }}>Atualizações</DivEixo>
+                    <table
+                      cellSpacing={0}
+                      style={{
+                        width: "98%",
+                        borderRadius: "10px",
+                        boxShadow: "0 3.8px 5.7px rgba(0, 0, 0, 0.1)",
+                        margin: "0 0 20px 20px",
+                        borderCollapse: "separate",
+                        borderSpacing: 0,
+                      }}
+                    >
+                      <thead>
                         <tr>
-                          <td
-                            colSpan={3}
+                          <th
                             style={{
-                              padding: "20px",
-                              textAlign: "center",
-                              color: "#999",
+                              background: "#0085bd",
+                              color: "#fff",
+                              padding: "10px 20px",
+                              textAlign: "left",
+                              fontWeight: 600,
+                              fontSize: "14px",
+                              borderTopLeftRadius: "10px",
                             }}
                           >
-                            Nenhum conselho cadastrado
-                          </td>
+                            Título
+                          </th>
+                          <th
+                            style={{
+                              background: "#0085bd",
+                              color: "#fff",
+                              padding: "10px 20px",
+                              textAlign: "left",
+                              fontWeight: 600,
+                              fontSize: "14px",
+                            }}
+                          >
+                            Ano
+                          </th>
+                          <th
+                            style={{
+                              background: "#0085bd",
+                              color: "#fff",
+                              padding: "10px 20px",
+                              textAlign: "left",
+                              fontWeight: 600,
+                              fontSize: "14px",
+                              borderTopRightRadius: "10px",
+                            }}
+                          >
+                            Ações
+                          </th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </TablesContainer>
-            </DivFormCadastro>
+                      </thead>
+                      <tbody>
+                        {conselhoMunicipal && conselhoMunicipal.length > 0 ? (
+                          conselhoMunicipal.map((conselho, index) => (
+                            <tr key={index}>
+                              <td
+                                style={{
+                                  padding: "16px 20px",
+                                  color: "#4a5568",
+                                  borderBottom: "1px solid #e2e8f0",
+                                  fontSize: "15px",
+                                }}
+                              >
+                                <InputG>{conselho.titulo}</InputG>
+                              </td>
+                              <td
+                                style={{
+                                  padding: "16px 20px",
+                                  color: "#4a5568",
+                                  borderBottom: "1px solid #e2e8f0",
+                                  fontSize: "15px",
+                                }}
+                              >
+                                {conselho.ano}
+                              </td>
+                              <td
+                                style={{
+                                  padding: "16px 20px",
+                                  color: "#4a5568",
+                                  borderBottom: "1px solid #e2e8f0",
+                                  fontSize: "15px",
+                                }}
+                              >
+                                <Actions>
+                                  {conselho.file && (
+                                    <a
+                                      href={conselho.file}
+                                      rel="noreferrer"
+                                      target="_blank"
+                                    >
+                                      <FaFilePdf></FaFilePdf>
+                                    </a>
+                                  )}
+                                  <Image
+                                    src={Excluir}
+                                    alt="Excluir"
+                                    width={25}
+                                    height={25}
+                                    onClick={() => {
+                                      handleRemoverConselho({
+                                        id: conselho.id_conselho_municipal_saneamento_basico,
+                                      });
+                                    }}
+                                  />
+                                </Actions>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td
+                              colSpan={3}
+                              style={{
+                                padding: "20px",
+                                textAlign: "center",
+                                color: "#999",
+                              }}
+                            >
+                              Nenhum conselho cadastrado
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </TablesContainer>
+              </div>
+            </Form>
+            <div style={{ display: activeTabConselho === "dadosComplementaresConselho" ? "block" : "none" }} suppressHydrationWarning>
+              <Form style={{ backgroundColor: "white" }} onSubmit={handleSubmitIndicadoresConselho(handleCadastroIndicadoresConselho)}>
 
-            <DivFormCadastro active={activeForm === "participacaoSocial"}>
+                <div
+                  style={{ width: "97%", padding: "20px", borderBottom: "1px solid #eee" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "20px",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <label style={{ width: "250px", marginRight: "10px" }}>Selecionar Ano:</label>
+                      <select
+                        value={anoSelectedConselho || ""}
+                        onChange={(e) => selectAnoConselho(e.target.value)}
+                        disabled={loadingDadosConselho}
+                        style={{ padding: "5px" }}
+                      >
+                        <option value="">Selecione o ano</option>
+                        {anosSelect().map((ano) => (
+                          <option key={ano} value={ano}>
+                            {ano}
+                          </option>
+                        ))}
+                      </select>
+                      {loadingDadosConselho && (
+                        <span style={{ marginLeft: "10px", color: "#12B2D5", whiteSpace: "nowrap" }}>
+                          Carregando dados...
+                        </span>
+                      )}
+                    </div>
+
+                    <div style={{ fontSize: "14px", color: "#666" }}>
+                      <strong>{indicadoresConselho.length}</strong> indicador
+                      {indicadoresConselho.length !== 1 ? "es" : ""} encontrado
+                      {indicadoresConselho.length !== 1 ? "s" : ""}
+                      {indicadoresConselho.some((ind) => ind._hasError) && (
+                        <span style={{ color: "#dc3545", marginLeft: "10px" }}>
+                          | ⚠️ Alguns campos com erro
+                        </span>
+                      )}
+                      {dadosCarregadosConselho.length > 0 && (
+                        <span style={{ color: "#28a745", marginLeft: "10px" }}>
+                          | ✅ {dadosCarregadosConselho.length} dado
+                          {dadosCarregadosConselho.length !== 1 ? "s" : ""} carregado
+                          {dadosCarregadosConselho.length !== 1 ? "s" : ""}
+                        </span>
+                      )}
+                    </div>
+
+                    {grupoConselho &&
+                      !loadingIndicadoresConselho &&
+                      indicadoresConselho.some((ind) => ind._hasError) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const menuItem = menuItemsConselho.find(
+                              (item) => item.nome_menu_item === grupoConselho
+                            );
+                            if (menuItem) {
+                              getIndicadoresConselho(menuItem);
+                            }
+                          }}
+                          style={{
+                            padding: "6px 12px",
+                            fontSize: "12px",
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          🔄 Tentar Novamente
+                        </button>
+                      )}
+                  </div>
+                </div>
+
+                {!grupoConselho ? (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "40px",
+                      backgroundColor: "#f8f9fa",
+                    }}
+                  >
+                    <p>Carregando indicadores...</p>
+                  </div>
+                ) : loadingIndicadoresConselho ? (
+                  <div style={{ textAlign: "center", padding: "40px" }}>
+                    <p>Carregando indicadores...</p>
+                  </div>
+                ) : indicadoresConselho.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "40px" }}>
+                    <p>Nenhum indicador encontrado para este grupo.</p>
+                  </div>
+                ) : (
+                  <div
+                    suppressHydrationWarning
+                    style={{
+                      backgroundColor: "#fff",
+                      borderRadius: "8px",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                      overflow: "hidden",
+                      marginTop: "20px",
+                      width: "97%",
+                    }}
+                  >
+                    {/* Cabeçalho da Tabela */}
+                    <div
+                      suppressHydrationWarning
+                      style={{
+                        backgroundColor: "#1e88e5",
+                        color: "white",
+                        padding: "15px 0",
+                        fontWeight: "600",
+                        fontSize: "13px",
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns:
+                            isMounted && innerWidth > 768
+                              ? "180px 1fr 280px 100px"
+                              : "1fr",
+                          gap: isMounted && innerWidth > 768 ? "15px" : "10px",
+                          alignItems: "center",
+                          padding: "0 15px",
+                          color: "#fff",
+                          fontWeight: 600,
+                          fontSize: "14px",
+                        }}
+                        suppressHydrationWarning
+                      >
+                        {isMounted && innerWidth > 768 ? (
+                          <>
+                            <div suppressHydrationWarning>CÓDIGO</div>
+                            <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              VALOR - ANO: {anoSelectedConselho || "____"}
+                            </div>
+                            <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                              UNIDADE
+                            </div>
+                          </>
+                        ) : (
+                          <div suppressHydrationWarning>
+                            INDICADORES - ANO: {anoSelectedConselho || "____"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Linhas da Tabela */}
+                    {indicadoresConselho.map((indicador, index) => {
+                      const tipoCampo =
+                        indicador.tiposCampo &&
+                          indicador.tiposCampo.length > 0
+                          ? indicador.tiposCampo[0]
+                          : null;
+                      const isEven = index % 2 === 0;
+
+                      return (
+                        <div
+                          key={indicador.id_indicador}
+                          suppressHydrationWarning
+                          style={{
+                            backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                            borderBottom:
+                              index < indicadoresConselho.length - 1
+                                ? "1px solid #dee2e6"
+                                : "none",
+                            padding: "15px 0",
+                            transition: "background-color 0.2s ease",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#e8f4fd";
+                            e.currentTarget.style.borderLeft = "3px solid #1e88e5";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isEven
+                              ? "#f8f9fa"
+                              : "#ffffff";
+                            e.currentTarget.style.borderLeft = "none";
+                          }}
+                        >
+                          {isMounted && innerWidth > 768 ? (
+                            <div
+                              suppressHydrationWarning
+                              style={{
+                                display: "grid",
+                                gridTemplateColumns: "180px 1fr 280px 100px",
+                                gap: "15px",
+                                alignItems: "center",
+                                padding: "0 15px",
+                              }}
+                            >
+                              {/* Código */}
+                              <div>
+                                <div
+                                  style={{
+                                    fontSize: "15px",
+                                    fontWeight: "bold",
+                                    color: "#1e88e5",
+                                  }}
+                                >
+                                  {indicador.codigo_indicador}
+                                </div>
+                              </div>
+
+                              {/* Descrição */}
+                              <div
+                                style={{
+                                  fontSize: "14px",
+                                  color: "#495057",
+                                  lineHeight: "1.3",
+                                }}
+                              >
+                                {indicador.nome_indicador}
+                              </div>
+
+                              {/* Campo de Input */}
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                              >
+                                {anoSelectedConselho ? (
+                                  <div style={{ width: "260px" }}>
+                                    <CampoIndicadorConselho
+                                      indicador={indicador}
+                                      register={registerIndicadoresConselho}
+                                      anoSelected={anoSelectedConselho}
+                                      setValue={setValueIndicadoresConselho}
+                                      watch={watchIndicadoresConselho}
+                                    />
+                                  </div>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="Selecione um ano"
+                                    disabled
+                                    style={{
+                                      width: "260px",
+                                      backgroundColor: "#f8f9fa",
+                                      border: "1px solid #dee2e6",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      color: "#6c757d",
+                                      textAlign: "center",
+                                      fontSize: "12px",
+                                    }}
+                                  />
+                                )}
+                              </div>
+
+                              {/* Unidade */}
+                              <div
+                                style={{
+                                  textAlign: "center",
+                                  fontSize: "12px",
+                                  color: "#495057",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    fontWeight: "500",
+                                    padding: "5px 6px",
+                                    backgroundColor: "#e9ecef",
+                                    borderRadius: "3px",
+                                    fontSize: "11px",
+                                  }}
+                                >
+                                  {indicador.unidade_indicador || "-"}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            /* Layout Mobile */
+                            <div
+                              suppressHydrationWarning
+                              style={{
+                                padding: "0 15px",
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "10px",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: "16px",
+                                      fontWeight: "bold",
+                                      color: "#1e88e5",
+                                    }}
+                                  >
+                                    {indicador.codigo_indicador}
+                                  </div>
+                                  <div
+                                    style={{
+                                      fontSize: "11px",
+                                      color: "#6c757d",
+                                    }}
+                                  >
+                                    {indicador.unidade_indicador || "-"}
+                                  </div>
+                                </div>
+                                {tipoCampo && (
+                                  <div
+                                    style={{
+                                      fontSize: "10px",
+                                      color: "#6c757d",
+                                      backgroundColor: "#f8f9fa",
+                                      padding: "3px 6px",
+                                      borderRadius: "3px",
+                                    }}
+                                  >
+                                    {tipoCampo.type}
+                                  </div>
+                                )}
+                              </div>
+
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  color: "#495057",
+                                  lineHeight: "1.3",
+                                  marginBottom: "8px",
+                                }}
+                              >
+                                {indicador.nome_indicador}
+                              </div>
+
+                              {anoSelectedConselho ? (
+                                <CampoIndicadorConselho
+                                  indicador={indicador}
+                                  register={registerIndicadoresConselho}
+                                  anoSelected={anoSelectedConselho}
+                                  setValue={setValueIndicadoresConselho}
+                                  watch={watchIndicadoresConselho}
+                                />
+                              ) : (
+                                <input
+                                  type="text"
+                                  placeholder="Selecione um ano primeiro"
+                                  disabled
+                                  style={{
+                                    backgroundColor: "#f8f9fa",
+                                    border: "1px solid #dee2e6",
+                                    borderRadius: "4px",
+                                    padding: "8px 12px",
+                                    color: "#6c757d",
+                                    textAlign: "center",
+                                  }}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {indicadoresConselho.length > 0 && anoSelectedConselho && (
+                  <div
+                    style={{
+                      marginTop: "30px",
+                      padding: "20px",
+                      textAlign: "center",
+                      borderTop: "1px solid #e1e5e9",
+                    }}
+                  >
+                    <button
+                      type="submit"
+                      style={{
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "8px",
+                        padding: "12px 40px",
+                        fontSize: "16px",
+                        fontWeight: "500",
+                        cursor: "pointer",
+                        boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                        transition: "all 0.2s ease",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#218838";
+                        e.currentTarget.style.boxShadow =
+                          "0 4px 8px rgba(40,167,69,0.3)";
+                        e.currentTarget.style.transform = "translateY(-1px)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#28a745";
+                        e.currentTarget.style.boxShadow =
+                          "0 2px 4px rgba(40,167,69,0.2)";
+                        e.currentTarget.style.transform = "translateY(0)";
+                      }}
+                    >
+                      💾 Salvar Dados dos Indicadores
+                    </button>
+                  </div>
+                )}
+
+              </Form>
+            </div>
+          </DivFormCadastro>
+
+          <Form onSubmit={handleSubmitParticipacao(handleAddParticipacao)}>
+            <DivFormCadastro active={activeForm === "participacaoSocial"} suppressHydrationWarning>
               <DivTituloForm>Participação e Controle Social</DivTituloForm>
               <table
                 style={{
@@ -3107,71 +7622,68 @@ export default function GestaoIndicadores({
               >
                 <tbody>
                   <tr>
-                    <td style={{ width: "50%", padding: "10px" }}>
-                      <InputG>
-                        <label>Titulo</label>
-                        <input
-                          style={{ width: "100%" }}
-                          {...register("pcs_titulo")}
-                          onChange={(e) => {
-                            const value = capitalizeFrasal(e.target.value);
-                            setValue("pcs_titulo", value);
-                          }}
-                          type="text"
-                          onKeyPress={onlyLettersAndCharacters}
-                        ></input>
-                      </InputG>
+                    <td style={{ width: "40%", padding: "10px" }}>
+
+                      <label>Titulo</label>
+                      <input
+                        style={{ width: "100%" }}
+                        {...registerParticipacao("pcs_titulo")}
+                        onChange={(e) => {
+                          const value = capitalizeFrasal(e.target.value);
+                          setValueParticipacao("pcs_titulo", value);
+                        }}
+                        type="text"
+                        onKeyPress={onlyLettersAndCharacters}
+                      ></input>
                     </td>
-                    <td style={{ width: "15%", padding: "10px" }}>
-                      <InputP>
-                        <label>Ano</label>
-                        <input
-                          style={{ width: "100%" }}
-                          {...register("pcs_ano")}
-                          type="text"
-                          onKeyPress={(e) => {
-                            if (!/[0-9]/.test(e.key)) {
-                              e.preventDefault();
-                            }
-                          }}
-                        ></input>
-                      </InputP>
+                    <td style={{ width: "10%", padding: "10px" }}>
+                      <label>Ano</label>
+                      <input
+                        style={{ width: "100%" }}
+                        {...registerParticipacao("pcs_ano")}
+                        type="text"
+                        onKeyPress={(e) => {
+                          if (!/[0-9]/.test(e.key)) {
+                            e.preventDefault();
+                          }
+                        }}
+                        onChange={(e) => {
+                          setValueParticipacao("pcs_ano", e.target.value);
+                        }}
+                      ></input>
+
                     </td>
-                    <td style={{ padding: "10px" }}>
-                      <InputM>
-                        <label>Arquivo</label>
-                        <input {...register("pcs_arquivo")} type="file"></input>
-                      </InputM>
+                    <td style={{ width: "30%", padding: "10px" }}>
+
+                      <label>Arquivo</label>
+                      <input style={{ width: "100%" }} {...registerParticipacao("pcs_arquivo")} type="file"></input>
+
+                    </td>
+                    <td style={{ textAlign: "right", width: "10%" }}>
+                      {usuario?.id_permissao !== 4 && (
+                        <button
+                          type="submit"
+                          style={{
+                            padding: "12px 24px",
+                            fontSize: "14px",
+                            fontWeight: "500",
+                            borderRadius: "6px",
+                            transition: "all 0.2s",
+                            backgroundColor: "#0085bd",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Gravar
+                        </button>
+                      )}
                     </td>
                   </tr>
                 </tbody>
               </table>
 
-              <div
-                style={{
-                  marginBottom: "20px",
-                  marginLeft: "20px",
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  width: "97%",
-                  position: "relative",
-                }}
-              >
-                {usuario?.id_permissao !== 4 && (
-                  <SubmitButton
-                    type="submit"
-                    style={{
-                      padding: "12px 24px",
-                      fontSize: "14px",
-                      fontWeight: "500",
-                      borderRadius: "6px",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    Gravar
-                  </SubmitButton>
-                )}
-              </div>
+
 
               <DivEixo>Atualizações</DivEixo>
 
@@ -3333,13 +7845,16 @@ export default function GestaoIndicadores({
                 </tbody>
               </table>
             </DivFormCadastro>
+          </Form>
 
+          <Form onSubmit={handleSubmitSR(handleAddSaneamentoRural)}>
             <DivFormCadastro
               active={activeForm === "saneamentoRural"}
               style={{
-                minWidth: innerWidth > 0 && innerWidth <= 1000 ? "95%" : "1045px",
+                minWidth: typeof window !== "undefined" && isMounted && innerWidth > 0 && innerWidth <= 1000 ? "95%" : "1045px",
                 minHeight: "380px",
               }}
+              suppressHydrationWarning
             >
               <DivTituloForm
                 style={{
@@ -3367,12 +7882,15 @@ export default function GestaoIndicadores({
                 </Actions>
               </DivTituloForm>
               <DivTextArea>
-                <label>Breve Descrição</label>
+                <label style={{ margin: "10px 0 0 30px" }}>Breve Descrição</label>
                 <textarea
+                  style={{ width: "95%", margin: "10px 0 0 30px" }}
                   ref={txtArea}
-                  {...register("sr_descricao")}
-                  onChange={handleOnChange}
-                  // required
+                  {...registerSR("sr_descricao")}
+                  onChange={(e) => {
+                    setValueSR("sr_descricao", e.target.value);
+                  }}
+                // required
                 ></textarea>
               </DivTextArea>
 
@@ -3387,13 +7905,16 @@ export default function GestaoIndicadores({
                 )}
               </SubmitButtonContainer>
             </DivFormCadastro>
+          </Form>
 
+          <Form onSubmit={handleSubmitCT(handleAddComunidadesTradicionais)}>
             <DivFormCadastro
               active={activeForm === "comunidadesTradicionais"}
               style={{
-                minWidth: innerWidth > 0 && innerWidth <= 1000 ? "95%" : "1045px",
+                minWidth: typeof window !== "undefined" && isMounted && innerWidth > 0 && innerWidth <= 1000 ? "95%" : "1045px",
                 height: "658px",
               }}
+              suppressHydrationWarning
             >
               <DivTituloForm
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
@@ -3418,20 +7939,22 @@ export default function GestaoIndicadores({
               </DivTituloForm>
 
               <DivTextArea>
-                <label>Nome das Comunidades Beneficiadas</label>
+                <label style={{ margin: "10px 0 0 30px" }}>Nome das Comunidades Beneficiadas</label>
 
                 <textarea
+                  style={{ width: "95%", margin: "10px 0 0 30px" }}
                   ref={txtArea}
-                  {...register("ct_nomes_comunidades")}
-                  // required
+                  {...registerCT("ct_nomes_comunidades")}
+                // required
                 ></textarea>
 
-                <label>Breve Descrição</label>
+                <label style={{ margin: "10px 0 0 30px" }}>Breve Descrição</label>
 
                 <textarea
+                  style={{ width: "95%", margin: "10px 0 0 30px" }}
                   ref={txtArea}
-                  {...register("ct_descricao")}
-                  // required
+                  {...registerCT("ct_descricao")}
+                // required
                 ></textarea>
               </DivTextArea>
 
@@ -3448,6 +7971,486 @@ export default function GestaoIndicadores({
             </DivFormCadastro>
           </Form>
 
+          {isDynamicMenuItemActive && ( 
+            <Form  onSubmit={handleSubmitIndicadores(handleCadastroIndicadores)}>
+              <DivTituloForm style={{ margin: 0 }}  >{grupo}</DivTituloForm>
+
+              <div
+                style={{ width: "97%", padding: "20px", borderBottom: "1px solid #eee" }}
+                suppressHydrationWarning
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "20px",
+                    flexWrap: "wrap",
+                    
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <label>Selecionar Ano:</label>
+                    <select
+                      value={anoSelected || ""}
+                      onChange={(e) => selectAno(e.target.value)}
+                      disabled={loadingDados}
+                      style={{ marginLeft: "10px", padding: "5px" }}
+                    >
+                      <option value="">Selecione o ano</option>
+                      {anosSelect().map((ano) => (
+                        <option key={ano} value={ano}>
+                          {ano}
+                        </option>
+                      ))}
+                    </select>
+                    {loadingDados && (
+                      <span style={{ marginLeft: "10px", color: "#12B2D5" }}>
+                        Carregando dados...
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ fontSize: "14px", color: "#666" }}>
+                    <strong>{indicadores.length}</strong> indicador
+                    {indicadores.length !== 1 ? "es" : ""} encontrado
+                    {indicadores.length !== 1 ? "s" : ""}
+                  </div>
+                </div>
+              </div>
+
+           
+
+                  {!grupo ? (
+                    <div
+                      style={{
+                        textAlign: "center",
+                        padding: "40px",
+                        backgroundColor: "#f8f9fa",
+                      }}
+                    >
+                      <p>👈 Selecione um item do menu lateral para começar</p>
+                    </div>
+                  ) : loadingIndicadores ? (
+                    <div style={{ textAlign: "center", padding: "40px" }}>
+                      <p>Carregando indicadores...</p>
+                    </div>
+                  ) : indicadores.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "40px" }}>
+                      <p>Nenhum indicador encontrado para este grupo.</p>
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                        overflow: "hidden",
+                        width: "97%",
+                        margin: "20px 20px",
+                      }}
+                    >
+                      {/* Cabeçalho da Tabela */}
+                      <div
+                        style={{
+                          backgroundColor: "#1e88e5",
+                          color: "white",
+                          padding: "15px 0",
+                          fontWeight: "600",
+                          fontSize: "13px",
+                          letterSpacing: "0.5px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns:
+                              isMounted && innerWidth > 768
+                                ? "180px 1fr 280px 100px"
+                                : "1fr",
+                            gap: isMounted && innerWidth > 768 ? "15px" : "10px",
+                            alignItems: "center",
+                            padding: "0 15px",
+                          }}
+                          suppressHydrationWarning
+                        >
+                          {isMounted && innerWidth > 768 ? (
+                            <>
+                              <div suppressHydrationWarning>CÓDIGO</div>
+                              <div suppressHydrationWarning>DESCRIÇÃO DO INDICADOR</div>
+                              <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                                VALOR - ANO: {anoSelected || "____"}
+                              </div>
+                              <div suppressHydrationWarning style={{ textAlign: "center" }}>
+                                UNIDADE
+                              </div>
+                            </>
+                          ) : (
+                            <div suppressHydrationWarning>
+                              INDICADORES - ANO: {anoSelected || "____"}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Linhas da Tabela */}
+                      {indicadores.map((indicador, index) => {
+                        const tipoCampo =
+                          indicador.tiposCampo &&
+                            indicador.tiposCampo.length > 0
+                            ? indicador.tiposCampo[0]
+                            : null;
+                        const isEven = index % 2 === 0;
+                        const fieldName = anoSelected
+                          ? `${indicador.codigo_indicador}_${anoSelected}`
+                          : null;
+
+                        return (
+                          <div
+                            key={indicador.id_indicador}
+                            style={{
+                              backgroundColor: isEven ? "#f8f9fa" : "#ffffff",
+                              borderBottom:
+                                index < indicadores.length - 1
+                                  ? "1px solid #dee2e6"
+                                  : "none",
+                              padding: "15px 0",
+                              transition: "background-color 0.2s ease",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor =
+                                "#e8f4fd";
+                              e.currentTarget.style.borderLeft =
+                                "3px solid #1e88e5";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = isEven
+                                ? "#f8f9fa"
+                                : "#ffffff";
+                              e.currentTarget.style.borderLeft = "none";
+                            }}
+                          >
+                            {isMounted && innerWidth > 768 ? (
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns:
+                                    "180px 1fr 280px 100px",
+                                  gap: "15px",
+                                  alignItems: "center",
+                                  padding: "0 15px",
+                                }}
+                                suppressHydrationWarning
+                              >
+                                {/* Código */}
+                                <div>
+                                  <div
+                                    style={{
+                                      fontSize: "15px",
+                                      fontWeight: "bold",
+                                      color: "#1e88e5",
+                                    }}
+                                  >
+                                    {indicador.codigo_indicador}
+                                  </div>
+                                </div>
+
+                                {/* Descrição */}
+                                <div
+                                  style={{
+                                    fontSize: "14px",
+                                    color: "#495057",
+                                    lineHeight: "1.3",
+                                  }}
+                                >
+                                  {indicador.nome_indicador}
+                                </div>
+
+                                {/* Campo de Input */}
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                  }}
+                                >
+                                  {anoSelected && fieldName ? (
+                                    <div style={{ width: "260px" }}>
+                                      {tipoCampo?.type === "number" ? (
+                                        <input
+                                          {...registerIndicadores(fieldName as any)}
+                                          type="number"
+                                          step="any"
+                                          style={{
+                                            width: "100%",
+                                            padding: "8px 12px",
+                                            border: "1px solid #dee2e6",
+                                            borderRadius: "4px",
+                                          }}
+                                        />
+                                      ) : tipoCampo?.type === "select" ? (
+                                        <select
+                                          {...registerIndicadores(fieldName as any)}
+                                          style={{
+                                            width: "100%",
+                                            padding: "8px 12px",
+                                            border: "1px solid #dee2e6",
+                                            borderRadius: "4px",
+                                          }}
+                                        >
+                                          <option value="">Selecione...</option>
+                                          {tipoCampo.selectOptions
+                                            ?.sort(
+                                              (a, b) =>
+                                                (a.ordem_option || 0) -
+                                                (b.ordem_option || 0)
+                                            )
+                                            .map((option) => (
+                                              <option
+                                                key={option.id_select_option}
+                                                value={option.value}
+                                              >
+                                                {option.descricao || option.value}
+                                              </option>
+                                            ))}
+                                        </select>
+                                      ) : (
+                                        <input
+                                          {...registerIndicadores(fieldName as any)}
+                                          type="text"
+                                          style={{
+                                            width: "100%",
+                                            padding: "8px 12px",
+                                            border: "1px solid #dee2e6",
+                                            borderRadius: "4px",
+                                          }}
+                                        />
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder="Selecione um ano"
+                                      disabled
+                                      style={{
+                                        width: "260px",
+                                        backgroundColor: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                        padding: "8px 12px",
+                                        color: "#6c757d",
+                                        textAlign: "center",
+                                        fontSize: "12px",
+                                      }}
+                                    />
+                                  )}
+                                </div>
+
+                                {/* Unidade */}
+                                <div
+                                  style={{
+                                    textAlign: "center",
+                                    fontSize: "12px",
+                                    color: "#495057",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      fontWeight: "500",
+                                      padding: "5px 6px",
+                                      backgroundColor: "#e9ecef",
+                                      borderRadius: "3px",
+                                      fontSize: "11px",
+                                    }}
+                                  >
+                                    {indicador.unidade_indicador || "-"}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              /* Layout Mobile */
+                              <div
+                                style={{
+                                  padding: "0 15px",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "10px",
+                                }}
+                              >
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <div>
+                                    <div
+                                      style={{
+                                        fontSize: "16px",
+                                        fontWeight: "bold",
+                                        color: "#1e88e5",
+                                      }}
+                                    >
+                                      {indicador.codigo_indicador}
+                                    </div>
+                                    <div
+                                      style={{
+                                        fontSize: "11px",
+                                        color: "#6c757d",
+                                      }}
+                                    >
+                                      {indicador.unidade_indicador || "-"}
+                                    </div>
+                                  </div>
+                                  {tipoCampo && (
+                                    <div
+                                      style={{
+                                        fontSize: "10px",
+                                        color: "#6c757d",
+                                        backgroundColor: "#f8f9fa",
+                                        padding: "3px 6px",
+                                        borderRadius: "3px",
+                                      }}
+                                    >
+                                      {tipoCampo.type}
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    color: "#495057",
+                                    lineHeight: "1.3",
+                                    marginBottom: "8px",
+                                  }}
+                                >
+                                  {indicador.nome_indicador}
+                                </div>
+
+                                {anoSelected && fieldName ? (
+                                  tipoCampo?.type === "number" ? (
+                                    <input
+                                      {...registerIndicadores(fieldName as any)}
+                                      type="number"
+                                      step="any"
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                      }}
+                                    />
+                                  ) : tipoCampo?.type === "select" ? (
+                                    <select
+                                      {...registerIndicadores(fieldName as any)}
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                      }}
+                                    >
+                                      <option value="">Selecione...</option>
+                                      {tipoCampo.selectOptions
+                                        ?.sort(
+                                          (a, b) =>
+                                            (a.ordem_option || 0) -
+                                            (b.ordem_option || 0)
+                                        )
+                                        .map((option) => (
+                                          <option
+                                            key={option.id_select_option}
+                                            value={option.value}
+                                          >
+                                            {option.descricao || option.value}
+                                          </option>
+                                        ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      {...registerIndicadores(fieldName as any)}
+                                      type="text"
+                                      style={{
+                                        width: "100%",
+                                        padding: "8px 12px",
+                                        border: "1px solid #dee2e6",
+                                        borderRadius: "4px",
+                                      }}
+                                    />
+                                  )
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder="Selecione um ano primeiro"
+                                    disabled
+                                    style={{
+                                      backgroundColor: "#f8f9fa",
+                                      border: "1px solid #dee2e6",
+                                      borderRadius: "4px",
+                                      padding: "8px 12px",
+                                      color: "#6c757d",
+                                      textAlign: "center",
+                                    }}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                {usuario?.id_permissao !== 4 &&
+                  indicadores.length > 0 &&
+                  anoSelected && (
+                    <div
+                      style={{
+                        marginTop: "30px",
+                        padding: "20px",
+                        textAlign: "center",
+                        borderTop: "1px solid #e1e5e9",
+                      }}
+                    >
+                      <button
+                        type="submit"
+                        style={{
+                          backgroundColor: "#28a745",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "8px",
+                          padding: "12px 40px",
+                          fontSize: "16px",
+                          fontWeight: "500",
+                          cursor: "pointer",
+                          boxShadow: "0 2px 4px rgba(40,167,69,0.2)",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#218838";
+                          e.currentTarget.style.boxShadow =
+                            "0 4px 8px rgba(40,167,69,0.3)";
+                          e.currentTarget.style.transform =
+                            "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#28a745";
+                          e.currentTarget.style.boxShadow =
+                            "0 2px 4px rgba(40,167,69,0.2)";
+                          e.currentTarget.style.transform =
+                            "translateY(0)";
+                        }}
+                      >
+                        💾 Salvar Dados dos Indicadores
+                      </button>
+                    </div>
+                  )}
+             
+
+            </Form>
+          )}
+
+
           {ShowModalPresidente && (
             <ContainerModal>
               <Modal>
@@ -3459,7 +8462,10 @@ export default function GestaoIndicadores({
                   )}
                 >
                   <CloseModalButton
-                    onClick={() => {
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       handleCloseModalPresidente();
                     }}
                   >
@@ -3590,7 +8596,10 @@ export default function GestaoIndicadores({
                   )}
                 >
                   <CloseModalButton
-                    onClick={() => {
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
                       handleCloseModal();
                     }}
                   >
@@ -3672,99 +8681,405 @@ export default function GestaoIndicadores({
                       ? updateRepresentantesServicos
                       : handleAddRepresentante
                   )}
+                  suppressHydrationWarning
                 >
-                  <CloseModalButton
-                    onClick={() => {
-                      handleCloseModal();
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      padding: "24px 32px",
+
                     }}
+                    suppressHydrationWarning
                   >
-                    X
-                  </CloseModalButton>
-                  <ConteudoModal>
-                    <InputG>
-                      <label>
-                        Nome<span> *</span>
-                      </label>
-                      <input
-                        {...register("ga_nome_representante", {
-                          required: "O nome é obrigatório",
-                        })}
-                        onKeyPress={onlyLettersAndCharacters}
-                        type="text"
-                        onChange={(e) => {
-                          const value = capitalizeFrasal(e.target.value);
-                          setValue("ga_nome_representante", value);
+                    <h2
+                      style={{
+                        margin: 0,
+                        color: "#006d9a",
+                        fontSize: "20px",
+                        fontWeight: "600",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "10px",
+                      }}
+                    >
+                      <FaUser style={{ fontSize: "18px" }} />
+                      {updateRepresentantes
+                        ? "Editar Representante"
+                        : "Adicionar Representante"}
+                    </h2>
+
+                  </div>
+                  <ConteudoModal
+                    style={{
+                      padding: "32px",
+                      background: "#f8fafc",
+                      width: "92%",
+                      marginBottom: "20px",
+                      border: "1px solid #e2e8f0",
+                    }}
+                    suppressHydrationWarning
+                  >
+                    <CloseModalButton
+                      onClick={() => {
+                        handleCloseModal();
+                      }}
+                      style={{
+                        background: "red",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "8px",
+                        width: "36px",
+                        height: "36px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        transition: "all 0.2s ease",
+                        fontSize: "18px",
+                        padding: 0,
+                        marginRight: "40px",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = "red";
+                        e.currentTarget.style.transform = "rotate(90deg)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = "red";
+                        e.currentTarget.style.transform = "rotate(0deg)";
+                      }}
+                    >
+                      <FaTimes />
+                    </CloseModalButton>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "20px",
+                        marginBottom: "8px",
+                      }}
+                      suppressHydrationWarning
+                    >
+                      <InputG
+                        style={{
+                          marginBottom: 0,
                         }}
-                      ></input>
-                    </InputG>
-                    {errors.ga_nome_representante && (
-                      <span>{errors.ga_nome_representante.message}</span>
-                    )}
-                    <InputP>
-                      <label>
-                        Cargo<span> *</span>
-                      </label>
-                      <input
-                        {...register("ga_cargo", {
-                          required: "O cargo é obrigatório",
-                        })}
-                        onKeyPress={onlyLettersAndCharacters}
-                        type="text"
-                        onChange={(e) => {
-                          const value = capitalizeFrasal(e.target.value);
-                          setValue("ga_cargo", value);
+                      >
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            color: "#2d3748",
+                            fontWeight: "500",
+                            fontSize: "14px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <FaUser style={{ color: "#0085bd", fontSize: "14px" }} />
+                          Nome<span style={{ color: "#e53e3e" }}> *</span>
+                        </label>
+                        <input
+                          {...register("ga_nome_representante", {
+                            required: "O nome é obrigatório",
+                          })}
+                          onKeyPress={onlyLettersAndCharacters}
+                          type="text"
+                          placeholder="Digite o nome completo"
+                          onChange={(e) => {
+                            const value = capitalizeFrasal(e.target.value);
+                            setValue("ga_nome_representante", value);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "12px 16px",
+                            border: "2px solid #e2e8f0",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            color: "#2d3748",
+                            transition: "all 0.2s ease",
+                            background: "#fff",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = "#0085bd";
+                            e.target.style.boxShadow = "0 0 0 3px rgba(0, 133, 189, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = "#e2e8f0";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        ></input>
+                      </InputG>
+                      {errors.ga_nome_representante && (
+                        <span
+                          style={{
+                            color: "#e53e3e",
+                            fontSize: "12px",
+                            marginTop: "-16px",
+                            display: "block",
+                          }}
+                        >
+                          {errors.ga_nome_representante.message}
+                        </span>
+                      )}
+
+                      <InputG
+                        style={{
+                          marginBottom: 0,
                         }}
-                      ></input>
-                    </InputP>
-                    {errors.ga_cargo && <span>{errors.ga_cargo.message}</span>}
-                    <InputP>
-                      <label>
-                        Telefone<span> *</span>
-                      </label>
-                      <Controller
-                        name="ga_telefone"
-                        control={control}
-                        rules={{ required: "O telefone é obrigatório" }}
-                        render={({
-                          field: { onChange, value },
-                          fieldState: { error },
-                        }) => (
-                          <>
-                            <InputMask
-                              mask="(99) 99999-9999"
-                              maskChar={null}
-                              value={value}
-                              onChange={(e) => {
-                                const justNumbers = e.target.value.replace(
-                                  /\D/g,
-                                  ""
-                                );
-                                if (justNumbers.length <= 11) {
-                                  onChange(justNumbers);
-                                }
-                              }}
-                            >
-                              {(inputProps) => (
-                                <input {...inputProps} type="text" />
+                      >
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            color: "#2d3748",
+                            fontWeight: "500",
+                            fontSize: "14px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <FaBriefcase style={{ color: "#0085bd", fontSize: "14px" }} />
+                          Cargo<span style={{ color: "#e53e3e" }}> *</span>
+                        </label>
+                        <input
+                          {...register("ga_cargo", {
+                            required: "O cargo é obrigatório",
+                          })}
+                          onKeyPress={onlyLettersAndCharacters}
+                          type="text"
+                          placeholder="Digite o cargo"
+                          onChange={(e) => {
+                            const value = capitalizeFrasal(e.target.value);
+                            setValue("ga_cargo", value);
+                          }}
+                          style={{
+                            width: "100%",
+                            padding: "12px 16px",
+                            border: "2px solid #e2e8f0",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            color: "#2d3748",
+                            transition: "all 0.2s ease",
+                            background: "#fff",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = "#0085bd";
+                            e.target.style.boxShadow = "0 0 0 3px rgba(0, 133, 189, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = "#e2e8f0";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        ></input>
+                      </InputG>
+                      {errors.ga_cargo && (
+                        <span
+                          style={{
+                            color: "#e53e3e",
+                            fontSize: "12px",
+                            marginTop: "-16px",
+                            display: "block",
+                          }}
+                        >
+                          {errors.ga_cargo.message}
+                        </span>
+                      )}
+
+                      <InputP
+                        style={{
+                          marginBottom: 0,
+                        }}
+                      >
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            color: "#2d3748",
+                            fontWeight: "500",
+                            fontSize: "14px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <FaPhone style={{ color: "#0085bd", fontSize: "14px" }} />
+                          Telefone<span style={{ color: "#e53e3e" }}> *</span>
+                        </label>
+                        <Controller
+                          name="ga_telefone"
+                          control={control}
+                          rules={{ required: "O telefone é obrigatório" }}
+                          render={({
+                            field: { onChange, value },
+                            fieldState: { error },
+                          }) => (
+                            <>
+                              <InputMask
+                                mask="(99) 99999-9999"
+                                maskChar={null}
+                                value={value}
+                                onChange={(e) => {
+                                  const justNumbers = e.target.value.replace(
+                                    /\D/g,
+                                    ""
+                                  );
+                                  if (justNumbers.length <= 11) {
+                                    onChange(justNumbers);
+                                  }
+                                }}
+                              >
+                                {(inputProps) => (
+                                  <PhoneInput
+                                    {...inputProps}
+                                    type="text"
+                                    placeholder="(00) 00000-0000"
+                                  />
+                                )}
+                              </InputMask>
+                              {error && (
+                                <span
+                                  style={{
+                                    color: "#e53e3e",
+                                    fontSize: "12px",
+                                    marginTop: "4px",
+                                    display: "block",
+                                  }}
+                                >
+                                  {error.message}
+                                </span>
                               )}
-                            </InputMask>
-                            {error && <span>{error.message}</span>}
-                          </>
+                            </>
+                          )}
+                        />
+                      </InputP>
+
+                      <InputM
+                        style={{
+                          marginBottom: 0,
+                        }}
+                      >
+                        <label
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                            color: "#2d3748",
+                            fontWeight: "500",
+                            fontSize: "14px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <FaEnvelope style={{ color: "#0085bd", fontSize: "14px" }} />
+                          Email<span style={{ color: "#e53e3e" }}> *</span>
+                        </label>
+                        <input
+                          {...register("ga_email", {
+                            required: "O email é obrigatório",
+                            pattern: {
+                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              message: "Email inválido",
+                            },
+                          })}
+                          defaultValue={dadosGestao?.ga_email}
+                          onChange={handleOnChange}
+                          type="email"
+                          placeholder="exemplo@email.com"
+                          style={{
+                            width: "100%",
+                            padding: "12px 16px",
+                            border: "2px solid #e2e8f0",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            color: "#2d3748",
+                            transition: "all 0.2s ease",
+                            background: "#fff",
+                          }}
+                          onFocus={(e) => {
+                            e.target.style.borderColor = "#0085bd";
+                            e.target.style.boxShadow = "0 0 0 3px rgba(0, 133, 189, 0.1)";
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = "#e2e8f0";
+                            e.target.style.boxShadow = "none";
+                          }}
+                        ></input>
+                        {errors.ga_email && (
+                          <span
+                            style={{
+                              color: "#e53e3e",
+                              fontSize: "12px",
+                              marginTop: "4px",
+                              display: "block",
+                            }}
+                          >
+                            {errors.ga_email.message}
+                          </span>
                         )}
-                      />
-                    </InputP>
-                    <InputM>
-                      <label>
-                        Email<span> *</span>
-                      </label>
-                      <input
-                        {...register("ga_email")}
-                        defaultValue={dadosGestao?.ga_email}
-                        onChange={handleOnChange}
-                        type="text"
-                      ></input>
-                    </InputM>
-                    <ModalSubmitButton type="submit">Gravar</ModalSubmitButton>
+                      </InputM>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: "12px",
+                        marginTop: "32px",
+                        paddingTop: "24px",
+                        borderTop: "1px solid #e2e8f0",
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={handleCloseModal}
+                        style={{
+                          padding: "12px 24px",
+                          fontSize: "14px",
+                          fontWeight: "500",
+                          borderRadius: "8px",
+                          border: "2px solid #e2e8f0",
+                          background: "#fff",
+                          color: "#64748b",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = "#cbd5e0";
+                          e.currentTarget.style.color = "#475569";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = "#e2e8f0";
+                          e.currentTarget.style.color = "#64748b";
+                        }}
+                      >
+                        Cancelar
+                      </button>
+                      <ModalSubmitButton
+                        type="submit"
+                        style={{
+                          padding: "12px 32px",
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          borderRadius: "8px",
+                          background: "linear-gradient(135deg, #0085bd 0%, #006d9a 100%)",
+                          color: "#fff",
+                          border: "none",
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          boxShadow: "0 4px 6px rgba(0, 133, 189, 0.2)",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = "translateY(-2px)";
+                          e.currentTarget.style.boxShadow = "0 6px 12px rgba(0, 133, 189, 0.3)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = "translateY(0)";
+                          e.currentTarget.style.boxShadow = "0 4px 6px rgba(0, 133, 189, 0.2)";
+                        }}
+                      >
+                        {updateRepresentantes ? "Atualizar" : "Salvar"}
+                      </ModalSubmitButton>
+                    </div>
                   </ConteudoModal>
                 </Form>
               </Modal>

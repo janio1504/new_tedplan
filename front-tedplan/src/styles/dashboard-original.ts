@@ -223,10 +223,9 @@ export const ItensMenu = styled.div`
 `;
 
 export const DivCenter = styled.div`
-  max-width: 80%;
+  max-width: 85%;
   width: 100%;
-  max-height: 100vh;
-  height: 100vh;
+  min-height: calc(100vh - 100px);
   overflow-y: auto;
   overflow-x: hidden;
   /* background: #fff; */
@@ -234,7 +233,7 @@ export const DivCenter = styled.div`
   margin-right: auto; 
   display: flex;
   flex-direction: column;
-  padding: 50px 20px 20px 20px;
+  padding: 10px 20px 20px 20px;
   box-sizing: border-box;
 
   /* Estilizar a barra de rolagem */
@@ -257,22 +256,21 @@ export const DivCenter = styled.div`
   }
 
   @media (max-width: 1000px) {
-    max-height: calc(100vh - 100px);
+    min-height: calc(100vh - 100px);
     padding: 10px;
   }
 `;
 
 export const BodyDashboard = styled.div`  
   width: 100%;
-  height: 100vh;
-  max-height: 100vh;
+  min-height: 100vh;
   background: #f3f4f6;
   margin-left: auto;
   margin-right: auto;
   text-align: left;
   display: flex;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
   box-sizing: border-box;
 `;
 export const DivInstrucoes = styled.div`
