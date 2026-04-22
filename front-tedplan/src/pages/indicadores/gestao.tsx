@@ -3420,7 +3420,6 @@ export default function GestaoIndicadores({
             ano: parseInt(anoSelected),
             valor_indicador: String(valor),
             id_municipio: Number(usuario.id_municipio),
-            id_eixo: null,
           });
         }
       }
@@ -3436,7 +3435,6 @@ export default function GestaoIndicadores({
           ano: parseInt(anoSelected),
           valor_indicador: JSON.stringify(descricoes),
           id_municipio: Number(usuario.id_municipio) as number,
-          id_eixo: null,
         });
       }
     });
