@@ -32,6 +32,16 @@ import {
 } from "react-icons/fa";
 import { parse } from "path";
 import { TabsInfoIndicador } from "./TabsInfoIndicador";
+import {
+  getFormulaResiduos,
+  isCodigoCalculadoResiduos,
+  CODIGOS_CALCULADOS_RESIDUOS,
+} from "../utils/formulasResiduosSolidos";
+import {
+  extrairCodigosFormula,
+  indicadoresParaMapa,
+  calcularFormula,
+} from "../utils/formulaCalculadora";
 
 interface IMunicipio {
   id_municipio: string;
@@ -142,6 +152,68 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
       .catch((error) => {
         console.log(error);
       });
+  }
+
+  async function getDadosCodigos(
+    codigos: string[],
+    params: { id_eixo?: number; id_municipio?: number; ano?: number | null } = {}
+  ) {
+    try {
+      const body: Record<string, unknown> = {
+        codigos: Array.isArray(codigos) ? codigos : [codigos],
+        id_eixo: params.id_eixo ?? 4,
+        id_municipio: params.id_municipio ?? usuario?.id_municipio,
+      };
+      if (params.ano != null && params.ano !== undefined) {
+        body.ano = params.ano;
+      }
+      const res = await api.post("get-por-codigos/", body);
+      return res?.data ?? [];
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+
+  async function handleIndicadorFormula(data: { indicador: string; id_municipio?: number }) {
+    const codigo = data.indicador;
+    const id_municipio = Number(data.id_municipio ?? usuario?.id_municipio);
+    const formula = getFormulaResiduos(codigo);
+    if (!formula) return;
+
+    const codigos = extrairCodigosFormula(formula);
+    if (codigos.length === 0) return;
+
+    const indicadores = await getDadosCodigos(codigos, { id_municipio, id_eixo: 4 });
+    const anosUnicos = Array.from(
+      new Set(
+        (indicadores as { ano?: number }[]).map((i) => i.ano).filter((a): a is number => a != null)
+      )
+    ).sort((a, b) => b - a);
+
+    const opcoes = { toInt: false, precision: 2 };
+    const rs: ([string, number, string] | null)[] = anosUnicos.map((ano) => {
+      const dadosMap = indicadoresParaMapa(indicadores, ano);
+      const result = calcularFormula(formula, dadosMap, opcoes);
+      if (result === null) return null;
+      const anoStr = String(ano);
+      const valorNum = parseFloat(Number(result).toFixed(2));
+      const valorStr = Number.isInteger(Number(result))
+        ? String(Math.round(Number(result)))
+        : Number(result).toFixed(2).toString();
+      return [anoStr, valorNum, valorStr];
+    });
+
+    const rsFilter = rs.filter((item): item is [string, number, string] => item !== null);
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+      return;
+    }
+    setActiveTab("graficos");
+    setTituloIndicador(`${codigo} - Indicador calculado`);
+    setIndicador(rsFilter);
+    setData([["Ano", "Dados", { role: "annotation" }], ...rsFilter]);
   }
 
   function handleIndicador(data) {
@@ -2491,13 +2563,13 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
     <>
       <TabsList>
         <TabButtonDados
-          activeButtonDados={activeButtonDados}
+          $activeButtonDados={activeButtonDados}
           onClick={() => handleActiveTab({ value: "dados" })}
         >
           Dados
         </TabButtonDados>
         <TabButtonGrafico
-          activeButtonGrafico={activeButtonGrafico}
+          $activeButtonGrafico={activeButtonGrafico}
           onClick={() => handleActiveTab({ value: "graficos" })}
         >
           Gráficos
@@ -2515,7 +2587,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
             <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
               <FaInfo />
             </div>
-            <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
+            <TabsMenuChartsOnClick $visibleMenuChart={visibleMenuChart}>
               <ul>
                 <li onClick={() => setTypeChart("ColumnChart")}>
                   <FaChartBar /> Gráfico Barra
@@ -2528,7 +2600,7 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuChartsOnClick>
-            <TabsMenuReportsOnClick visibleMenuReports={visibleMenuReports}>
+            <TabsMenuReportsOnClick $visibleMenuReports={visibleMenuReports}>
               <ul>
                 <li onClick={() => handlePrint()}>
                   <FaPrint /> Imprimir
@@ -2548,7 +2620,15 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
             Para obter os indicadores, selecione o município e o indicador.
           </TabsInstructons>
 
-          <form onSubmit={handleSubmit(handleIndicador)}>
+          <form
+            onSubmit={handleSubmit((data: { indicador?: string; id_municipio?: number }) => {
+              if (data.indicador && isCodigoCalculadoResiduos(data.indicador)) {
+                handleIndicadorFormula({ ...data, indicador: data.indicador });
+              } else {
+                handleIndicador(data);
+              }
+            })}
+          >
             <table>
               <thead>
                 <tr>
@@ -2569,7 +2649,14 @@ export default function ResiduosSolidos({ municipio }: MunicipioProps) {
                   </td>
                   <td>
                     <select {...register("indicador")}>
-                      <option>Indicardor</option>
+                      <option>Indicador</option>
+                      <optgroup label="Resíduos Sólidos (fórmula SINISA)">
+                        {CODIGOS_CALCULADOS_RESIDUOS.map((cod) => (
+                          <option key={cod} value={cod}>
+                            {cod}
+                          </option>
+                        ))}
+                      </optgroup>
                       <option value="IN001">
                         IN001 - Taxa de empregados em relação à população urbana
                       </option>

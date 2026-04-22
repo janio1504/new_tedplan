@@ -1721,6 +1721,7 @@ export default function PrestacaoServicoAgua() {
               valor_indicador: valor,
               id_municipio: usuario.id_municipio,
               id_unidade: unidadeSelecionada.id_unidade, // Incluir id_unidade
+              id_eixo: unidadeSelecionada?.id_eixo || 1,
             });
           }
         }
@@ -1738,6 +1739,7 @@ export default function PrestacaoServicoAgua() {
             valor_indicador: JSON.stringify(descricoes),
             id_municipio: usuario.id_municipio,
             id_unidade: unidadeSelecionada.id_unidade, // Incluir id_unidade
+            id_eixo: unidadeSelecionada?.id_eixo || 1,
           });
         }
       });
@@ -2334,6 +2336,7 @@ export default function PrestacaoServicoAgua() {
               ano: parseInt(anoSelected),
               valor_indicador: valor,
               id_municipio: usuario.id_municipio,
+              id_eixo: 1,
             });
           }
         }
@@ -2351,6 +2354,7 @@ export default function PrestacaoServicoAgua() {
             ano: parseInt(anoSelected),
             valor_indicador: JSON.stringify(descricoes), // Array JSON
             id_municipio: usuario.id_municipio,
+            id_eixo: 1,
           });
         }
       });

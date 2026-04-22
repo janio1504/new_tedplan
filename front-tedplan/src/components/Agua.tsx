@@ -35,6 +35,16 @@ import {
   FaPrint,
 } from "react-icons/fa";
 import { TabsInfoIndicador } from "./TabsInfoIndicador";
+import {
+  getFormula,
+  isCodigoCalculado,
+  CODIGOS_CALCULADOS,
+} from "../utils/formulasAguasPluviais";
+import {
+  extrairCodigosFormula,
+  indicadoresParaMapa,
+  calcularFormula,
+} from "../utils/formulaCalculadora";
 
 interface IMunicipio {
   id_municipio: string;
@@ -82,8 +92,8 @@ export default function Agua({ municipio }: MunicipioProps) {
   };
 
   useEffect(() => {
-    IN002({indicador: "IN002", id_municipio: 2});
     getMunucipios();
+    //IN002({id_municipio: usuario.id_municipio});
     const handleClickOutside = (event) => {
       if (chartRef.current && !chartRef.current.contains(event.target)) {
         setVisibleMenuChart(false);
@@ -117,169 +127,46 @@ export default function Agua({ municipio }: MunicipioProps) {
       });
   }
 
-  function handleIndicador(data) {
-    if (data.indicador == "IN002") {
-      IN002(data);
+  async function handleIndicadorFormula(data) {
+    const codigo = data.indicador;
+    const id_municipio = Number(data.id_municipio ?? usuario?.id_municipio);
+    const formula = getFormula(codigo);
+    if (!formula) return;
+
+    const codigos = extrairCodigosFormula(formula);
+    if (codigos.length === 0) return;
+
+    // Busca todos os anos em indicador_municipio (sem filtrar por ano) para ter 2023, 2025, etc.
+    const indicadores = await getDadosCodigos(codigos, { id_municipio, id_eixo: 2 });
+    const anosUnicos = Array.from(new Set((indicadores as { ano?: number }[]).map((i) => i.ano).filter((a): a is number => a != null))).sort((a, b) => b - a);
+
+    const opcoes = { toInt: false, precision: 2 };
+    const rs: ([string, number, string] | null)[] = anosUnicos.map((ano) => {
+      const dadosMap = indicadoresParaMapa(indicadores, ano);
+      const result = calcularFormula(formula, dadosMap, opcoes);
+      if (result === null) return null;
+      const anoStr = String(ano);
+      const valorNum = parseFloat(Number(result).toFixed(2));
+      const valorStr = Number.isInteger(Number(result)) ? String(Math.round(Number(result))) : Number(result).toFixed(2).toString();
+      return [anoStr, valorNum, valorStr];
+    });
+
+    const rsFilter = rs.filter((item): item is [string, number, string] => item !== null);
+    if (rsFilter.length === 0) {
+      setActiveTab("error");
+      setData(null);
+      return;
     }
-    if (data.indicador == "IN003") {
-      IN003(data);
-    }
-    if (data.indicador == "IN004") {
-      IN004(data);
-    }
-    if (data.indicador == "IN005") {
-      IN005(data);
-    }
-    if (data.indicador == "IN006") {
-      IN006(data);
-    }
-    if (data.indicador == "IN006") {
-      IN007(data);
-    }
-    if (data.indicador == "IN008") {
-      IN008(data);
-    }
-    if (data.indicador == "IN012") {
-      IN012(data);
-    }
-    if (data.indicador == "IN018") {
-      IN018(data);
-    }
-    if (data.indicador == "IN019") {
-      IN019(data);
-    }
-    if (data.indicador == "IN026") {
-      IN026(data);
-    }
-    if (data.indicador == "IN027") {
-      IN027(data);
-    }
-    if (data.indicador == "IN029") {
-      IN029(data);
-    }
-    if (data.indicador == "IN030") {
-      IN030(data);
-    }
-    if (data.indicador == "IN031") {
-      IN031(data);
-    }
-    if (data.indicador == "IN032") {
-      IN032(data);
-    }
-    if (data.indicador == "IN033") {
-      IN033(data);
-    }
-    if (data.indicador == "IN034") {
-      IN034(data);
-    }
-    if (data.indicador == "IN035") {
-      IN035(data);
-    }
-    if (data.indicador == "IN036") {
-      IN036(data);
-    }
-    if (data.indicador == "IN037") {
-      IN037(data);
-    }
-    if (data.indicador == "IN038") {
-      IN038(data);
-    }
-    if (data.indicador == "IN039") {
-      IN039(data);
-    }
-    if (data.indicador == "IN040") {
-      IN040(data);
-    }
-    if (data.indicador == "IN041") {
-      IN041(data);
-    }
-    if (data.indicador == "IN042") {
-      IN042(data);
-    }
-    if (data.indicador == "IN045") {
-      IN045(data);
-    }
-    if (data.indicador == "IN048") {
-      IN048(data);
-    }
-    if (data.indicador == "IN054") {
-      IN054(data);
-    }
-    if (data.indicador == "IN060") {
-      IN060(data);
-    }
-    if (data.indicador == "IN101") {
-      IN101(data);
-    }
-    if (data.indicador == "IN102") {
-      IN102(data);
-    }
-    if (data.indicador == "IN001") {
-      IN001(data);
-    }
-    if (data.indicador == "IN009") {
-      IN009(data);
-    }
-    if (data.indicador == "IN010") {
-      IN010(data);
-    }
-    if (data.indicador == "IN011") {
-      IN011(data);
-    }
-    if (data.indicador == "IN013") {
-      IN013(data);
-    }
-    if (data.indicador == "IN014") {
-      IN014(data);
-    }
-    if (data.indicador == "IN017") {
-      IN017(data);
-    }
-    if (data.indicador == "IN020") {
-      IN020(data);
-    }
-    if (data.indicador == "IN022") {
-      IN022(data);
-    }
-    if (data.indicador == "IN023") {
-      IN023(data);
-    }
-    if (data.indicador == "IN025") {
-      IN025(data);
-    }
-    if (data.indicador == "IN028") {
-      IN028(data);
-    }
-    if (data.indicador == "IN043") {
-      IN043(data);
-    }
-    if (data.indicador == "IN044") {
-      IN044(data);
-    }
-    if (data.indicador == "IN049") {
-      IN049(data);
-    }
-    if (data.indicador == "IN050") {
-      IN050(data);
-    }
-    if (data.indicador == "IN051") {
-      IN051(data);
-    }
-    if (data.indicador == "IN052") {
-      IN052(data);
-    }
-    if (data.indicador == "IN053") {
-      IN053(data);
-    }
-    if (data.indicador == "IN055") {
-      IN055(data);
-    }
-    if (data.indicador == "IN057") {
-      IN057(data);
-    }
-    if (data.indicador == "IN058") {
-      IN058(data);
-    }
+    setActiveTab("graficos");
+
+    const titulos = {
+      IFAP003: "IFAP003 - Participação do pessoal terceirizado",
+      IFAP002: "IFAP002 - Participação do pessoal próprio",
+      IFAP001: "IFAP001 - Produtividade de pessoal",
+    };
+    setTituloIndicador(titulos[codigo] || `${codigo} - Indicador calculado`);
+    setIndicador(rsFilter);
+    setData([["Ano", "Dados", { role: "annotation" }], ...rsFilter]);
   }
 
   async function getDescricaoIndicador(data) {
@@ -315,6 +202,24 @@ export default function Agua({ municipio }: MunicipioProps) {
     );    
     setDescricaoIndicador(indicador[0]);
   
+  }
+
+  async function getDadosCodigos(codigos, params: { id_eixo?: number; id_municipio?: number; ano?: number | null } = {}) {
+    try {
+      const body: Record<string, unknown> = {
+        codigos: Array.isArray(codigos) ? codigos : [codigos],
+        id_eixo: params.id_eixo ?? 2,
+        id_municipio: params.id_municipio ?? usuario.id_municipio,
+      };
+      if (params.ano != null && params.ano !== undefined) {
+        body.ano = params.ano;
+      }
+      const res = await api.post("get-por-codigos/", body);
+      return res?.data ?? [];
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
   }
   
 
@@ -412,7 +317,7 @@ export default function Agua({ municipio }: MunicipioProps) {
         const result = (AG003 + ES003) / FN026;
         const ano = resAgua.ano.toString();
         const dados = [ano,parseFloat(result.toFixed(2)), result.toFixed(2).toString()];
-
+        
         return dados;
       })
     );
@@ -3369,13 +3274,13 @@ export default function Agua({ municipio }: MunicipioProps) {
     <>
       <TabsList>
       <TabButtonGrafico
-          activeButtonGrafico={activeButtonGrafico}
+          $activeButtonGrafico={activeButtonGrafico}
           onClick={() => handleActiveTab({ value: "graficos" })}
         >
          <FaChartLine /> Gráficos
         </TabButtonGrafico>
         <TabButtonDados
-          activeButtonDados={activeButtonDados}
+          $activeButtonDados={activeButtonDados}
           onClick={() => handleActiveTab({ value: "dados" })}
         >
          <FaDatabase /> Dados
@@ -3394,7 +3299,7 @@ export default function Agua({ municipio }: MunicipioProps) {
             <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
             <FaInfo />
             </div>
-            <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
+            <TabsMenuChartsOnClick $visibleMenuChart={visibleMenuChart}>
               <ul>
                 <li onClick={() => setTypeChart("ColumnChart")}>
                   <FaChartBar /> Gráfico Barra
@@ -3407,7 +3312,7 @@ export default function Agua({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuChartsOnClick>
-            <TabsMenuReportsOnClick visibleMenuReports={visibleMenuReports}>
+            <TabsMenuReportsOnClick $visibleMenuReports={visibleMenuReports}>
               <ul>
                 <li onClick={() => handlePrint()}>
                   <FaPrint /> Imprimir
@@ -3426,7 +3331,7 @@ export default function Agua({ municipio }: MunicipioProps) {
           <TabsInstructons>
             Para obter os indicadores, selecione o município e o indicador.
           </TabsInstructons>
-          <form onSubmit={handleSubmit(handleIndicador)}>
+          <form onSubmit={handleSubmit(handleIndicadorFormula)}>
             <table>
               <thead>
                 <tr>
@@ -3460,188 +3365,13 @@ export default function Agua({ municipio }: MunicipioProps) {
                      {...register("indicador", {
                       required: true,
                     })}>
-                      <option value="IN002">
-                        IN002 - Índice de produtividade: economias ativas por
-                        pessoal próprio
-                      </option>
-                      <option value="IN003">
-                        IN003 - Despesa total com os serviços por m3 faturado
-                      </option>
-                      <option value="IN004">
-                        IN004 - Tarifa média praticada
-                      </option>
-                      <option value="IN005">
-                        IN005 - Tarifa média de água
-                      </option>
-                      <option value="IN006">
-                        IN006 - Tarifa média de esgoto
-                      </option>
-                      <option value="IN007">
-                        IN007 - Incidência da desp. de pessoal e de serv. de
-                        terc. nas despesas totais com os serviços
-                      </option>
-                      <option value="IN008">
-                        IN008 - Despesa média anual por empregado
-                      </option>
-                      <option value="IN012">
-                        IN012 - Indicador de desempenho financeiro
-                      </option>
-                      <option value="IN018">
-                        IN018 - Quantidade equivalente de pessoal total
-                      </option>
-                      <option value="IN019">
-                        IN019 - Índice de produtividade: economias ativas por
-                        pessoal total (equivalente)
-                      </option>
-                      <option value="IN026">
-                        IN026 - Despesa de exploração por m3 faturado
-                      </option>
-                      <option value="IN027">
-                        IN027 - Despesa de exploração por economia
-                      </option>
-                      <option value="IN029">
-                        IN029 - Índice de evasão de receitas
-                      </option>
-                      <option value="IN030">
-                        IN030 - Margem da despesa de exploração
-                      </option>
-                      <option value="IN031">
-                        IN031 - Margem da despesa com pessoal próprio
-                      </option>
-                      <option value="IN032">
-                        IN032 - Margem da despesa com pessoal total
-                        (equivalente)
-                      </option>
-                      <option value="IN033">
-                        IN033 - Margem do serviço da divida
-                      </option>
-                      <option value="IN034">
-                        IN034 - Margem das outras despesas de exploração
-                      </option>
-                      <option value="IN035">
-                        IN035 - Participação da despesa com pessoal próprio nas
-                        despesas de exploração
-                      </option>
-                      <option value="IN036">
-                        IN036 - Participação da despesa com pessoal total
-                        (equivalente) nas despesas de exploração
-                      </option>
-                      <option value="IN037">
-                        IN037 - Participação da despesa com energia elétrica nas
-                        despesas de exploração
-                      </option>
-                      <option value="IN038">
-                        IN038 - Participação da despesa com produtos químicos
-                        nas despesas de exploração (DEX)
-                      </option>
-                      <option value="IN039">
-                        IN039 - Participação das outras despesas nas despesas de
-                        exploração
-                      </option>
-                      <option value="IN040">
-                        IN040 - Participação da receita operacional direta de
-                        água na receita operacional total
-                      </option>
-                      <option value="IN041">
-                        IN041 - Participação da receita operacional direta de
-                        esgoto na receita operacional total
-                      </option>
-                      <option value="IN042">
-                        IN042 - Participação da receita operacional indireta na
-                        receita operacional total
-                      </option>
-                      <option value="IN045">
-                        IN045 - Índice de produtividade: empregados próprios por
-                        1000 ligações de água
-                      </option>
-                      <option value="IN048">
-                        IN048 - Índice de produtividade: empregados próprios por
-                        1000 ligações de água + esgoto
-                      </option>
-                      <option value="IN054">
-                        IN054 - Dias de faturamento comprometidos com contas a
-                        receber
-                      </option>
-                      <option value="IN060">
-                        IN060 - Índice de despesas por consumo de energia
-                        elétrica nos sistemas de água e esgotos
-                      </option>
-                      <option value="IN101">
-                        IN101 - Índice de suficiência de caixa
-                      </option>
-                      <option value="IN102">
-                        IN102 - Índice de produtividade de pessoal total
-                        (equivalente)
-                      </option>
-                      <option value="IN001">
-                        IN001 - Densidade de economias de água por ligação
-                      </option>
-                      <option value="IN009">
-                        IN009 - Índice de hidrometração
-                      </option>
-                      <option value="IN010">
-                        IN010 - Índice de micromedição relativo ao volume
-                        disponibilizado
-                      </option>
-                      <option value="IN011">
-                        IN011 - Índice de macromedição
-                      </option>
-                      <option value="IN013">
-                        IN013 - Índice de perdas faturamento
-                      </option>
-                      <option value="IN014">
-                        IN014 - Consumo micromedido por economia
-                      </option>
-                      <option value="IN017">
-                        IN017 - Consumo de água faturado por economia
-                      </option>
-                      <option value="IN020">
-                        IN020 - Extensão da rede de água por ligação
-                      </option>
-                      <option value="IN022">
-                        IN022 - Consumo médio percapita de água
-                      </option>
-                      <option value="IN023">
-                        IN023 - Índice de atendimento urbano de água
-                      </option>
-                      <option value="IN025">
-                        IN025 - Volume de água disponibilizado por economia
-                      </option>
-                      <option value="IN028">
-                        IN028 - Índice de faturamento de água
-                      </option>
-                      <option value="IN043">
-                        IN043 - Participação das economias residenciais de água
-                        no total das economias de água
-                      </option>
-                      <option value="IN044">
-                        IN044 - Índice de micromedição relativo ao consumo
-                      </option>
-                      <option value="IN049">
-                        IN049 - Índice de perdas na distribuição
-                      </option>
-                      <option value="IN050">
-                        IN050 - Índice bruto de perdas lineares
-                      </option>
-                      <option value="IN051">
-                        IN051 - Índice de perdas por ligação
-                      </option>
-                      <option value="IN052">
-                        IN052 - Índice de consumo de água
-                      </option>
-                      <option value="IN053">
-                        IN053 - Consumo médio de água por economia
-                      </option>
-                      <option value="IN055">
-                        IN055 - Índice de atendimento total de água
-                      </option>
-                      <option value="IN057">
-                        IN057 - Índice de fluoretação de água
-                      </option>
-                      <option value="IN058">
-                        IN058 - Índice de consumo de energia elétrica em
-                        sistemas de abastecimento de água
-                      </option>
+                      <optgroup label="Águas Pluviais (fórmula)">
+                        {CODIGOS_CALCULADOS.map((cod) => (
+                          <option key={cod} value={cod}>
+                            {cod}
+                          </option>
+                        ))}
+                      </optgroup>
                     </select><br />
                     {errors.indicador &&
                           errors.indicador.type && (

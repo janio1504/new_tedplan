@@ -1178,13 +1178,13 @@ export default function Drenagem({ municipio }: MunicipioProps) {
     <>
       <TabsList>
         <TabButtonDados
-          activeButtonDados={activeButtonDados}
+          $activeButtonDados={activeButtonDados}
           onClick={() => handleActiveTab({ value: "dados" })}
         >
           Dados
         </TabButtonDados>
         <TabButtonGrafico
-          activeButtonGrafico={activeButtonGrafico}
+          $activeButtonGrafico={activeButtonGrafico}
           onClick={() => handleActiveTab({ value: "graficos" })}
         >
           Gráficos
@@ -1202,7 +1202,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
               <div ref={infoRef} onClick={() => setVisibleInfo(true)}>
               <FaInfo />
               </div>
-            <TabsMenuChartsOnClick visibleMenuChart={visibleMenuChart}>
+            <TabsMenuChartsOnClick $visibleMenuChart={visibleMenuChart}>
               <ul>
                 <li onClick={() => setTypeChart("ColumnChart")}>
                   <FaChartBar /> Gráfico Barra
@@ -1215,7 +1215,7 @@ export default function Drenagem({ municipio }: MunicipioProps) {
                 </li>
               </ul>
             </TabsMenuChartsOnClick>
-            <TabsMenuReportsOnClick visibleMenuReports={visibleMenuReports}>
+            <TabsMenuReportsOnClick $visibleMenuReports={visibleMenuReports}>
               <ul>
                 <li onClick={() => handlePrint()}>
                   <FaPrint /> Imprimir

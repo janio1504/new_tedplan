@@ -431,9 +431,9 @@ export const TabsMenuReports = styled.div`
   }
 `;
 
-export const TabsMenuChartsOnClick = styled.div<{ visibleMenuChart: boolean }>`
-   opacity: ${({ visibleMenuChart }) => (visibleMenuChart ? "1" : "0")};
-   visibility: ${({ visibleMenuChart }) => (visibleMenuChart ? "visible" : "hidden")};
+export const TabsMenuChartsOnClick = styled.div<{ $visibleMenuChart: boolean }>`
+   opacity: ${({ $visibleMenuChart }) => ($visibleMenuChart ? "1" : "0")};
+   visibility: ${({ $visibleMenuChart }) => ($visibleMenuChart ? "visible" : "hidden")};
   position: absolute;
   background-color: #f9f9f9;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
@@ -456,9 +456,9 @@ export const TabsMenuChartsOnClick = styled.div<{ visibleMenuChart: boolean }>`
     }  
 `;
 
-export const TabsMenuReportsOnClick = styled.div<{ visibleMenuReports: boolean }>`
-   opacity: ${({ visibleMenuReports }) => (visibleMenuReports ? "1" : "0")};
-   visibility: ${({ visibleMenuReports }) => (visibleMenuReports ? "visible" : "hidden")};
+export const TabsMenuReportsOnClick = styled.div<{ $visibleMenuReports: boolean }>`
+   opacity: ${({ $visibleMenuReports }) => ($visibleMenuReports ? "1" : "0")};
+   visibility: ${({ $visibleMenuReports }) => ($visibleMenuReports ? "visible" : "hidden")};
   position: absolute;
   background-color: #f9f9f9;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
@@ -481,9 +481,9 @@ export const TabsMenuReportsOnClick = styled.div<{ visibleMenuReports: boolean }
     }  
 `;
 
-export const TabsInfoOnClick = styled.div<{ visibleInfo: boolean }>`
-   opacity: ${({ visibleInfo }) => (visibleInfo ? "1" : "0")};
-   visibility: ${({ visibleInfo }) => (visibleInfo ? "visible" : "hidden")};
+export const TabsInfoOnClick = styled.div<{ $visibleInfo: boolean }>`
+   opacity: ${({ $visibleInfo }) => ($visibleInfo ? "1" : "0")};
+   visibility: ${({ $visibleInfo }) => ($visibleInfo ? "visible" : "hidden")};
     max-width: 600px;
     position: absolute;
     background-color: #f9f9f9;
@@ -497,52 +497,52 @@ export const TabsInfoOnClick = styled.div<{ visibleInfo: boolean }>`
     text-align: left;
   `;
 
-export const TabButtonGrafico = styled.button<{activeButtonGrafico: boolean}>`
+export const TabButtonGrafico = styled.button<{ $activeButtonGrafico: boolean }>`
   padding: 10px 20px;
   font-size: 18px;
   border-right: 2px solid #eeeeee;
   border-left: 2px solid #eeeeee;
   border-top: 2px solid #eeeeee;
   border-bottom: none;
-  color:${({ activeButtonGrafico }) => (activeButtonGrafico ? "#fff" : "#053d68")};
+  color: ${({ $activeButtonGrafico }) => ($activeButtonGrafico ? "#fff" : "#053d68")};
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   cursor: pointer;
-  background-color: ${({ activeButtonGrafico }) => (activeButtonGrafico ? "#0085bd" : "#fff")};
+  background-color: ${({ $activeButtonGrafico }) => ($activeButtonGrafico ? "#0085bd" : "#fff")};
   svg {
     margin-bottom: -3px;
     } 
 `;
 
-export const TabButtonDados = styled.button<{activeButtonDados: boolean}>`
+export const TabButtonDados = styled.button<{ $activeButtonDados: boolean }>`
   padding: 10px 20px;
   font-size: 18px;
   border-right: 2px solid #eeeeee;
   border-left: 2px solid #eeeeee;
   border-top: 2px solid #eeeeee;
   border-bottom: none;
-  color: ${({ activeButtonDados }) => (activeButtonDados ? "#fff" : "#053d68")};
+  color: ${({ $activeButtonDados }) => ($activeButtonDados ? "#fff" : "#053d68")};
   border-top-left-radius: 10px;
-  border-top-right-radius:10px;
+  border-top-right-radius: 10px;
   cursor: pointer;
-  background-color: ${({ activeButtonDados }) => (activeButtonDados ? "#0085bd" : "#fff")};
+  background-color: ${({ $activeButtonDados }) => ($activeButtonDados ? "#0085bd" : "#fff")};
   svg {
     margin-bottom: -3px;
     } 
 `;
 
-export const TabButtonIndicador = styled.button<{activeButtonIndicador: boolean}>`
+export const TabButtonIndicador = styled.button<{ $activeButtonIndicador: boolean }>`
   padding: 10px 20px;
   font-size: 16px;
   border-right: 2px solid #eeeeee;
   border-left: 2px solid #eeeeee;
   border-top: 2px solid #eeeeee;
   border-bottom: none;
-  color:${({ activeButtonIndicador }) => (activeButtonIndicador ? "#fff" : "#053d68")};
+  color: ${({ $activeButtonIndicador }) => ($activeButtonIndicador ? "#fff" : "#053d68")};
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   cursor: pointer;
-  background-color: ${({ activeButtonIndicador }) => (activeButtonIndicador ? "#0085bd" : "#fff")};
+  background-color: ${({ $activeButtonIndicador }) => ($activeButtonIndicador ? "#0085bd" : "#fff")};
   /* &:hover {
     background: #0085bd;
     color: #fff;
