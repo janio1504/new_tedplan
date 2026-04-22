@@ -481,6 +481,48 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
   }) {
     try {
       const apiClient = getAPIClient();
+      const codigoNormalizado = (codigo_indicador || "").trim().toUpperCase();
+
+      const getEixoByMenuItemId = (menuItemId?: string | number | null) => {
+        if (!menuItemId) return "";
+        const menuItem = allMenuItems.find(
+          (item: IMenuItem) => item.id_menu_item?.toString() === menuItemId.toString()
+        );
+        return menuItem?.menu?.id_eixo?.toString() || "";
+      };
+
+      const isCodigoDuplicado = indicador.some((item: IIndicador) => {
+        if (isEditing && indicadorId && item.id_indicador?.toString() === indicadorId.toString()) {
+          return false;
+        }
+
+        const codigoItemNormalizado = (item.codigo_indicador || "").trim().toUpperCase();
+        if (codigoItemNormalizado !== codigoNormalizado) {
+          return false;
+        }
+
+        const eixoItem = getEixoByMenuItemId(item.id_menu_item);
+        const indicadorSemEixo = !eixoItem;
+
+        if (selectedEixo) {
+          return eixoItem === selectedEixo.toString() || indicadorSemEixo;
+        }
+
+        return indicadorSemEixo;
+      });
+
+      if (isCodigoDuplicado) {
+        toast.warning(
+          selectedEixo
+            ? "Este código já foi cadastrado para o eixo selecionado ou sem eixo."
+            : "Este código já foi cadastrado sem eixo.",
+          {
+            position: "top-right",
+            autoClose: 5000,
+          }
+        );
+        return;
+      }
 
       const indicadorData = {
         codigo_indicador,
