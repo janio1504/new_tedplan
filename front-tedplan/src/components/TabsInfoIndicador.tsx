@@ -5,7 +5,7 @@ import { TabsInfoOnClick } from "@/styles/financeiro";
 export function TabsInfoIndicador(descricaoIndicador: any) {  
   return (
   
-   <TabsInfoOnClick visibleInfo={true}>
+   <TabsInfoOnClick $visibleInfo={true}>
                  <div style={{width: '100%', marginTop: '10px', borderBottom: 'solid 2px  #0085bd', fontSize: '18px', textAlign: 'center', color: '#0085bd'}}>
                    Informações do Indicador </div>
                <table style={{ borderSpacing: "0", padding: '20px', width: "100%" }} >

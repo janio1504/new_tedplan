@@ -20,12 +20,31 @@ class IndicadorMunicipioRepository {
         return indicador;
     }
 
+    async getIndicadorMunicipioByCodigoIndicador(codigos, ano = null, id_municipio = null) {
+        console.log(codigos, ano, id_municipio);
+        let query = IndicadorMunicipio.query()
+            .whereIn('codigo_indicador', codigos)
+
+        if (ano) {
+            query = query.where('ano', ano);
+        }
+
+        if (id_municipio) {
+            query = query.where('id_municipio', id_municipio);
+        }
+
+
+        const indicadores = await query.fetch();
+        console.log(indicadores.toJSON());
+        return indicadores;
+    }
+
     async getIndicadoresByMunicipio(id_municipio, ano = null, id_unidade = null) {
         let query = IndicadorMunicipio.query()
             .where('id_municipio', id_municipio)
             .with('indicador')
             .with('municipio');
-            
+
         if (ano) {
             query = query.where('ano', ano);
         }
@@ -33,7 +52,7 @@ class IndicadorMunicipioRepository {
         if (id_unidade) {
             query = query.where('id_unidade', id_unidade);
         }
-        
+
         const indicadores = await query
             .orderBy("ano", "desc")
             .fetch();
@@ -45,11 +64,11 @@ class IndicadorMunicipioRepository {
             .where('id_indicador', id_indicador)
             .with('indicador')
             .with('municipio');
-            
+
         if (ano) {
             query = query.where('ano', ano);
         }
-        
+
         const indicadores = await query
             .orderBy("ano", "desc")
             .fetch();
@@ -76,19 +95,19 @@ class IndicadorMunicipioRepository {
             .first();
         return indicador;
     }
-    
+
     async addIndicadorMunicipio(data) {
         const indicador = await IndicadorMunicipio.create(data);
         return indicador;
     }
-    
+
     async updateIndicadorMunicipio(id, data) {
         const indicador = await IndicadorMunicipio.findOrFail(id);
         indicador.merge(data);
         await indicador.save();
         return indicador;
     }
-    
+
     async deleteIndicadorMunicipio(id) {
         const indicador = await IndicadorMunicipio.findOrFail(id);
         await indicador.delete();
@@ -106,7 +125,7 @@ class IndicadorMunicipioRepository {
             .where('id_municipio', municipio)
             .where('ano', ano)
             .delete();
-            
+
         // Insere os novos indicadores
         const novosIndicadores = await IndicadorMunicipio.createMany(indicadores);
         return novosIndicadores;
