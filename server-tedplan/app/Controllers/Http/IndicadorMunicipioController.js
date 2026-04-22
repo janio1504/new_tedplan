@@ -17,6 +17,17 @@ class IndicadorMunicipioController {
     }
   }
 
+  async getIndicadoresByCodigos({ request, response }) {
+    try {
+    const { codigos, ano , id_municipio } = request.all();
+    const indicadores = await this.indicadorMunicipioRepository.getIndicadorMunicipioByCodigoIndicador(codigos, ano, id_municipio);
+    return response.status(200).json(indicadores);
+    } catch (error) {
+      console.log(error);
+      return response.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  }
+
   async show({ params, response }) {
     try {
       const { id } = params;
@@ -57,9 +68,13 @@ class IndicadorMunicipioController {
 
       if (existingRecord) {
         // Se já existe, atualizar o valor
+        const updateData = { valor_indicador: data.valor_indicador };
+        if (data.id_eixo !== undefined) {
+          updateData.id_eixo = data.id_eixo;
+        }
         const updatedRecord = await this.indicadorMunicipioRepository.updateIndicadorMunicipio(
           existingRecord.id_incicador_municipio,
-          { valor_indicador: data.valor_indicador }
+          updateData
         );
         return response.status(200).json(updatedRecord);
       }
@@ -109,8 +124,8 @@ class IndicadorMunicipioController {
       const { ano, id_unidade } = request.get();
 
       const indicadores = await this.indicadorMunicipioRepository.getIndicadoresByMunicipio(
-        id_municipio, 
-        ano, 
+        id_municipio,
+        ano,
         id_unidade ? parseInt(id_unidade, 10) : null
       );
       return response.status(200).json(indicadores);

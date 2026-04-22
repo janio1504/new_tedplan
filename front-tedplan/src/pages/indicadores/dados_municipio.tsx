@@ -1218,6 +1218,7 @@ export default function Cadastro({ municipio }: MunicipioProps) {
             ano: parseInt(anoSelected),
             valor_indicador: valor,
             id_municipio: usuario.id_municipio,
+            id_eixo: null,
           });
         }
       });

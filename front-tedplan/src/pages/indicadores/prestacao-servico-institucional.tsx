@@ -1110,6 +1110,7 @@ export default function PrestacaoServicoInstitucional() {
               valor_indicador: valor,
               id_municipio: usuario.id_municipio,
               id_unidade: unidadeSelecionada.id_unidade,
+              id_eixo: unidadeSelecionada?.id_eixo || 5,
             });
           }
         }
@@ -1126,6 +1127,7 @@ export default function PrestacaoServicoInstitucional() {
             valor_indicador: JSON.stringify(descricoes),
             id_municipio: usuario.id_municipio,
             id_unidade: unidadeSelecionada.id_unidade,
+            id_eixo: unidadeSelecionada?.id_eixo || 5,
           });
         }
       });
@@ -1585,6 +1587,7 @@ export default function PrestacaoServicoInstitucional() {
               ano: parseInt(anoSelected),
               valor_indicador: valor,
               id_municipio: usuario.id_municipio,
+              id_eixo: 5,
             });
           }
         }
@@ -1602,6 +1605,7 @@ export default function PrestacaoServicoInstitucional() {
             ano: parseInt(anoSelected),
             valor_indicador: JSON.stringify(descricoes), // Array JSON
             id_municipio: usuario.id_municipio,
+            id_eixo: 5,
           });
         }
       });

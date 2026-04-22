@@ -267,6 +267,9 @@ Route.delete(
   "IndicadorController.deleteIndicador"
 );
 
+Route.get("get-por-codigos", "IndicadorMunicipioController.getIndicadoresByCodigos");
+Route.post("get-por-codigos", "IndicadorMunicipioController.getIndicadoresByCodigos");
+
 Route.get("getNormas", "NormaController.index");
 Route.get("getNorma", "NormaController.getNorma");
 Route.get("getPorFiltroNormas", "NormaController.buscaPorFiltro");

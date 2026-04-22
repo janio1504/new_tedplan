@@ -29,6 +29,11 @@ class IndicadorMunicipio extends Model {
   municipio() {
     return this.belongsTo('App/Models/Municipio', 'id_municipio', 'id_municipio');
   }
+
+  // Relacionamento com Eixo
+  eixo() {
+    return this.belongsTo('App/Models/Eixo', 'id_eixo', 'id_eixo');
+  }
 }
 
 module.exports = IndicadorMunicipio;
