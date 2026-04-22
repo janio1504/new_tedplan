@@ -88,7 +88,10 @@ interface IndicadorProps {
   menuItems: IMenuItem[];
 }
 
-export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
+export default function AddIndicador({
+  indicador = [],
+  menuItems = [],
+}: Partial<IndicadorProps>) {
   const {
     register,
     handleSubmit,
@@ -491,7 +494,8 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
         return menuItem?.menu?.id_eixo?.toString() || "";
       };
 
-      const isCodigoDuplicado = indicador.some((item: IIndicador) => {
+      const indicadoresCadastrados = Array.isArray(indicador) ? indicador : [];
+      const isCodigoDuplicado = indicadoresCadastrados.some((item: IIndicador) => {
         if (isEditing && indicadorId && item.id_indicador?.toString() === indicadorId.toString()) {
           return false;
         }
@@ -546,8 +550,14 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           indicadorData
         );
 
-        // Remover tipo de campo existente
-        await apiClient.delete(`/tipos-campo/indicador/${indicadorId}`);
+        // Remover tipo de campo existente (alguns indicadores podem não ter)
+        try {
+          await apiClient.delete(`/tipos-campo/indicador/${indicadorId}`);
+        } catch (error: any) {
+          if (error?.response?.status !== 404) {
+            throw error;
+          }
+        }
 
         // Remover itens de checkbox existentes
         try {
@@ -717,7 +727,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
     >
       <HeadIndicadores usuarios={[]}></HeadIndicadores>
       <DivMenuTitulo>
-        <text
+        <span
           style={{
             fontSize: "20px",
             fontWeight: "bold",
@@ -726,7 +736,7 @@ export default function AddIndicador({ indicador, menuItems }: IndicadorProps) {
           }}
         >
           Painel de Edição
-        </text>
+        </span>
         <ul style={{}}>
           <MenuMunicipioItem
             style={{ marginRight: "18px" }}
